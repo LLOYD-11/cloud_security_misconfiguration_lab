@@ -33,6 +33,10 @@ S3_WRITE_ACTIONS = {
     "s3:PutObjectAcl",
 }
 
+REF_MITRE_CLOUD_ACCOUNTS = "https://attack.mitre.org/techniques/T1078/004/"
+REF_MITRE_TRUSTED_RELATIONSHIP = "https://attack.mitre.org/techniques/T1199/"
+REF_AWS_IAM_BEST_PRACTICES = "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+
 
 def _as_list(value: Any) -> list[Any]:
     if value is None:
@@ -106,6 +110,7 @@ def _add_finding(
     evidence: str,
     impact: str,
     remediation: str,
+    references: list[str] | None = None,
     policy_name: str = "",
     statement_id: str = "",
 ) -> None:
@@ -127,6 +132,7 @@ def _add_finding(
             evidence=evidence,
             impact=impact,
             remediation=remediation,
+            references=references or [],
             metadata=metadata,
         )
     )
@@ -161,6 +167,7 @@ def analyze_principal(
                     evidence='Allow statement grants Action "*" on Resource "*".',
                     impact="The principal may have full administrative access across the account.",
                     remediation="Replace wildcard administrator access with task-specific actions and scoped resources.",
+                    references=[REF_MITRE_CLOUD_ACCOUNTS, REF_AWS_IAM_BEST_PRACTICES],
                     policy_name=policy_name,
                     statement_id=statement_id,
                 )
@@ -175,6 +182,7 @@ def analyze_principal(
                     evidence='Allow statement grants Action "*".',
                     impact="The principal can perform all actions against the listed resources.",
                     remediation="Limit allowed actions to the minimum service actions required.",
+                    references=[REF_MITRE_CLOUD_ACCOUNTS, REF_AWS_IAM_BEST_PRACTICES],
                     policy_name=policy_name,
                     statement_id=statement_id,
                 )
@@ -190,6 +198,7 @@ def analyze_principal(
                     evidence='Allow statement uses Resource "*".',
                     impact="The permission is not limited to specific cloud resources.",
                     remediation="Scope the statement to specific ARNs wherever the service supports resource-level permissions.",
+                    references=[REF_MITRE_CLOUD_ACCOUNTS, REF_AWS_IAM_BEST_PRACTICES],
                     policy_name=policy_name,
                     statement_id=statement_id,
                 )
@@ -205,6 +214,7 @@ def analyze_principal(
                     evidence=f"S3 write action with broad resource scope: {actions} on {resources}.",
                     impact="The principal may alter or delete data across a broad set of storage resources.",
                     remediation="Restrict S3 write actions to the exact bucket and prefix required for the workload.",
+                    references=[REF_AWS_IAM_BEST_PRACTICES],
                     policy_name=policy_name,
                     statement_id=statement_id,
                 )
@@ -220,6 +230,7 @@ def analyze_principal(
                     evidence="Sensitive action is allowed without an MFA condition.",
                     impact="Compromised credentials could be used for privileged activity without an additional identity check.",
                     remediation="Add an MFA condition for sensitive IAM, STS, KMS, account, or organization actions where appropriate.",
+                    references=[REF_AWS_IAM_BEST_PRACTICES],
                     policy_name=policy_name,
                     statement_id=statement_id,
                 )
@@ -235,6 +246,7 @@ def analyze_principal(
             evidence="User metadata shows MFA is not enabled.",
             impact="A password or access-key compromise has less resistance without multi-factor authentication.",
             remediation="Enable MFA for interactive users and prefer short-lived role credentials for automation.",
+            references=[REF_AWS_IAM_BEST_PRACTICES],
             policy_name="user-metadata",
             statement_id="mfa",
         )
@@ -252,6 +264,7 @@ def analyze_principal(
                 evidence=f"Access key age is {age_days} days.",
                 impact="Long-lived access keys increase the window of exposure if credentials are leaked.",
                 remediation="Rotate old access keys and prefer temporary credentials where possible.",
+                references=[REF_AWS_IAM_BEST_PRACTICES],
                 policy_name="access-key-metadata",
                 statement_id=str(key.get("id", "access-key")),
             )
@@ -286,6 +299,7 @@ def analyze_trust_policy(role: dict[str, Any], account_id: str) -> list[Finding]
                 evidence=f"Trust policy allows an external principal: {principal_text}.",
                 impact="An external account or principal may be able to assume this role.",
                 remediation="Require an external ID, restrict the trusted principal, and confirm the business need for cross-account access.",
+                references=[REF_MITRE_TRUSTED_RELATIONSHIP, REF_AWS_IAM_BEST_PRACTICES],
                 policy_name="trust-policy",
                 statement_id=statement_id,
             )

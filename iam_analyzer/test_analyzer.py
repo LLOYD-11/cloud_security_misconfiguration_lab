@@ -35,6 +35,7 @@ class AnalyzerTests(unittest.TestCase):
         self.assertTrue(sample_finding.title)
         self.assertTrue(sample_finding.resource_type)
         self.assertTrue(sample_finding.resource_id)
+        self.assertTrue(all(finding.references for finding in findings))
 
     def test_readonly_user_with_mfa_has_no_findings(self):
         environment = {

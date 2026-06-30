@@ -56,6 +56,7 @@ class ReportGeneratorTests(unittest.TestCase):
             evidence="Trust policy allows an external principal.",
             impact="External account may assume the role.",
             remediation="Restrict trusted principals and require external ID.",
+            references=["https://attack.mitre.org/techniques/T1199/"],
             metadata={"policy_name": "trust-policy", "statement_id": "ExternalTrust"},
         )
 
@@ -70,6 +71,7 @@ class ReportGeneratorTests(unittest.TestCase):
         self.assertIn("| iam | 1 |", report)
         self.assertIn("#### IAM-008: Cross-account role trust", report)
         self.assertIn("policy_name: trust-policy", report)
+        self.assertIn("https://attack.mitre.org/techniques/T1199/", report)
 
     def test_write_report_creates_parent_directory(self):
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -35,6 +35,8 @@ Policies use simplified IAM-style statements with `effect`, `action`, `resource`
 | `IAM-007` | Medium | Access key is older than 90 days |
 | `IAM-008` | High | Role trust policy allows an external account |
 
+Each IAM finding includes references to the relevant MITRE ATT&CK or AWS IAM best-practice documentation where applicable.
+
 ## Run
 
 ```bash

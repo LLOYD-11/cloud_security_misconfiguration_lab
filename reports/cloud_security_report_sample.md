@@ -39,6 +39,7 @@ This report consolidates 9 finding(s) from offline cloud security analyzers.
 - Impact: The principal may have full administrative access across the account.
 - Remediation: Replace wildcard administrator access with task-specific actions and scoped resources.
 - Metadata: policy_name: OverBroadAdminPolicy, statement_id: FullAdmin
+- References: https://attack.mitre.org/techniques/T1078/004/, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
 ### High
 
@@ -51,6 +52,7 @@ This report consolidates 9 finding(s) from offline cloud security analyzers.
 - Impact: The principal may alter or delete data across a broad set of storage resources.
 - Remediation: Restrict S3 write actions to the exact bucket and prefix required for the workload.
 - Metadata: policy_name: BroadS3WritePolicy, statement_id: BroadS3
+- References: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
 #### IAM-008: Cross-account role trust
 
@@ -61,6 +63,7 @@ This report consolidates 9 finding(s) from offline cloud security analyzers.
 - Impact: An external account or principal may be able to assume this role.
 - Remediation: Require an external ID, restrict the trusted principal, and confirm the business need for cross-account access.
 - Metadata: policy_name: trust-policy, statement_id: ExternalAccountTrust
+- References: https://attack.mitre.org/techniques/T1199/, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
 ### Medium
 
@@ -73,6 +76,7 @@ This report consolidates 9 finding(s) from offline cloud security analyzers.
 - Impact: The permission is not limited to specific cloud resources.
 - Remediation: Scope the statement to specific ARNs wherever the service supports resource-level permissions.
 - Metadata: policy_name: AuditReadOnly, statement_id: AuditRead
+- References: https://attack.mitre.org/techniques/T1078/004/, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
 #### IAM-003: Wildcard resource scope
 
@@ -83,6 +87,7 @@ This report consolidates 9 finding(s) from offline cloud security analyzers.
 - Impact: The permission is not limited to specific cloud resources.
 - Remediation: Scope the statement to specific ARNs wherever the service supports resource-level permissions.
 - Metadata: policy_name: OverBroadAdminPolicy, statement_id: FullAdmin
+- References: https://attack.mitre.org/techniques/T1078/004/, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
 #### IAM-005: Sensitive action without MFA condition
 
@@ -93,6 +98,7 @@ This report consolidates 9 finding(s) from offline cloud security analyzers.
 - Impact: Compromised credentials could be used for privileged activity without an additional identity check.
 - Remediation: Add an MFA condition for sensitive IAM, STS, KMS, account, or organization actions where appropriate.
 - Metadata: policy_name: AuditReadOnly, statement_id: AuditRead
+- References: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
 #### IAM-005: Sensitive action without MFA condition
 
@@ -103,6 +109,7 @@ This report consolidates 9 finding(s) from offline cloud security analyzers.
 - Impact: Compromised credentials could be used for privileged activity without an additional identity check.
 - Remediation: Add an MFA condition for sensitive IAM, STS, KMS, account, or organization actions where appropriate.
 - Metadata: policy_name: OverBroadAdminPolicy, statement_id: FullAdmin
+- References: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
 #### IAM-006: User MFA is disabled
 
@@ -113,6 +120,7 @@ This report consolidates 9 finding(s) from offline cloud security analyzers.
 - Impact: A password or access-key compromise has less resistance without multi-factor authentication.
 - Remediation: Enable MFA for interactive users and prefer short-lived role credentials for automation.
 - Metadata: policy_name: user-metadata, statement_id: mfa
+- References: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
 #### IAM-007: Long-lived access key
 
@@ -123,3 +131,4 @@ This report consolidates 9 finding(s) from offline cloud security analyzers.
 - Impact: Long-lived access keys increase the window of exposure if credentials are leaked.
 - Remediation: Rotate old access keys and prefer temporary credentials where possible.
 - Metadata: policy_name: access-key-metadata, statement_id: AKIAEXAMPLEALICE
+- References: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
