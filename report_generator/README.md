@@ -31,6 +31,7 @@ python3 iam_analyzer/analyzer.py \
 python3 report_generator/generate_report.py \
   --findings reports/generated/iam_findings.json \
   --findings reports/generated/storage_findings.json \
+  --findings reports/generated/network_findings.json \
   --output reports/generated/cloud_security_report.md
 ```
 

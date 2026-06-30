@@ -74,6 +74,22 @@ Current rule IDs:
 | `STO-004` | Bucket encryption is disabled |
 | `STO-005` | Bucket versioning is not enabled |
 
+### Module 4: Network Configuration Analyzer
+
+The network analyzer checks sample security group configurations for risky network exposure:
+
+- Sensitive ports open to `0.0.0.0/0` or `::/0`
+- All inbound ports open to the internet
+- Unrestricted outbound traffic to the internet
+
+Current rule IDs:
+
+| Rule | Risk Pattern |
+| --- | --- |
+| `NET-001` | Sensitive port is open to the internet |
+| `NET-002` | All inbound ports are open to the internet |
+| `NET-003` | Unrestricted outbound traffic is allowed |
+
 ## Planned Modules
 
 The project is planned as a phased cloud security lab:
@@ -115,12 +131,28 @@ python3 storage_analyzer/analyzer.py \
   --output reports/generated/storage_findings.json
 ```
 
+## Run the Network Analyzer
+
+```bash
+python3 network_analyzer/analyzer.py \
+  sample_data/network/sample_network_environment.json
+```
+
+Export findings as JSON:
+
+```bash
+python3 network_analyzer/analyzer.py \
+  sample_data/network/sample_network_environment.json \
+  --output reports/generated/network_findings.json
+```
+
 ## Generate Risk Report
 
 ```bash
 python3 report_generator/generate_report.py \
   --findings reports/generated/iam_findings.json \
   --findings reports/generated/storage_findings.json \
+  --findings reports/generated/network_findings.json \
   --output reports/generated/cloud_security_report.md
 ```
 
@@ -143,6 +175,10 @@ cloud_security_misconfiguration_lab/
 │   ├── analyzer.py
 │   ├── README.md
 │   └── test_analyzer.py
+├── network_analyzer/
+│   ├── analyzer.py
+│   ├── README.md
+│   └── test_analyzer.py
 ├── report_generator/
 │   ├── generate_report.py
 │   ├── README.md
@@ -152,6 +188,8 @@ cloud_security_misconfiguration_lab/
 ├── sample_data/
 │   ├── iam/
 │   │   └── sample_iam_environment.json
+│   ├── network/
+│   │   └── sample_network_environment.json
 │   └── storage/
 │       └── sample_storage_environment.json
 ├── storage_analyzer/

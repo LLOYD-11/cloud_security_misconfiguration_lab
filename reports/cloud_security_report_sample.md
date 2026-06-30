@@ -4,15 +4,15 @@ Generated: 2026-06-30
 
 ## Executive Summary
 
-This report consolidates 16 finding(s) from offline cloud security analyzers.
+This report consolidates 23 finding(s) from offline cloud security analyzers.
 
 ## Severity Summary
 
 | Severity | Count |
 | --- | ---: |
-| Critical | 3 |
-| High | 3 |
-| Medium | 10 |
+| Critical | 4 |
+| High | 7 |
+| Medium | 12 |
 | Low | 0 |
 | Info | 0 |
 
@@ -21,12 +21,14 @@ This report consolidates 16 finding(s) from offline cloud security analyzers.
 | Module | Findings |
 | --- | ---: |
 | iam | 9 |
+| network | 7 |
 | storage | 7 |
 
 ## Source Files
 
 - `reports/generated/iam_findings.json`
 - `reports/generated/storage_findings.json`
+- `reports/generated/network_findings.json`
 
 ## Findings
 
@@ -42,6 +44,17 @@ This report consolidates 16 finding(s) from offline cloud security analyzers.
 - Remediation: Replace wildcard administrator access with task-specific actions and scoped resources.
 - Metadata: policy_name: OverBroadAdminPolicy, statement_id: FullAdmin
 - References: https://attack.mitre.org/techniques/T1078/004/, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
+
+#### NET-002: Security group allows all inbound ports from the internet
+
+- Module: `network`
+- Category: `network-exposure`
+- Resource: `security_group/sg-003-all-open`
+- Evidence: Inbound rule 1 allows -1 all from 0.0.0.0/0.
+- Impact: Any exposed service attached to this security group may be reachable from the public internet.
+- Remediation: Remove all-port public inbound access and allow only required ports from trusted CIDR ranges.
+- Metadata: group_name: all-open, rule_index: 1
+- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://attack.mitre.org/techniques/T1578/005/
 
 #### STO-002: Bucket ACL grants public access
 
@@ -88,6 +101,50 @@ This report consolidates 16 finding(s) from offline cloud security analyzers.
 - Remediation: Require an external ID, restrict the trusted principal, and confirm the business need for cross-account access.
 - Metadata: policy_name: trust-policy, statement_id: ExternalAccountTrust
 - References: https://attack.mitre.org/techniques/T1199/, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
+
+#### NET-001: Sensitive SSH port is open to the internet
+
+- Module: `network`
+- Category: `network-exposure`
+- Resource: `security_group/sg-001-admin-open`
+- Evidence: Inbound rule 1 allows tcp 22 from 0.0.0.0/0.
+- Impact: SSH exposure can increase the risk of brute force, exploitation, or unauthorized administrative access.
+- Remediation: Restrict SSH access to a VPN, bastion host, private CIDR, or specific trusted IP range.
+- Metadata: group_name: admin-open, port: 22, rule_index: 1, service: SSH
+- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
+
+#### NET-001: Sensitive RDP port is open to the internet
+
+- Module: `network`
+- Category: `network-exposure`
+- Resource: `security_group/sg-001-admin-open`
+- Evidence: Inbound rule 2 allows tcp 3389 from ::/0.
+- Impact: RDP exposure can increase the risk of brute force, exploitation, or unauthorized administrative access.
+- Remediation: Restrict RDP access to a VPN, bastion host, private CIDR, or specific trusted IP range.
+- Metadata: group_name: admin-open, port: 3389, rule_index: 2, service: RDP
+- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
+
+#### NET-001: Sensitive MySQL port is open to the internet
+
+- Module: `network`
+- Category: `network-exposure`
+- Resource: `security_group/sg-002-database-public`
+- Evidence: Inbound rule 1 allows tcp 3306 from 0.0.0.0/0.
+- Impact: MySQL exposure can increase the risk of brute force, exploitation, or unauthorized administrative access.
+- Remediation: Restrict MySQL access to a VPN, bastion host, private CIDR, or specific trusted IP range.
+- Metadata: group_name: database-public, port: 3306, rule_index: 1, service: MySQL
+- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
+
+#### NET-001: Sensitive PostgreSQL port is open to the internet
+
+- Module: `network`
+- Category: `network-exposure`
+- Resource: `security_group/sg-002-database-public`
+- Evidence: Inbound rule 2 allows tcp 5432 from 0.0.0.0/0.
+- Impact: PostgreSQL exposure can increase the risk of brute force, exploitation, or unauthorized administrative access.
+- Remediation: Restrict PostgreSQL access to a VPN, bastion host, private CIDR, or specific trusted IP range.
+- Metadata: group_name: database-public, port: 5432, rule_index: 2, service: PostgreSQL
+- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
 
 #### STO-001: S3 public access block is incomplete
 
@@ -167,6 +224,28 @@ This report consolidates 16 finding(s) from offline cloud security analyzers.
 - Remediation: Rotate old access keys and prefer temporary credentials where possible.
 - Metadata: policy_name: access-key-metadata, statement_id: AKIAEXAMPLEALICE
 - References: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
+
+#### NET-003: Security group allows unrestricted outbound traffic
+
+- Module: `network`
+- Category: `network-exposure`
+- Resource: `security_group/sg-001-admin-open`
+- Evidence: Outbound rule 1 allows -1 all from 0.0.0.0/0.
+- Impact: Compromised workloads may communicate freely with internet destinations, making exfiltration or command-and-control traffic harder to contain.
+- Remediation: Restrict outbound traffic to required protocols, ports, and destination CIDR ranges where practical.
+- Metadata: group_name: admin-open, rule_index: 1
+- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
+
+#### NET-003: Security group allows unrestricted outbound traffic
+
+- Module: `network`
+- Category: `network-exposure`
+- Resource: `security_group/sg-003-all-open`
+- Evidence: Outbound rule 1 allows -1 all from ::/0.
+- Impact: Compromised workloads may communicate freely with internet destinations, making exfiltration or command-and-control traffic harder to contain.
+- Remediation: Restrict outbound traffic to required protocols, ports, and destination CIDR ranges where practical.
+- Metadata: group_name: all-open, rule_index: 1
+- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
 
 #### STO-004: Bucket encryption is disabled
 

@@ -1,0 +1,111 @@
+{
+  "account_id": "111122223333",
+  "security_groups": [
+    {
+      "id": "sg-001-admin-open",
+      "name": "admin-open",
+      "description": "Management access accidentally exposed to the internet.",
+      "inbound_rules": [
+        {
+          "protocol": "tcp",
+          "from_port": 22,
+          "to_port": 22,
+          "cidr": "0.0.0.0/0",
+          "description": "SSH from anywhere"
+        },
+        {
+          "protocol": "tcp",
+          "from_port": 3389,
+          "to_port": 3389,
+          "cidr": "::/0",
+          "description": "RDP from anywhere over IPv6"
+        }
+      ],
+      "outbound_rules": [
+        {
+          "protocol": "-1",
+          "from_port": null,
+          "to_port": null,
+          "cidr": "0.0.0.0/0",
+          "description": "Default allow all outbound"
+        }
+      ]
+    },
+    {
+      "id": "sg-002-database-public",
+      "name": "database-public",
+      "description": "Database ports exposed to the internet.",
+      "inbound_rules": [
+        {
+          "protocol": "tcp",
+          "from_port": 3306,
+          "to_port": 3306,
+          "cidr": "0.0.0.0/0",
+          "description": "MySQL from anywhere"
+        },
+        {
+          "protocol": "tcp",
+          "from_port": 5432,
+          "to_port": 5432,
+          "cidr": "0.0.0.0/0",
+          "description": "Postgres from anywhere"
+        }
+      ],
+      "outbound_rules": [
+        {
+          "protocol": "tcp",
+          "from_port": 443,
+          "to_port": 443,
+          "cidr": "0.0.0.0/0",
+          "description": "HTTPS outbound"
+        }
+      ]
+    },
+    {
+      "id": "sg-003-all-open",
+      "name": "all-open",
+      "description": "All inbound traffic exposed.",
+      "inbound_rules": [
+        {
+          "protocol": "-1",
+          "from_port": null,
+          "to_port": null,
+          "cidr": "0.0.0.0/0",
+          "description": "All traffic from anywhere"
+        }
+      ],
+      "outbound_rules": [
+        {
+          "protocol": "-1",
+          "from_port": null,
+          "to_port": null,
+          "cidr": "::/0",
+          "description": "All IPv6 outbound"
+        }
+      ]
+    },
+    {
+      "id": "sg-004-internal-app",
+      "name": "internal-app",
+      "description": "Private application traffic only.",
+      "inbound_rules": [
+        {
+          "protocol": "tcp",
+          "from_port": 8080,
+          "to_port": 8080,
+          "cidr": "10.0.0.0/16",
+          "description": "App traffic from private VPC range"
+        }
+      ],
+      "outbound_rules": [
+        {
+          "protocol": "tcp",
+          "from_port": 443,
+          "to_port": 443,
+          "cidr": "10.0.0.0/16",
+          "description": "HTTPS to private services"
+        }
+      ]
+    }
+  ]
+}
