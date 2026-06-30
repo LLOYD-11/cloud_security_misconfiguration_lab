@@ -18,7 +18,7 @@ The first module analyzes sample IAM users, identity policies, and trust policie
 - Cross-account trust relationships
 - Long-lived access keys in sample user metadata
 
-The analyzer produces terminal findings and can export structured JSON evidence for later reporting.
+The analyzer produces terminal findings and exports structured JSON evidence for reporting.
 
 Current rule IDs:
 
@@ -33,17 +33,36 @@ Current rule IDs:
 | `IAM-007` | Long-lived access key |
 | `IAM-008` | Cross-account role trust |
 
+### Module 2: Risk Report Generator
+
+The report generator reads one or more finding JSON files and creates a consolidated Markdown risk report.
+
+All analyzers should emit the same finding schema:
+
+| Field | Purpose |
+| --- | --- |
+| `rule_id` | Stable detection rule identifier |
+| `severity` | `critical`, `high`, `medium`, `low`, or `info` |
+| `module` | Analyzer module name, such as `iam` |
+| `category` | Security domain, such as `identity-and-access` |
+| `resource_type` | Affected resource type |
+| `resource_id` | Affected resource name or identifier |
+| `title` | Short finding title |
+| `evidence` | Concrete observed evidence |
+| `impact` | Why the issue matters |
+| `remediation` | Recommended fix |
+| `references` | Optional reference links |
+| `metadata` | Optional module-specific details |
+
 ## Planned Modules
 
-The project structure leaves room for later modules, but the first milestone is intentionally narrow:
+The project is planned as a phased cloud security lab:
 
 1. IAM policy analyzer
 2. Risk report generator
 3. Storage exposure analyzer
 4. Network configuration analyzer
 5. CloudTrail-style event detector
-
-Module 1 and the risk report generator are the core target. The other modules should be added only if they improve the project without making the scope noisy.
 
 ## Run the IAM Analyzer
 
@@ -61,10 +80,20 @@ python3 iam_analyzer/analyzer.py \
   --output reports/generated/iam_findings.json
 ```
 
+## Generate Risk Report
+
+```bash
+python3 report_generator/generate_report.py \
+  --findings reports/generated/iam_findings.json \
+  --output reports/generated/cloud_security_report.md
+```
+
+A committed sample report is available at `reports/cloud_security_report_sample.md`.
+
 ## Run Tests
 
 ```bash
-python3 -m unittest iam_analyzer.test_analyzer
+python3 -m unittest iam_analyzer.test_analyzer report_generator.test_generate_report
 ```
 
 ## Project Structure
@@ -72,14 +101,22 @@ python3 -m unittest iam_analyzer.test_analyzer
 ```text
 cloud_security_misconfiguration_lab/
 ├── README.md
+├── cloud_findings/
+│   └── finding.py
 ├── iam_analyzer/
 │   ├── analyzer.py
 │   ├── README.md
 │   └── test_analyzer.py
+├── report_generator/
+│   ├── generate_report.py
+│   ├── README.md
+│   └── test_generate_report.py
+├── reports/
+│   └── cloud_security_report_sample.md
 ├── sample_data/
 │   └── iam/
 │       └── sample_iam_environment.json
-└── reports/
+└── .gitignore
 ```
 
 ## Safety Boundary

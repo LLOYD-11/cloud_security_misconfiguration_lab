@@ -4,9 +4,16 @@ from __future__ import annotations
 
 import argparse
 import json
-from dataclasses import asdict, dataclass
 from pathlib import Path
+import sys
 from typing import Any, Iterable
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from cloud_findings import Finding, findings_to_dicts, sort_findings, write_findings
 
 
 SENSITIVE_ACTION_PREFIXES = (
@@ -25,19 +32,6 @@ S3_WRITE_ACTIONS = {
     "s3:PutBucketAcl",
     "s3:PutObjectAcl",
 }
-
-
-@dataclass(frozen=True)
-class Finding:
-    severity: str
-    rule_id: str
-    subject_type: str
-    subject_name: str
-    policy_name: str
-    statement_id: str
-    evidence: str
-    impact: str
-    remediation: str
 
 
 def _as_list(value: Any) -> list[Any]:
@@ -106,25 +100,34 @@ def _add_finding(
     *,
     severity: str,
     rule_id: str,
-    subject_type: str,
-    subject_name: str,
-    policy_name: str,
-    statement_id: str,
+    resource_type: str,
+    resource_id: str,
+    title: str,
     evidence: str,
     impact: str,
     remediation: str,
+    policy_name: str = "",
+    statement_id: str = "",
 ) -> None:
+    metadata = {}
+    if policy_name:
+        metadata["policy_name"] = policy_name
+    if statement_id:
+        metadata["statement_id"] = statement_id
+
     findings.append(
         Finding(
-            severity=severity,
             rule_id=rule_id,
-            subject_type=subject_type,
-            subject_name=subject_name,
-            policy_name=policy_name,
-            statement_id=statement_id,
+            severity=severity,
+            module="iam",
+            category="identity-and-access",
+            resource_type=resource_type,
+            resource_id=resource_id,
+            title=title,
             evidence=evidence,
             impact=impact,
             remediation=remediation,
+            metadata=metadata,
         )
     )
 
@@ -152,26 +155,28 @@ def analyze_principal(
                     findings,
                     severity="critical",
                     rule_id="IAM-001",
-                    subject_type=subject_type,
-                    subject_name=subject_name,
-                    policy_name=policy_name,
-                    statement_id=statement_id,
+                    resource_type=subject_type,
+                    resource_id=subject_name,
+                    title="Administrator-style wildcard permission",
                     evidence='Allow statement grants Action "*" on Resource "*".',
                     impact="The principal may have full administrative access across the account.",
                     remediation="Replace wildcard administrator access with task-specific actions and scoped resources.",
+                    policy_name=policy_name,
+                    statement_id=statement_id,
                 )
             elif "*" in actions:
                 _add_finding(
                     findings,
                     severity="high",
                     rule_id="IAM-002",
-                    subject_type=subject_type,
-                    subject_name=subject_name,
-                    policy_name=policy_name,
-                    statement_id=statement_id,
+                    resource_type=subject_type,
+                    resource_id=subject_name,
+                    title="Wildcard action allowed",
                     evidence='Allow statement grants Action "*".',
                     impact="The principal can perform all actions against the listed resources.",
                     remediation="Limit allowed actions to the minimum service actions required.",
+                    policy_name=policy_name,
+                    statement_id=statement_id,
                 )
 
             if "*" in resources:
@@ -179,13 +184,14 @@ def analyze_principal(
                     findings,
                     severity="medium",
                     rule_id="IAM-003",
-                    subject_type=subject_type,
-                    subject_name=subject_name,
-                    policy_name=policy_name,
-                    statement_id=statement_id,
+                    resource_type=subject_type,
+                    resource_id=subject_name,
+                    title="Wildcard resource scope",
                     evidence='Allow statement uses Resource "*".',
                     impact="The permission is not limited to specific cloud resources.",
                     remediation="Scope the statement to specific ARNs wherever the service supports resource-level permissions.",
+                    policy_name=policy_name,
+                    statement_id=statement_id,
                 )
 
             if _has_broad_s3_write(actions) and _contains_wildcard(resources):
@@ -193,13 +199,14 @@ def analyze_principal(
                     findings,
                     severity="high",
                     rule_id="IAM-004",
-                    subject_type=subject_type,
-                    subject_name=subject_name,
-                    policy_name=policy_name,
-                    statement_id=statement_id,
+                    resource_type=subject_type,
+                    resource_id=subject_name,
+                    title="Broad S3 write permission",
                     evidence=f"S3 write action with broad resource scope: {actions} on {resources}.",
                     impact="The principal may alter or delete data across a broad set of storage resources.",
                     remediation="Restrict S3 write actions to the exact bucket and prefix required for the workload.",
+                    policy_name=policy_name,
+                    statement_id=statement_id,
                 )
 
             if _has_sensitive_action(actions) and not _has_mfa_condition(statement):
@@ -207,13 +214,14 @@ def analyze_principal(
                     findings,
                     severity="medium",
                     rule_id="IAM-005",
-                    subject_type=subject_type,
-                    subject_name=subject_name,
-                    policy_name=policy_name,
-                    statement_id=statement_id,
+                    resource_type=subject_type,
+                    resource_id=subject_name,
+                    title="Sensitive action without MFA condition",
                     evidence="Sensitive action is allowed without an MFA condition.",
                     impact="Compromised credentials could be used for privileged activity without an additional identity check.",
                     remediation="Add an MFA condition for sensitive IAM, STS, KMS, account, or organization actions where appropriate.",
+                    policy_name=policy_name,
+                    statement_id=statement_id,
                 )
 
     if subject_type == "user" and not principal.get("mfa_enabled", False):
@@ -221,13 +229,14 @@ def analyze_principal(
             findings,
             severity="medium",
             rule_id="IAM-006",
-            subject_type=subject_type,
-            subject_name=subject_name,
-            policy_name="user-metadata",
-            statement_id="mfa",
+            resource_type=subject_type,
+            resource_id=subject_name,
+            title="User MFA is disabled",
             evidence="User metadata shows MFA is not enabled.",
             impact="A password or access-key compromise has less resistance without multi-factor authentication.",
             remediation="Enable MFA for interactive users and prefer short-lived role credentials for automation.",
+            policy_name="user-metadata",
+            statement_id="mfa",
         )
 
     for key in principal.get("access_keys", []):
@@ -237,13 +246,14 @@ def analyze_principal(
                 findings,
                 severity="medium",
                 rule_id="IAM-007",
-                subject_type=subject_type,
-                subject_name=subject_name,
-                policy_name="access-key-metadata",
-                statement_id=str(key.get("id", "access-key")),
+                resource_type=subject_type,
+                resource_id=subject_name,
+                title="Long-lived access key",
                 evidence=f"Access key age is {age_days} days.",
                 impact="Long-lived access keys increase the window of exposure if credentials are leaked.",
                 remediation="Rotate old access keys and prefer temporary credentials where possible.",
+                policy_name="access-key-metadata",
+                statement_id=str(key.get("id", "access-key")),
             )
 
     if subject_type == "role":
@@ -270,13 +280,14 @@ def analyze_trust_policy(role: dict[str, Any], account_id: str) -> list[Finding]
                 findings,
                 severity="high",
                 rule_id="IAM-008",
-                subject_type="role",
-                subject_name=role_name,
-                policy_name="trust-policy",
-                statement_id=statement_id,
+                resource_type="role",
+                resource_id=role_name,
+                title="Cross-account role trust",
                 evidence=f"Trust policy allows an external principal: {principal_text}.",
                 impact="An external account or principal may be able to assume this role.",
                 remediation="Require an external ID, restrict the trusted principal, and confirm the business need for cross-account access.",
+                policy_name="trust-policy",
+                statement_id=statement_id,
             )
 
     return findings
@@ -292,18 +303,7 @@ def analyze_environment(environment: dict[str, Any]) -> list[Finding]:
     for role in environment.get("roles", []):
         findings.extend(analyze_principal("role", role, account_id))
 
-    return sorted(findings, key=lambda item: (severity_rank(item.severity), item.rule_id, item.subject_name))
-
-
-def severity_rank(severity: str) -> int:
-    order = {
-        "critical": 0,
-        "high": 1,
-        "medium": 2,
-        "low": 3,
-        "info": 4,
-    }
-    return order.get(severity.lower(), 5)
+    return sort_findings(findings)
 
 
 def load_environment(path: Path) -> dict[str, Any]:
@@ -314,10 +314,6 @@ def load_environment(path: Path) -> dict[str, Any]:
     return data
 
 
-def findings_to_dicts(findings: Iterable[Finding]) -> list[dict[str, str]]:
-    return [asdict(finding) for finding in findings]
-
-
 def print_findings(findings: list[Finding]) -> None:
     if not findings:
         print("No IAM findings detected.")
@@ -326,23 +322,16 @@ def print_findings(findings: list[Finding]) -> None:
     print(f"IAM findings detected: {len(findings)}")
     print()
     for finding in findings:
-        print(f"[{finding.severity.upper()}] {finding.rule_id} {finding.subject_type}/{finding.subject_name}")
-        print(f"Policy: {finding.policy_name} | Statement: {finding.statement_id}")
+        print(f"[{finding.severity.upper()}] {finding.rule_id} {finding.resource_type}/{finding.resource_id}")
+        print(f"Title: {finding.title}")
+        if finding.metadata:
+            policy_name = finding.metadata.get("policy_name", "n/a")
+            statement_id = finding.metadata.get("statement_id", "n/a")
+            print(f"Policy: {policy_name} | Statement: {statement_id}")
         print(f"Evidence: {finding.evidence}")
         print(f"Impact: {finding.impact}")
         print(f"Remediation: {finding.remediation}")
         print()
-
-
-def write_findings(path: Path, findings: list[Finding]) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    payload = {
-        "finding_count": len(findings),
-        "findings": findings_to_dicts(findings),
-    }
-    with path.open("w", encoding="utf-8") as handle:
-        json.dump(payload, handle, indent=2)
-        handle.write("\n")
 
 
 def build_parser() -> argparse.ArgumentParser:

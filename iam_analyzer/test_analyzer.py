@@ -21,6 +21,7 @@ class AnalyzerTests(unittest.TestCase):
 
         findings = analyze_environment(environment)
         rule_ids = {finding.rule_id for finding in findings}
+        sample_finding = findings[0]
 
         self.assertIn("IAM-001", rule_ids)
         self.assertIn("IAM-003", rule_ids)
@@ -29,6 +30,11 @@ class AnalyzerTests(unittest.TestCase):
         self.assertIn("IAM-006", rule_ids)
         self.assertIn("IAM-007", rule_ids)
         self.assertIn("IAM-008", rule_ids)
+        self.assertEqual("iam", sample_finding.module)
+        self.assertEqual("identity-and-access", sample_finding.category)
+        self.assertTrue(sample_finding.title)
+        self.assertTrue(sample_finding.resource_type)
+        self.assertTrue(sample_finding.resource_id)
 
     def test_readonly_user_with_mfa_has_no_findings(self):
         environment = {
@@ -99,6 +105,7 @@ class AnalyzerTests(unittest.TestCase):
             payload = json.loads(output_path.read_text(encoding="utf-8"))
 
         self.assertEqual(len(findings), payload["finding_count"])
+        self.assertEqual("1.0", payload["schema_version"])
         self.assertEqual(findings_to_dicts(findings), payload["findings"])
 
 

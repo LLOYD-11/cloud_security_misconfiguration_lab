@@ -1,6 +1,6 @@
 # IAM Policy Analyzer
 
-This module analyzes offline IAM-style JSON data and reports risky identity and permission patterns.
+This module analyzes offline IAM-style JSON data and reports risky identity and permission patterns using the shared finding schema.
 
 It is intentionally offline-first. The sample data is shaped like cloud IAM data, but the module does not call AWS APIs or require cloud credentials.
 
@@ -48,6 +48,8 @@ python3 iam_analyzer/analyzer.py \
   sample_data/iam/sample_iam_environment.json \
   --output reports/generated/iam_findings.json
 ```
+
+The exported JSON can be passed directly to `report_generator/generate_report.py`.
 
 ## Test
 
