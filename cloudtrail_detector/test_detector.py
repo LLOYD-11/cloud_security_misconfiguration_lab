@@ -27,6 +27,8 @@ class CloudTrailDetectorTests(unittest.TestCase):
         self.assertTrue(all(finding.module == "cloudtrail" for finding in findings))
         self.assertTrue(all(finding.category == "audit-and-detection" for finding in findings))
         self.assertTrue(all(finding.references for finding in findings))
+        cld_004 = next(finding for finding in findings if finding.rule_id == "CLD-004")
+        self.assertGreaterEqual(len(cld_004.references), 2)
 
     def test_benign_read_only_event_has_no_findings(self):
         environment = {

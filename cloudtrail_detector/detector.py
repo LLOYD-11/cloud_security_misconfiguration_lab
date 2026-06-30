@@ -20,8 +20,10 @@ from cloud_findings import Finding, findings_to_dicts, sort_findings, write_find
 
 REF_AWS_CLOUDTRAIL = "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html"
 REF_AWS_IAM_BEST_PRACTICES = "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+REF_AWS_S3_BUCKET_POLICIES = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-policies.html"
 REF_MITRE_CLOUD_ACCOUNTS = "https://attack.mitre.org/techniques/T1078/004/"
 REF_MITRE_ACCOUNT_MANIPULATION = "https://attack.mitre.org/techniques/T1098/"
+REF_MITRE_DATA_MANIPULATION = "https://attack.mitre.org/techniques/T1565/"
 REF_MITRE_INFRA_MODIFY = "https://attack.mitre.org/techniques/T1578/005/"
 REF_MITRE_BRUTE_FORCE = "https://attack.mitre.org/techniques/T1110/"
 
@@ -202,7 +204,7 @@ def analyze_single_event(event: dict[str, Any], index: int) -> list[Finding]:
             evidence=f"{event_name} was called by {actor} from {source_ip} at {event_time}.",
             impact="Bucket policy or public-access changes can expose cloud storage data.",
             remediation="Review the bucket policy diff and restore least-privilege access if the change was not approved.",
-            references=[REF_AWS_CLOUDTRAIL],
+            references=[REF_AWS_CLOUDTRAIL, REF_AWS_S3_BUCKET_POLICIES, REF_MITRE_DATA_MANIPULATION],
             metadata=base_metadata,
         )
 

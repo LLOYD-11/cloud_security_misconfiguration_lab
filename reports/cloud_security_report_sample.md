@@ -113,7 +113,7 @@ This report consolidates 29 finding(s) from offline cloud security analyzers.
 - Impact: Bucket policy or public-access changes can expose cloud storage data.
 - Remediation: Review the bucket policy diff and restore least-privilege access if the change was not approved.
 - Metadata: actor: alice-admin, event_name: PutBucketPolicy, event_time: 2026-06-30T01:12:00Z, source_ip: 198.51.100.20
-- References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html
+- References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-policies.html, https://attack.mitre.org/techniques/T1565/
 
 #### CLD-005: IAM policy configuration changed
 
