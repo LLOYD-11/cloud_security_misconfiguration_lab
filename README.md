@@ -90,15 +90,27 @@ Current rule IDs:
 | `NET-002` | All inbound ports are open to the internet |
 | `NET-003` | Unrestricted outbound traffic is allowed |
 
-## Planned Modules
+### Module 5: CloudTrail-Style Event Detector
 
-The project is planned as a phased cloud security lab:
+The CloudTrail detector checks sample audit events for suspicious cloud API activity:
 
-1. IAM policy analyzer
-2. Risk report generator
-3. Storage exposure analyzer
-4. Network configuration analyzer
-5. CloudTrail-style event detector
+- Root account console login
+- MFA device disabled or deleted
+- Security group configuration changed
+- Bucket policy changed
+- IAM policy changed
+- Repeated API failures from one actor and source
+
+Current rule IDs:
+
+| Rule | Risk Pattern |
+| --- | --- |
+| `CLD-001` | Root account console login |
+| `CLD-002` | MFA device disabled or deleted |
+| `CLD-003` | Security group configuration changed |
+| `CLD-004` | Bucket access policy changed |
+| `CLD-005` | IAM policy configuration changed |
+| `CLD-006` | Repeated API failures |
 
 ## Run the IAM Analyzer
 
@@ -146,6 +158,21 @@ python3 network_analyzer/analyzer.py \
   --output reports/generated/network_findings.json
 ```
 
+## Run the CloudTrail Detector
+
+```bash
+python3 cloudtrail_detector/detector.py \
+  sample_data/cloudtrail/sample_cloudtrail_events.json
+```
+
+Export findings as JSON:
+
+```bash
+python3 cloudtrail_detector/detector.py \
+  sample_data/cloudtrail/sample_cloudtrail_events.json \
+  --output reports/generated/cloudtrail_findings.json
+```
+
 ## Generate Risk Report
 
 ```bash
@@ -153,6 +180,7 @@ python3 report_generator/generate_report.py \
   --findings reports/generated/iam_findings.json \
   --findings reports/generated/storage_findings.json \
   --findings reports/generated/network_findings.json \
+  --findings reports/generated/cloudtrail_findings.json \
   --output reports/generated/cloud_security_report.md
 ```
 
@@ -171,6 +199,10 @@ cloud_security_misconfiguration_lab/
 ├── README.md
 ├── cloud_findings/
 │   └── finding.py
+├── cloudtrail_detector/
+│   ├── detector.py
+│   ├── README.md
+│   └── test_detector.py
 ├── iam_analyzer/
 │   ├── analyzer.py
 │   ├── README.md
@@ -186,6 +218,8 @@ cloud_security_misconfiguration_lab/
 ├── reports/
 │   └── cloud_security_report_sample.md
 ├── sample_data/
+│   ├── cloudtrail/
+│   │   └── sample_cloudtrail_events.json
 │   ├── iam/
 │   │   └── sample_iam_environment.json
 │   ├── network/

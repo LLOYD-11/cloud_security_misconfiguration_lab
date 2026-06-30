@@ -17,12 +17,21 @@ Every analyzer should output the same finding schema:
 - `references`
 - `metadata`
 
-## Generate IAM Findings First
+## Generate Module Findings First
 
 ```bash
 python3 iam_analyzer/analyzer.py \
   sample_data/iam/sample_iam_environment.json \
   --output reports/generated/iam_findings.json
+python3 storage_analyzer/analyzer.py \
+  sample_data/storage/sample_storage_environment.json \
+  --output reports/generated/storage_findings.json
+python3 network_analyzer/analyzer.py \
+  sample_data/network/sample_network_environment.json \
+  --output reports/generated/network_findings.json
+python3 cloudtrail_detector/detector.py \
+  sample_data/cloudtrail/sample_cloudtrail_events.json \
+  --output reports/generated/cloudtrail_findings.json
 ```
 
 ## Generate Report
@@ -32,6 +41,7 @@ python3 report_generator/generate_report.py \
   --findings reports/generated/iam_findings.json \
   --findings reports/generated/storage_findings.json \
   --findings reports/generated/network_findings.json \
+  --findings reports/generated/cloudtrail_findings.json \
   --output reports/generated/cloud_security_report.md
 ```
 

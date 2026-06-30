@@ -4,15 +4,15 @@ Generated: 2026-06-30
 
 ## Executive Summary
 
-This report consolidates 23 finding(s) from offline cloud security analyzers.
+This report consolidates 29 finding(s) from offline cloud security analyzers.
 
 ## Severity Summary
 
 | Severity | Count |
 | --- | ---: |
-| Critical | 4 |
-| High | 7 |
-| Medium | 12 |
+| Critical | 5 |
+| High | 10 |
+| Medium | 14 |
 | Low | 0 |
 | Info | 0 |
 
@@ -20,6 +20,7 @@ This report consolidates 23 finding(s) from offline cloud security analyzers.
 
 | Module | Findings |
 | --- | ---: |
+| cloudtrail | 6 |
 | iam | 9 |
 | network | 7 |
 | storage | 7 |
@@ -29,10 +30,22 @@ This report consolidates 23 finding(s) from offline cloud security analyzers.
 - `reports/generated/iam_findings.json`
 - `reports/generated/storage_findings.json`
 - `reports/generated/network_findings.json`
+- `reports/generated/cloudtrail_findings.json`
 
 ## Findings
 
 ### Critical
+
+#### CLD-001: Root account console login
+
+- Module: `cloudtrail`
+- Category: `audit-and-detection`
+- Resource: `identity/root`
+- Evidence: Root ConsoleLogin event from 203.0.113.10 at 2026-06-30T01:00:00Z.
+- Impact: Root account use is highly sensitive and may indicate emergency access or account compromise.
+- Remediation: Avoid routine root use, confirm the login was authorized, and require MFA on the root account.
+- Metadata: actor: arn:aws:iam::111122223333:root, event_name: ConsoleLogin, event_time: 2026-06-30T01:00:00Z, source_ip: 203.0.113.10
+- References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://attack.mitre.org/techniques/T1078/004/
 
 #### IAM-001: Administrator-style wildcard permission
 
@@ -79,6 +92,39 @@ This report consolidates 23 finding(s) from offline cloud security analyzers.
 - References: https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-policies.html, https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html
 
 ### High
+
+#### CLD-002: MFA device was disabled or deleted
+
+- Module: `cloudtrail`
+- Category: `audit-and-detection`
+- Resource: `identity/alice-admin`
+- Evidence: DeactivateMFADevice was called by alice-admin from 198.51.100.20 at 2026-06-30T01:04:00Z.
+- Impact: Disabling MFA weakens account protection and may be part of account takeover or persistence activity.
+- Remediation: Confirm the MFA change was authorized and re-enable MFA for affected users.
+- Metadata: actor: alice-admin, event_name: DeactivateMFADevice, event_time: 2026-06-30T01:04:00Z, source_ip: 198.51.100.20
+- References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://attack.mitre.org/techniques/T1098/
+
+#### CLD-004: Bucket access policy changed
+
+- Module: `cloudtrail`
+- Category: `audit-and-detection`
+- Resource: `bucket/public-customer-exports`
+- Evidence: PutBucketPolicy was called by alice-admin from 198.51.100.20 at 2026-06-30T01:12:00Z.
+- Impact: Bucket policy or public-access changes can expose cloud storage data.
+- Remediation: Review the bucket policy diff and restore least-privilege access if the change was not approved.
+- Metadata: actor: alice-admin, event_name: PutBucketPolicy, event_time: 2026-06-30T01:12:00Z, source_ip: 198.51.100.20
+- References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html
+
+#### CLD-005: IAM policy configuration changed
+
+- Module: `cloudtrail`
+- Category: `audit-and-detection`
+- Resource: `iam_policy/arn:aws:iam::111122223333:policy/OverBroadAdminPolicy`
+- Evidence: CreatePolicyVersion was called by alice-admin from 198.51.100.20 at 2026-06-30T01:15:00Z.
+- Impact: IAM policy changes can grant new permissions, create persistence, or weaken least privilege.
+- Remediation: Review the IAM policy change and confirm it matches an approved access request.
+- Metadata: actor: alice-admin, event_name: CreatePolicyVersion, event_time: 2026-06-30T01:15:00Z, source_ip: 198.51.100.20
+- References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://attack.mitre.org/techniques/T1098/
 
 #### IAM-004: Broad S3 write permission
 
@@ -158,6 +204,28 @@ This report consolidates 23 finding(s) from offline cloud security analyzers.
 - References: https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html, https://attack.mitre.org/techniques/T1619/
 
 ### Medium
+
+#### CLD-003: Security group configuration changed
+
+- Module: `cloudtrail`
+- Category: `audit-and-detection`
+- Resource: `security_group/sg-001-admin-open`
+- Evidence: AuthorizeSecurityGroupIngress was called by alice-admin from 198.51.100.20 at 2026-06-30T01:09:00Z.
+- Impact: Security group changes can expose services, enable lateral movement, or weaken network controls.
+- Remediation: Review the rule change, verify the business need, and revert unauthorized exposure.
+- Metadata: actor: alice-admin, event_name: AuthorizeSecurityGroupIngress, event_time: 2026-06-30T01:09:00Z, source_ip: 198.51.100.20
+- References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://attack.mitre.org/techniques/T1578/005/
+
+#### CLD-006: Repeated API failures from one actor and source
+
+- Module: `cloudtrail`
+- Category: `audit-and-detection`
+- Resource: `api_activity/unknown-user@192.0.2.44`
+- Evidence: 6 failed API call(s) from unknown-user at 192.0.2.44 within 10 minutes starting 2026-06-30T02:00:00Z.
+- Impact: Repeated failed API calls may indicate credential misuse, probing, or brute-force style activity.
+- Remediation: Review the source IP, actor, failed API names, and related authentication activity.
+- Metadata: actor: unknown-user, error_codes: AccessDenied, UnauthorizedOperation, event_names: AssumeRole, DescribeInstances, GetUser, ListBuckets, ListUsers, failure_count: 6, source_ip: 192.0.2.44, window_minutes: 10
+- References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://attack.mitre.org/techniques/T1110/
 
 #### IAM-003: Wildcard resource scope
 
