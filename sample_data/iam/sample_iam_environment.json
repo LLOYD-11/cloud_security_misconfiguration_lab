@@ -1,0 +1,120 @@
+{
+  "account_id": "111122223333",
+  "users": [
+    {
+      "name": "alice-admin",
+      "mfa_enabled": false,
+      "access_keys": [
+        {
+          "id": "AKIAEXAMPLEALICE",
+          "age_days": 142,
+          "last_used_days": 4
+        }
+      ],
+      "attached_policies": [
+        {
+          "policy_name": "OverBroadAdminPolicy",
+          "statements": [
+            {
+              "sid": "FullAdmin",
+              "effect": "Allow",
+              "action": "*",
+              "resource": "*"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "data-engineer",
+      "mfa_enabled": true,
+      "access_keys": [
+        {
+          "id": "AKIAEXAMPLEDATA",
+          "age_days": 12,
+          "last_used_days": 1
+        }
+      ],
+      "attached_policies": [
+        {
+          "policy_name": "BroadS3WritePolicy",
+          "statements": [
+            {
+              "sid": "BroadS3",
+              "effect": "Allow",
+              "action": [
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:DeleteObject"
+              ],
+              "resource": "arn:aws:s3:::company-data-*/*"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "readonly-analyst",
+      "mfa_enabled": true,
+      "access_keys": [],
+      "attached_policies": [
+        {
+          "policy_name": "ReadOnlyReports",
+          "statements": [
+            {
+              "sid": "ReadReports",
+              "effect": "Allow",
+              "action": [
+                "s3:GetObject",
+                "cloudwatch:GetMetricData"
+              ],
+              "resource": [
+                "arn:aws:s3:::company-reports/*",
+                "arn:aws:cloudwatch:ap-southeast-2:111122223333:metric/*"
+              ],
+              "condition": {
+                "Bool": {
+                  "aws:MultiFactorAuthPresent": "true"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "roles": [
+    {
+      "name": "third-party-audit-role",
+      "trust_policy": {
+        "statements": [
+          {
+            "sid": "ExternalAccountTrust",
+            "effect": "Allow",
+            "principal": {
+              "AWS": "arn:aws:iam::999988887777:root"
+            },
+            "action": "sts:AssumeRole"
+          }
+        ]
+      },
+      "attached_policies": [
+        {
+          "policy_name": "AuditReadOnly",
+          "statements": [
+            {
+              "sid": "AuditRead",
+              "effect": "Allow",
+              "action": [
+                "iam:Get*",
+                "iam:List*",
+                "s3:ListBucket"
+              ],
+              "resource": "*"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
