@@ -54,6 +54,26 @@ All analyzers should emit the same finding schema:
 | `references` | Optional reference links |
 | `metadata` | Optional module-specific details |
 
+### Module 3: Storage Exposure Analyzer
+
+The storage analyzer checks sample S3-style bucket configurations for common exposure and resilience risks:
+
+- Incomplete S3 Block Public Access controls
+- Public ACL grants
+- Bucket policies that allow `Principal: "*"`
+- Missing default encryption
+- Missing or suspended versioning
+
+Current rule IDs:
+
+| Rule | Risk Pattern |
+| --- | --- |
+| `STO-001` | S3 public access block is incomplete |
+| `STO-002` | Bucket ACL grants public access |
+| `STO-003` | Bucket policy allows public principal |
+| `STO-004` | Bucket encryption is disabled |
+| `STO-005` | Bucket versioning is not enabled |
+
 ## Planned Modules
 
 The project is planned as a phased cloud security lab:
@@ -80,11 +100,27 @@ python3 iam_analyzer/analyzer.py \
   --output reports/generated/iam_findings.json
 ```
 
+## Run the Storage Analyzer
+
+```bash
+python3 storage_analyzer/analyzer.py \
+  sample_data/storage/sample_storage_environment.json
+```
+
+Export findings as JSON:
+
+```bash
+python3 storage_analyzer/analyzer.py \
+  sample_data/storage/sample_storage_environment.json \
+  --output reports/generated/storage_findings.json
+```
+
 ## Generate Risk Report
 
 ```bash
 python3 report_generator/generate_report.py \
   --findings reports/generated/iam_findings.json \
+  --findings reports/generated/storage_findings.json \
   --output reports/generated/cloud_security_report.md
 ```
 
@@ -93,7 +129,7 @@ A committed sample report is available at `reports/cloud_security_report_sample.
 ## Run Tests
 
 ```bash
-python3 -m unittest iam_analyzer.test_analyzer report_generator.test_generate_report
+python3 -m unittest discover
 ```
 
 ## Project Structure
@@ -114,8 +150,14 @@ cloud_security_misconfiguration_lab/
 ├── reports/
 │   └── cloud_security_report_sample.md
 ├── sample_data/
-│   └── iam/
-│       └── sample_iam_environment.json
+│   ├── iam/
+│   │   └── sample_iam_environment.json
+│   └── storage/
+│       └── sample_storage_environment.json
+├── storage_analyzer/
+│   ├── analyzer.py
+│   ├── README.md
+│   └── test_analyzer.py
 └── .gitignore
 ```
 

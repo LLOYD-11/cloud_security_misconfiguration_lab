@@ -1,0 +1,87 @@
+{
+  "account_id": "111122223333",
+  "buckets": [
+    {
+      "name": "public-customer-exports",
+      "public_access_block": {
+        "block_public_acls": false,
+        "ignore_public_acls": false,
+        "block_public_policy": false,
+        "restrict_public_buckets": false
+      },
+      "acl": {
+        "grants": [
+          {
+            "grantee": "AllUsers",
+            "permission": "READ"
+          }
+        ]
+      },
+      "bucket_policy": {
+        "statements": [
+          {
+            "sid": "PublicRead",
+            "effect": "Allow",
+            "principal": "*",
+            "action": "s3:GetObject",
+            "resource": "arn:aws:s3:::public-customer-exports/*"
+          }
+        ]
+      },
+      "encryption": {
+        "enabled": false
+      },
+      "versioning": {
+        "status": "Suspended"
+      }
+    },
+    {
+      "name": "internal-audit-logs",
+      "public_access_block": {
+        "block_public_acls": true,
+        "ignore_public_acls": true,
+        "block_public_policy": true,
+        "restrict_public_buckets": true
+      },
+      "acl": {
+        "grants": [
+          {
+            "grantee": "AccountOwner",
+            "permission": "FULL_CONTROL"
+          }
+        ]
+      },
+      "bucket_policy": {
+        "statements": []
+      },
+      "encryption": {
+        "enabled": true,
+        "algorithm": "aws:kms"
+      },
+      "versioning": {
+        "status": "Enabled"
+      }
+    },
+    {
+      "name": "analytics-raw-data",
+      "public_access_block": {
+        "block_public_acls": true,
+        "ignore_public_acls": true,
+        "block_public_policy": true,
+        "restrict_public_buckets": true
+      },
+      "acl": {
+        "grants": []
+      },
+      "bucket_policy": {
+        "statements": []
+      },
+      "encryption": {
+        "enabled": false
+      },
+      "versioning": {
+        "status": "Disabled"
+      }
+    }
+  ]
+}
