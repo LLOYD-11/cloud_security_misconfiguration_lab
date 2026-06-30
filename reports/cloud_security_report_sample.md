@@ -27,6 +27,8 @@ This report consolidates 29 finding(s) from offline cloud security analyzers.
 
 ## Source Files
 
+The source files below are generated locally under `reports/generated/` and are not committed to the repository.
+
 - `reports/generated/iam_findings.json`
 - `reports/generated/storage_findings.json`
 - `reports/generated/network_findings.json`

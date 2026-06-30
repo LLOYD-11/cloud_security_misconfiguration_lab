@@ -4,7 +4,7 @@ This project is an offline-first cloud security lab for identifying risky IAM an
 
 The goal is to build a practical, explainable project that shows cloud security reasoning without requiring a live AWS or Azure account during the early stages.
 
-## Current Scope
+## Modules
 
 ### Module 1: IAM Policy Analyzer
 
@@ -185,6 +185,10 @@ python3 report_generator/generate_report.py \
 ```
 
 A committed sample report is available at `reports/cloud_security_report_sample.md`.
+
+## Requirements
+
+Python 3.10 or later. No third-party packages required.
 
 ## Run Tests
 
