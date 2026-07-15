@@ -1,8 +1,8 @@
 # Cloud Security Misconfiguration Lab
 
-This project is an offline-first cloud security lab for identifying risky IAM and cloud configuration patterns from sample JSON data.
+This project is an offline-first AWS security analysis lab for identifying risky identity, storage, network, and audit-event patterns from JSON evidence.
 
-The goal is to build a practical, explainable project that shows cloud security reasoning without requiring a live AWS or Azure account during the early stages.
+The goal is to provide practical and explainable security findings without requiring cloud credentials or making changes to a live AWS account.
 
 ## Modules
 
@@ -14,13 +14,13 @@ The first module analyzes sample IAM users, identity policies, and trust policie
 - Wildcard resources such as `Resource: "*"`
 - Administrator-style access
 - Broad S3 permissions
-- Missing MFA conditions on sensitive access
+- Sensitive user permissions without an MFA policy guard
 - Cross-account trust relationships
 - Long-lived access keys in sample user metadata
 
 The analyzer produces terminal findings and exports structured JSON evidence for reporting.
 
-Current rule IDs:
+Rule catalog:
 
 | Rule | Risk Pattern |
 | --- | --- |
@@ -61,28 +61,28 @@ The storage analyzer checks sample S3-style bucket configurations for common exp
 - Incomplete S3 Block Public Access controls
 - Public ACL grants
 - Bucket policies that allow `Principal: "*"`
-- Missing default encryption
+- Missing an explicit bucket encryption configuration beyond the S3 SSE-S3 baseline
 - Missing or suspended versioning
 
-Current rule IDs:
+Rule catalog:
 
 | Rule | Risk Pattern |
 | --- | --- |
 | `STO-001` | S3 public access block is incomplete |
 | `STO-002` | Bucket ACL grants public access |
 | `STO-003` | Bucket policy allows public principal |
-| `STO-004` | Bucket encryption is disabled |
+| `STO-004` | Bucket lacks an explicit encryption configuration |
 | `STO-005` | Bucket versioning is not enabled |
 
 ### Module 4: Network Configuration Analyzer
 
 The network analyzer checks sample security group configurations for risky network exposure:
 
-- Sensitive ports open to `0.0.0.0/0` or `::/0`
+- Protocol-aware sensitive ports open to internet-wide or exceptionally broad public CIDRs
 - All inbound ports open to the internet
 - Unrestricted outbound traffic to the internet
 
-Current rule IDs:
+Rule catalog:
 
 | Rule | Risk Pattern |
 | --- | --- |
@@ -96,12 +96,14 @@ The CloudTrail detector checks sample audit events for suspicious cloud API acti
 
 - Root account console login
 - MFA device disabled or deleted
-- Security group configuration changed
-- Bucket policy changed
-- IAM policy changed
+- Successful security group authorization changes
+- Successful bucket access changes that can weaken controls
+- Successful IAM policy changes that can add access
 - Repeated API failures from one actor and source
 
-Current rule IDs:
+Duplicate CloudTrail events with the same `eventID` are analyzed once. Failed API calls remain available to the failure-spike detector but are not reported as successful configuration changes.
+
+Rule catalog:
 
 | Rule | Risk Pattern |
 | --- | --- |
@@ -181,10 +183,17 @@ python3 report_generator/generate_report.py \
   --findings reports/generated/storage_findings.json \
   --findings reports/generated/network_findings.json \
   --findings reports/generated/cloudtrail_findings.json \
+  --report-date 2026-06-30 \
   --output reports/generated/cloud_security_report.md
 ```
 
-A committed sample report is available at `reports/cloud_security_report_sample.md`.
+A [committed sample report](reports/cloud_security_report_sample.md) demonstrates the complete pipeline output. The explicit report date makes this sample reproducible; omit `--report-date` to use the current local date.
+
+## Project Documentation
+
+- [Upgrade roadmap](ROADMAP.md)
+- [Known limitations](docs/known-limitations.md)
+- [Change log](CHANGELOG.md)
 
 ## Requirements
 
@@ -201,6 +210,8 @@ python3 -m unittest discover
 ```text
 cloud_security_misconfiguration_lab/
 ├── README.md
+├── ROADMAP.md
+├── CHANGELOG.md
 ├── cloud_findings/
 │   └── finding.py
 ├── cloudtrail_detector/
@@ -234,9 +245,12 @@ cloud_security_misconfiguration_lab/
 │   ├── analyzer.py
 │   ├── README.md
 │   └── test_analyzer.py
+├── docs/
+│   └── known-limitations.md
+├── LICENSE
 └── .gitignore
 ```
 
 ## Safety Boundary
 
-This project starts with offline sample data. Do not connect it to a real cloud account unless the account is owned by you or you have explicit permission to assess it.
+This project operates on offline sample data. Do not connect future collectors to a real cloud account unless the account is owned by you or you have explicit permission to assess it.

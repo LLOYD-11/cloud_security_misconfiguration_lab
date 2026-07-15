@@ -11,7 +11,7 @@ It does not call AWS APIs or require cloud credentials. The sample data models b
 | `STO-001` | High | S3 public access block is incomplete |
 | `STO-002` | Critical | Bucket ACL grants public access |
 | `STO-003` | Critical | Bucket policy allows a public principal |
-| `STO-004` | Medium | Bucket encryption is disabled |
+| `STO-004` | Low | Bucket lacks an explicit encryption configuration beyond the S3 SSE-S3 baseline |
 | `STO-005` | Medium | Bucket versioning is not enabled |
 
 Each finding uses the shared schema and includes references to AWS S3 documentation or MITRE ATT&CK where applicable.

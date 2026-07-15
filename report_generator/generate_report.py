@@ -20,6 +20,15 @@ from cloud_findings import Finding, load_findings_file, severity_rank, sort_find
 SEVERITY_ORDER = ("critical", "high", "medium", "low", "info")
 
 
+def _parse_report_date(value: str) -> date:
+    try:
+        return date.fromisoformat(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(
+            "report date must use YYYY-MM-DD format"
+        ) from exc
+
+
 def load_all_findings(paths: Iterable[Path]) -> list[Finding]:
     findings: list[Finding] = []
     for path in paths:
@@ -100,6 +109,8 @@ def render_report(
             "",
             "## Source Files",
             "",
+            "The source files below are generated analyzer outputs and are not committed to the repository.",
+            "",
         ]
     )
     for path in source_files:
@@ -156,6 +167,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Path to a findings JSON file. Repeat this option to merge multiple modules.",
     )
     parser.add_argument("--output", type=Path, required=True, help="Markdown report output path.")
+    parser.add_argument(
+        "--report-date",
+        type=_parse_report_date,
+        help="Report date in YYYY-MM-DD format. Defaults to the current local date.",
+    )
     return parser
 
 
@@ -168,7 +184,11 @@ def main() -> int:
     except (OSError, ValueError, KeyError) as exc:
         parser.error(str(exc))
 
-    report = render_report(findings, source_files=args.findings)
+    report = render_report(
+        findings,
+        source_files=args.findings,
+        report_date=args.report_date,
+    )
     write_report(args.output, report)
     print(f"Report saved to {args.output}")
     print(f"Findings included: {len(findings)}")

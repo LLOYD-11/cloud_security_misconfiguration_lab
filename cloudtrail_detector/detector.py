@@ -30,17 +30,11 @@ REF_MITRE_BRUTE_FORCE = "https://attack.mitre.org/techniques/T1110/"
 MFA_DISABLE_EVENTS = {"DeactivateMFADevice", "DeleteVirtualMFADevice"}
 SECURITY_GROUP_CHANGE_EVENTS = {
     "AuthorizeSecurityGroupIngress",
-    "RevokeSecurityGroupIngress",
     "AuthorizeSecurityGroupEgress",
-    "RevokeSecurityGroupEgress",
-    "CreateSecurityGroup",
-    "DeleteSecurityGroup",
 }
 BUCKET_POLICY_CHANGE_EVENTS = {
     "PutBucketPolicy",
-    "DeleteBucketPolicy",
     "PutBucketAcl",
-    "PutPublicAccessBlock",
     "DeletePublicAccessBlock",
 }
 IAM_POLICY_CHANGE_EVENTS = {
@@ -48,10 +42,6 @@ IAM_POLICY_CHANGE_EVENTS = {
     "AttachRolePolicy",
     "CreatePolicy",
     "CreatePolicyVersion",
-    "DeletePolicy",
-    "DeletePolicyVersion",
-    "DetachUserPolicy",
-    "DetachRolePolicy",
     "PutUserPolicy",
     "PutRolePolicy",
     "SetDefaultPolicyVersion",
@@ -99,6 +89,17 @@ def _event_id(event: dict[str, Any], index: int) -> str:
     return str(event.get("eventID") or f"{_event_name(event)}-{index + 1}")
 
 
+def _event_succeeded(event: dict[str, Any]) -> bool:
+    if event.get("errorCode") or event.get("errorMessage"):
+        return False
+    if _event_name(event) == "ConsoleLogin":
+        response = event.get("responseElements", {})
+        if not isinstance(response, dict):
+            return False
+        return str(response.get("ConsoleLogin", "")).lower() == "success"
+    return True
+
+
 def _add_finding(
     findings: list[Finding],
     *,
@@ -133,12 +134,16 @@ def _add_finding(
 
 def analyze_single_event(event: dict[str, Any], index: int) -> list[Finding]:
     findings: list[Finding] = []
+    if not _event_succeeded(event):
+        return findings
+
     event_name = _event_name(event)
     actor = _actor(event)
     source_ip = _source_ip(event)
     event_time = str(event.get("eventTime", "unknown-time"))
     identity_type = str(event.get("userIdentity", {}).get("type", "unknown"))
     base_metadata = {
+        "event_id": _event_id(event, index),
         "event_name": event_name,
         "event_time": event_time,
         "source_ip": source_ip,
@@ -284,7 +289,17 @@ def analyze_environment(
     failure_threshold: int = 5,
     failure_window_minutes: int = 10,
 ) -> list[Finding]:
-    events = [event for event in environment.get("events", []) if isinstance(event, dict)]
+    raw_events = [event for event in environment.get("events", []) if isinstance(event, dict)]
+    events: list[dict[str, Any]] = []
+    seen_event_ids: set[str] = set()
+    for index, event in enumerate(raw_events):
+        event_id = event.get("eventID")
+        if event_id:
+            normalized_event_id = str(event_id)
+            if normalized_event_id in seen_event_ids:
+                continue
+            seen_event_ids.add(normalized_event_id)
+        events.append(event)
     findings: list[Finding] = []
 
     for index, event in enumerate(events):

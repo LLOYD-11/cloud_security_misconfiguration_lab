@@ -18,6 +18,7 @@ class NetworkAnalyzerTests(unittest.TestCase):
         findings = analyze_environment(environment)
         rule_ids = {finding.rule_id for finding in findings}
 
+        self.assertEqual(7, len(findings))
         self.assertIn("NET-001", rule_ids)
         self.assertIn("NET-002", rule_ids)
         self.assertIn("NET-003", rule_ids)
@@ -101,6 +102,51 @@ class NetworkAnalyzerTests(unittest.TestCase):
         findings = analyze_environment(environment)
 
         self.assertEqual(["NET-002"], [finding.rule_id for finding in findings])
+
+    def test_udp_database_port_is_not_reported_as_tcp_database_service(self):
+        environment = {
+            "security_groups": [
+                {
+                    "id": "sg-udp",
+                    "name": "udp-range",
+                    "inbound_rules": [
+                        {
+                            "protocol": "udp",
+                            "from_port": 3306,
+                            "to_port": 3306,
+                            "cidr": "0.0.0.0/0",
+                        }
+                    ],
+                    "outbound_rules": [],
+                }
+            ]
+        }
+
+        self.assertEqual([], analyze_environment(environment))
+
+    def test_broad_public_cidr_is_detected(self):
+        environment = {
+            "security_groups": [
+                {
+                    "id": "sg-broad",
+                    "name": "broad-range",
+                    "inbound_rules": [
+                        {
+                            "protocol": "tcp",
+                            "from_port": 22,
+                            "to_port": 22,
+                            "cidr": "0.0.0.0/1",
+                        }
+                    ],
+                    "outbound_rules": [],
+                }
+            ]
+        }
+
+        findings = analyze_environment(environment)
+
+        self.assertEqual(["NET-001"], [finding.rule_id for finding in findings])
+        self.assertEqual("broad-public", findings[0].metadata["exposure_scope"])
 
     def test_findings_export_writes_shared_schema(self):
         environment = load_environment(SAMPLE_FILE)

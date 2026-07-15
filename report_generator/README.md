@@ -2,6 +2,8 @@
 
 This module generates a Markdown risk report from one or more shared finding JSON files.
 
+Finding inputs must use the versioned object written by the analyzers. The loader rejects unsupported schema versions, mismatched `finding_count` values, missing required fields, and unknown severities instead of silently omitting malformed findings.
+
 Every analyzer should output the same finding schema:
 
 - `rule_id`
@@ -42,19 +44,11 @@ python3 report_generator/generate_report.py \
   --findings reports/generated/storage_findings.json \
   --findings reports/generated/network_findings.json \
   --findings reports/generated/cloudtrail_findings.json \
+  --report-date 2026-06-30 \
   --output reports/generated/cloud_security_report.md
 ```
 
-The `--findings` option can be repeated as new modules are added:
-
-```bash
-python3 report_generator/generate_report.py \
-  --findings reports/generated/iam_findings.json \
-  --findings reports/generated/storage_findings.json \
-  --findings reports/generated/network_findings.json \
-  --findings reports/generated/cloudtrail_findings.json \
-  --output reports/generated/cloud_security_report.md
-```
+The `--findings` option can be repeated as new modules are added. Use `--report-date YYYY-MM-DD` for deterministic output, or omit it to use the current local date.
 
 ## Test
 

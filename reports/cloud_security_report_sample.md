@@ -4,7 +4,7 @@ Generated: 2026-06-30
 
 ## Executive Summary
 
-This report consolidates 29 finding(s) from offline cloud security analyzers.
+This report consolidates 28 finding(s) from offline cloud security analyzers.
 
 ## Severity Summary
 
@@ -12,8 +12,8 @@ This report consolidates 29 finding(s) from offline cloud security analyzers.
 | --- | ---: |
 | Critical | 5 |
 | High | 10 |
-| Medium | 14 |
-| Low | 0 |
+| Medium | 11 |
+| Low | 2 |
 | Info | 0 |
 
 ## Module Coverage
@@ -21,13 +21,13 @@ This report consolidates 29 finding(s) from offline cloud security analyzers.
 | Module | Findings |
 | --- | ---: |
 | cloudtrail | 6 |
-| iam | 9 |
+| iam | 8 |
 | network | 7 |
 | storage | 7 |
 
 ## Source Files
 
-The source files below are generated locally under `reports/generated/` and are not committed to the repository.
+The source files below are generated analyzer outputs and are not committed to the repository.
 
 - `reports/generated/iam_findings.json`
 - `reports/generated/storage_findings.json`
@@ -46,7 +46,7 @@ The source files below are generated locally under `reports/generated/` and are 
 - Evidence: Root ConsoleLogin event from 203.0.113.10 at 2026-06-30T01:00:00Z.
 - Impact: Root account use is highly sensitive and may indicate emergency access or account compromise.
 - Remediation: Avoid routine root use, confirm the login was authorized, and require MFA on the root account.
-- Metadata: actor: arn:aws:iam::111122223333:root, event_name: ConsoleLogin, event_time: 2026-06-30T01:00:00Z, source_ip: 203.0.113.10
+- Metadata: actor: arn:aws:iam::111122223333:root, event_id: ConsoleLogin-1, event_name: ConsoleLogin, event_time: 2026-06-30T01:00:00Z, source_ip: 203.0.113.10
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://attack.mitre.org/techniques/T1078/004/
 
 #### IAM-001: Administrator-style wildcard permission
@@ -68,7 +68,7 @@ The source files below are generated locally under `reports/generated/` and are 
 - Evidence: Inbound rule 1 allows -1 all from 0.0.0.0/0.
 - Impact: Any exposed service attached to this security group may be reachable from the public internet.
 - Remediation: Remove all-port public inbound access and allow only required ports from trusted CIDR ranges.
-- Metadata: group_name: all-open, rule_index: 1
+- Metadata: exposure_scope: internet-wide, group_name: all-open, rule_index: 1
 - References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://attack.mitre.org/techniques/T1578/005/
 
 #### STO-002: Bucket ACL grants public access
@@ -103,7 +103,7 @@ The source files below are generated locally under `reports/generated/` and are 
 - Evidence: DeactivateMFADevice was called by alice-admin from 198.51.100.20 at 2026-06-30T01:04:00Z.
 - Impact: Disabling MFA weakens account protection and may be part of account takeover or persistence activity.
 - Remediation: Confirm the MFA change was authorized and re-enable MFA for affected users.
-- Metadata: actor: alice-admin, event_name: DeactivateMFADevice, event_time: 2026-06-30T01:04:00Z, source_ip: 198.51.100.20
+- Metadata: actor: alice-admin, event_id: DeactivateMFADevice-2, event_name: DeactivateMFADevice, event_time: 2026-06-30T01:04:00Z, source_ip: 198.51.100.20
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://attack.mitre.org/techniques/T1098/
 
 #### CLD-004: Bucket access policy changed
@@ -114,7 +114,7 @@ The source files below are generated locally under `reports/generated/` and are 
 - Evidence: PutBucketPolicy was called by alice-admin from 198.51.100.20 at 2026-06-30T01:12:00Z.
 - Impact: Bucket policy or public-access changes can expose cloud storage data.
 - Remediation: Review the bucket policy diff and restore least-privilege access if the change was not approved.
-- Metadata: actor: alice-admin, event_name: PutBucketPolicy, event_time: 2026-06-30T01:12:00Z, source_ip: 198.51.100.20
+- Metadata: actor: alice-admin, event_id: PutBucketPolicy-4, event_name: PutBucketPolicy, event_time: 2026-06-30T01:12:00Z, source_ip: 198.51.100.20
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-policies.html, https://attack.mitre.org/techniques/T1565/
 
 #### CLD-005: IAM policy configuration changed
@@ -125,7 +125,7 @@ The source files below are generated locally under `reports/generated/` and are 
 - Evidence: CreatePolicyVersion was called by alice-admin from 198.51.100.20 at 2026-06-30T01:15:00Z.
 - Impact: IAM policy changes can grant new permissions, create persistence, or weaken least privilege.
 - Remediation: Review the IAM policy change and confirm it matches an approved access request.
-- Metadata: actor: alice-admin, event_name: CreatePolicyVersion, event_time: 2026-06-30T01:15:00Z, source_ip: 198.51.100.20
+- Metadata: actor: alice-admin, event_id: CreatePolicyVersion-5, event_name: CreatePolicyVersion, event_time: 2026-06-30T01:15:00Z, source_ip: 198.51.100.20
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://attack.mitre.org/techniques/T1098/
 
 #### IAM-004: Broad S3 write permission
@@ -144,7 +144,7 @@ The source files below are generated locally under `reports/generated/` and are 
 - Module: `iam`
 - Category: `identity-and-access`
 - Resource: `role/third-party-audit-role`
-- Evidence: Trust policy allows an external principal: {"AWS": "arn:aws:iam::999988887777:root"}.
+- Evidence: Trust policy allows external principal(s): ["arn:aws:iam::999988887777:root"].
 - Impact: An external account or principal may be able to assume this role.
 - Remediation: Require an external ID, restrict the trusted principal, and confirm the business need for cross-account access.
 - Metadata: policy_name: trust-policy, statement_id: ExternalAccountTrust
@@ -158,7 +158,7 @@ The source files below are generated locally under `reports/generated/` and are 
 - Evidence: Inbound rule 1 allows tcp 22 from 0.0.0.0/0.
 - Impact: SSH exposure can increase the risk of brute force, exploitation, or unauthorized administrative access.
 - Remediation: Restrict SSH access to a VPN, bastion host, private CIDR, or specific trusted IP range.
-- Metadata: group_name: admin-open, port: 22, rule_index: 1, service: SSH
+- Metadata: exposure_scope: internet-wide, group_name: admin-open, port: 22, rule_index: 1, service: SSH
 - References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
 
 #### NET-001: Sensitive RDP port is open to the internet
@@ -169,7 +169,7 @@ The source files below are generated locally under `reports/generated/` and are 
 - Evidence: Inbound rule 2 allows tcp 3389 from ::/0.
 - Impact: RDP exposure can increase the risk of brute force, exploitation, or unauthorized administrative access.
 - Remediation: Restrict RDP access to a VPN, bastion host, private CIDR, or specific trusted IP range.
-- Metadata: group_name: admin-open, port: 3389, rule_index: 2, service: RDP
+- Metadata: exposure_scope: internet-wide, group_name: admin-open, port: 3389, rule_index: 2, service: RDP
 - References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
 
 #### NET-001: Sensitive MySQL port is open to the internet
@@ -180,7 +180,7 @@ The source files below are generated locally under `reports/generated/` and are 
 - Evidence: Inbound rule 1 allows tcp 3306 from 0.0.0.0/0.
 - Impact: MySQL exposure can increase the risk of brute force, exploitation, or unauthorized administrative access.
 - Remediation: Restrict MySQL access to a VPN, bastion host, private CIDR, or specific trusted IP range.
-- Metadata: group_name: database-public, port: 3306, rule_index: 1, service: MySQL
+- Metadata: exposure_scope: internet-wide, group_name: database-public, port: 3306, rule_index: 1, service: MySQL
 - References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
 
 #### NET-001: Sensitive PostgreSQL port is open to the internet
@@ -191,7 +191,7 @@ The source files below are generated locally under `reports/generated/` and are 
 - Evidence: Inbound rule 2 allows tcp 5432 from 0.0.0.0/0.
 - Impact: PostgreSQL exposure can increase the risk of brute force, exploitation, or unauthorized administrative access.
 - Remediation: Restrict PostgreSQL access to a VPN, bastion host, private CIDR, or specific trusted IP range.
-- Metadata: group_name: database-public, port: 5432, rule_index: 2, service: PostgreSQL
+- Metadata: exposure_scope: internet-wide, group_name: database-public, port: 5432, rule_index: 2, service: PostgreSQL
 - References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
 
 #### STO-001: S3 public access block is incomplete
@@ -215,7 +215,7 @@ The source files below are generated locally under `reports/generated/` and are 
 - Evidence: AuthorizeSecurityGroupIngress was called by alice-admin from 198.51.100.20 at 2026-06-30T01:09:00Z.
 - Impact: Security group changes can expose services, enable lateral movement, or weaken network controls.
 - Remediation: Review the rule change, verify the business need, and revert unauthorized exposure.
-- Metadata: actor: alice-admin, event_name: AuthorizeSecurityGroupIngress, event_time: 2026-06-30T01:09:00Z, source_ip: 198.51.100.20
+- Metadata: actor: alice-admin, event_id: AuthorizeSecurityGroupIngress-3, event_name: AuthorizeSecurityGroupIngress, event_time: 2026-06-30T01:09:00Z, source_ip: 198.51.100.20
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://attack.mitre.org/techniques/T1578/005/
 
 #### CLD-006: Repeated API failures from one actor and source
@@ -250,17 +250,6 @@ The source files below are generated locally under `reports/generated/` and are 
 - Remediation: Scope the statement to specific ARNs wherever the service supports resource-level permissions.
 - Metadata: policy_name: OverBroadAdminPolicy, statement_id: FullAdmin
 - References: https://attack.mitre.org/techniques/T1078/004/, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
-
-#### IAM-005: Sensitive action without MFA condition
-
-- Module: `iam`
-- Category: `identity-and-access`
-- Resource: `role/third-party-audit-role`
-- Evidence: Sensitive action is allowed without an MFA condition.
-- Impact: Compromised credentials could be used for privileged activity without an additional identity check.
-- Remediation: Add an MFA condition for sensitive IAM, STS, KMS, account, or organization actions where appropriate.
-- Metadata: policy_name: AuditReadOnly, statement_id: AuditRead
-- References: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
 #### IAM-005: Sensitive action without MFA condition
 
@@ -303,7 +292,7 @@ The source files below are generated locally under `reports/generated/` and are 
 - Evidence: Outbound rule 1 allows -1 all from 0.0.0.0/0.
 - Impact: Compromised workloads may communicate freely with internet destinations, making exfiltration or command-and-control traffic harder to contain.
 - Remediation: Restrict outbound traffic to required protocols, ports, and destination CIDR ranges where practical.
-- Metadata: group_name: admin-open, rule_index: 1
+- Metadata: exposure_scope: internet-wide, group_name: admin-open, rule_index: 1
 - References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
 
 #### NET-003: Security group allows unrestricted outbound traffic
@@ -314,30 +303,8 @@ The source files below are generated locally under `reports/generated/` and are 
 - Evidence: Outbound rule 1 allows -1 all from ::/0.
 - Impact: Compromised workloads may communicate freely with internet destinations, making exfiltration or command-and-control traffic harder to contain.
 - Remediation: Restrict outbound traffic to required protocols, ports, and destination CIDR ranges where practical.
-- Metadata: group_name: all-open, rule_index: 1
+- Metadata: exposure_scope: internet-wide, group_name: all-open, rule_index: 1
 - References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
-
-#### STO-004: Bucket encryption is disabled
-
-- Module: `storage`
-- Category: `data-exposure`
-- Resource: `bucket/analytics-raw-data`
-- Evidence: Bucket encryption configuration is missing or disabled.
-- Impact: Stored data may lack a default server-side encryption control.
-- Remediation: Enable default server-side encryption, preferably with a managed KMS key for sensitive data.
-- Metadata: None
-- References: https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingServerSideEncryption.html
-
-#### STO-004: Bucket encryption is disabled
-
-- Module: `storage`
-- Category: `data-exposure`
-- Resource: `bucket/public-customer-exports`
-- Evidence: Bucket encryption configuration is missing or disabled.
-- Impact: Stored data may lack a default server-side encryption control.
-- Remediation: Enable default server-side encryption, preferably with a managed KMS key for sensitive data.
-- Metadata: None
-- References: https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingServerSideEncryption.html
 
 #### STO-005: Bucket versioning is not enabled
 
@@ -360,3 +327,27 @@ The source files below are generated locally under `reports/generated/` and are 
 - Remediation: Enable bucket versioning for important data and pair it with lifecycle rules if storage cost matters.
 - Metadata: versioning_status: Suspended
 - References: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html
+
+### Low
+
+#### STO-004: Bucket lacks an explicit encryption configuration
+
+- Module: `storage`
+- Category: `data-exposure`
+- Resource: `bucket/analytics-raw-data`
+- Evidence: No explicit bucket-level default encryption configuration is present in the input.
+- Impact: S3 applies baseline SSE-S3 encryption to new objects, but explicit key-management requirements cannot be confirmed.
+- Remediation: For sensitive or regulated data, configure explicit default encryption with an approved KMS key and document key ownership requirements.
+- Metadata: None
+- References: https://docs.aws.amazon.com/AmazonS3/latest/userguide/default-encryption-faq.html, https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingServerSideEncryption.html
+
+#### STO-004: Bucket lacks an explicit encryption configuration
+
+- Module: `storage`
+- Category: `data-exposure`
+- Resource: `bucket/public-customer-exports`
+- Evidence: No explicit bucket-level default encryption configuration is present in the input.
+- Impact: S3 applies baseline SSE-S3 encryption to new objects, but explicit key-management requirements cannot be confirmed.
+- Remediation: For sensitive or regulated data, configure explicit default encryption with an approved KMS key and document key ownership requirements.
+- Metadata: None
+- References: https://docs.aws.amazon.com/AmazonS3/latest/userguide/default-encryption-faq.html, https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingServerSideEncryption.html

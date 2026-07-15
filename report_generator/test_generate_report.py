@@ -1,10 +1,16 @@
+import json
 import tempfile
 import unittest
 from datetime import date
 from pathlib import Path
 
-from cloud_findings import Finding, write_findings
-from report_generator.generate_report import load_all_findings, render_report, write_report
+from cloud_findings import Finding, load_findings_file, write_findings
+from report_generator.generate_report import (
+    build_parser,
+    load_all_findings,
+    render_report,
+    write_report,
+)
 
 
 class ReportGeneratorTests(unittest.TestCase):
@@ -79,6 +85,107 @@ class ReportGeneratorTests(unittest.TestCase):
             write_report(output_path, "# Report\n")
 
             self.assertEqual("# Report\n", output_path.read_text(encoding="utf-8"))
+
+    def test_parser_accepts_explicit_report_date(self):
+        args = build_parser().parse_args(
+            [
+                "--findings",
+                "findings.json",
+                "--output",
+                "report.md",
+                "--report-date",
+                "2026-06-30",
+            ]
+        )
+
+        self.assertEqual(date(2026, 6, 30), args.report_date)
+
+    def test_finding_rejects_unknown_severity(self):
+        with self.assertRaisesRegex(ValueError, "severity"):
+            Finding(
+                rule_id="TEST-001",
+                severity="urgent",
+                module="test",
+                category="test",
+                resource_type="resource",
+                resource_id="example",
+                title="Invalid severity",
+                evidence="Evidence",
+                impact="Impact",
+                remediation="Remediation",
+            )
+
+    def test_loader_rejects_unknown_schema_version(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "findings.json"
+            path.write_text(
+                '{"schema_version":"999.0","finding_count":0,"findings":[]}\n',
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "schema version"):
+                load_findings_file(path)
+
+    def test_loader_rejects_incorrect_finding_count(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "findings.json"
+            path.write_text(
+                '{"schema_version":"1.0","finding_count":1,"findings":[]}\n',
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(ValueError, "finding_count"):
+                load_findings_file(path)
+
+    def test_loader_rejects_unversioned_legacy_list(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "findings.json"
+            path.write_text("[]\n", encoding="utf-8")
+
+            with self.assertRaisesRegex(ValueError, "versioned"):
+                load_findings_file(path)
+
+    def test_loader_rejects_non_string_finding_values(self):
+        valid_finding = {
+            "rule_id": "TEST-001",
+            "severity": "high",
+            "module": "test",
+            "category": "test",
+            "resource_type": "resource",
+            "resource_id": "example",
+            "title": "Example finding",
+            "evidence": "Evidence",
+            "impact": "Impact",
+            "remediation": "Remediation",
+            "references": ["https://example.com/reference"],
+            "metadata": {"source": "test"},
+        }
+        invalid_values = (
+            ("rule_id", 101, "rule_id"),
+            ("severity", 3, "severity"),
+            ("references", [42], "references"),
+            ("metadata", {"attempts": 5}, "metadata"),
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "findings.json"
+            for field_name, invalid_value, error_pattern in invalid_values:
+                with self.subTest(field_name=field_name):
+                    finding = dict(valid_finding)
+                    finding[field_name] = invalid_value
+                    path.write_text(
+                        json.dumps(
+                            {
+                                "schema_version": "1.0",
+                                "finding_count": 1,
+                                "findings": [finding],
+                            }
+                        ),
+                        encoding="utf-8",
+                    )
+
+                    with self.assertRaisesRegex(ValueError, error_pattern):
+                        load_findings_file(path)
 
 
 if __name__ == "__main__":

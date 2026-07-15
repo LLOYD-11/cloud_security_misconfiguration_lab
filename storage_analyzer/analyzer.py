@@ -20,6 +20,7 @@ REF_AWS_S3_BLOCK_PUBLIC_ACCESS = "https://docs.aws.amazon.com/AmazonS3/latest/us
 REF_AWS_S3_ACLS = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html"
 REF_AWS_S3_BUCKET_POLICIES = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-policies.html"
 REF_AWS_S3_ENCRYPTION = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingServerSideEncryption.html"
+REF_AWS_S3_DEFAULT_ENCRYPTION = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/default-encryption-faq.html"
 REF_AWS_S3_VERSIONING = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html"
 REF_MITRE_CLOUD_STORAGE_DISCOVERY = "https://attack.mitre.org/techniques/T1619/"
 
@@ -30,7 +31,12 @@ PUBLIC_ACCESS_BLOCK_KEYS = (
     "restrict_public_buckets",
 )
 
-PUBLIC_GRANTEES = {"AllUsers", "AuthenticatedUsers", "http://acs.amazonaws.com/groups/global/AllUsers"}
+PUBLIC_GRANTEES = {
+    "AllUsers",
+    "AuthenticatedUsers",
+    "http://acs.amazonaws.com/groups/global/AllUsers",
+    "http://acs.amazonaws.com/groups/global/AuthenticatedUsers",
+}
 
 
 def _as_list(value: Any) -> list[Any]:
@@ -60,7 +66,9 @@ def _is_public_principal(principal: Any) -> bool:
     if principal == "*":
         return True
     if isinstance(principal, dict):
-        return any(value == "*" for value in principal.values())
+        return any(_is_public_principal(value) for value in principal.values())
+    if isinstance(principal, list):
+        return any(_is_public_principal(value) for value in principal)
     return False
 
 
@@ -156,14 +164,20 @@ def analyze_bucket(bucket: dict[str, Any]) -> list[Finding]:
     if encryption.get("enabled") is not True:
         _add_finding(
             findings,
-            severity="medium",
+            severity="low",
             rule_id="STO-004",
             resource_id=bucket_name,
-            title="Bucket encryption is disabled",
-            evidence="Bucket encryption configuration is missing or disabled.",
-            impact="Stored data may lack a default server-side encryption control.",
-            remediation="Enable default server-side encryption, preferably with a managed KMS key for sensitive data.",
-            references=[REF_AWS_S3_ENCRYPTION],
+            title="Bucket lacks an explicit encryption configuration",
+            evidence="No explicit bucket-level default encryption configuration is present in the input.",
+            impact=(
+                "S3 applies baseline SSE-S3 encryption to new objects, but explicit key-management "
+                "requirements cannot be confirmed."
+            ),
+            remediation=(
+                "For sensitive or regulated data, configure explicit default encryption with an "
+                "approved KMS key and document key ownership requirements."
+            ),
+            references=[REF_AWS_S3_DEFAULT_ENCRYPTION, REF_AWS_S3_ENCRYPTION],
         )
 
     versioning_status = str(bucket.get("versioning", {}).get("status", "Disabled"))

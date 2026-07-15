@@ -18,6 +18,7 @@ class CloudTrailDetectorTests(unittest.TestCase):
         findings = analyze_environment(environment)
         rule_ids = {finding.rule_id for finding in findings}
 
+        self.assertEqual(6, len(findings))
         self.assertIn("CLD-001", rule_ids)
         self.assertIn("CLD-002", rule_ids)
         self.assertIn("CLD-003", rule_ids)
@@ -108,6 +109,83 @@ class CloudTrailDetectorTests(unittest.TestCase):
             {"unknown-user@192.0.2.44", "unknown-user@198.51.100.22"},
             {finding.resource_id for finding in findings},
         )
+
+    def test_failed_change_event_does_not_claim_resource_was_changed(self):
+        environment = {
+            "events": [
+                {
+                    "eventTime": "2026-06-30T01:00:00Z",
+                    "eventName": "PutBucketPolicy",
+                    "sourceIPAddress": "192.0.2.1",
+                    "userIdentity": {"type": "IAMUser", "userName": "alice"},
+                    "requestParameters": {"bucketName": "example"},
+                    "errorCode": "AccessDenied",
+                }
+            ]
+        }
+
+        self.assertEqual([], analyze_environment(environment))
+
+    def test_failed_root_console_login_is_not_reported_as_successful_login(self):
+        environment = {
+            "events": [
+                {
+                    "eventTime": "2026-06-30T01:00:00Z",
+                    "eventName": "ConsoleLogin",
+                    "sourceIPAddress": "192.0.2.1",
+                    "userIdentity": {"type": "Root"},
+                    "responseElements": {"ConsoleLogin": "Failure"},
+                }
+            ]
+        }
+
+        self.assertEqual([], analyze_environment(environment))
+
+    def test_root_console_login_with_unknown_outcome_is_not_reported_as_successful(self):
+        environment = {
+            "events": [
+                {
+                    "eventTime": "2026-06-30T01:00:00Z",
+                    "eventName": "ConsoleLogin",
+                    "sourceIPAddress": "192.0.2.1",
+                    "userIdentity": {"type": "Root"},
+                    "responseElements": None,
+                }
+            ]
+        }
+
+        self.assertEqual([], analyze_environment(environment))
+
+    def test_risk_reducing_change_events_are_not_reported_as_risky_changes(self):
+        events = []
+        for index, event_name in enumerate(
+            ["RevokeSecurityGroupIngress", "DeleteBucketPolicy", "DetachUserPolicy"]
+        ):
+            events.append(
+                {
+                    "eventTime": f"2026-06-30T01:0{index}:00Z",
+                    "eventName": event_name,
+                    "sourceIPAddress": "192.0.2.1",
+                    "userIdentity": {"type": "IAMUser", "userName": "security-admin"},
+                    "requestParameters": {},
+                }
+            )
+
+        self.assertEqual([], analyze_environment({"events": events}))
+
+    def test_duplicate_event_ids_are_analyzed_once(self):
+        event = {
+            "eventID": "duplicate-event",
+            "eventTime": "2026-06-30T01:00:00Z",
+            "eventName": "PutBucketPolicy",
+            "sourceIPAddress": "192.0.2.1",
+            "userIdentity": {"type": "IAMUser", "userName": "alice"},
+            "requestParameters": {"bucketName": "example"},
+        }
+
+        findings = analyze_environment({"events": [event, dict(event)]})
+
+        self.assertEqual(["CLD-004"], [finding.rule_id for finding in findings])
 
     def test_findings_export_writes_shared_schema(self):
         environment = load_environment(SAMPLE_FILE)

@@ -30,12 +30,14 @@ Policies use simplified IAM-style statements with `effect`, `action`, `resource`
 | `IAM-002` | High | Allows wildcard action |
 | `IAM-003` | Medium | Uses wildcard resource |
 | `IAM-004` | High | Allows broad S3 write access |
-| `IAM-005` | Medium | Allows sensitive action without an MFA condition |
+| `IAM-005` | Medium | Allows a sensitive user action without an MFA policy condition |
 | `IAM-006` | Medium | User metadata shows MFA is disabled |
 | `IAM-007` | Medium | Access key is older than 90 days |
-| `IAM-008` | High | Role trust policy allows an external account |
+| `IAM-008` | High | Role trust policy allows an external AWS or federated principal |
 
 Each IAM finding includes references to the relevant MITRE ATT&CK or AWS IAM best-practice documentation where applicable.
+
+The analyzer evaluates AWS and federated principals individually, so a mixed same-account and external principal list is not treated as entirely trusted. AWS service principals such as `lambda.amazonaws.com` are not classified as cross-account principals.
 
 ## Run
 

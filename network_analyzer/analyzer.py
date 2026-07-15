@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import ipaddress
 import json
 from pathlib import Path
 import sys
@@ -20,25 +21,42 @@ REF_AWS_SECURITY_GROUPS = "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-
 REF_AWS_SECURITY_GROUP_RULES = "https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html"
 REF_MITRE_CLOUD_COMPUTE_INFRA_MODIFY = "https://attack.mitre.org/techniques/T1578/005/"
 
-PUBLIC_CIDRS = {"0.0.0.0/0", "::/0"}
 SENSITIVE_PORTS = {
-    22: "SSH",
-    3389: "RDP",
-    3306: "MySQL",
-    5432: "PostgreSQL",
+    22: ("SSH", frozenset({"tcp"})),
+    3389: ("RDP", frozenset({"tcp", "udp"})),
+    3306: ("MySQL", frozenset({"tcp"})),
+    5432: ("PostgreSQL", frozenset({"tcp"})),
 }
+
+BROAD_PUBLIC_PREFIX = {4: 8, 6: 32}
 
 
 def _rule_cidr(rule: dict[str, Any]) -> str:
     return str(rule.get("cidr", rule.get("cidr_ip", rule.get("cidr_ipv6", ""))))
 
 
-def _is_public_cidr(rule: dict[str, Any]) -> bool:
-    return _rule_cidr(rule) in PUBLIC_CIDRS
+def _exposure_scope(rule: dict[str, Any]) -> str | None:
+    try:
+        network = ipaddress.ip_network(_rule_cidr(rule), strict=False)
+    except ValueError:
+        return None
+
+    if network.prefixlen == 0:
+        return "internet-wide"
+    if network.is_private or network.is_loopback or network.is_link_local:
+        return None
+    if network.prefixlen <= BROAD_PUBLIC_PREFIX[network.version]:
+        return "broad-public"
+    return None
 
 
 def _protocol(rule: dict[str, Any]) -> str:
     return str(rule.get("protocol", "")).lower()
+
+
+def _normalized_protocol(rule: dict[str, Any]) -> str:
+    protocol = _protocol(rule)
+    return {"6": "tcp", "17": "udp"}.get(protocol, protocol)
 
 
 def _port_range(rule: dict[str, Any]) -> tuple[int | None, int | None]:
@@ -113,7 +131,8 @@ def analyze_security_group(group: dict[str, Any]) -> list[Finding]:
     group_name = str(group.get("name", group_id))
 
     for index, rule in enumerate(group.get("inbound_rules", [])):
-        if not _is_public_cidr(rule):
+        exposure_scope = _exposure_scope(rule)
+        if exposure_scope is None:
             continue
 
         if _is_all_ports(rule):
@@ -127,18 +146,28 @@ def analyze_security_group(group: dict[str, Any]) -> list[Finding]:
                 impact="Any exposed service attached to this security group may be reachable from the public internet.",
                 remediation="Remove all-port public inbound access and allow only required ports from trusted CIDR ranges.",
                 references=[REF_AWS_SECURITY_GROUPS, REF_AWS_SECURITY_GROUP_RULES, REF_MITRE_CLOUD_COMPUTE_INFRA_MODIFY],
-                metadata={"group_name": group_name, "rule_index": str(index + 1)},
+                metadata={
+                    "group_name": group_name,
+                    "rule_index": str(index + 1),
+                    "exposure_scope": exposure_scope,
+                },
             )
             continue
 
-        for port, service in SENSITIVE_PORTS.items():
-            if _covers_port(rule, port):
+        protocol = _normalized_protocol(rule)
+        for port, (service, supported_protocols) in SENSITIVE_PORTS.items():
+            if protocol in supported_protocols and _covers_port(rule, port):
+                exposure_title = (
+                    "the internet"
+                    if exposure_scope == "internet-wide"
+                    else "a broad public network"
+                )
                 _add_finding(
                     findings,
                     severity="high",
                     rule_id="NET-001",
                     resource_id=group_id,
-                    title=f"Sensitive {service} port is open to the internet",
+                    title=f"Sensitive {service} port is open to {exposure_title}",
                     evidence=f"Inbound rule {index + 1} allows {_rule_summary(rule)}.",
                     impact=f"{service} exposure can increase the risk of brute force, exploitation, or unauthorized administrative access.",
                     remediation=f"Restrict {service} access to a VPN, bastion host, private CIDR, or specific trusted IP range.",
@@ -148,11 +177,13 @@ def analyze_security_group(group: dict[str, Any]) -> list[Finding]:
                         "rule_index": str(index + 1),
                         "port": str(port),
                         "service": service,
+                        "exposure_scope": exposure_scope,
                     },
                 )
 
     for index, rule in enumerate(group.get("outbound_rules", [])):
-        if _is_public_cidr(rule) and _is_all_ports(rule):
+        exposure_scope = _exposure_scope(rule)
+        if exposure_scope is not None and _is_all_ports(rule):
             _add_finding(
                 findings,
                 severity="medium",
@@ -163,7 +194,11 @@ def analyze_security_group(group: dict[str, Any]) -> list[Finding]:
                 impact="Compromised workloads may communicate freely with internet destinations, making exfiltration or command-and-control traffic harder to contain.",
                 remediation="Restrict outbound traffic to required protocols, ports, and destination CIDR ranges where practical.",
                 references=[REF_AWS_SECURITY_GROUPS, REF_AWS_SECURITY_GROUP_RULES],
-                metadata={"group_name": group_name, "rule_index": str(index + 1)},
+                metadata={
+                    "group_name": group_name,
+                    "rule_index": str(index + 1),
+                    "exposure_scope": exposure_scope,
+                },
             )
 
     return findings

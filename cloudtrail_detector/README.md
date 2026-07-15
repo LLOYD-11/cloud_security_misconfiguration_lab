@@ -10,12 +10,14 @@ It does not call AWS APIs or require cloud credentials. The sample data models a
 | --- | --- | --- |
 | `CLD-001` | Critical | Root account console login |
 | `CLD-002` | High | MFA device disabled or deleted |
-| `CLD-003` | Medium | Security group configuration changed |
-| `CLD-004` | High | Bucket access policy changed |
-| `CLD-005` | High | IAM policy configuration changed |
+| `CLD-003` | Medium | Successful security group authorization change |
+| `CLD-004` | High | Successful bucket access change that can weaken controls |
+| `CLD-005` | High | Successful IAM policy change that can add access |
 | `CLD-006` | Medium | Repeated API failures from one actor and source |
 
 The failed API detector uses a default threshold of 5 failed API calls within 10 minutes for the same actor and source IP.
+
+Failed API calls do not produce findings that claim a configuration changed. Risk-reducing actions such as revoking ingress, deleting a bucket policy, or detaching an IAM policy are also excluded from the risk-increasing change rules. Duplicate events with the same `eventID` are analyzed once.
 
 Each finding uses the shared schema and includes AWS CloudTrail, AWS IAM, or MITRE ATT&CK references where applicable.
 

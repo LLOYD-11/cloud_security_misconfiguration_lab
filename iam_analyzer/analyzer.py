@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import argparse
+from fnmatch import fnmatchcase
 import json
 from pathlib import Path
+import re
 import sys
 from typing import Any, Iterable
 
@@ -16,22 +18,36 @@ if str(PROJECT_ROOT) not in sys.path:
 from cloud_findings import Finding, findings_to_dicts, sort_findings, write_findings
 
 
-SENSITIVE_ACTION_PREFIXES = (
-    "iam:",
-    "sts:",
-    "organizations:",
-    "account:",
-    "kms:",
+SENSITIVE_ACTIONS = (
+    "iam:attachrolepolicy",
+    "iam:attachuserpolicy",
+    "iam:createaccesskey",
+    "iam:createpolicyversion",
+    "iam:createuser",
+    "iam:deleteuser",
+    "iam:passrole",
+    "iam:putrolepolicy",
+    "iam:putuserpolicy",
+    "iam:updateassumerolepolicy",
+    "organizations:leaveorganization",
+    "organizations:moveaccount",
+    "sts:assumerole",
+    "kms:creategrant",
+    "kms:disablekey",
+    "kms:putkeypolicy",
+    "kms:schedulekeydeletion",
 )
 
-S3_WRITE_ACTIONS = {
-    "s3:*",
-    "s3:PutObject",
-    "s3:DeleteObject",
-    "s3:PutBucketPolicy",
-    "s3:PutBucketAcl",
-    "s3:PutObjectAcl",
-}
+S3_WRITE_ACTIONS = (
+    "s3:putobject",
+    "s3:deleteobject",
+    "s3:putbucketpolicy",
+    "s3:putbucketacl",
+    "s3:putobjectacl",
+)
+
+ACCOUNT_ID_PATTERN = re.compile(r"^\d{12}$")
+IAM_ARN_ACCOUNT_PATTERN = re.compile(r"^arn:[^:]+:iam::(\d{12}):")
 
 REF_MITRE_CLOUD_ACCOUNTS = "https://attack.mitre.org/techniques/T1078/004/"
 REF_MITRE_TRUSTED_RELATIONSHIP = "https://attack.mitre.org/techniques/T1199/"
@@ -78,8 +94,15 @@ def _has_mfa_condition(statement: dict[str, Any]) -> bool:
     condition = statement.get("condition", statement.get("Condition", {}))
     if not isinstance(condition, dict):
         return False
-    condition_text = json.dumps(condition).lower()
-    return "aws:multifactorauthpresent" in condition_text and "true" in condition_text
+
+    for operator_values in condition.values():
+        if not isinstance(operator_values, dict):
+            continue
+        for key, value in operator_values.items():
+            if str(key).lower() != "aws:multifactorauthpresent":
+                continue
+            return any(str(item).lower() == "true" for item in _as_list(value))
+    return False
 
 
 def _contains_wildcard(values: Iterable[str]) -> bool:
@@ -88,15 +111,60 @@ def _contains_wildcard(values: Iterable[str]) -> bool:
 
 def _has_sensitive_action(actions: Iterable[str]) -> bool:
     for action in actions:
-        if action == "*":
+        normalized = action.lower()
+        if normalized == "*":
             return True
-        if any(action.startswith(prefix) for prefix in SENSITIVE_ACTION_PREFIXES):
+        if any(fnmatchcase(sensitive_action, normalized) for sensitive_action in SENSITIVE_ACTIONS):
             return True
     return False
 
 
 def _has_broad_s3_write(actions: Iterable[str]) -> bool:
-    return any(action in S3_WRITE_ACTIONS for action in actions)
+    for action in actions:
+        normalized = action.lower()
+        if not normalized.startswith("s3:"):
+            continue
+        if any(fnmatchcase(write_action, normalized) for write_action in S3_WRITE_ACTIONS):
+            return True
+    return False
+
+
+def _principal_strings(value: Any) -> list[str]:
+    values: list[str] = []
+    for item in _as_list(value):
+        if isinstance(item, list):
+            values.extend(_principal_strings(item))
+        else:
+            values.append(str(item))
+    return values
+
+
+def _principal_account_id(principal: str) -> str | None:
+    if ACCOUNT_ID_PATTERN.fullmatch(principal):
+        return principal
+    match = IAM_ARN_ACCOUNT_PATTERN.match(principal)
+    return match.group(1) if match else None
+
+
+def _external_principals(principal: Any, account_id: str) -> list[str]:
+    if principal == "*":
+        return ["*"]
+    if not isinstance(principal, dict) or not account_id:
+        return []
+
+    candidates: list[str] = []
+    for principal_type in ("AWS", "Federated"):
+        candidates.extend(_principal_strings(principal.get(principal_type)))
+
+    external: list[str] = []
+    for candidate in candidates:
+        if candidate == "*":
+            external.append(candidate)
+            continue
+        principal_account = _principal_account_id(candidate)
+        if principal_account and principal_account != account_id:
+            external.append(candidate)
+    return external
 
 
 def _add_finding(
@@ -219,7 +287,11 @@ def analyze_principal(
                     statement_id=statement_id,
                 )
 
-            if _has_sensitive_action(actions) and not _has_mfa_condition(statement):
+            if (
+                subject_type == "user"
+                and _has_sensitive_action(actions)
+                and not _has_mfa_condition(statement)
+            ):
                 _add_finding(
                     findings,
                     severity="medium",
@@ -252,6 +324,8 @@ def analyze_principal(
         )
 
     for key in principal.get("access_keys", []):
+        if str(key.get("status", "Active")).lower() == "inactive":
+            continue
         age_days = int(key.get("age_days", 0))
         if age_days > 90:
             _add_finding(
@@ -285,10 +359,10 @@ def analyze_trust_policy(role: dict[str, Any], account_id: str) -> list[Finding]
             continue
 
         principal = statement.get("principal", statement.get("Principal", {}))
-        principal_text = json.dumps(principal)
+        external_principals = _external_principals(principal, account_id)
         statement_id = _statement_id(statement, index)
 
-        if account_id not in principal_text:
+        if external_principals:
             _add_finding(
                 findings,
                 severity="high",
@@ -296,7 +370,10 @@ def analyze_trust_policy(role: dict[str, Any], account_id: str) -> list[Finding]
                 resource_type="role",
                 resource_id=role_name,
                 title="Cross-account role trust",
-                evidence=f"Trust policy allows an external principal: {principal_text}.",
+                evidence=(
+                    "Trust policy allows external principal(s): "
+                    f"{json.dumps(external_principals)}."
+                ),
                 impact="An external account or principal may be able to assume this role.",
                 remediation="Require an external ID, restrict the trusted principal, and confirm the business need for cross-account access.",
                 references=[REF_MITRE_TRUSTED_RELATIONSHIP, REF_AWS_IAM_BEST_PRACTICES],
