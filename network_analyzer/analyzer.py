@@ -27,6 +27,39 @@ SENSITIVE_PORTS = {
 }
 
 BROAD_PUBLIC_PREFIX = {4: 8, 6: 32}
+NON_PUBLIC_IPV4_NETWORKS = tuple(
+    ipaddress.IPv4Network(cidr)
+    for cidr in (
+        "0.0.0.0/8",
+        "10.0.0.0/8",
+        "100.64.0.0/10",
+        "127.0.0.0/8",
+        "169.254.0.0/16",
+        "172.16.0.0/12",
+        "192.0.0.0/24",
+        "192.0.2.0/24",
+        "192.168.0.0/16",
+        "198.18.0.0/15",
+        "198.51.100.0/24",
+        "203.0.113.0/24",
+        "224.0.0.0/4",
+        "240.0.0.0/4",
+    )
+)
+NON_PUBLIC_IPV6_NETWORKS = tuple(
+    ipaddress.IPv6Network(cidr)
+    for cidr in (
+        "::/128",
+        "::1/128",
+        "::ffff:0:0/96",
+        "64:ff9b::/96",
+        "100::/64",
+        "2001:db8::/32",
+        "fc00::/7",
+        "fe80::/10",
+        "ff00::/8",
+    )
+)
 
 
 def _rule_cidr(rule: dict[str, Any]) -> str:
@@ -41,7 +74,10 @@ def _exposure_scope(rule: dict[str, Any]) -> str | None:
 
     if network.prefixlen == 0:
         return "internet-wide"
-    if network.is_private or network.is_loopback or network.is_link_local:
+    if isinstance(network, ipaddress.IPv4Network):
+        if any(network.subnet_of(non_public) for non_public in NON_PUBLIC_IPV4_NETWORKS):
+            return None
+    elif any(network.subnet_of(non_public) for non_public in NON_PUBLIC_IPV6_NETWORKS):
         return None
     if network.prefixlen <= BROAD_PUBLIC_PREFIX[network.version]:
         return "broad-public"

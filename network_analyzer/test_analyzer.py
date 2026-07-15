@@ -147,6 +147,27 @@ class NetworkAnalyzerTests(unittest.TestCase):
         self.assertEqual(["NET-001"], [finding.rule_id for finding in findings])
         self.assertEqual("broad-public", findings[0].metadata["exposure_scope"])
 
+    def test_private_slash_eight_is_not_reported_as_broad_public(self):
+        environment = {
+            "security_groups": [
+                {
+                    "id": "sg-private",
+                    "name": "private-range",
+                    "inbound_rules": [
+                        {
+                            "protocol": "tcp",
+                            "from_port": 22,
+                            "to_port": 22,
+                            "cidr": "10.0.0.0/8",
+                        }
+                    ],
+                    "outbound_rules": [],
+                }
+            ]
+        }
+
+        self.assertEqual([], analyze_environment(environment))
+
     def test_findings_export_writes_shared_schema(self):
         environment = load_environment(SAMPLE_FILE)
         findings = analyze_environment(environment)

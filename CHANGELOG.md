@@ -20,7 +20,7 @@ All notable changes to this project are documented in this file.
 - IAM MFA-condition analysis now checks the value associated with the MFA condition key instead of searching serialized condition text.
 - S3 write analysis recognizes scoped wildcard actions such as `s3:Put*`.
 - Storage encryption findings now describe the absence of an explicit key-management posture without claiming that S3 baseline encryption is disabled.
-- Network analysis is protocol-aware and distinguishes internet-wide from exceptionally broad public CIDRs.
+- Network analysis is protocol-aware and uses explicit non-public ranges to classify internet-wide and exceptionally broad public CIDRs consistently across supported Python versions.
 - CloudTrail change findings require successful, risk-increasing API activity and deduplicate explicit event IDs.
 - Shared finding files now enforce supported schema versions, declared finding counts, required fields, field types, and valid severities.
 - Unversioned legacy finding lists are rejected by the report pipeline.
