@@ -14,6 +14,10 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import unquote
 
+from cloud_security_lab.normalizers.common import (
+    write_normalized_environment as write_normalized_environment,
+)
+
 IAM_ARN_ACCOUNT_PATTERN = re.compile(r"^arn:[^:]+:iam::(\d{12}):")
 ROOT_USER_NAMES = {"<root_account>", "root_account"}
 CREDENTIAL_REQUIRED_COLUMNS = {
@@ -516,12 +520,3 @@ def load_aws_iam_environment(
         _credential_rows(credential_report_path),
         as_of=as_of,
     )
-
-
-def write_normalized_environment(path: Path, environment: dict[str, Any]) -> None:
-    """Write normalized IAM input in deterministic, human-readable JSON."""
-
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as handle:
-        json.dump(environment, handle, indent=2, sort_keys=True)
-        handle.write("\n")

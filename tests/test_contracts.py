@@ -1,3 +1,4 @@
+import copy
 import json
 import tempfile
 import unittest
@@ -13,6 +14,10 @@ SCHEMA_SAMPLE_PAIRS = (
     (
         "aws-iam-authorization-details-v1.0.schema.json",
         "sample_data/aws/iam/account_authorization_details.json",
+    ),
+    (
+        "aws-s3-evidence-bundle-v1.0.schema.json",
+        "sample_data/aws/s3/s3_security_evidence_bundle.json",
     ),
     (
         "iam-environment-v1.0.schema.json",
@@ -48,6 +53,31 @@ class DataContractTests(unittest.TestCase):
                     schema,
                     format_checker=FormatChecker(),
                 ).validate(sample)
+
+    def test_s3_contract_supports_blocked_encryption_rules_and_rejects_empty_rules(self):
+        schema = _load_json(
+            PROJECT_ROOT / "schemas/aws-s3-evidence-bundle-v1.0.schema.json"
+        )
+        sample = _load_json(
+            PROJECT_ROOT / "sample_data/aws/s3/s3_security_evidence_bundle.json"
+        )
+        validator = Draft202012Validator(schema, format_checker=FormatChecker())
+        rules = sample["BucketEvidence"][0]["GetBucketEncryption"][
+            "ServerSideEncryptionConfiguration"
+        ]["Rules"]
+
+        for encryption_type in ("NONE", ["SSE-C"]):
+            with self.subTest(encryption_type=encryption_type):
+                candidate = copy.deepcopy(sample)
+                candidate["BucketEvidence"][0]["GetBucketEncryption"][
+                    "ServerSideEncryptionConfiguration"
+                ]["Rules"] = [
+                    {"BlockedEncryptionTypes": {"EncryptionType": encryption_type}}
+                ]
+                validator.validate(candidate)
+
+        rules[:] = [{}]
+        self.assertTrue(list(validator.iter_errors(sample)))
 
     def test_generated_findings_match_shared_contract(self):
         schema = _load_json(PROJECT_ROOT / "schemas/findings-v1.0.schema.json")

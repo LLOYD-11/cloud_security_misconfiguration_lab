@@ -15,6 +15,9 @@ All notable changes to this project are documented in this file.
 - Ruff linting, strict production type checks, branch coverage, package builds, and deterministic end-to-end verification.
 - Native IAM normalization for AWS account authorization details, Base64 JSON or decoded CSV credential reports, managed policies, group inheritance, and role trust policies.
 - A native IAM input schema, AWS-shape sample evidence, normalization warnings, and optional normalized evidence export from the unified CLI.
+- Native S3 evidence-bundle normalization for bucket inventory, effective Block Public Access, ACLs, policies, default encryption, and versioning.
+- Strict S3 collection-error and bucket-coverage validation, an AWS-shape sample, a versioned bundle schema, and native storage CLI verification.
+- Support for the 2026 S3 `BlockedEncryptionTypes` response shape while preserving the universal SSE-S3 baseline.
 
 ### Changed
 
@@ -23,6 +26,7 @@ All notable changes to this project are documented in this file.
 - S3 write analysis recognizes scoped wildcard actions such as `s3:Put*`.
 - Storage encryption findings now describe the absence of an explicit key-management posture without claiming that S3 baseline encryption is disabled.
 - Network analysis is protocol-aware and uses explicit non-public ranges to classify internet-wide and exceptionally broad public CIDRs consistently across supported Python versions.
+- Storage ACL and policy exposure rules now respect effective `IgnorePublicAcls` and `RestrictPublicBuckets` controls.
 - CloudTrail change findings require successful, risk-increasing API activity and deduplicate explicit event IDs.
 - Shared finding files now enforce supported schema versions, declared finding counts, required fields, field types, and valid severities.
 - Unversioned legacy finding lists are rejected by the report pipeline.

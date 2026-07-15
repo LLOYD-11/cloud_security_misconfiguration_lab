@@ -1,8 +1,10 @@
 # Native AWS Inputs
 
-The IAM analyzer can consume exports produced by AWS IAM without requiring the lab to hold cloud credentials or call a live account.
+The IAM and storage analyzers can consume exported AWS API evidence without requiring the lab to hold cloud credentials or call a live account.
 
-## Collect IAM Evidence
+## IAM Evidence
+
+### Collect IAM Evidence
 
 Run these commands only against an account that you own or are authorized to assess:
 
@@ -26,7 +28,7 @@ AWS references:
 - [IAM credential report format](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html)
 - [GetCredentialReport API](https://docs.aws.amazon.com/IAM/latest/APIReference/API_GetCredentialReport.html)
 
-## Analyze Native Evidence
+### Analyze IAM Evidence
 
 ```bash
 python3 -m cloud_security_lab analyze iam \
@@ -50,7 +52,7 @@ python3 -m cloud_security_lab analyze iam \
   --as-of 2026-06-30
 ```
 
-## Normalization Behavior
+### IAM Normalization Behavior
 
 The adapter:
 
@@ -64,3 +66,75 @@ The adapter:
 Missing credential rows, conflicting account IDs, malformed policies, invalid credential fields, and truncated authorization details stop analysis. The normalizer does not silently replace missing MFA or access-key evidence with a default value.
 
 Credential reports do not expose access-key IDs, so normalized keys use stable slot labels such as `credential-report:key-1`. AWS credential reports cover the first two IAM access keys and do not include service-specific credentials; see the AWS credential report documentation for that evidence boundary.
+
+## S3 Evidence
+
+S3 security state is distributed across account-level and per-bucket operations. The storage normalizer therefore consumes a versioned evidence bundle that preserves each native response under its AWS operation name.
+
+The bundle contract is [`aws-s3-evidence-bundle-v1.0.schema.json`](../schemas/aws-s3-evidence-bundle-v1.0.schema.json). Its main fields are:
+
+| Field | AWS evidence |
+| --- | --- |
+| `ListBuckets` | Complete `s3api list-buckets` response |
+| `AccountPublicAccessBlock` | `s3control get-public-access-block` response or expected not-found error |
+| `BucketEvidence[].GetPublicAccessBlock` | Bucket-level Block Public Access response or expected not-found error |
+| `BucketEvidence[].GetBucketAcl` | Bucket ACL response |
+| `BucketEvidence[].GetBucketPolicy` | Bucket policy response or expected not-found error |
+| `BucketEvidence[].GetBucketEncryption` | Default encryption response |
+| `BucketEvidence[].GetBucketVersioning` | Versioning response, including `{}` when never enabled |
+
+Representative collection commands are:
+
+```bash
+aws s3api list-buckets --output json
+aws s3control get-public-access-block --account-id 111122223333 --output json
+aws s3api get-public-access-block --bucket BUCKET_NAME --output json
+aws s3api get-bucket-acl --bucket BUCKET_NAME --output json
+aws s3api get-bucket-policy --bucket BUCKET_NAME --output json
+aws s3api get-bucket-encryption --bucket BUCKET_NAME --output json
+aws s3api get-bucket-versioning --bucket BUCKET_NAME --output json
+```
+
+Run collection only against accounts you own or are authorized to assess. Store successful JSON bodies unchanged inside the bundle. When an optional configuration is absent, store an error envelope such as:
+
+```json
+{
+  "Error": {
+    "Code": "NoSuchBucketPolicy"
+  }
+}
+```
+
+Only `NoSuchPublicAccessBlockConfiguration` and `NoSuchBucketPolicy` are interpreted as an absent optional configuration. `AccessDenied`, malformed responses, incomplete bucket coverage, and any paginated or prefix-filtered `ListBuckets` response stop analysis instead of being converted into insecure defaults.
+
+### Analyze S3 Evidence
+
+```bash
+python3 -m cloud_security_lab analyze storage \
+  sample_data/aws/s3/s3_security_evidence_bundle.json \
+  --input-format aws \
+  --normalized-output reports/generated/normalized_storage_environment.json \
+  --output reports/generated/storage_findings.json
+```
+
+### S3 Normalization Behavior
+
+The adapter:
+
+- Requires one evidence entry for every bucket returned by a complete, unfiltered `ListBuckets` response, with no unlisted extras.
+- Combines account-level and bucket-level Block Public Access controls using S3's most-restrictive behavior.
+- Converts AWS ACL grantee structures into stable analyzer identifiers while retaining public group URIs.
+- Parses the JSON string returned by `GetBucketPolicy` and preserves its statements.
+- Reads SSE-S3, SSE-KMS, and DSSE-KMS default encryption responses without claiming that baseline SSE-S3 is absent. A 2026 `BlockedEncryptionTypes`-only rule is normalized to the S3 SSE-S3 baseline with a visible warning.
+- Converts an empty `GetBucketVersioning` response to the analyzer's `Disabled` state.
+
+Current S3 references:
+
+- [ListBuckets API](https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListBuckets.html)
+- [GetPublicAccessBlock API](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetPublicAccessBlock.html)
+- [GetBucketAcl CLI response](https://docs.aws.amazon.com/cli/latest/reference/s3api/get-bucket-acl.html)
+- [GetBucketPolicy API](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketPolicy.html)
+- [GetBucketEncryption CLI response](https://docs.aws.amazon.com/cli/latest/reference/s3api/get-bucket-encryption.html)
+- [ServerSideEncryptionRule API](https://docs.aws.amazon.com/AmazonS3/latest/API/API_ServerSideEncryptionRule.html)
+- [Blocking or unblocking SSE-C](https://docs.aws.amazon.com/AmazonS3/latest/userguide/blocking-unblocking-s3-c-encryption-gpb.html)
+- [GetBucketVersioning API](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketVersioning.html)

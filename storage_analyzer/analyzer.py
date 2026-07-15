@@ -123,10 +123,11 @@ def analyze_bucket(bucket: dict[str, Any]) -> list[Finding]:
             metadata={"disabled_controls": ", ".join(disabled_controls)},
         )
 
+    ignore_public_acls = public_access_block.get("ignore_public_acls") is True
     for index, grant in enumerate(bucket.get("acl", {}).get("grants", [])):
         grantee = str(grant.get("grantee", ""))
         permission = str(grant.get("permission", ""))
-        if grantee in PUBLIC_GRANTEES:
+        if grantee in PUBLIC_GRANTEES and not ignore_public_acls:
             _add_finding(
                 findings,
                 severity="critical",
@@ -140,11 +141,12 @@ def analyze_bucket(bucket: dict[str, Any]) -> list[Finding]:
                 metadata={"grantee": grantee, "permission": permission},
             )
 
+    restrict_public_buckets = public_access_block.get("restrict_public_buckets") is True
     for index, statement in enumerate(_statements(bucket.get("bucket_policy", {}))):
         if _statement_effect(statement) != "allow":
             continue
         principal = _principal_value(statement)
-        if _is_public_principal(principal):
+        if _is_public_principal(principal) and not restrict_public_buckets:
             _add_finding(
                 findings,
                 severity="critical",

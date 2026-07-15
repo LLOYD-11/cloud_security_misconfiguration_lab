@@ -64,6 +64,36 @@ class UnifiedCliTests(unittest.TestCase):
         self.assertEqual(8, payload["finding_count"])
         self.assertEqual("111122223333", normalized["account_id"])
 
+    def test_analyze_native_aws_s3_writes_findings_and_normalized_evidence(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = Path(tmpdir) / "storage.json"
+            normalized_path = Path(tmpdir) / "normalized-storage.json"
+            with redirect_stdout(StringIO()), redirect_stderr(StringIO()) as stderr:
+                result = main(
+                    [
+                        "analyze",
+                        "storage",
+                        str(
+                            PROJECT_ROOT
+                            / "sample_data/aws/s3/s3_security_evidence_bundle.json"
+                        ),
+                        "--input-format",
+                        "aws",
+                        "--normalized-output",
+                        str(normalized_path),
+                        "--output",
+                        str(output_path),
+                    ]
+                )
+
+            payload = json.loads(output_path.read_text(encoding="utf-8"))
+            normalized = json.loads(normalized_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(0, result)
+        self.assertEqual("", stderr.getvalue())
+        self.assertEqual(5, payload["finding_count"])
+        self.assertEqual(3, len(normalized["buckets"]))
+
     def test_demo_runs_all_modules_and_writes_report(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             output_dir = Path(tmpdir) / "generated"
@@ -172,6 +202,21 @@ class UnifiedCliTests(unittest.TestCase):
             )
 
         self.assertEqual(2, context.exception.code)
+
+    def test_aws_input_is_rejected_for_unsupported_modules(self):
+        with redirect_stderr(StringIO()) as stderr, self.assertRaises(SystemExit) as context:
+            main(
+                [
+                    "analyze",
+                    "network",
+                    str(PROJECT_ROOT / "sample_data/network/sample_network_environment.json"),
+                    "--input-format",
+                    "aws",
+                ]
+            )
+
+        self.assertEqual(2, context.exception.code)
+        self.assertIn("only for iam and storage", stderr.getvalue())
 
 
 if __name__ == "__main__":

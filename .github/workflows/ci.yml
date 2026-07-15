@@ -60,6 +60,14 @@ jobs:
           --normalized-output reports/generated/normalized_iam_environment.json
           --output reports/generated/native_iam_findings.json
 
+      - name: Verify native S3 input pipeline
+        run: >-
+          python -m cloud_security_lab analyze storage
+          sample_data/aws/s3/s3_security_evidence_bundle.json
+          --input-format aws
+          --normalized-output reports/generated/normalized_storage_environment.json
+          --output reports/generated/native_storage_findings.json
+
       - name: Build wheel and source distribution
         if: matrix.python-version == '3.13'
         run: python -m build

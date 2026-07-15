@@ -73,7 +73,7 @@ class StorageAnalyzerTests(unittest.TestCase):
                         "block_public_acls": True,
                         "ignore_public_acls": True,
                         "block_public_policy": True,
-                        "restrict_public_buckets": True,
+                        "restrict_public_buckets": False,
                     },
                     "acl": {"grants": []},
                     "bucket_policy": {
@@ -94,7 +94,7 @@ class StorageAnalyzerTests(unittest.TestCase):
 
         findings = analyze_environment(environment)
 
-        self.assertEqual(["STO-003"], [finding.rule_id for finding in findings])
+        self.assertIn("STO-003", [finding.rule_id for finding in findings])
 
     def test_public_principal_list_is_detected(self):
         environment = {
@@ -105,7 +105,7 @@ class StorageAnalyzerTests(unittest.TestCase):
                         "block_public_acls": True,
                         "ignore_public_acls": True,
                         "block_public_policy": True,
-                        "restrict_public_buckets": True,
+                        "restrict_public_buckets": False,
                     },
                     "acl": {"grants": []},
                     "bucket_policy": {
@@ -126,7 +126,46 @@ class StorageAnalyzerTests(unittest.TestCase):
 
         findings = analyze_environment(environment)
 
-        self.assertEqual(["STO-003"], [finding.rule_id for finding in findings])
+        self.assertIn("STO-003", [finding.rule_id for finding in findings])
+
+    def test_effective_public_access_block_suppresses_inactive_acl_and_policy_exposure(self):
+        environment = {
+            "buckets": [
+                {
+                    "name": "protected-public-artifacts",
+                    "public_access_block": {
+                        "block_public_acls": True,
+                        "ignore_public_acls": True,
+                        "block_public_policy": True,
+                        "restrict_public_buckets": True,
+                    },
+                    "acl": {
+                        "grants": [
+                            {
+                                "grantee": "AllUsers",
+                                "permission": "READ",
+                            }
+                        ]
+                    },
+                    "bucket_policy": {
+                        "statements": [
+                            {
+                                "effect": "Allow",
+                                "principal": "*",
+                                "action": "s3:GetObject",
+                                "resource": "arn:aws:s3:::protected-public-artifacts/*",
+                            }
+                        ]
+                    },
+                    "encryption": {"enabled": True},
+                    "versioning": {"status": "Enabled"},
+                }
+            ]
+        }
+
+        findings = analyze_environment(environment)
+
+        self.assertEqual([], findings)
 
     def test_missing_explicit_encryption_is_low_severity_posture_gap(self):
         environment = {

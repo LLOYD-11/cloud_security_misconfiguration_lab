@@ -4,7 +4,7 @@ This project is an offline-first AWS security analysis lab for identifying risky
 
 The goal is to provide practical and explainable security findings without requiring cloud credentials or making changes to a live AWS account.
 
-The repository includes four analyzers, native AWS IAM input normalization, a versioned shared finding contract, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
+The repository includes four analyzers, native AWS IAM and S3 input normalization, a versioned shared finding contract, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
 
 ## Quick Start
 
@@ -86,6 +86,10 @@ The storage analyzer checks sample S3-style bucket configurations for common exp
 - Missing an explicit bucket encryption configuration beyond the S3 SSE-S3 baseline
 - Missing or suspended versioning
 
+Storage input can use either the simplified environment contract or a versioned native evidence bundle containing `ListBuckets`, account and bucket Public Access Block, ACL, policy, default encryption, and versioning responses.
+
+Public ACL and bucket-policy exposure findings account for effective `IgnorePublicAcls` and `RestrictPublicBuckets` controls rather than reporting blocked access paths as active exposure.
+
 Rule catalog:
 
 | Rule | Risk Pattern |
@@ -160,6 +164,16 @@ python3 -m cloud_security_lab analyze iam \
 
 See [Native AWS inputs](docs/native-aws-inputs.md) for evidence collection, validation behavior, and limitations.
 
+Analyze the bundled native AWS S3 evidence:
+
+```bash
+python3 -m cloud_security_lab analyze storage \
+  sample_data/aws/s3/s3_security_evidence_bundle.json \
+  --input-format aws \
+  --normalized-output reports/generated/normalized_storage_environment.json \
+  --output reports/generated/storage_findings.json
+```
+
 Merge one or more versioned finding files:
 
 ```bash
@@ -228,7 +242,9 @@ cloud_security_misconfiguration_lab/
 │   ├── __main__.py
 │   ├── cli.py
 │   └── normalizers/
-│       └── iam.py
+│       ├── common.py
+│       ├── iam.py
+│       └── s3.py
 ├── cloud_findings/
 │   └── finding.py
 ├── cloudtrail_detector/
@@ -252,11 +268,14 @@ cloud_security_misconfiguration_lab/
 ├── schemas/
 │   ├── findings-v1.0.schema.json
 │   ├── aws-iam-authorization-details-v1.0.schema.json
+│   ├── aws-s3-evidence-bundle-v1.0.schema.json
 │   └── *-environment-v1.0.schema.json
 ├── sample_data/
 │   ├── aws/iam/
 │   │   ├── account_authorization_details.json
 │   │   └── credential_report.csv
+│   ├── aws/s3/
+│   │   └── s3_security_evidence_bundle.json
 │   ├── cloudtrail/
 │   │   └── sample_cloudtrail_events.json
 │   ├── iam/

@@ -1,0 +1,181 @@
+{
+  "schema_version": "1.0",
+  "account_id": "111122223333",
+  "ListBuckets": {
+    "Buckets": [
+      {
+        "Name": "public-customer-exports",
+        "CreationDate": "2025-10-01T00:00:00+00:00",
+        "BucketRegion": "ap-southeast-2"
+      },
+      {
+        "Name": "internal-audit-logs",
+        "CreationDate": "2025-10-02T00:00:00+00:00",
+        "BucketRegion": "ap-southeast-2"
+      },
+      {
+        "Name": "analytics-raw-data",
+        "CreationDate": "2025-10-03T00:00:00+00:00",
+        "BucketRegion": "ap-southeast-2"
+      }
+    ],
+    "Owner": {
+      "ID": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  },
+  "AccountPublicAccessBlock": {
+    "Error": {
+      "Code": "NoSuchPublicAccessBlockConfiguration",
+      "Message": "The account has no PublicAccessBlockConfiguration"
+    }
+  },
+  "BucketEvidence": [
+    {
+      "BucketName": "public-customer-exports",
+      "GetPublicAccessBlock": {
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": false,
+          "IgnorePublicAcls": false,
+          "BlockPublicPolicy": false,
+          "RestrictPublicBuckets": false
+        }
+      },
+      "GetBucketAcl": {
+        "Owner": {
+          "DisplayName": "sample-owner",
+          "ID": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "Grants": [
+          {
+            "Grantee": {
+              "Type": "CanonicalUser",
+              "DisplayName": "sample-owner",
+              "ID": "0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "Permission": "FULL_CONTROL"
+          },
+          {
+            "Grantee": {
+              "Type": "Group",
+              "URI": "http://acs.amazonaws.com/groups/global/AllUsers"
+            },
+            "Permission": "READ"
+          }
+        ]
+      },
+      "GetBucketPolicy": {
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"PublicRead\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::public-customer-exports/*\"}]}"
+      },
+      "GetBucketEncryption": {
+        "ServerSideEncryptionConfiguration": {
+          "Rules": [
+            {
+              "ApplyServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              },
+              "BucketKeyEnabled": false
+            }
+          ]
+        }
+      },
+      "GetBucketVersioning": {
+        "Status": "Suspended"
+      }
+    },
+    {
+      "BucketName": "internal-audit-logs",
+      "GetPublicAccessBlock": {
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "IgnorePublicAcls": true,
+          "BlockPublicPolicy": true,
+          "RestrictPublicBuckets": true
+        }
+      },
+      "GetBucketAcl": {
+        "Owner": {
+          "DisplayName": "sample-owner",
+          "ID": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "Grants": [
+          {
+            "Grantee": {
+              "Type": "CanonicalUser",
+              "DisplayName": "sample-owner",
+              "ID": "0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "Permission": "FULL_CONTROL"
+          }
+        ]
+      },
+      "GetBucketPolicy": {
+        "Error": {
+          "Code": "NoSuchBucketPolicy",
+          "Message": "The bucket policy does not exist"
+        }
+      },
+      "GetBucketEncryption": {
+        "ServerSideEncryptionConfiguration": {
+          "Rules": [
+            {
+              "ApplyServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "aws:kms",
+                "KMSMasterKeyID": "arn:aws:kms:ap-southeast-2:111122223333:key/00000000-1111-2222-3333-444444444444"
+              },
+              "BucketKeyEnabled": true
+            }
+          ]
+        }
+      },
+      "GetBucketVersioning": {
+        "Status": "Enabled"
+      }
+    },
+    {
+      "BucketName": "analytics-raw-data",
+      "GetPublicAccessBlock": {
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "IgnorePublicAcls": true,
+          "BlockPublicPolicy": true,
+          "RestrictPublicBuckets": true
+        }
+      },
+      "GetBucketAcl": {
+        "Owner": {
+          "DisplayName": "sample-owner",
+          "ID": "0000000000000000000000000000000000000000000000000000000000000000"
+        },
+        "Grants": [
+          {
+            "Grantee": {
+              "Type": "CanonicalUser",
+              "DisplayName": "sample-owner",
+              "ID": "0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            "Permission": "FULL_CONTROL"
+          }
+        ]
+      },
+      "GetBucketPolicy": {
+        "Error": {
+          "Code": "NoSuchBucketPolicy",
+          "Message": "The bucket policy does not exist"
+        }
+      },
+      "GetBucketEncryption": {
+        "ServerSideEncryptionConfiguration": {
+          "Rules": [
+            {
+              "ApplyServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              },
+              "BucketKeyEnabled": false
+            }
+          ]
+        }
+      },
+      "GetBucketVersioning": {}
+    }
+  ]
+}

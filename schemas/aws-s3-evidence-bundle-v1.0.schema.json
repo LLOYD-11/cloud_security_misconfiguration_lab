@@ -1,0 +1,401 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/schemas/aws-s3-evidence-bundle-v1.0.schema.json",
+  "title": "AWS S3 Security Evidence Bundle v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "account_id",
+    "ListBuckets",
+    "AccountPublicAccessBlock",
+    "BucketEvidence"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "account_id": {
+      "type": "string",
+      "pattern": "^[0-9]{12}$"
+    },
+    "ListBuckets": {
+      "$ref": "#/$defs/listBuckets"
+    },
+    "AccountPublicAccessBlock": {
+      "$ref": "#/$defs/publicAccessBlockResult"
+    },
+    "BucketEvidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/bucketEvidence"
+      }
+    }
+  },
+  "$defs": {
+    "awsError": {
+      "type": "object",
+      "required": [
+        "Error"
+      ],
+      "properties": {
+        "Error": {
+          "type": "object",
+          "required": [
+            "Code"
+          ],
+          "properties": {
+            "Code": {
+              "type": "string",
+              "minLength": 1
+            },
+            "Message": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "publicAccessBlockConfiguration": {
+      "type": "object",
+      "required": [
+        "BlockPublicAcls",
+        "IgnorePublicAcls",
+        "BlockPublicPolicy",
+        "RestrictPublicBuckets"
+      ],
+      "properties": {
+        "BlockPublicAcls": {
+          "type": "boolean"
+        },
+        "IgnorePublicAcls": {
+          "type": "boolean"
+        },
+        "BlockPublicPolicy": {
+          "type": "boolean"
+        },
+        "RestrictPublicBuckets": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true
+    },
+    "publicAccessBlockResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "PublicAccessBlockConfiguration"
+          ],
+          "properties": {
+            "PublicAccessBlockConfiguration": {
+              "$ref": "#/$defs/publicAccessBlockConfiguration"
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "$ref": "#/$defs/awsError"
+        }
+      ]
+    },
+    "listBuckets": {
+      "type": "object",
+      "required": [
+        "Buckets"
+      ],
+      "properties": {
+        "Buckets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "Name"
+            ],
+            "properties": {
+              "Name": {
+                "type": "string",
+                "minLength": 3
+              },
+              "CreationDate": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "BucketArn": {
+                "type": "string",
+                "minLength": 1
+              },
+              "BucketRegion": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "ContinuationToken": {
+          "type": "string",
+          "minLength": 1
+        },
+        "NextToken": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "bucketAcl": {
+      "type": "object",
+      "required": [
+        "Owner",
+        "Grants"
+      ],
+      "properties": {
+        "Owner": {
+          "type": "object",
+          "required": [
+            "ID"
+          ],
+          "properties": {
+            "ID": {
+              "type": "string",
+              "minLength": 1
+            },
+            "DisplayName": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": true
+        },
+        "Grants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "Grantee",
+              "Permission"
+            ],
+            "properties": {
+              "Grantee": {
+                "type": "object",
+                "required": [
+                  "Type"
+                ],
+                "properties": {
+                  "Type": {
+                    "enum": [
+                      "CanonicalUser",
+                      "AmazonCustomerByEmail",
+                      "Group"
+                    ]
+                  },
+                  "URI": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "ID": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "EmailAddress": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "DisplayName": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "additionalProperties": true
+              },
+              "Permission": {
+                "enum": [
+                  "FULL_CONTROL",
+                  "WRITE",
+                  "WRITE_ACP",
+                  "READ",
+                  "READ_ACP"
+                ]
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "bucketPolicyResult": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "Policy"
+          ],
+          "properties": {
+            "Policy": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object"
+                }
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "$ref": "#/$defs/awsError"
+        }
+      ]
+    },
+    "bucketEncryption": {
+      "type": "object",
+      "required": [
+        "ServerSideEncryptionConfiguration"
+      ],
+      "properties": {
+        "ServerSideEncryptionConfiguration": {
+          "type": "object",
+          "required": [
+            "Rules"
+          ],
+          "properties": {
+            "Rules": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "anyOf": [
+                  {
+                    "required": [
+                      "ApplyServerSideEncryptionByDefault"
+                    ]
+                  },
+                  {
+                    "required": [
+                      "BlockedEncryptionTypes"
+                    ]
+                  }
+                ],
+                "properties": {
+                  "ApplyServerSideEncryptionByDefault": {
+                    "type": "object",
+                    "required": [
+                      "SSEAlgorithm"
+                    ],
+                    "properties": {
+                      "SSEAlgorithm": {
+                        "enum": [
+                          "AES256",
+                          "aws:fsx",
+                          "aws:kms",
+                          "aws:kms:dsse"
+                        ]
+                      },
+                      "KMSMasterKeyID": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "additionalProperties": true
+                  },
+                  "BucketKeyEnabled": {
+                    "type": "boolean"
+                  },
+                  "BlockedEncryptionTypes": {
+                    "type": "object",
+                    "required": [
+                      "EncryptionType"
+                    ],
+                    "properties": {
+                      "EncryptionType": {
+                        "oneOf": [
+                          {
+                            "enum": [
+                              "SSE-C",
+                              "NONE"
+                            ]
+                          },
+                          {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {
+                              "enum": [
+                                "SSE-C",
+                                "NONE"
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    "additionalProperties": true
+                  }
+                },
+                "additionalProperties": true
+              }
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "bucketVersioning": {
+      "type": "object",
+      "properties": {
+        "Status": {
+          "enum": [
+            "Enabled",
+            "Suspended"
+          ]
+        },
+        "MFADelete": {
+          "enum": [
+            "Enabled",
+            "Disabled"
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "bucketEvidence": {
+      "type": "object",
+      "required": [
+        "BucketName",
+        "GetPublicAccessBlock",
+        "GetBucketAcl",
+        "GetBucketPolicy",
+        "GetBucketEncryption",
+        "GetBucketVersioning"
+      ],
+      "properties": {
+        "BucketName": {
+          "type": "string",
+          "minLength": 3
+        },
+        "GetPublicAccessBlock": {
+          "$ref": "#/$defs/publicAccessBlockResult"
+        },
+        "GetBucketAcl": {
+          "$ref": "#/$defs/bucketAcl"
+        },
+        "GetBucketPolicy": {
+          "$ref": "#/$defs/bucketPolicyResult"
+        },
+        "GetBucketEncryption": {
+          "$ref": "#/$defs/bucketEncryption"
+        },
+        "GetBucketVersioning": {
+          "$ref": "#/$defs/bucketVersioning"
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

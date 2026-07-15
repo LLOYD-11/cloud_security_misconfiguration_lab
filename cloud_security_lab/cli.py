@@ -14,6 +14,7 @@ from cloud_findings import Finding, write_findings
 from cloud_security_lab import __version__
 from cloud_security_lab.normalizers import (
     load_aws_iam_environment,
+    load_aws_s3_environment,
     write_normalized_environment,
 )
 from cloudtrail_detector.detector import (
@@ -135,34 +136,9 @@ def _run_analyze(args: argparse.Namespace) -> int:
         raise ValueError(
             "--failure-threshold and --failure-window-minutes are only valid for cloudtrail"
         )
-    iam_native_options = (
-        args.input_format != "simplified"
-        or args.credential_report is not None
-        or args.as_of is not None
-        or args.normalized_output is not None
-    )
-    if args.module != "iam" and iam_native_options:
-        raise ValueError(
-            "--input-format, --credential-report, --as-of, and --normalized-output "
-            "native options are only valid for iam"
-        )
-
-    if args.input_format == "aws":
-        if args.credential_report is None:
-            raise ValueError("--credential-report is required for AWS IAM input")
-        normalized = load_aws_iam_environment(
-            args.input,
-            args.credential_report,
-            as_of=args.as_of or date.today(),
-        )
-        for warning in normalized.warnings:
-            print(f"Warning: {warning}", file=sys.stderr)
-        if args.normalized_output:
-            write_normalized_environment(args.normalized_output, normalized.environment)
-            print(f"Normalized IAM environment saved to {args.normalized_output}")
-        findings = analyze_iam(normalized.environment)
-    else:
-        if args.module == "iam" and iam_native_options:
+    native_auxiliary_options = args.credential_report is not None or args.as_of is not None
+    if args.input_format == "simplified":
+        if native_auxiliary_options or args.normalized_output is not None:
             raise ValueError(
                 "--credential-report, --as-of, and --normalized-output require "
                 "--input-format aws"
@@ -173,6 +149,33 @@ def _run_analyze(args: argparse.Namespace) -> int:
             failure_threshold=args.failure_threshold,
             failure_window_minutes=args.failure_window_minutes,
         )
+    else:
+        if args.module == "iam":
+            if args.credential_report is None:
+                raise ValueError("--credential-report is required for AWS IAM input")
+            iam_result = load_aws_iam_environment(
+                args.input,
+                args.credential_report,
+                as_of=args.as_of or date.today(),
+            )
+            normalized_environment = iam_result.environment
+            normalization_warnings = iam_result.warnings
+            findings = analyze_iam(normalized_environment)
+        elif args.module == "storage":
+            if native_auxiliary_options:
+                raise ValueError("--credential-report and --as-of are only valid for AWS IAM input")
+            s3_result = load_aws_s3_environment(args.input)
+            normalized_environment = s3_result.environment
+            normalization_warnings = s3_result.warnings
+            findings = analyze_storage(normalized_environment)
+        else:
+            raise ValueError("AWS input format is currently supported only for iam and storage")
+
+        for warning in normalization_warnings:
+            print(f"Warning: {warning}", file=sys.stderr)
+        if args.normalized_output:
+            write_normalized_environment(args.normalized_output, normalized_environment)
+            print(f"Normalized environment saved to {args.normalized_output}")
     ANALYZERS[args.module].printer(findings)
     if args.output:
         write_findings(args.output, findings)
@@ -233,7 +236,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--input-format",
         choices=("simplified", "aws"),
         default="simplified",
-        help="Input contract. AWS is currently supported by the IAM module.",
+        help="Input contract. AWS is currently supported by the IAM and storage modules.",
     )
     analyze_parser.add_argument(
         "--credential-report",
@@ -248,7 +251,7 @@ def build_parser() -> argparse.ArgumentParser:
     analyze_parser.add_argument(
         "--normalized-output",
         type=Path,
-        help="Optional normalized IAM environment output. Requires --input-format aws.",
+        help="Optional normalized analyzer environment output. Requires --input-format aws.",
     )
     analyze_parser.add_argument(
         "--failure-threshold",

@@ -4,7 +4,7 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 
 ## Input Compatibility
 
-- IAM accepts documented simplified input or native `GetAccountAuthorizationDetails` plus credential-report exports. Storage, network, and CloudTrail still require simplified models.
+- IAM and storage accept documented simplified inputs or versioned native AWS evidence. Network and CloudTrail still require simplified models.
 - CloudTrail input currently expects an `events` list and does not yet read `Records` payloads or gzip archives.
 - Evidence is loaded into memory and is intended for small lab datasets.
 
@@ -20,7 +20,9 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 
 ## Storage Analysis
 
-- Public-principal detection does not yet evaluate policy conditions, access points, account-level Block Public Access, or Object Ownership.
+- Native S3 normalization combines account-level and bucket-level Block Public Access. Simplified storage input relies on the supplied bucket values.
+- Public-principal detection does not yet evaluate policy conditions, access points, or Object Ownership.
+- Native S3 bundles currently cover general purpose buckets returned by `ListBuckets`, not S3 directory buckets.
 - The explicit-encryption rule is a key-management posture check. S3 applies SSE-S3 to new objects even when a customer-defined bucket encryption configuration is absent.
 - Versioning requirements depend on data criticality, retention requirements, and cost constraints.
 
