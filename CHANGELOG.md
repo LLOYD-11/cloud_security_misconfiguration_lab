@@ -13,6 +13,8 @@ All notable changes to this project are documented in this file.
 - Versioned Draft 2020-12 JSON Schema contracts for all simplified inputs and findings.
 - GitHub Actions checks for Python 3.10 and 3.13.
 - Ruff linting, strict production type checks, branch coverage, package builds, and deterministic end-to-end verification.
+- Native IAM normalization for AWS account authorization details, Base64 JSON or decoded CSV credential reports, managed policies, group inheritance, and role trust policies.
+- A native IAM input schema, AWS-shape sample evidence, normalization warnings, and optional normalized evidence export from the unified CLI.
 
 ### Changed
 

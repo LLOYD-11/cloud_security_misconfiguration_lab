@@ -50,6 +50,16 @@ jobs:
           python -m cloud_security_lab demo --report-date 2026-06-30 &&
           cmp reports/cloud_security_report_sample.md reports/generated/cloud_security_report.md
 
+      - name: Verify native IAM input pipeline
+        run: >-
+          python -m cloud_security_lab analyze iam
+          sample_data/aws/iam/account_authorization_details.json
+          --input-format aws
+          --credential-report sample_data/aws/iam/credential_report.csv
+          --as-of 2026-06-30
+          --normalized-output reports/generated/normalized_iam_environment.json
+          --output reports/generated/native_iam_findings.json
+
       - name: Build wheel and source distribution
         if: matrix.python-version == '3.13'
         run: python -m build

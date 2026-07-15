@@ -1,10 +1,10 @@
 # Cloud Security Misconfiguration Lab
 
-This project is an offline-first AWS security analysis lab for identifying risky identity, storage, network, and audit-event patterns from JSON evidence.
+This project is an offline-first AWS security analysis lab for identifying risky identity, storage, network, and audit-event patterns from exported evidence.
 
 The goal is to provide practical and explainable security findings without requiring cloud credentials or making changes to a live AWS account.
 
-The repository includes four analyzers, a versioned shared finding contract, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
+The repository includes four analyzers, native AWS IAM input normalization, a versioned shared finding contract, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
 
 ## Quick Start
 
@@ -39,6 +39,8 @@ The first module analyzes sample IAM users, identity policies, and trust policie
 - Long-lived access keys in sample user metadata
 
 The analyzer produces terminal findings and exports structured JSON evidence for reporting.
+
+IAM input can use either the documented simplified environment contract or native AWS `GetAccountAuthorizationDetails` plus credential-report exports. Native input resolves user, group, role, and managed-policy relationships before applying the same detection rules.
 
 Rule catalog:
 
@@ -144,6 +146,20 @@ python3 -m cloud_security_lab analyze iam \
   --output reports/generated/iam_findings.json
 ```
 
+Analyze native AWS IAM exports without connecting the lab to an account:
+
+```bash
+python3 -m cloud_security_lab analyze iam \
+  sample_data/aws/iam/account_authorization_details.json \
+  --input-format aws \
+  --credential-report sample_data/aws/iam/credential_report.csv \
+  --as-of 2026-06-30 \
+  --normalized-output reports/generated/normalized_iam_environment.json \
+  --output reports/generated/iam_findings.json
+```
+
+See [Native AWS inputs](docs/native-aws-inputs.md) for evidence collection, validation behavior, and limitations.
+
 Merge one or more versioned finding files:
 
 ```bash
@@ -173,6 +189,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 
 - [Upgrade roadmap](ROADMAP.md)
 - [Data contracts](docs/data-contracts.md)
+- [Native AWS inputs](docs/native-aws-inputs.md)
 - [Engineering checks](docs/engineering.md)
 - [Known limitations](docs/known-limitations.md)
 - [Change log](CHANGELOG.md)
@@ -209,7 +226,9 @@ cloud_security_misconfiguration_lab/
 ├── pyproject.toml
 ├── cloud_security_lab/
 │   ├── __main__.py
-│   └── cli.py
+│   ├── cli.py
+│   └── normalizers/
+│       └── iam.py
 ├── cloud_findings/
 │   └── finding.py
 ├── cloudtrail_detector/
@@ -232,8 +251,12 @@ cloud_security_misconfiguration_lab/
 │   └── cloud_security_report_sample.md
 ├── schemas/
 │   ├── findings-v1.0.schema.json
+│   ├── aws-iam-authorization-details-v1.0.schema.json
 │   └── *-environment-v1.0.schema.json
 ├── sample_data/
+│   ├── aws/iam/
+│   │   ├── account_authorization_details.json
+│   │   └── credential_report.csv
 │   ├── cloudtrail/
 │   │   └── sample_cloudtrail_events.json
 │   ├── iam/
@@ -249,6 +272,7 @@ cloud_security_misconfiguration_lab/
 ├── docs/
 │   ├── data-contracts.md
 │   ├── engineering.md
+│   ├── native-aws-inputs.md
 │   └── known-limitations.md
 ├── tests/
 │   ├── test_contracts.py

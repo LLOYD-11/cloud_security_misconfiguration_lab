@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 import sysconfig
 from dataclasses import dataclass
 from datetime import date
@@ -11,6 +12,10 @@ from typing import Any, Callable, Sequence
 
 from cloud_findings import Finding, write_findings
 from cloud_security_lab import __version__
+from cloud_security_lab.normalizers import (
+    load_aws_iam_environment,
+    write_normalized_environment,
+)
 from cloudtrail_detector.detector import (
     analyze_environment as analyze_cloudtrail,
     load_environment as load_cloudtrail,
@@ -102,7 +107,7 @@ def _report_date(value: str) -> date:
     try:
         return date.fromisoformat(value)
     except ValueError as exc:
-        raise argparse.ArgumentTypeError("report date must use YYYY-MM-DD format") from exc
+        raise argparse.ArgumentTypeError("date must use YYYY-MM-DD format") from exc
 
 
 def _analyze(
@@ -130,12 +135,44 @@ def _run_analyze(args: argparse.Namespace) -> int:
         raise ValueError(
             "--failure-threshold and --failure-window-minutes are only valid for cloudtrail"
         )
-    findings = _analyze(
-        args.module,
-        args.input,
-        failure_threshold=args.failure_threshold,
-        failure_window_minutes=args.failure_window_minutes,
+    iam_native_options = (
+        args.input_format != "simplified"
+        or args.credential_report is not None
+        or args.as_of is not None
+        or args.normalized_output is not None
     )
+    if args.module != "iam" and iam_native_options:
+        raise ValueError(
+            "--input-format, --credential-report, --as-of, and --normalized-output "
+            "native options are only valid for iam"
+        )
+
+    if args.input_format == "aws":
+        if args.credential_report is None:
+            raise ValueError("--credential-report is required for AWS IAM input")
+        normalized = load_aws_iam_environment(
+            args.input,
+            args.credential_report,
+            as_of=args.as_of or date.today(),
+        )
+        for warning in normalized.warnings:
+            print(f"Warning: {warning}", file=sys.stderr)
+        if args.normalized_output:
+            write_normalized_environment(args.normalized_output, normalized.environment)
+            print(f"Normalized IAM environment saved to {args.normalized_output}")
+        findings = analyze_iam(normalized.environment)
+    else:
+        if args.module == "iam" and iam_native_options:
+            raise ValueError(
+                "--credential-report, --as-of, and --normalized-output require "
+                "--input-format aws"
+            )
+        findings = _analyze(
+            args.module,
+            args.input,
+            failure_threshold=args.failure_threshold,
+            failure_window_minutes=args.failure_window_minutes,
+        )
     ANALYZERS[args.module].printer(findings)
     if args.output:
         write_findings(args.output, findings)
@@ -192,6 +229,27 @@ def build_parser() -> argparse.ArgumentParser:
     analyze_parser.add_argument("module", choices=tuple(ANALYZERS))
     analyze_parser.add_argument("input", type=Path, help="Path to the module input JSON file.")
     analyze_parser.add_argument("--output", type=Path, help="Optional findings JSON output path.")
+    analyze_parser.add_argument(
+        "--input-format",
+        choices=("simplified", "aws"),
+        default="simplified",
+        help="Input contract. AWS is currently supported by the IAM module.",
+    )
+    analyze_parser.add_argument(
+        "--credential-report",
+        type=Path,
+        help="AWS IAM credential report JSON or decoded CSV. Requires --input-format aws.",
+    )
+    analyze_parser.add_argument(
+        "--as-of",
+        type=_report_date,
+        help="Date used for credential age calculations (YYYY-MM-DD; defaults to today).",
+    )
+    analyze_parser.add_argument(
+        "--normalized-output",
+        type=Path,
+        help="Optional normalized IAM environment output. Requires --input-format aws.",
+    )
     analyze_parser.add_argument(
         "--failure-threshold",
         type=_positive_int,

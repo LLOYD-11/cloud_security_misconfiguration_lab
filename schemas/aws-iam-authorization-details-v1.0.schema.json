@@ -1,0 +1,254 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/cloud-security-misconfiguration-lab/aws-iam-authorization-details-v1.0.schema.json",
+  "title": "Complete AWS IAM account authorization details export",
+  "type": "object",
+  "required": [
+    "UserDetailList",
+    "GroupDetailList",
+    "RoleDetailList",
+    "Policies",
+    "IsTruncated"
+  ],
+  "properties": {
+    "UserDetailList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/userDetail"
+      }
+    },
+    "GroupDetailList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/groupDetail"
+      }
+    },
+    "RoleDetailList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/roleDetail"
+      }
+    },
+    "Policies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/managedPolicyDetail"
+      }
+    },
+    "IsTruncated": {
+      "const": false
+    },
+    "Marker": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "policyDocument": {
+      "oneOf": [
+        {
+          "type": "object"
+        },
+        {
+          "type": "string",
+          "minLength": 1
+        }
+      ]
+    },
+    "attachedManagedPolicy": {
+      "type": "object",
+      "required": [
+        "PolicyName",
+        "PolicyArn"
+      ],
+      "properties": {
+        "PolicyName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "PolicyArn": {
+          "type": "string",
+          "pattern": "^arn:[^:]+:iam::[^:]+:policy/"
+        }
+      },
+      "additionalProperties": true
+    },
+    "inlinePolicy": {
+      "type": "object",
+      "required": [
+        "PolicyName",
+        "PolicyDocument"
+      ],
+      "properties": {
+        "PolicyName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "PolicyDocument": {
+          "$ref": "#/$defs/policyDocument"
+        }
+      },
+      "additionalProperties": true
+    },
+    "userDetail": {
+      "type": "object",
+      "required": [
+        "UserName",
+        "Arn",
+        "UserPolicyList",
+        "GroupList",
+        "AttachedManagedPolicies"
+      ],
+      "properties": {
+        "UserName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "Arn": {
+          "type": "string",
+          "pattern": "^arn:[^:]+:iam::[0-9]{12}:user/"
+        },
+        "UserPolicyList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/inlinePolicy"
+          }
+        },
+        "GroupList": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "AttachedManagedPolicies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/attachedManagedPolicy"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "groupDetail": {
+      "type": "object",
+      "required": [
+        "GroupName",
+        "Arn",
+        "GroupPolicyList",
+        "AttachedManagedPolicies"
+      ],
+      "properties": {
+        "GroupName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "Arn": {
+          "type": "string",
+          "pattern": "^arn:[^:]+:iam::[0-9]{12}:group/"
+        },
+        "GroupPolicyList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/inlinePolicy"
+          }
+        },
+        "AttachedManagedPolicies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/attachedManagedPolicy"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "roleDetail": {
+      "type": "object",
+      "required": [
+        "RoleName",
+        "Arn",
+        "AssumeRolePolicyDocument",
+        "RolePolicyList",
+        "AttachedManagedPolicies"
+      ],
+      "properties": {
+        "RoleName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "Arn": {
+          "type": "string",
+          "pattern": "^arn:[^:]+:iam::[0-9]{12}:role/"
+        },
+        "AssumeRolePolicyDocument": {
+          "$ref": "#/$defs/policyDocument"
+        },
+        "RolePolicyList": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/inlinePolicy"
+          }
+        },
+        "AttachedManagedPolicies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/attachedManagedPolicy"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "policyVersion": {
+      "type": "object",
+      "required": [
+        "Document",
+        "VersionId",
+        "IsDefaultVersion"
+      ],
+      "properties": {
+        "Document": {
+          "$ref": "#/$defs/policyDocument"
+        },
+        "VersionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "IsDefaultVersion": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": true
+    },
+    "managedPolicyDetail": {
+      "type": "object",
+      "required": [
+        "PolicyName",
+        "Arn",
+        "DefaultVersionId",
+        "PolicyVersionList"
+      ],
+      "properties": {
+        "PolicyName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "Arn": {
+          "type": "string",
+          "pattern": "^arn:[^:]+:iam::[^:]+:policy/"
+        },
+        "DefaultVersionId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "PolicyVersionList": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/policyVersion"
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

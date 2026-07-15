@@ -1,0 +1,167 @@
+{
+  "UserDetailList": [
+    {
+      "Path": "/",
+      "UserName": "alice-admin",
+      "UserId": "AIDAEXAMPLEALICE",
+      "Arn": "arn:aws:iam::111122223333:user/alice-admin",
+      "CreateDate": "2025-01-10T00:00:00Z",
+      "UserPolicyList": [],
+      "GroupList": [],
+      "AttachedManagedPolicies": [
+        {
+          "PolicyName": "OverBroadAdminPolicy",
+          "PolicyArn": "arn:aws:iam::111122223333:policy/OverBroadAdminPolicy"
+        }
+      ]
+    },
+    {
+      "Path": "/engineering/",
+      "UserName": "data-engineer",
+      "UserId": "AIDAEXAMPLEDATA",
+      "Arn": "arn:aws:iam::111122223333:user/engineering/data-engineer",
+      "CreateDate": "2025-09-01T00:00:00Z",
+      "UserPolicyList": [
+        {
+          "PolicyName": "BroadS3WritePolicy",
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Sid": "BroadS3",
+                "Effect": "Allow",
+                "Action": [
+                  "s3:GetObject",
+                  "s3:PutObject",
+                  "s3:DeleteObject"
+                ],
+                "Resource": "arn:aws:s3:::company-data-*/*"
+              }
+            ]
+          }
+        }
+      ],
+      "GroupList": [],
+      "AttachedManagedPolicies": []
+    },
+    {
+      "Path": "/analytics/",
+      "UserName": "readonly-analyst",
+      "UserId": "AIDAEXAMPLEREADONLY",
+      "Arn": "arn:aws:iam::111122223333:user/analytics/readonly-analyst",
+      "CreateDate": "2025-11-01T00:00:00Z",
+      "UserPolicyList": [],
+      "GroupList": [
+        "ReportingReaders"
+      ],
+      "AttachedManagedPolicies": []
+    }
+  ],
+  "GroupDetailList": [
+    {
+      "Path": "/",
+      "GroupName": "ReportingReaders",
+      "GroupId": "AGPAEXAMPLEREPORTS",
+      "Arn": "arn:aws:iam::111122223333:group/ReportingReaders",
+      "CreateDate": "2025-10-01T00:00:00Z",
+      "GroupPolicyList": [
+        {
+          "PolicyName": "ReadOnlyReports",
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": {
+              "Sid": "ReadReports",
+              "Effect": "Allow",
+              "Action": [
+                "s3:GetObject",
+                "cloudwatch:GetMetricData"
+              ],
+              "Resource": [
+                "arn:aws:s3:::company-reports/*",
+                "arn:aws:cloudwatch:ap-southeast-2:111122223333:metric/*"
+              ],
+              "Condition": {
+                "Bool": {
+                  "aws:MultiFactorAuthPresent": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "AttachedManagedPolicies": []
+    }
+  ],
+  "RoleDetailList": [
+    {
+      "Path": "/audit/",
+      "RoleName": "third-party-audit-role",
+      "RoleId": "AROAEXAMPLEAUDIT",
+      "Arn": "arn:aws:iam::111122223333:role/audit/third-party-audit-role",
+      "CreateDate": "2025-03-01T00:00:00Z",
+      "AssumeRolePolicyDocument": {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "ExternalAccountTrust",
+            "Effect": "Allow",
+            "Principal": {
+              "AWS": "arn:aws:iam::999988887777:root"
+            },
+            "Action": "sts:AssumeRole"
+          }
+        ]
+      },
+      "RolePolicyList": [
+        {
+          "PolicyName": "AuditReadOnly",
+          "PolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Sid": "AuditRead",
+                "Effect": "Allow",
+                "Action": [
+                  "iam:Get*",
+                  "iam:List*",
+                  "s3:ListBucket"
+                ],
+                "Resource": "*"
+              }
+            ]
+          }
+        }
+      ],
+      "AttachedManagedPolicies": [],
+      "InstanceProfileList": []
+    }
+  ],
+  "Policies": [
+    {
+      "PolicyName": "OverBroadAdminPolicy",
+      "PolicyId": "ANPAEXAMPLEADMIN",
+      "Arn": "arn:aws:iam::111122223333:policy/OverBroadAdminPolicy",
+      "Path": "/",
+      "DefaultVersionId": "v2",
+      "AttachmentCount": 1,
+      "IsAttachable": true,
+      "PolicyVersionList": [
+        {
+          "Document": {
+            "Version": "2012-10-17",
+            "Statement": {
+              "Sid": "FullAdmin",
+              "Effect": "Allow",
+              "Action": "*",
+              "Resource": "*"
+            }
+          },
+          "VersionId": "v2",
+          "IsDefaultVersion": true,
+          "CreateDate": "2026-01-01T00:00:00Z"
+        }
+      ]
+    }
+  ],
+  "IsTruncated": false
+}

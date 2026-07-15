@@ -57,6 +57,10 @@ include = [
 [tool.setuptools.data-files]
 "share/cloud-security-misconfiguration-lab/schemas" = ["schemas/*.json"]
 "share/cloud-security-misconfiguration-lab/sample_data/iam" = ["sample_data/iam/*.json"]
+"share/cloud-security-misconfiguration-lab/sample_data/aws/iam" = [
+  "sample_data/aws/iam/*.csv",
+  "sample_data/aws/iam/*.json",
+]
 "share/cloud-security-misconfiguration-lab/sample_data/storage" = ["sample_data/storage/*.json"]
 "share/cloud-security-misconfiguration-lab/sample_data/network" = ["sample_data/network/*.json"]
 "share/cloud-security-misconfiguration-lab/sample_data/cloudtrail" = ["sample_data/cloudtrail/*.json"]

@@ -4,13 +4,16 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 
 ## Input Compatibility
 
-- The current analyzers consume documented simplified JSON models rather than unmodified AWS CLI or API responses.
+- IAM accepts documented simplified input or native `GetAccountAuthorizationDetails` plus credential-report exports. Storage, network, and CloudTrail still require simplified models.
 - CloudTrail input currently expects an `events` list and does not yet read `Records` payloads or gzip archives.
 - Evidence is loaded into memory and is intended for small lab datasets.
 
 ## IAM Analysis
 
 - The analyzer does not calculate effective permissions across identity policies, resource policies, service control policies, permissions boundaries, sessions, and explicit denies.
+- Native normalization resolves direct and group identity policies, but an absent referenced policy or group is skipped with a warning rather than reconstructed.
+- IAM credential reports expose active-key slots rather than access-key IDs and omit service-specific credentials; normalized key identifiers are synthetic.
+- The credential-report root row is used only as collection context; root credential posture is not yet emitted as an IAM finding.
 - `NotAction`, `NotResource`, policy variables, and the full AWS action catalog are not yet modeled.
 - External trust conditions such as `sts:ExternalId` and `aws:PrincipalOrgID` do not yet lower finding confidence or severity.
 - Some AWS actions require `Resource: "*"`; the current wildcard-resource rule does not maintain a service action catalog for those exceptions.

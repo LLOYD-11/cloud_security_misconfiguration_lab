@@ -30,6 +30,40 @@ class UnifiedCliTests(unittest.TestCase):
         self.assertEqual(0, result)
         self.assertEqual(8, payload["finding_count"])
 
+    def test_analyze_native_aws_iam_writes_findings_and_normalized_evidence(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = Path(tmpdir) / "iam.json"
+            normalized_path = Path(tmpdir) / "normalized-iam.json"
+            with redirect_stdout(StringIO()), redirect_stderr(StringIO()) as stderr:
+                result = main(
+                    [
+                        "analyze",
+                        "iam",
+                        str(
+                            PROJECT_ROOT
+                            / "sample_data/aws/iam/account_authorization_details.json"
+                        ),
+                        "--input-format",
+                        "aws",
+                        "--credential-report",
+                        str(PROJECT_ROOT / "sample_data/aws/iam/credential_report.csv"),
+                        "--as-of",
+                        "2026-06-30",
+                        "--normalized-output",
+                        str(normalized_path),
+                        "--output",
+                        str(output_path),
+                    ]
+                )
+
+            payload = json.loads(output_path.read_text(encoding="utf-8"))
+            normalized = json.loads(normalized_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(0, result)
+        self.assertEqual("", stderr.getvalue())
+        self.assertEqual(8, payload["finding_count"])
+        self.assertEqual("111122223333", normalized["account_id"])
+
     def test_demo_runs_all_modules_and_writes_report(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             output_dir = Path(tmpdir) / "generated"
@@ -102,6 +136,38 @@ class UnifiedCliTests(unittest.TestCase):
                     str(PROJECT_ROOT / "sample_data/iam/sample_iam_environment.json"),
                     "--failure-threshold",
                     "3",
+                ]
+            )
+
+        self.assertEqual(2, context.exception.code)
+
+    def test_native_iam_requires_credential_report(self):
+        with redirect_stderr(StringIO()) as stderr, self.assertRaises(SystemExit) as context:
+            main(
+                [
+                    "analyze",
+                    "iam",
+                    str(
+                        PROJECT_ROOT
+                        / "sample_data/aws/iam/account_authorization_details.json"
+                    ),
+                    "--input-format",
+                    "aws",
+                ]
+            )
+
+        self.assertEqual(2, context.exception.code)
+        self.assertIn("--credential-report is required", stderr.getvalue())
+
+    def test_native_iam_options_are_rejected_for_other_modules(self):
+        with redirect_stderr(StringIO()), self.assertRaises(SystemExit) as context:
+            main(
+                [
+                    "analyze",
+                    "storage",
+                    str(PROJECT_ROOT / "sample_data/storage/sample_storage_environment.json"),
+                    "--as-of",
+                    "2026-06-30",
                 ]
             )
 

@@ -11,6 +11,10 @@ from iam_analyzer.analyzer import analyze_environment, load_environment
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_SAMPLE_PAIRS = (
     (
+        "aws-iam-authorization-details-v1.0.schema.json",
+        "sample_data/aws/iam/account_authorization_details.json",
+    ),
+    (
         "iam-environment-v1.0.schema.json",
         "sample_data/iam/sample_iam_environment.json",
     ),

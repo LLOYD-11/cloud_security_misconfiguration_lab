@@ -2,7 +2,7 @@
 
 This module analyzes offline IAM-style JSON data and reports risky identity and permission patterns using the shared finding schema.
 
-It is intentionally offline-first. The sample data is shaped like cloud IAM data, but the module does not call AWS APIs or require cloud credentials.
+It is intentionally offline-first. The module does not call AWS APIs or require cloud credentials. The unified CLI can normalize previously exported AWS IAM authorization details and credential reports before running this analyzer.
 
 ## Input Model
 
@@ -54,6 +54,19 @@ python3 iam_analyzer/analyzer.py \
 ```
 
 The exported JSON can be passed directly to `report_generator/generate_report.py`.
+
+Native AWS exports are supported through the unified CLI:
+
+```bash
+python3 -m cloud_security_lab analyze iam \
+  sample_data/aws/iam/account_authorization_details.json \
+  --input-format aws \
+  --credential-report sample_data/aws/iam/credential_report.csv \
+  --as-of 2026-06-30 \
+  --output reports/generated/iam_findings.json
+```
+
+See [`docs/native-aws-inputs.md`](../docs/native-aws-inputs.md) for collection and normalization details. The standalone compatibility script continues to accept the simplified IAM environment only.
 
 ## Test
 

@@ -20,12 +20,12 @@ Status: Complete.
 
 ## Milestone 3: Native AWS Inputs
 
-Status: Planned.
+Status: In progress. Native IAM inputs are complete.
 
-- Normalize IAM authorization details and credential reports.
-- Normalize S3 security API responses.
-- Normalize EC2 `DescribeSecurityGroups` output.
-- Read CloudTrail `Records` payloads, multiple files, and gzip archives.
+- [x] Normalize IAM authorization details and credential reports.
+- [ ] Normalize S3 security API responses.
+- [ ] Normalize EC2 `DescribeSecurityGroups` output.
+- [ ] Read CloudTrail `Records` payloads, multiple files, and gzip archives.
 
 ## Milestone 4: Detection Depth
 
