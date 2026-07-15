@@ -1,0 +1,101 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cloud-security-misconfiguration-lab"
+dynamic = ["version"]
+description = "Offline AWS security analyzers with explainable findings and consolidated reporting"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Lloyd" }]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "Intended Audience :: Education",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Security",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2,<2",
+  "coverage[toml]>=7.6,<8",
+  "jsonschema>=4.23,<5",
+  "mypy>=1.11,<2",
+  "ruff>=0.12,<1",
+]
+
+[project.scripts]
+cloud-security-lab = "cloud_security_lab.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/LLOYD-11/cloud_security_misconfiguration_lab"
+Repository = "https://github.com/LLOYD-11/cloud_security_misconfiguration_lab"
+
+[tool.setuptools.dynamic]
+version = { attr = "cloud_security_lab.__version__" }
+
+[tool.setuptools.packages.find]
+include = [
+  "cloud_security_lab*",
+  "cloud_findings*",
+  "cloudtrail_detector*",
+  "iam_analyzer*",
+  "network_analyzer*",
+  "report_generator*",
+  "storage_analyzer*",
+]
+
+[tool.setuptools.data-files]
+"share/cloud-security-misconfiguration-lab/schemas" = ["schemas/*.json"]
+"share/cloud-security-misconfiguration-lab/sample_data/iam" = ["sample_data/iam/*.json"]
+"share/cloud-security-misconfiguration-lab/sample_data/storage" = ["sample_data/storage/*.json"]
+"share/cloud-security-misconfiguration-lab/sample_data/network" = ["sample_data/network/*.json"]
+"share/cloud-security-misconfiguration-lab/sample_data/cloudtrail" = ["sample_data/cloudtrail/*.json"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+ignore = ["E402"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+
+[tool.mypy]
+python_version = "3.10"
+exclude = "(^|/)test_[^/]*\\.py$"
+check_untyped_defs = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+show_error_codes = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+
+[tool.coverage.run]
+branch = true
+source = [
+  "cloud_security_lab",
+  "cloud_findings",
+  "cloudtrail_detector",
+  "iam_analyzer",
+  "network_analyzer",
+  "report_generator",
+  "storage_analyzer",
+]
+omit = ["*/__main__.py", "*/test_*.py"]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true
+skip_covered = true

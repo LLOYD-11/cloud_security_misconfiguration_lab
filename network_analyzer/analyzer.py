@@ -5,17 +5,15 @@ from __future__ import annotations
 import argparse
 import ipaddress
 import json
-from pathlib import Path
 import sys
+from pathlib import Path
 from typing import Any
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from cloud_findings import Finding, findings_to_dicts, sort_findings, write_findings
-
+from cloud_findings import Finding, sort_findings, write_findings
 
 REF_AWS_SECURITY_GROUPS = "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html"
 REF_AWS_SECURITY_GROUP_RULES = "https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html"

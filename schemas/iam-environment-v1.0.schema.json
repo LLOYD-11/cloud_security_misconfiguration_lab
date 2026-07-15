@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/schemas/iam-environment-v1.0.schema.json",
+  "title": "Simplified IAM Environment v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["account_id", "users", "roles"],
+  "properties": {
+    "account_id": { "$ref": "#/$defs/accountId" },
+    "users": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/user" }
+    },
+    "roles": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/role" }
+    }
+  },
+  "$defs": {
+    "accountId": {
+      "type": "string",
+      "pattern": "^[0-9]{12}$"
+    },
+    "stringOrStringList": {
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      ]
+    },
+    "principal": {
+      "oneOf": [
+        { "type": "string", "minLength": 1 },
+        {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "$ref": "#/$defs/stringOrStringList" }
+        }
+      ]
+    },
+    "statement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["effect", "action"],
+      "properties": {
+        "sid": { "type": "string" },
+        "effect": { "enum": ["Allow", "Deny"] },
+        "action": { "$ref": "#/$defs/stringOrStringList" },
+        "resource": { "$ref": "#/$defs/stringOrStringList" },
+        "principal": { "$ref": "#/$defs/principal" },
+        "condition": { "type": "object" }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_name", "statements"],
+      "properties": {
+        "policy_name": { "type": "string", "minLength": 1 },
+        "statements": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/statement" }
+        }
+      }
+    },
+    "accessKey": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "age_days"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "age_days": { "type": "integer", "minimum": 0 },
+        "last_used_days": { "type": ["integer", "null"], "minimum": 0 },
+        "status": { "enum": ["Active", "Inactive", "active", "inactive"] }
+      }
+    },
+    "user": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "mfa_enabled", "access_keys", "attached_policies"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "mfa_enabled": { "type": "boolean" },
+        "access_keys": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/accessKey" }
+        },
+        "attached_policies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/policy" }
+        }
+      }
+    },
+    "role": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "trust_policy", "attached_policies"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "trust_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["statements"],
+          "properties": {
+            "statements": {
+              "type": "array",
+              "items": { "$ref": "#/$defs/statement" }
+            }
+          }
+        },
+        "attached_policies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/policy" }
+        }
+      }
+    }
+  }
+}

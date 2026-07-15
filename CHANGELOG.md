@@ -9,6 +9,10 @@ All notable changes to this project are documented in this file.
 - Regression tests for IAM trust, MFA conditions, S3 action wildcards, storage principals, network protocols and CIDRs, CloudTrail outcomes, duplicate events, and finding-schema validation.
 - Public upgrade roadmap and known-limitations documentation.
 - Optional `--report-date` support for reproducible sample reports.
+- Installable Python package metadata and the `cloud-security-lab` unified CLI.
+- Versioned Draft 2020-12 JSON Schema contracts for all simplified inputs and findings.
+- GitHub Actions checks for Python 3.10 and 3.13.
+- Ruff linting, strict production type checks, branch coverage, package builds, and deterministic end-to-end verification.
 
 ### Changed
 
@@ -20,6 +24,7 @@ All notable changes to this project are documented in this file.
 - CloudTrail change findings require successful, risk-increasing API activity and deduplicate explicit event IDs.
 - Shared finding files now enforce supported schema versions, declared finding counts, required fields, field types, and valid severities.
 - Unversioned legacy finding lists are rejected by the report pipeline.
+- Sample data and schemas are included in built distributions so the demo command works outside a source checkout.
 
 ## 1.0.0 - 2026-06-30
 

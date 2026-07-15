@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/schemas/cloudtrail-events-v1.0.schema.json",
+  "title": "Simplified CloudTrail Events v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["account_id", "events"],
+  "properties": {
+    "account_id": { "type": "string", "pattern": "^[0-9]{12}$" },
+    "events": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/event" }
+    }
+  },
+  "$defs": {
+    "event": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["eventTime", "eventName", "sourceIPAddress", "userIdentity"],
+      "properties": {
+        "eventID": { "type": "string", "minLength": 1 },
+        "eventTime": { "type": "string", "format": "date-time" },
+        "eventSource": { "type": "string", "minLength": 1 },
+        "eventName": { "type": "string", "minLength": 1 },
+        "awsRegion": { "type": "string", "minLength": 1 },
+        "sourceIPAddress": { "type": "string", "minLength": 1 },
+        "userIdentity": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["type"],
+          "properties": {
+            "type": { "type": "string", "minLength": 1 },
+            "userName": { "type": "string", "minLength": 1 },
+            "arn": { "type": "string", "minLength": 1 }
+          }
+        },
+        "requestParameters": { "type": ["object", "null"] },
+        "responseElements": { "type": ["object", "null"] },
+        "errorCode": { "type": "string", "minLength": 1 },
+        "errorMessage": { "type": "string" }
+      }
+    }
+  }
+}

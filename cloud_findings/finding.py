@@ -7,7 +7,6 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any, Iterable
 
-
 SCHEMA_VERSION = "1.0"
 VALID_SEVERITIES = frozenset({"critical", "high", "medium", "low", "info"})
 REQUIRED_TEXT_FIELDS = (

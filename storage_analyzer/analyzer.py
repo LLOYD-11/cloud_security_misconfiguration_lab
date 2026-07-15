@@ -4,17 +4,15 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
 import sys
+from pathlib import Path
 from typing import Any
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from cloud_findings import Finding, findings_to_dicts, sort_findings, write_findings
-
+from cloud_findings import Finding, sort_findings, write_findings
 
 REF_AWS_S3_BLOCK_PUBLIC_ACCESS = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html"
 REF_AWS_S3_ACLS = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html"

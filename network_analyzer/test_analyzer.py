@@ -6,7 +6,6 @@ from pathlib import Path
 from cloud_findings import findings_to_dicts, write_findings
 from network_analyzer.analyzer import analyze_environment, load_environment
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SAMPLE_FILE = PROJECT_ROOT / "sample_data" / "network" / "sample_network_environment.json"
 

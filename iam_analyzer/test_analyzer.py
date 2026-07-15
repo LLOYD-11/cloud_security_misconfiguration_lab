@@ -3,13 +3,11 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from cloud_findings import findings_to_dicts, write_findings
 from iam_analyzer.analyzer import (
     analyze_environment,
-    findings_to_dicts,
     load_environment,
-    write_findings,
 )
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SAMPLE_FILE = PROJECT_ROOT / "sample_data" / "iam" / "sample_iam_environment.json"

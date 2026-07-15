@@ -3,20 +3,18 @@
 from __future__ import annotations
 
 import argparse
+import json
+import sys
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
-import json
 from pathlib import Path
-import sys
 from typing import Any
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from cloud_findings import Finding, findings_to_dicts, sort_findings, write_findings
-
+from cloud_findings import Finding, sort_findings, write_findings
 
 REF_AWS_CLOUDTRAIL = "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html"
 REF_AWS_IAM_BEST_PRACTICES = "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"

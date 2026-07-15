@@ -3,19 +3,17 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from collections import Counter, defaultdict
 from datetime import date
 from pathlib import Path
-import sys
 from typing import Iterable
-
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from cloud_findings import Finding, load_findings_file, severity_rank, sort_findings
-
+from cloud_findings import Finding, load_findings_file, sort_findings
 
 SEVERITY_ORDER = ("critical", "high", "medium", "low", "info")
 

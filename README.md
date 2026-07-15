@@ -4,6 +4,26 @@ This project is an offline-first AWS security analysis lab for identifying risky
 
 The goal is to provide practical and explainable security findings without requiring cloud credentials or making changes to a live AWS account.
 
+The repository includes four analyzers, a versioned shared finding contract, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
+
+## Quick Start
+
+From the repository root, run the complete sample pipeline without installing runtime dependencies:
+
+```bash
+python3 -m cloud_security_lab demo --report-date 2026-06-30
+```
+
+This writes four versioned finding files and a 28-finding consolidated report under `reports/generated/`. The result should exactly match [`reports/cloud_security_report_sample.md`](reports/cloud_security_report_sample.md).
+
+Install the project in a virtual environment to expose the `cloud-security-lab` command:
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -e .
+.venv/bin/cloud-security-lab --help
+```
+
 ## Modules
 
 ### Module 1: IAM Policy Analyzer
@@ -114,71 +134,20 @@ Rule catalog:
 | `CLD-005` | IAM policy configuration changed |
 | `CLD-006` | Repeated API failures |
 
-## Run the IAM Analyzer
+## Unified CLI
 
-From the project root:
-
-```bash
-python3 iam_analyzer/analyzer.py sample_data/iam/sample_iam_environment.json
-```
-
-Export findings as JSON:
+Run one analyzer:
 
 ```bash
-python3 iam_analyzer/analyzer.py \
+python3 -m cloud_security_lab analyze iam \
   sample_data/iam/sample_iam_environment.json \
   --output reports/generated/iam_findings.json
 ```
 
-## Run the Storage Analyzer
+Merge one or more versioned finding files:
 
 ```bash
-python3 storage_analyzer/analyzer.py \
-  sample_data/storage/sample_storage_environment.json
-```
-
-Export findings as JSON:
-
-```bash
-python3 storage_analyzer/analyzer.py \
-  sample_data/storage/sample_storage_environment.json \
-  --output reports/generated/storage_findings.json
-```
-
-## Run the Network Analyzer
-
-```bash
-python3 network_analyzer/analyzer.py \
-  sample_data/network/sample_network_environment.json
-```
-
-Export findings as JSON:
-
-```bash
-python3 network_analyzer/analyzer.py \
-  sample_data/network/sample_network_environment.json \
-  --output reports/generated/network_findings.json
-```
-
-## Run the CloudTrail Detector
-
-```bash
-python3 cloudtrail_detector/detector.py \
-  sample_data/cloudtrail/sample_cloudtrail_events.json
-```
-
-Export findings as JSON:
-
-```bash
-python3 cloudtrail_detector/detector.py \
-  sample_data/cloudtrail/sample_cloudtrail_events.json \
-  --output reports/generated/cloudtrail_findings.json
-```
-
-## Generate Risk Report
-
-```bash
-python3 report_generator/generate_report.py \
+python3 -m cloud_security_lab report \
   --findings reports/generated/iam_findings.json \
   --findings reports/generated/storage_findings.json \
   --findings reports/generated/network_findings.json \
@@ -187,31 +156,60 @@ python3 report_generator/generate_report.py \
   --output reports/generated/cloud_security_report.md
 ```
 
-A [committed sample report](reports/cloud_security_report_sample.md) demonstrates the complete pipeline output. The explicit report date makes this sample reproducible; omit `--report-date` to use the current local date.
+The installed `cloud-security-lab` command exposes the same `analyze`, `report`, and `demo` subcommands. The explicit report date makes sample output reproducible; omit `--report-date` to use the current local date.
+
+## Compatibility Entrypoints
+
+The original module scripts remain supported:
+
+```bash
+python3 iam_analyzer/analyzer.py sample_data/iam/sample_iam_environment.json
+python3 storage_analyzer/analyzer.py sample_data/storage/sample_storage_environment.json
+python3 network_analyzer/analyzer.py sample_data/network/sample_network_environment.json
+python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail_events.json
+```
 
 ## Project Documentation
 
 - [Upgrade roadmap](ROADMAP.md)
+- [Data contracts](docs/data-contracts.md)
+- [Engineering checks](docs/engineering.md)
 - [Known limitations](docs/known-limitations.md)
 - [Change log](CHANGELOG.md)
 
 ## Requirements
 
-Python 3.10 or later. No third-party packages required.
+Runtime: Python 3.10 or later. The analyzers and unified CLI have no third-party runtime dependencies.
 
-## Run Tests
+Development and contract checks use optional tools declared in `pyproject.toml`:
 
 ```bash
-python3 -m unittest discover
+.venv/bin/python -m pip install -e ".[dev]"
 ```
+
+## Quality Checks
+
+```bash
+.venv/bin/ruff check .
+.venv/bin/mypy cloud_security_lab cloud_findings iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
+.venv/bin/coverage run -m unittest discover
+.venv/bin/coverage report
+```
+
+The coverage gate is 85% with branch coverage enabled. GitHub Actions also rebuilds the package and verifies the deterministic end-to-end report on Python 3.10 and 3.13.
 
 ## Project Structure
 
 ```text
 cloud_security_misconfiguration_lab/
+├── .github/workflows/ci.yml
 ├── README.md
 ├── ROADMAP.md
 ├── CHANGELOG.md
+├── pyproject.toml
+├── cloud_security_lab/
+│   ├── __main__.py
+│   └── cli.py
 ├── cloud_findings/
 │   └── finding.py
 ├── cloudtrail_detector/
@@ -232,6 +230,9 @@ cloud_security_misconfiguration_lab/
 │   └── test_generate_report.py
 ├── reports/
 │   └── cloud_security_report_sample.md
+├── schemas/
+│   ├── findings-v1.0.schema.json
+│   └── *-environment-v1.0.schema.json
 ├── sample_data/
 │   ├── cloudtrail/
 │   │   └── sample_cloudtrail_events.json
@@ -246,7 +247,12 @@ cloud_security_misconfiguration_lab/
 │   ├── README.md
 │   └── test_analyzer.py
 ├── docs/
+│   ├── data-contracts.md
+│   ├── engineering.md
 │   └── known-limitations.md
+├── tests/
+│   ├── test_contracts.py
+│   └── test_legacy_clis.py
 ├── LICENSE
 └── .gitignore
 ```
