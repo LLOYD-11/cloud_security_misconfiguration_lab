@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/schemas/aws-ec2-describe-security-groups-v1.0.schema.json",
+  "title": "Complete AWS EC2 DescribeSecurityGroups Response v1.0",
+  "type": "object",
+  "required": [
+    "SecurityGroups"
+  ],
+  "properties": {
+    "SecurityGroups": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/securityGroup"
+      }
+    },
+    "NextToken": {
+      "type": "null"
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "awsAccountId": {
+      "type": "string",
+      "pattern": "^[0-9]{12}$"
+    },
+    "securityGroupId": {
+      "type": "string",
+      "pattern": "^sg-([0-9a-f]{8}|[0-9a-f]{17})$"
+    },
+    "vpcId": {
+      "type": "string",
+      "pattern": "^vpc-([0-9a-f]{8}|[0-9a-f]{17})$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "ipv4Range": {
+      "type": "object",
+      "required": [
+        "CidrIp"
+      ],
+      "properties": {
+        "CidrIp": {
+          "type": "string",
+          "minLength": 1
+        },
+        "Description": {
+          "$ref": "#/$defs/description"
+        }
+      },
+      "additionalProperties": true
+    },
+    "ipv6Range": {
+      "type": "object",
+      "required": [
+        "CidrIpv6"
+      ],
+      "properties": {
+        "CidrIpv6": {
+          "type": "string",
+          "minLength": 1
+        },
+        "Description": {
+          "$ref": "#/$defs/description"
+        }
+      },
+      "additionalProperties": true
+    },
+    "prefixList": {
+      "type": "object",
+      "required": [
+        "PrefixListId"
+      ],
+      "properties": {
+        "PrefixListId": {
+          "type": "string",
+          "pattern": "^pl-[0-9a-f]+$"
+        },
+        "Description": {
+          "$ref": "#/$defs/description"
+        }
+      },
+      "additionalProperties": true
+    },
+    "securityGroupReference": {
+      "type": "object",
+      "required": [
+        "GroupId"
+      ],
+      "properties": {
+        "GroupId": {
+          "$ref": "#/$defs/securityGroupId"
+        },
+        "GroupName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "UserId": {
+          "$ref": "#/$defs/awsAccountId"
+        },
+        "VpcId": {
+          "$ref": "#/$defs/vpcId"
+        },
+        "VpcPeeringConnectionId": {
+          "type": "string",
+          "pattern": "^pcx-([0-9a-f]{8}|[0-9a-f]{17})$"
+        },
+        "PeeringStatus": {
+          "type": "string",
+          "minLength": 1
+        },
+        "Description": {
+          "$ref": "#/$defs/description"
+        }
+      },
+      "additionalProperties": true
+    },
+    "ipPermission": {
+      "type": "object",
+      "required": [
+        "IpProtocol"
+      ],
+      "properties": {
+        "IpProtocol": {
+          "type": "string",
+          "minLength": 1
+        },
+        "FromPort": {
+          "type": "integer",
+          "minimum": -1,
+          "maximum": 65535
+        },
+        "ToPort": {
+          "type": "integer",
+          "minimum": -1,
+          "maximum": 65535
+        },
+        "IpRanges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ipv4Range"
+          }
+        },
+        "Ipv6Ranges": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ipv6Range"
+          }
+        },
+        "PrefixListIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/prefixList"
+          }
+        },
+        "UserIdGroupPairs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/securityGroupReference"
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "tag": {
+      "type": "object",
+      "required": [
+        "Key",
+        "Value"
+      ],
+      "properties": {
+        "Key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "Value": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "securityGroup": {
+      "type": "object",
+      "required": [
+        "Description",
+        "GroupName",
+        "IpPermissions",
+        "IpPermissionsEgress",
+        "OwnerId",
+        "GroupId",
+        "VpcId"
+      ],
+      "properties": {
+        "Description": {
+          "type": "string"
+        },
+        "GroupName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "IpPermissions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ipPermission"
+          }
+        },
+        "IpPermissionsEgress": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ipPermission"
+          }
+        },
+        "OwnerId": {
+          "$ref": "#/$defs/awsAccountId"
+        },
+        "GroupId": {
+          "$ref": "#/$defs/securityGroupId"
+        },
+        "VpcId": {
+          "$ref": "#/$defs/vpcId"
+        },
+        "SecurityGroupArn": {
+          "type": "string",
+          "pattern": "^arn:[^:]+:ec2:[^:]+:[0-9]{12}:security-group/sg-([0-9a-f]{8}|[0-9a-f]{17})$"
+        },
+        "Tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tag"
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

@@ -4,7 +4,7 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 
 ## Input Compatibility
 
-- IAM and storage accept documented simplified inputs or versioned native AWS evidence. Network and CloudTrail still require simplified models.
+- IAM, storage, and network accept documented simplified inputs or versioned native AWS evidence. CloudTrail still requires its simplified model.
 - CloudTrail input currently expects an `events` list and does not yet read `Records` payloads or gzip archives.
 - Evidence is loaded into memory and is intended for small lab datasets.
 
@@ -30,6 +30,9 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 
 - A broad security-group rule does not prove that an attached workload is internet reachable.
 - ENIs, public addresses, load balancers, routes, network ACLs, and firewall controls are not yet correlated.
+- Native prefix-list and referenced-security-group targets are preserved with warnings but are not expanded or evaluated for public exposure.
+- Native normalization accepts one owner account per snapshot. Shared-VPC or multi-owner inventories must currently be analyzed separately.
+- A filtered `DescribeSecurityGroups` response does not identify itself as filtered; users must follow the documented unfiltered collection command to avoid false negatives.
 - Broad CIDR thresholds are fixed and are not yet user configurable.
 
 ## CloudTrail Detection

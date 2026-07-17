@@ -21,7 +21,11 @@
     "rule": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["protocol", "from_port", "to_port", "cidr"],
+      "required": ["protocol", "from_port", "to_port"],
+      "oneOf": [
+        { "required": ["cidr"] },
+        { "required": ["peer_type", "peer_id"] }
+      ],
       "properties": {
         "protocol": {
           "oneOf": [
@@ -32,6 +36,13 @@
         "from_port": { "$ref": "#/$defs/port" },
         "to_port": { "$ref": "#/$defs/port" },
         "cidr": { "type": "string", "minLength": 1 },
+        "peer_type": { "enum": ["prefix_list", "security_group"] },
+        "peer_id": { "type": "string", "minLength": 1 },
+        "peer_account_id": { "type": "string", "pattern": "^[0-9]{12}$" },
+        "peer_vpc_id": { "type": "string", "minLength": 1 },
+        "peering_status": { "type": "string", "minLength": 1 },
+        "peer_group_name": { "type": "string", "minLength": 1 },
+        "peer_vpc_peering_connection_id": { "type": "string", "minLength": 1 },
         "description": { "type": "string" }
       }
     },
@@ -43,6 +54,13 @@
         "id": { "type": "string", "minLength": 1 },
         "name": { "type": "string", "minLength": 1 },
         "description": { "type": "string" },
+        "owner_id": { "type": "string", "pattern": "^[0-9]{12}$" },
+        "vpc_id": { "type": "string", "minLength": 1 },
+        "arn": { "type": "string", "minLength": 1 },
+        "tags": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
         "inbound_rules": {
           "type": "array",
           "items": { "$ref": "#/$defs/rule" }

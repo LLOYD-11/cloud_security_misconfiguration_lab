@@ -13,6 +13,7 @@ from typing import Any, Callable, Sequence
 from cloud_findings import Finding, write_findings
 from cloud_security_lab import __version__
 from cloud_security_lab.normalizers import (
+    load_aws_ec2_environment,
     load_aws_iam_environment,
     load_aws_s3_environment,
     write_normalized_environment,
@@ -168,8 +169,17 @@ def _run_analyze(args: argparse.Namespace) -> int:
             normalized_environment = s3_result.environment
             normalization_warnings = s3_result.warnings
             findings = analyze_storage(normalized_environment)
+        elif args.module == "network":
+            if native_auxiliary_options:
+                raise ValueError("--credential-report and --as-of are only valid for AWS IAM input")
+            ec2_result = load_aws_ec2_environment(args.input)
+            normalized_environment = ec2_result.environment
+            normalization_warnings = ec2_result.warnings
+            findings = analyze_network(normalized_environment)
         else:
-            raise ValueError("AWS input format is currently supported only for iam and storage")
+            raise ValueError(
+                "AWS input format is currently supported only for iam, storage, and network"
+            )
 
         for warning in normalization_warnings:
             print(f"Warning: {warning}", file=sys.stderr)
@@ -236,7 +246,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--input-format",
         choices=("simplified", "aws"),
         default="simplified",
-        help="Input contract. AWS is currently supported by the IAM and storage modules.",
+        help="Input contract. AWS is currently supported by IAM, storage, and network.",
     )
     analyze_parser.add_argument(
         "--credential-report",

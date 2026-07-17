@@ -4,7 +4,7 @@ This project is an offline-first AWS security analysis lab for identifying risky
 
 The goal is to provide practical and explainable security findings without requiring cloud credentials or making changes to a live AWS account.
 
-The repository includes four analyzers, native AWS IAM and S3 input normalization, a versioned shared finding contract, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
+The repository includes four analyzers, native AWS IAM, S3, and EC2 security-group input normalization, a versioned shared finding contract, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
 
 ## Quick Start
 
@@ -108,6 +108,8 @@ The network analyzer checks sample security group configurations for risky netwo
 - All inbound ports open to the internet
 - Unrestricted outbound traffic to the internet
 
+Network input can use either the simplified environment contract or a complete native EC2 `DescribeSecurityGroups` response. Native normalization validates account, VPC, security-group, peering, protocol, port, and CIDR evidence before applying the same rules. Prefix-list and security-group targets are preserved with visible warnings but are not resolved into public reachability.
+
 Rule catalog:
 
 | Rule | Risk Pattern |
@@ -172,6 +174,16 @@ python3 -m cloud_security_lab analyze storage \
   --input-format aws \
   --normalized-output reports/generated/normalized_storage_environment.json \
   --output reports/generated/storage_findings.json
+```
+
+Analyze the bundled native EC2 security-group response:
+
+```bash
+python3 -m cloud_security_lab analyze network \
+  sample_data/aws/ec2/describe_security_groups.json \
+  --input-format aws \
+  --normalized-output reports/generated/normalized_network_environment.json \
+  --output reports/generated/network_findings.json
 ```
 
 Merge one or more versioned finding files:
@@ -243,6 +255,7 @@ cloud_security_misconfiguration_lab/
 │   ├── cli.py
 │   └── normalizers/
 │       ├── common.py
+│       ├── ec2.py
 │       ├── iam.py
 │       └── s3.py
 ├── cloud_findings/
@@ -268,12 +281,15 @@ cloud_security_misconfiguration_lab/
 ├── schemas/
 │   ├── findings-v1.0.schema.json
 │   ├── aws-iam-authorization-details-v1.0.schema.json
+│   ├── aws-ec2-describe-security-groups-v1.0.schema.json
 │   ├── aws-s3-evidence-bundle-v1.0.schema.json
 │   └── *-environment-v1.0.schema.json
 ├── sample_data/
 │   ├── aws/iam/
 │   │   ├── account_authorization_details.json
 │   │   └── credential_report.csv
+│   ├── aws/ec2/
+│   │   └── describe_security_groups.json
 │   ├── aws/s3/
 │   │   └── s3_security_evidence_bundle.json
 │   ├── cloudtrail/

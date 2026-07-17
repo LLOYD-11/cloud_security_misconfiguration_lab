@@ -102,6 +102,28 @@ class NetworkAnalyzerTests(unittest.TestCase):
 
         self.assertEqual(["NET-002"], [finding.rule_id for finding in findings])
 
+    def test_missing_group_name_uses_resource_id_in_metadata(self):
+        environment = {
+            "security_groups": [
+                {
+                    "id": "sg-legacy",
+                    "inbound_rules": [
+                        {
+                            "protocol": "tcp",
+                            "from_port": 22,
+                            "to_port": 22,
+                            "cidr": "0.0.0.0/0",
+                        }
+                    ],
+                    "outbound_rules": [],
+                }
+            ]
+        }
+
+        findings = analyze_environment(environment)
+
+        self.assertEqual("sg-legacy", findings[0].metadata["group_name"])
+
     def test_udp_database_port_is_not_reported_as_tcp_database_service(self):
         environment = {
             "security_groups": [

@@ -1,0 +1,221 @@
+{
+  "SecurityGroups": [
+    {
+      "Description": "Management access accidentally exposed to the internet.",
+      "GroupName": "admin-open",
+      "IpPermissions": [
+        {
+          "FromPort": 22,
+          "IpProtocol": "tcp",
+          "IpRanges": [
+            {
+              "CidrIp": "0.0.0.0/0",
+              "Description": "SSH from anywhere"
+            }
+          ],
+          "Ipv6Ranges": [],
+          "PrefixListIds": [],
+          "ToPort": 22,
+          "UserIdGroupPairs": []
+        },
+        {
+          "FromPort": 3389,
+          "IpProtocol": "tcp",
+          "IpRanges": [],
+          "Ipv6Ranges": [
+            {
+              "CidrIpv6": "::/0",
+              "Description": "RDP from anywhere over IPv6"
+            }
+          ],
+          "PrefixListIds": [],
+          "ToPort": 3389,
+          "UserIdGroupPairs": []
+        }
+      ],
+      "IpPermissionsEgress": [
+        {
+          "IpProtocol": "-1",
+          "IpRanges": [
+            {
+              "CidrIp": "0.0.0.0/0",
+              "Description": "Default allow all outbound"
+            }
+          ],
+          "Ipv6Ranges": [],
+          "PrefixListIds": [],
+          "UserIdGroupPairs": []
+        }
+      ],
+      "OwnerId": "111122223333",
+      "GroupId": "sg-00000000000000001",
+      "VpcId": "vpc-00000000000000001",
+      "SecurityGroupArn": "arn:aws:ec2:ap-southeast-2:111122223333:security-group/sg-00000000000000001",
+      "Tags": [
+        {
+          "Key": "Environment",
+          "Value": "production"
+        },
+        {
+          "Key": "Name",
+          "Value": "admin-open"
+        }
+      ]
+    },
+    {
+      "Description": "Database ports exposed to the internet.",
+      "GroupName": "database-public",
+      "IpPermissions": [
+        {
+          "FromPort": 3306,
+          "IpProtocol": "tcp",
+          "IpRanges": [
+            {
+              "CidrIp": "0.0.0.0/0",
+              "Description": "MySQL from anywhere"
+            }
+          ],
+          "Ipv6Ranges": [],
+          "PrefixListIds": [],
+          "ToPort": 3306,
+          "UserIdGroupPairs": []
+        },
+        {
+          "FromPort": 5432,
+          "IpProtocol": "tcp",
+          "IpRanges": [
+            {
+              "CidrIp": "0.0.0.0/0",
+              "Description": "PostgreSQL from anywhere"
+            }
+          ],
+          "Ipv6Ranges": [],
+          "PrefixListIds": [],
+          "ToPort": 5432,
+          "UserIdGroupPairs": []
+        }
+      ],
+      "IpPermissionsEgress": [
+        {
+          "FromPort": 443,
+          "IpProtocol": "tcp",
+          "IpRanges": [
+            {
+              "CidrIp": "0.0.0.0/0",
+              "Description": "HTTPS outbound"
+            }
+          ],
+          "Ipv6Ranges": [],
+          "PrefixListIds": [],
+          "ToPort": 443,
+          "UserIdGroupPairs": []
+        }
+      ],
+      "OwnerId": "111122223333",
+      "GroupId": "sg-00000000000000002",
+      "VpcId": "vpc-00000000000000001",
+      "SecurityGroupArn": "arn:aws:ec2:ap-southeast-2:111122223333:security-group/sg-00000000000000002",
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": "database-public"
+        }
+      ]
+    },
+    {
+      "Description": "All inbound traffic exposed.",
+      "GroupName": "all-open",
+      "IpPermissions": [
+        {
+          "IpProtocol": "-1",
+          "IpRanges": [
+            {
+              "CidrIp": "0.0.0.0/0",
+              "Description": "All traffic from anywhere"
+            }
+          ],
+          "Ipv6Ranges": [],
+          "PrefixListIds": [],
+          "UserIdGroupPairs": []
+        }
+      ],
+      "IpPermissionsEgress": [
+        {
+          "IpProtocol": "-1",
+          "IpRanges": [],
+          "Ipv6Ranges": [
+            {
+              "CidrIpv6": "::/0",
+              "Description": "All IPv6 outbound"
+            }
+          ],
+          "PrefixListIds": [],
+          "UserIdGroupPairs": []
+        }
+      ],
+      "OwnerId": "111122223333",
+      "GroupId": "sg-00000000000000003",
+      "VpcId": "vpc-00000000000000001",
+      "SecurityGroupArn": "arn:aws:ec2:ap-southeast-2:111122223333:security-group/sg-00000000000000003",
+      "Tags": [
+        {
+          "Key": "Name",
+          "Value": "all-open"
+        }
+      ]
+    },
+    {
+      "Description": "Private application traffic and managed service egress.",
+      "GroupName": "internal-app",
+      "IpPermissions": [
+        {
+          "FromPort": 8080,
+          "IpProtocol": "tcp",
+          "IpRanges": [],
+          "Ipv6Ranges": [],
+          "PrefixListIds": [],
+          "ToPort": 8080,
+          "UserIdGroupPairs": [
+            {
+              "Description": "Application traffic from the load balancer",
+              "GroupId": "sg-00000000000000005",
+              "GroupName": "load-balancer",
+              "UserId": "111122223333",
+              "VpcId": "vpc-00000000000000001"
+            }
+          ]
+        }
+      ],
+      "IpPermissionsEgress": [
+        {
+          "FromPort": 443,
+          "IpProtocol": "tcp",
+          "IpRanges": [],
+          "Ipv6Ranges": [],
+          "PrefixListIds": [
+            {
+              "Description": "HTTPS to an AWS-managed service prefix list",
+              "PrefixListId": "pl-00000000000000001"
+            }
+          ],
+          "ToPort": 443,
+          "UserIdGroupPairs": []
+        }
+      ],
+      "OwnerId": "111122223333",
+      "GroupId": "sg-00000000000000004",
+      "VpcId": "vpc-00000000000000001",
+      "SecurityGroupArn": "arn:aws:ec2:ap-southeast-2:111122223333:security-group/sg-00000000000000004",
+      "Tags": [
+        {
+          "Key": "Environment",
+          "Value": "production"
+        },
+        {
+          "Key": "Name",
+          "Value": "internal-app"
+        }
+      ]
+    }
+  ]
+}

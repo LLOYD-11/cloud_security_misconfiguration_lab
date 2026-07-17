@@ -7,10 +7,15 @@ from pathlib import Path
 from jsonschema import Draft202012Validator, FormatChecker
 
 from cloud_findings import write_findings
+from cloud_security_lab.normalizers.ec2 import load_aws_ec2_environment
 from iam_analyzer.analyzer import analyze_environment, load_environment
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_SAMPLE_PAIRS = (
+    (
+        "aws-ec2-describe-security-groups-v1.0.schema.json",
+        "sample_data/aws/ec2/describe_security_groups.json",
+    ),
     (
         "aws-iam-authorization-details-v1.0.schema.json",
         "sample_data/aws/iam/account_authorization_details.json",
@@ -78,6 +83,15 @@ class DataContractTests(unittest.TestCase):
 
         rules[:] = [{}]
         self.assertTrue(list(validator.iter_errors(sample)))
+
+    def test_normalized_native_ec2_environment_matches_network_contract(self):
+        schema = _load_json(PROJECT_ROOT / "schemas/network-environment-v1.0.schema.json")
+        result = load_aws_ec2_environment(
+            PROJECT_ROOT / "sample_data/aws/ec2/describe_security_groups.json"
+        )
+
+        Draft202012Validator.check_schema(schema)
+        Draft202012Validator(schema).validate(result.environment)
 
     def test_generated_findings_match_shared_contract(self):
         schema = _load_json(PROJECT_ROOT / "schemas/findings-v1.0.schema.json")

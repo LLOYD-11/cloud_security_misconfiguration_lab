@@ -18,6 +18,8 @@ All notable changes to this project are documented in this file.
 - Native S3 evidence-bundle normalization for bucket inventory, effective Block Public Access, ACLs, policies, default encryption, and versioning.
 - Strict S3 collection-error and bucket-coverage validation, an AWS-shape sample, a versioned bundle schema, and native storage CLI verification.
 - Support for the 2026 S3 `BlockedEncryptionTypes` response shape while preserving the universal SSE-S3 baseline.
+- Native EC2 `DescribeSecurityGroups` normalization with strict identity, protocol, port, CIDR, and pagination validation.
+- A versioned native EC2 schema, AWS-shape security-group sample, normalized evidence export, CI pipeline verification, and regression tests.
 
 ### Changed
 
@@ -31,6 +33,7 @@ All notable changes to this project are documented in this file.
 - Shared finding files now enforce supported schema versions, declared finding counts, required fields, field types, and valid severities.
 - Unversioned legacy finding lists are rejected by the report pipeline.
 - Sample data and schemas are included in built distributions so the demo command works outside a source checkout.
+- Network environments can preserve security-group and prefix-list peers plus owner, VPC, ARN, tag, and peering context without treating unresolved peers as public CIDRs.
 
 ## 1.0.0 - 2026-06-30
 

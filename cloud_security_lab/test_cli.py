@@ -94,6 +94,37 @@ class UnifiedCliTests(unittest.TestCase):
         self.assertEqual(5, payload["finding_count"])
         self.assertEqual(3, len(normalized["buckets"]))
 
+    def test_analyze_native_aws_ec2_writes_findings_and_normalized_evidence(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = Path(tmpdir) / "network.json"
+            normalized_path = Path(tmpdir) / "normalized-network.json"
+            with redirect_stdout(StringIO()), redirect_stderr(StringIO()) as stderr:
+                result = main(
+                    [
+                        "analyze",
+                        "network",
+                        str(
+                            PROJECT_ROOT
+                            / "sample_data/aws/ec2/describe_security_groups.json"
+                        ),
+                        "--input-format",
+                        "aws",
+                        "--normalized-output",
+                        str(normalized_path),
+                        "--output",
+                        str(output_path),
+                    ]
+                )
+
+            payload = json.loads(output_path.read_text(encoding="utf-8"))
+            normalized = json.loads(normalized_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(0, result)
+        self.assertEqual(7, payload["finding_count"])
+        self.assertEqual(4, len(normalized["security_groups"]))
+        self.assertIn("prefix-list targets", stderr.getvalue())
+        self.assertIn("security-group targets", stderr.getvalue())
+
     def test_demo_runs_all_modules_and_writes_report(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             output_dir = Path(tmpdir) / "generated"
@@ -208,15 +239,18 @@ class UnifiedCliTests(unittest.TestCase):
             main(
                 [
                     "analyze",
-                    "network",
-                    str(PROJECT_ROOT / "sample_data/network/sample_network_environment.json"),
+                    "cloudtrail",
+                    str(
+                        PROJECT_ROOT
+                        / "sample_data/cloudtrail/sample_cloudtrail_events.json"
+                    ),
                     "--input-format",
                     "aws",
                 ]
             )
 
         self.assertEqual(2, context.exception.code)
-        self.assertIn("only for iam and storage", stderr.getvalue())
+        self.assertIn("only for iam, storage, and network", stderr.getvalue())
 
 
 if __name__ == "__main__":

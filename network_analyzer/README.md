@@ -2,7 +2,7 @@
 
 This module analyzes offline security group data for risky network exposure patterns.
 
-It does not call AWS APIs or require cloud credentials. The sample data models security group rules commonly reviewed in cloud configuration assessments.
+It does not call AWS APIs or require cloud credentials. It accepts the documented simplified model directly, while the unified CLI can normalize a complete native EC2 `DescribeSecurityGroups` response before analysis.
 
 ## Detection Rules
 
@@ -23,6 +23,8 @@ Each finding uses the shared schema and includes AWS security group documentatio
 
 Internet-wide CIDRs use the `internet-wide` exposure scope. Exceptionally broad public networks use `broad-public`. Private, loopback, link-local, and narrower allowlisted networks are not classified as broad exposure by this module.
 
+Native prefix-list and security-group targets are retained in normalized evidence and produce warnings. Their membership and transitive reachability are not resolved, so current detection rules evaluate CIDR targets only.
+
 ## Run
 
 ```bash
@@ -39,6 +41,18 @@ python3 network_analyzer/analyzer.py \
 ```
 
 The exported JSON can be passed directly to `report_generator/generate_report.py`.
+
+Analyze the bundled native EC2 response through the unified CLI:
+
+```bash
+python3 -m cloud_security_lab analyze network \
+  sample_data/aws/ec2/describe_security_groups.json \
+  --input-format aws \
+  --normalized-output reports/generated/normalized_network_environment.json \
+  --output reports/generated/network_findings.json
+```
+
+See [`docs/native-aws-inputs.md`](../docs/native-aws-inputs.md) for the collection command, completeness checks, and evidence boundaries.
 
 ## Test
 

@@ -1,6 +1,6 @@
 # Native AWS Inputs
 
-The IAM and storage analyzers can consume exported AWS API evidence without requiring the lab to hold cloud credentials or call a live account.
+The IAM, storage, and network analyzers can consume exported AWS API evidence without requiring the lab to hold cloud credentials or call a live account.
 
 ## IAM Evidence
 
@@ -138,3 +138,54 @@ Current S3 references:
 - [ServerSideEncryptionRule API](https://docs.aws.amazon.com/AmazonS3/latest/API/API_ServerSideEncryptionRule.html)
 - [Blocking or unblocking SSE-C](https://docs.aws.amazon.com/AmazonS3/latest/userguide/blocking-unblocking-s3-c-encryption-gpb.html)
 - [GetBucketVersioning API](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketVersioning.html)
+
+## EC2 Security Group Evidence
+
+### Collect EC2 Evidence
+
+Run the following command only against an account that you own or are authorized to assess:
+
+```bash
+aws ec2 describe-security-groups \
+  --output json > describe-security-groups.json
+```
+
+Do not add `--filters`, `--group-ids`, `--max-items`, or `--no-paginate`. The input contract represents one complete, unfiltered account snapshot. A non-null `NextToken` is rejected because omitted pages would create false negatives. The direct-response contract is [`aws-ec2-describe-security-groups-v1.0.schema.json`](../schemas/aws-ec2-describe-security-groups-v1.0.schema.json).
+
+### Analyze EC2 Evidence
+
+```bash
+python3 -m cloud_security_lab analyze network \
+  describe-security-groups.json \
+  --input-format aws \
+  --normalized-output reports/generated/normalized_network_environment.json \
+  --output reports/generated/network_findings.json
+```
+
+The bundled native-shape sample can be analyzed with the same command:
+
+```bash
+python3 -m cloud_security_lab analyze network \
+  sample_data/aws/ec2/describe_security_groups.json \
+  --input-format aws
+```
+
+### EC2 Normalization Behavior
+
+The adapter:
+
+- Requires a non-empty, complete response with unique security-group IDs from one owner account.
+- Cross-checks each security-group ARN against its owner account and group ID.
+- Validates VPC, security-group, prefix-list, and VPC peering identifiers.
+- Normalizes named and numeric IP protocols, validates TCP/UDP port ranges and ICMP type/code values, and canonicalizes IPv4 and IPv6 CIDRs.
+- Flattens each IPv4 range, IPv6 range, prefix-list entry, and referenced security group into one normalized rule while preserving descriptions and peer context.
+- Preserves group names, descriptions, owner IDs, VPC IDs, ARNs, and tags for traceability.
+- Emits visible warnings when prefix-list or security-group targets are present.
+
+The analyzer currently evaluates public exposure only for explicit CIDR targets. It does not retrieve prefix-list members, expand referenced security groups, or prove workload reachability through routes, public addresses, network interfaces, load balancers, or network ACLs. A filtered AWS response has no self-describing filter marker, so completeness also depends on using the documented unfiltered collection command.
+
+Current EC2 references:
+
+- [DescribeSecurityGroups CLI](https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-security-groups.html)
+- [IpPermission API](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_IpPermission.html)
+- [Security group rule components](https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html)

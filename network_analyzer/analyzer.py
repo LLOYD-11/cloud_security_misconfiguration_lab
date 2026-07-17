@@ -66,6 +66,15 @@ def _rule_cidr(rule: dict[str, Any]) -> str:
     return str(rule.get("cidr", rule.get("cidr_ip", rule.get("cidr_ipv6", ""))))
 
 
+def _group_metadata(group: dict[str, Any], group_id: str) -> dict[str, str]:
+    metadata = {"group_name": str(group.get("name", group_id))}
+    for key in ("owner_id", "vpc_id"):
+        value = group.get(key)
+        if value:
+            metadata[key] = str(value)
+    return metadata
+
+
 def _exposure_scope(rule: dict[str, Any]) -> str | None:
     try:
         network = ipaddress.ip_network(_rule_cidr(rule), strict=False)
@@ -162,7 +171,7 @@ def _add_finding(
 def analyze_security_group(group: dict[str, Any]) -> list[Finding]:
     findings: list[Finding] = []
     group_id = str(group.get("id", group.get("name", "unknown-security-group")))
-    group_name = str(group.get("name", group_id))
+    group_metadata = _group_metadata(group, group_id)
 
     for index, rule in enumerate(group.get("inbound_rules", [])):
         exposure_scope = _exposure_scope(rule)
@@ -181,7 +190,7 @@ def analyze_security_group(group: dict[str, Any]) -> list[Finding]:
                 remediation="Remove all-port public inbound access and allow only required ports from trusted CIDR ranges.",
                 references=[REF_AWS_SECURITY_GROUPS, REF_AWS_SECURITY_GROUP_RULES, REF_MITRE_CLOUD_COMPUTE_INFRA_MODIFY],
                 metadata={
-                    "group_name": group_name,
+                    **group_metadata,
                     "rule_index": str(index + 1),
                     "exposure_scope": exposure_scope,
                 },
@@ -207,7 +216,7 @@ def analyze_security_group(group: dict[str, Any]) -> list[Finding]:
                     remediation=f"Restrict {service} access to a VPN, bastion host, private CIDR, or specific trusted IP range.",
                     references=[REF_AWS_SECURITY_GROUPS, REF_AWS_SECURITY_GROUP_RULES],
                     metadata={
-                        "group_name": group_name,
+                        **group_metadata,
                         "rule_index": str(index + 1),
                         "port": str(port),
                         "service": service,
@@ -229,7 +238,7 @@ def analyze_security_group(group: dict[str, Any]) -> list[Finding]:
                 remediation="Restrict outbound traffic to required protocols, ports, and destination CIDR ranges where practical.",
                 references=[REF_AWS_SECURITY_GROUPS, REF_AWS_SECURITY_GROUP_RULES],
                 metadata={
-                    "group_name": group_name,
+                    **group_metadata,
                     "rule_index": str(index + 1),
                     "exposure_scope": exposure_scope,
                 },

@@ -68,6 +68,14 @@ jobs:
           --normalized-output reports/generated/normalized_storage_environment.json
           --output reports/generated/native_storage_findings.json
 
+      - name: Verify native EC2 input pipeline
+        run: >-
+          python -m cloud_security_lab analyze network
+          sample_data/aws/ec2/describe_security_groups.json
+          --input-format aws
+          --normalized-output reports/generated/normalized_network_environment.json
+          --output reports/generated/native_network_findings.json
+
       - name: Build wheel and source distribution
         if: matrix.python-version == '3.13'
         run: python -m build
