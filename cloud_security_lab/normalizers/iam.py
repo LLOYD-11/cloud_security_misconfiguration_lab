@@ -23,6 +23,9 @@ ROOT_USER_NAMES = {"<root_account>", "root_account"}
 CREDENTIAL_REQUIRED_COLUMNS = {
     "user",
     "arn",
+    "password_enabled",
+    "password_last_used",
+    "password_last_changed",
     "mfa_active",
     "access_key_1_active",
     "access_key_1_last_rotated",
@@ -167,7 +170,6 @@ def _identity_policies(
     managed: dict[str, dict[str, Any]],
     context: str,
     warnings: list[str],
-    policy_prefix: str = "",
 ) -> list[dict[str, Any]]:
     policies: list[dict[str, Any]] = []
     inline_policies = identity.get(inline_key, [])
@@ -182,7 +184,8 @@ def _identity_policies(
             raise ValueError(f"{context} inline policy {policy_name} is missing PolicyDocument.")
         policies.append(
             {
-                "policy_name": f"{policy_prefix}{policy_name}",
+                "policy_name": policy_name,
+                "policy_source": "inline",
                 "statements": _normalize_policy_document(
                     policy["PolicyDocument"],
                     f"{context} inline policy {policy_name}",
@@ -203,11 +206,55 @@ def _identity_policies(
             continue
         policies.append(
             {
-                "policy_name": f"{policy_prefix}{policy['policy_name']}",
+                "policy_name": policy["policy_name"],
+                "policy_arn": arn,
+                "policy_source": "managed",
                 "statements": policy["statements"],
             }
         )
     return policies
+
+
+def _permissions_boundary(
+    identity: dict[str, Any],
+    *,
+    managed: dict[str, dict[str, Any]],
+    context: str,
+    warnings: list[str],
+) -> dict[str, Any] | None:
+    value = identity.get("PermissionsBoundary")
+    if value is None:
+        return None
+    if not isinstance(value, dict):
+        raise ValueError(f"{context} PermissionsBoundary must be an object.")
+
+    boundary_type = value.get("PermissionsBoundaryType")
+    if boundary_type != "PermissionsBoundaryPolicy":
+        raise ValueError(
+            f"{context} PermissionsBoundaryType must be PermissionsBoundaryPolicy."
+        )
+    arn = _required_name(
+        value,
+        "PermissionsBoundaryArn",
+        f"{context} permissions boundary",
+    )
+    policy = managed.get(arn)
+    if policy is None:
+        warnings.append(
+            f"{context} references permissions boundary {arn}, but its document is absent."
+        )
+        return {
+            "policy_arn": arn,
+            "policy_name": arn.rsplit("/", 1)[-1],
+            "document_available": False,
+            "statements": [],
+        }
+    return {
+        "policy_arn": arn,
+        "policy_name": policy["policy_name"],
+        "document_available": True,
+        "statements": policy["statements"],
+    }
 
 
 def _credential_csv_text(path: Path) -> str:
@@ -251,8 +298,6 @@ def _credential_rows(path: Path) -> dict[str, dict[str, str]]:
         username = str(row.get("user", "")).strip()
         if not username:
             raise ValueError("AWS credential report contains a row without a user value.")
-        if username in ROOT_USER_NAMES:
-            continue
         if username in rows:
             raise ValueError(f"AWS credential report contains duplicate user {username}.")
         rows[username] = {key: str(value or "").strip() for key, value in row.items()}
@@ -335,11 +380,29 @@ def _user_credentials(row: dict[str, str], as_of: date, username: str) -> dict[s
         }
         last_used_key = f"access_key_{slot}_last_used_date"
         last_used_days = _days_since(row[last_used_key], as_of, f"{username} {last_used_key}")
-        if last_used_days is not None:
-            key["last_used_days"] = last_used_days
+        key["last_used_days"] = last_used_days
         access_keys.append(key)
 
+    password_enabled = _report_boolean(
+        row["password_enabled"],
+        f"{username} password_enabled",
+    )
+    password_age_days = _days_since(
+        row["password_last_changed"],
+        as_of,
+        f"{username} password_last_changed",
+    )
+    if password_enabled and password_age_days is None:
+        raise ValueError(f"{username} has an active password without password_last_changed.")
+
     return {
+        "password_enabled": password_enabled,
+        "password_age_days": password_age_days,
+        "password_last_used_days": _days_since(
+            row["password_last_used"],
+            as_of,
+            f"{username} password_last_used",
+        ),
         "mfa_enabled": _report_boolean(row["mfa_active"], f"{username} mfa_active"),
         "access_keys": access_keys,
     }
@@ -403,6 +466,7 @@ def normalize_aws_iam_environment(
     managed = _managed_policy_documents(policies, warnings)
 
     group_policies: dict[str, list[dict[str, Any]]] = {}
+    group_members: dict[str, list[str]] = {}
     for group in groups:
         group_name = _required_name(group, "GroupName", "IAM group")
         if group_name in group_policies:
@@ -413,17 +477,22 @@ def normalize_aws_iam_environment(
             managed=managed,
             context=f"Group {group_name}",
             warnings=warnings,
-            policy_prefix=f"group:{group_name}/",
         )
+        group_members[group_name] = []
 
     normalized_users: list[dict[str, Any]] = []
     seen_users: set[str] = set()
+    user_credential_rows = {
+        username: row
+        for username, row in credential_rows.items()
+        if username not in ROOT_USER_NAMES
+    }
     for user in users:
         username = _required_name(user, "UserName", "IAM user")
         if username in seen_users:
             raise ValueError(f"AWS authorization details contain duplicate user {username}.")
         seen_users.add(username)
-        credential_row = credential_rows.get(username)
+        credential_row = user_credential_rows.get(username)
         if credential_row is None:
             raise ValueError(f"AWS credential report has no row for IAM user {username}.")
 
@@ -439,6 +508,8 @@ def normalize_aws_iam_environment(
             isinstance(group_name, str) for group_name in group_names
         ):
             raise ValueError(f"User {username} GroupList must be a list of strings.")
+        if len(group_names) != len(set(group_names)):
+            raise ValueError(f"User {username} GroupList contains duplicate group names.")
         for group_name in group_names:
             inherited = group_policies.get(group_name)
             if inherited is None:
@@ -446,19 +517,30 @@ def normalize_aws_iam_environment(
                     f"User {username} references group {group_name}, but its detail is absent."
                 )
                 continue
-            attached_policies.extend(inherited)
+            group_members[group_name].append(username)
 
         credentials = _user_credentials(credential_row, as_of, username)
-        normalized_users.append(
-            {
-                "name": username,
-                "mfa_enabled": credentials["mfa_enabled"],
-                "access_keys": credentials["access_keys"],
-                "attached_policies": attached_policies,
-            }
+        normalized_user = {
+            "name": username,
+            "groups": group_names,
+            "password_enabled": credentials["password_enabled"],
+            "password_age_days": credentials["password_age_days"],
+            "password_last_used_days": credentials["password_last_used_days"],
+            "mfa_enabled": credentials["mfa_enabled"],
+            "access_keys": credentials["access_keys"],
+            "attached_policies": attached_policies,
+        }
+        boundary = _permissions_boundary(
+            user,
+            managed=managed,
+            context=f"User {username}",
+            warnings=warnings,
         )
+        if boundary is not None:
+            normalized_user["permissions_boundary"] = boundary
+        normalized_users.append(normalized_user)
 
-    extra_credential_users = sorted(set(credential_rows) - seen_users)
+    extra_credential_users = sorted(set(user_credential_rows) - seen_users)
     if extra_credential_users:
         warnings.append(
             "Credential report user(s) absent from authorization details: "
@@ -474,31 +556,65 @@ def normalize_aws_iam_environment(
         seen_roles.add(role_name)
         if "AssumeRolePolicyDocument" not in role:
             raise ValueError(f"Role {role_name} is missing AssumeRolePolicyDocument.")
-        normalized_roles.append(
-            {
-                "name": role_name,
-                "trust_policy": {
-                    "statements": _normalize_policy_document(
-                        role["AssumeRolePolicyDocument"],
-                        f"Role {role_name} trust policy",
-                    )
-                },
-                "attached_policies": _identity_policies(
-                    role,
-                    inline_key="RolePolicyList",
-                    managed=managed,
-                    context=f"Role {role_name}",
-                    warnings=warnings,
-                ),
-            }
+        normalized_role = {
+            "name": role_name,
+            "trust_policy": {
+                "statements": _normalize_policy_document(
+                    role["AssumeRolePolicyDocument"],
+                    f"Role {role_name} trust policy",
+                )
+            },
+            "attached_policies": _identity_policies(
+                role,
+                inline_key="RolePolicyList",
+                managed=managed,
+                context=f"Role {role_name}",
+                warnings=warnings,
+            ),
+        }
+        boundary = _permissions_boundary(
+            role,
+            managed=managed,
+            context=f"Role {role_name}",
+            warnings=warnings,
         )
+        if boundary is not None:
+            normalized_role["permissions_boundary"] = boundary
+        normalized_roles.append(normalized_role)
+
+    normalized_groups = [
+        {
+            "name": group_name,
+            "members": sorted(group_members[group_name]),
+            "attached_policies": group_policies[group_name],
+        }
+        for group_name in sorted(group_policies)
+    ]
+
+    root_rows = [
+        credential_rows[username]
+        for username in sorted(ROOT_USER_NAMES)
+        if username in credential_rows
+    ]
+    if len(root_rows) > 1:
+        raise ValueError("AWS credential report contains multiple root account rows.")
+    root_account = (
+        _user_credentials(root_rows[0], as_of, str(root_rows[0]["user"]))
+        if root_rows
+        else None
+    )
+
+    environment: dict[str, Any] = {
+        "account_id": _account_id(users, groups, roles, policies, credential_rows),
+        "users": normalized_users,
+        "groups": normalized_groups,
+        "roles": normalized_roles,
+    }
+    if root_account is not None:
+        environment["root_account"] = root_account
 
     return IamNormalizationResult(
-        environment={
-            "account_id": _account_id(users, groups, roles, policies, credential_rows),
-            "users": normalized_users,
-            "roles": normalized_roles,
-        },
+        environment=environment,
         warnings=tuple(warnings),
     )
 

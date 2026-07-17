@@ -42,7 +42,11 @@
         }
       ],
       "GroupList": [],
-      "AttachedManagedPolicies": []
+      "AttachedManagedPolicies": [],
+      "PermissionsBoundary": {
+        "PermissionsBoundaryType": "PermissionsBoundaryPolicy",
+        "PermissionsBoundaryArn": "arn:aws:iam::111122223333:policy/DataEngineeringBoundary"
+      }
     },
     {
       "Path": "/analytics/",
@@ -159,6 +163,39 @@
           "VersionId": "v2",
           "IsDefaultVersion": true,
           "CreateDate": "2026-01-01T00:00:00Z"
+        }
+      ]
+    },
+    {
+      "PolicyName": "DataEngineeringBoundary",
+      "PolicyId": "ANPAEXAMPLEBOUNDARY",
+      "Arn": "arn:aws:iam::111122223333:policy/DataEngineeringBoundary",
+      "Path": "/boundaries/",
+      "DefaultVersionId": "v1",
+      "AttachmentCount": 0,
+      "PermissionsBoundaryUsageCount": 1,
+      "IsAttachable": true,
+      "PolicyVersionList": [
+        {
+          "Document": {
+            "Version": "2012-10-17",
+            "Statement": {
+              "Sid": "LimitToDataServices",
+              "Effect": "Allow",
+              "Action": [
+                "s3:*",
+                "kms:Decrypt"
+              ],
+              "Resource": [
+                "arn:aws:s3:::company-data-*",
+                "arn:aws:s3:::company-data-*/*",
+                "arn:aws:kms:ap-southeast-2:111122223333:key/*"
+              ]
+            }
+          },
+          "VersionId": "v1",
+          "IsDefaultVersion": true,
+          "CreateDate": "2025-08-15T00:00:00Z"
         }
       ]
     }

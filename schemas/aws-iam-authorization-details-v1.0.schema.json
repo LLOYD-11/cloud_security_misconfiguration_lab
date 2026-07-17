@@ -126,6 +126,9 @@
           "items": {
             "$ref": "#/$defs/attachedManagedPolicy"
           }
+        },
+        "PermissionsBoundary": {
+          "$ref": "#/$defs/permissionsBoundary"
         }
       },
       "additionalProperties": true
@@ -194,6 +197,9 @@
           "items": {
             "$ref": "#/$defs/attachedManagedPolicy"
           }
+        },
+        "PermissionsBoundary": {
+          "$ref": "#/$defs/permissionsBoundary"
         }
       },
       "additionalProperties": true
@@ -215,6 +221,23 @@
         },
         "IsDefaultVersion": {
           "type": "boolean"
+        }
+      },
+      "additionalProperties": true
+    },
+    "permissionsBoundary": {
+      "type": "object",
+      "required": [
+        "PermissionsBoundaryType",
+        "PermissionsBoundaryArn"
+      ],
+      "properties": {
+        "PermissionsBoundaryType": {
+          "const": "PermissionsBoundaryPolicy"
+        },
+        "PermissionsBoundaryArn": {
+          "type": "string",
+          "pattern": "^arn:[^:]+:iam::[^:]+:policy/"
         }
       },
       "additionalProperties": true

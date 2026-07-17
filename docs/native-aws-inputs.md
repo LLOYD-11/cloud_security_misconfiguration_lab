@@ -26,6 +26,7 @@ AWS references:
 
 - [GetAccountAuthorizationDetails API](https://docs.aws.amazon.com/IAM/latest/APIReference/API_GetAccountAuthorizationDetails.html)
 - [IAM credential report format](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html)
+- [Permissions boundaries for IAM entities](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html)
 - [GetCredentialReport API](https://docs.aws.amazon.com/IAM/latest/APIReference/API_GetCredentialReport.html)
 
 ### Analyze IAM Evidence
@@ -57,15 +58,17 @@ python3 -m cloud_security_lab analyze iam \
 The adapter:
 
 - Resolves the default document for attached managed policies.
-- Combines direct user policies with policies inherited from IAM groups.
+- Preserves direct identity policies separately from IAM group policies and records group membership.
 - Converts role assume-role documents into the analyzer trust-policy model.
-- Derives MFA status and active access-key age from the credential report.
+- Resolves user and role permissions-boundary documents when they are present in the authorization snapshot.
+- Derives console-password, MFA, access-key age, and access-key last-used posture from the credential report.
+- Preserves root password, MFA, and active-key posture for dedicated root credential checks.
 - Infers and cross-checks the AWS account ID from IAM ARNs.
-- Emits warnings when referenced group or managed-policy evidence is absent.
+- Emits warnings when referenced group, managed-policy, or permissions-boundary evidence is absent.
 
-Missing credential rows, conflicting account IDs, malformed policies, invalid credential fields, and truncated authorization details stop analysis. The normalizer does not silently replace missing MFA or access-key evidence with a default value.
+Missing user credential rows, conflicting account IDs, malformed policies, invalid credential fields, and truncated authorization details stop analysis. A missing root row is accepted for compatibility with pre-normalized or reduced evidence, but native AWS credential reports normally include it. The normalizer does not silently replace missing password, MFA, or access-key evidence with a default value.
 
-Credential reports do not expose access-key IDs, so normalized keys use stable slot labels such as `credential-report:key-1`. AWS credential reports cover the first two IAM access keys and do not include service-specific credentials; see the AWS credential report documentation for that evidence boundary.
+Credential reports do not expose access-key IDs, so normalized keys use stable slot labels such as `credential-report:key-1`. AWS credential reports cover the first two IAM access keys and do not include service-specific credentials; see the AWS credential report documentation for that evidence boundary. Stale credential checks use the explicit `--as-of` date and a 90-day threshold.
 
 ## S3 Evidence
 

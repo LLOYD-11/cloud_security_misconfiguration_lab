@@ -11,9 +11,16 @@
       "type": "array",
       "items": { "$ref": "#/$defs/user" }
     },
+    "groups": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/group" }
+    },
     "roles": {
       "type": "array",
       "items": { "$ref": "#/$defs/role" }
+    },
+    "root_account": {
+      "$ref": "#/$defs/credentialContext"
     }
   },
   "$defs": {
@@ -44,13 +51,20 @@
     "statement": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["effect", "action"],
+      "required": ["effect"],
+      "anyOf": [
+        { "required": ["action"] },
+        { "required": ["not_action"] }
+      ],
       "properties": {
         "sid": { "type": "string" },
         "effect": { "enum": ["Allow", "Deny"] },
         "action": { "$ref": "#/$defs/stringOrStringList" },
+        "not_action": { "$ref": "#/$defs/stringOrStringList" },
         "resource": { "$ref": "#/$defs/stringOrStringList" },
+        "not_resource": { "$ref": "#/$defs/stringOrStringList" },
         "principal": { "$ref": "#/$defs/principal" },
+        "not_principal": { "$ref": "#/$defs/principal" },
         "condition": { "type": "object" }
       }
     },
@@ -60,6 +74,8 @@
       "required": ["policy_name", "statements"],
       "properties": {
         "policy_name": { "type": "string", "minLength": 1 },
+        "policy_arn": { "type": "string", "minLength": 1 },
+        "policy_source": { "enum": ["inline", "managed"] },
         "statements": {
           "type": "array",
           "items": { "$ref": "#/$defs/statement" }
@@ -77,16 +93,88 @@
         "status": { "enum": ["Active", "Inactive", "active", "inactive"] }
       }
     },
+    "credentialContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "password_enabled",
+        "password_age_days",
+        "password_last_used_days",
+        "mfa_enabled",
+        "access_keys"
+      ],
+      "properties": {
+        "password_enabled": { "type": "boolean" },
+        "password_age_days": { "type": ["integer", "null"], "minimum": 0 },
+        "password_last_used_days": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
+        "mfa_enabled": { "type": "boolean" },
+        "access_keys": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/accessKey" }
+        }
+      }
+    },
+    "permissionsBoundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy_arn",
+        "policy_name",
+        "document_available",
+        "statements"
+      ],
+      "properties": {
+        "policy_arn": { "type": "string", "minLength": 1 },
+        "policy_name": { "type": "string", "minLength": 1 },
+        "document_available": { "type": "boolean" },
+        "statements": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/statement" }
+        }
+      }
+    },
     "user": {
       "type": "object",
       "additionalProperties": false,
       "required": ["name", "mfa_enabled", "access_keys", "attached_policies"],
       "properties": {
         "name": { "type": "string", "minLength": 1 },
+        "groups": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "password_enabled": { "type": "boolean" },
+        "password_age_days": { "type": ["integer", "null"], "minimum": 0 },
+        "password_last_used_days": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        },
         "mfa_enabled": { "type": "boolean" },
         "access_keys": {
           "type": "array",
           "items": { "$ref": "#/$defs/accessKey" }
+        },
+        "attached_policies": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/policy" }
+        },
+        "permissions_boundary": { "$ref": "#/$defs/permissionsBoundary" }
+      }
+    },
+    "group": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "members", "attached_policies"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "members": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
         },
         "attached_policies": {
           "type": "array",
@@ -114,7 +202,8 @@
         "attached_policies": {
           "type": "array",
           "items": { "$ref": "#/$defs/policy" }
-        }
+        },
+        "permissions_boundary": { "$ref": "#/$defs/permissionsBoundary" }
       }
     }
   }

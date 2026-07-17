@@ -21,8 +21,9 @@ class AnalyzerTests(unittest.TestCase):
         rule_ids = {finding.rule_id for finding in findings}
         sample_finding = findings[0]
 
-        self.assertEqual(8, len(findings))
+        self.assertEqual(9, len(findings))
         self.assertIn("IAM-001", rule_ids)
+        self.assertIn("IAM-002", rule_ids)
         self.assertIn("IAM-003", rule_ids)
         self.assertIn("IAM-004", rule_ids)
         self.assertIn("IAM-005", rule_ids)
@@ -84,6 +85,7 @@ class AnalyzerTests(unittest.TestCase):
                                         "arn:aws:iam::999988887777:root",
                                     ]
                                 },
+                                "action": "sts:AssumeRole",
                             }
                         ]
                     },
@@ -109,6 +111,31 @@ class AnalyzerTests(unittest.TestCase):
                             {
                                 "effect": "Allow",
                                 "principal": {"Service": "lambda.amazonaws.com"},
+                            }
+                        ]
+                    },
+                }
+            ],
+        }
+
+        self.assertEqual([], analyze_environment(environment))
+
+    def test_external_principal_without_role_assumption_action_is_not_reported(self):
+        environment = {
+            "account_id": "111122223333",
+            "users": [],
+            "roles": [
+                {
+                    "name": "tag-session-only",
+                    "attached_policies": [],
+                    "trust_policy": {
+                        "statements": [
+                            {
+                                "effect": "Allow",
+                                "principal": {
+                                    "AWS": "arn:aws:iam::999988887777:root"
+                                },
+                                "action": "sts:TagSession",
                             }
                         ]
                     },
@@ -180,7 +207,320 @@ class AnalyzerTests(unittest.TestCase):
 
         findings = analyze_environment(environment)
 
-        self.assertEqual(["IAM-004"], [finding.rule_id for finding in findings])
+        self.assertEqual(["IAM-004", "IAM-002"], [finding.rule_id for finding in findings])
+
+    def test_programmatic_user_without_console_password_does_not_require_mfa(self):
+        environment = {
+            "account_id": "111122223333",
+            "users": [
+                {
+                    "name": "automation",
+                    "password_enabled": False,
+                    "mfa_enabled": False,
+                    "access_keys": [],
+                    "attached_policies": [],
+                }
+            ],
+            "roles": [],
+        }
+
+        self.assertEqual([], analyze_environment(environment))
+
+    def test_partial_action_and_resource_wildcards_remain_separate_findings(self):
+        environment = {
+            "account_id": "111122223333",
+            "users": [],
+            "roles": [
+                {
+                    "name": "audit-role",
+                    "attached_policies": [
+                        {
+                            "policy_name": "AuditRead",
+                            "statements": [
+                                {
+                                    "effect": "Allow",
+                                    "action": ["iam:Get*", "iam:List*"],
+                                    "resource": "*",
+                                }
+                            ],
+                        }
+                    ],
+                    "trust_policy": {"statements": []},
+                }
+            ],
+        }
+
+        findings = analyze_environment(environment)
+
+        self.assertEqual(
+            ["IAM-002", "IAM-003"],
+            [finding.rule_id for finding in findings],
+        )
+        self.assertEqual("medium", findings[0].severity)
+
+    def test_not_action_and_not_resource_are_detected(self):
+        environment = {
+            "account_id": "111122223333",
+            "users": [],
+            "roles": [
+                {
+                    "name": "complement-role",
+                    "attached_policies": [
+                        {
+                            "policy_name": "ComplementPolicy",
+                            "statements": [
+                                {
+                                    "sid": "EverythingExceptIam",
+                                    "effect": "Allow",
+                                    "not_action": "iam:*",
+                                    "resource": "*",
+                                },
+                                {
+                                    "sid": "PassEveryOtherRole",
+                                    "effect": "Allow",
+                                    "action": "iam:PassRole",
+                                    "not_resource": (
+                                        "arn:aws:iam::111122223333:role/protected-role"
+                                    ),
+                                },
+                            ],
+                        }
+                    ],
+                    "trust_policy": {"statements": []},
+                }
+            ],
+        }
+
+        findings = analyze_environment(environment)
+
+        self.assertEqual({"IAM-009", "IAM-010"}, {finding.rule_id for finding in findings})
+        self.assertTrue(all(finding.severity == "high" for finding in findings))
+
+    def test_group_policy_is_reported_once_with_member_context(self):
+        environment = {
+            "account_id": "111122223333",
+            "users": [],
+            "groups": [
+                {
+                    "name": "operators",
+                    "members": ["alice", "bob"],
+                    "attached_policies": [
+                        {
+                            "policy_name": "ServiceWildcard",
+                            "statements": [
+                                {
+                                    "effect": "Allow",
+                                    "action": "ec2:*",
+                                    "resource": (
+                                        "arn:aws:ec2:ap-southeast-2:111122223333:instance/*"
+                                    ),
+                                }
+                            ],
+                        }
+                    ],
+                }
+            ],
+            "roles": [],
+        }
+
+        findings = analyze_environment(environment)
+
+        self.assertEqual(["IAM-002"], [finding.rule_id for finding in findings])
+        self.assertEqual("group", findings[0].resource_type)
+        self.assertEqual("2", findings[0].metadata["member_count"])
+        self.assertEqual("alice, bob", findings[0].metadata["members"])
+
+    def test_trust_guardrails_lower_severity_but_public_trust_remains_visible(self):
+        environment = {
+            "account_id": "111122223333",
+            "users": [],
+            "roles": [
+                {
+                    "name": "guarded-vendor-role",
+                    "attached_policies": [],
+                    "trust_policy": {
+                        "statements": [
+                            {
+                                "effect": "Allow",
+                                "principal": {
+                                    "AWS": "arn:aws:iam::999988887777:root"
+                                },
+                                "action": "sts:AssumeRole",
+                                "condition": {
+                                    "StringEquals": {
+                                        "sts:ExternalId": "customer-111122223333"
+                                    }
+                                },
+                            }
+                        ]
+                    },
+                },
+                {
+                    "name": "public-role",
+                    "attached_policies": [],
+                    "trust_policy": {
+                        "statements": [
+                            {
+                                "effect": "Allow",
+                                "principal": "*",
+                                "action": "sts:AssumeRole",
+                            }
+                        ]
+                    },
+                },
+                {
+                    "name": "fake-guardrail-role",
+                    "attached_policies": [],
+                    "trust_policy": {
+                        "statements": [
+                            {
+                                "effect": "Allow",
+                                "principal": {
+                                    "AWS": "arn:aws:iam::999988887777:root"
+                                },
+                                "action": "sts:AssumeRole",
+                                "condition": {
+                                    "Null": {
+                                        "sts:ExternalId": "false"
+                                    },
+                                    "StringEquals": {
+                                        "aws:PrincipalOrgID": False
+                                    }
+                                },
+                            }
+                        ]
+                    },
+                },
+                {
+                    "name": "not-principal-role",
+                    "attached_policies": [],
+                    "trust_policy": {
+                        "statements": [
+                            {
+                                "effect": "Allow",
+                                "not_principal": {
+                                    "AWS": "arn:aws:iam::111122223333:role/blocked"
+                                },
+                                "action": "sts:AssumeRole",
+                            }
+                        ]
+                    },
+                },
+            ],
+        }
+
+        findings = analyze_environment(environment)
+        by_resource = {finding.resource_id: finding for finding in findings}
+
+        self.assertEqual("medium", by_resource["guarded-vendor-role"].severity)
+        self.assertEqual(
+            "sts:ExternalId",
+            by_resource["guarded-vendor-role"].metadata["trust_guardrails"],
+        )
+        self.assertEqual("critical", by_resource["public-role"].severity)
+        self.assertEqual("high", by_resource["fake-guardrail-role"].severity)
+        self.assertEqual(
+            "none",
+            by_resource["fake-guardrail-role"].metadata["trust_guardrails"],
+        )
+        self.assertEqual("critical", by_resource["not-principal-role"].severity)
+        self.assertIn("all principals except", by_resource["not-principal-role"].evidence)
+
+    def test_stale_credentials_are_distinct_from_rotation_age(self):
+        environment = {
+            "account_id": "111122223333",
+            "users": [
+                {
+                    "name": "legacy-automation",
+                    "password_enabled": False,
+                    "mfa_enabled": False,
+                    "access_keys": [
+                        {
+                            "id": "credential-report:key-1",
+                            "status": "Active",
+                            "age_days": 180,
+                            "last_used_days": None,
+                        }
+                    ],
+                    "attached_policies": [],
+                },
+                {
+                    "name": "dormant-console",
+                    "password_enabled": True,
+                    "password_age_days": 200,
+                    "password_last_used_days": 120,
+                    "mfa_enabled": True,
+                    "access_keys": [],
+                    "attached_policies": [],
+                },
+            ],
+            "roles": [],
+        }
+
+        findings = analyze_environment(environment)
+        signatures = {(finding.rule_id, finding.resource_id) for finding in findings}
+
+        self.assertEqual(
+            {
+                ("IAM-007", "legacy-automation"),
+                ("IAM-011", "legacy-automation"),
+                ("IAM-012", "dormant-console"),
+            },
+            signatures,
+        )
+        self.assertNotIn(("IAM-006", "legacy-automation"), signatures)
+
+    def test_root_credentials_and_unrestricted_boundary_are_detected(self):
+        environment = {
+            "account_id": "111122223333",
+            "root_account": {
+                "password_enabled": True,
+                "password_age_days": 300,
+                "password_last_used_days": 1,
+                "mfa_enabled": False,
+                "access_keys": [
+                    {
+                        "id": "credential-report:key-1",
+                        "status": "Active",
+                        "age_days": 30,
+                        "last_used_days": 1,
+                    }
+                ],
+            },
+            "users": [],
+            "roles": [
+                {
+                    "name": "delegated-admin",
+                    "attached_policies": [],
+                    "trust_policy": {"statements": []},
+                    "permissions_boundary": {
+                        "policy_arn": (
+                            "arn:aws:iam::111122223333:policy/UnrestrictedBoundary"
+                        ),
+                        "policy_name": "UnrestrictedBoundary",
+                        "document_available": True,
+                        "statements": [
+                            {
+                                "effect": "Allow",
+                                "action": "*",
+                                "resource": "*",
+                            }
+                        ],
+                    },
+                }
+            ],
+        }
+
+        findings = analyze_environment(environment)
+
+        self.assertEqual(
+            {"IAM-013", "IAM-014", "IAM-015"},
+            {finding.rule_id for finding in findings},
+        )
+        boundary_finding = next(
+            finding for finding in findings if finding.rule_id == "IAM-015"
+        )
+        self.assertIn("UnrestrictedBoundary", boundary_finding.metadata["permissions_boundary"])
 
     def test_readonly_role_does_not_require_mfa_in_identity_policy(self):
         environment = {

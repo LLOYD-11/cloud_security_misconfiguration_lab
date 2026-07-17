@@ -1,8 +1,19 @@
 {
   "account_id": "111122223333",
+  "root_account": {
+    "password_enabled": true,
+    "password_age_days": 211,
+    "password_last_used_days": 10,
+    "mfa_enabled": true,
+    "access_keys": []
+  },
   "users": [
     {
       "name": "alice-admin",
+      "groups": [],
+      "password_enabled": true,
+      "password_age_days": 176,
+      "password_last_used_days": 5,
       "mfa_enabled": false,
       "access_keys": [
         {
@@ -14,6 +25,8 @@
       "attached_policies": [
         {
           "policy_name": "OverBroadAdminPolicy",
+          "policy_arn": "arn:aws:iam::111122223333:policy/OverBroadAdminPolicy",
+          "policy_source": "managed",
           "statements": [
             {
               "sid": "FullAdmin",
@@ -27,6 +40,10 @@
     },
     {
       "name": "data-engineer",
+      "groups": [],
+      "password_enabled": false,
+      "password_age_days": null,
+      "password_last_used_days": null,
       "mfa_enabled": true,
       "access_keys": [
         {
@@ -38,6 +55,7 @@
       "attached_policies": [
         {
           "policy_name": "BroadS3WritePolicy",
+          "policy_source": "inline",
           "statements": [
             {
               "sid": "BroadS3",
@@ -51,15 +69,51 @@
             }
           ]
         }
-      ]
+      ],
+      "permissions_boundary": {
+        "policy_arn": "arn:aws:iam::111122223333:policy/DataEngineeringBoundary",
+        "policy_name": "DataEngineeringBoundary",
+        "document_available": true,
+        "statements": [
+          {
+            "sid": "LimitToDataServices",
+            "effect": "Allow",
+            "action": [
+              "s3:*",
+              "kms:Decrypt"
+            ],
+            "resource": [
+              "arn:aws:s3:::company-data-*",
+              "arn:aws:s3:::company-data-*/*",
+              "arn:aws:kms:ap-southeast-2:111122223333:key/*"
+            ]
+          }
+        ]
+      }
     },
     {
       "name": "readonly-analyst",
+      "groups": [
+        "ReportingReaders"
+      ],
+      "password_enabled": true,
+      "password_age_days": 149,
+      "password_last_used_days": 2,
       "mfa_enabled": true,
       "access_keys": [],
+      "attached_policies": []
+    }
+  ],
+  "groups": [
+    {
+      "name": "ReportingReaders",
+      "members": [
+        "readonly-analyst"
+      ],
       "attached_policies": [
         {
           "policy_name": "ReadOnlyReports",
+          "policy_source": "inline",
           "statements": [
             {
               "sid": "ReadReports",
@@ -101,6 +155,7 @@
       "attached_policies": [
         {
           "policy_name": "AuditReadOnly",
+          "policy_source": "inline",
           "statements": [
             {
               "sid": "AuditRead",

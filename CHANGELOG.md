@@ -22,6 +22,8 @@ All notable changes to this project are documented in this file.
 - A versioned native EC2 schema, AWS-shape security-group sample, normalized evidence export, CI pipeline verification, and regression tests.
 - Native CloudTrail `Records` normalization for multiple JSON and gzip log files, with event-version, timestamp, identity, account, and GUID validation.
 - AWS-shape CloudTrail log samples, a versioned native schema, duplicate-event warnings, conflicting-event rejection, and native pipeline verification.
+- IAM rules for broad `NotAction` and `NotResource` allows, stale active credentials, root credentials, and unrestricted permissions boundaries.
+- IAM environment evidence for groups and members, password usage, root posture, policy origin, and resolved permissions boundaries.
 
 ### Changed
 
@@ -37,6 +39,10 @@ All notable changes to this project are documented in this file.
 - Sample data and schemas are included in built distributions so the demo command works outside a source checkout.
 - Network environments can preserve security-group and prefix-list peers plus owner, VPC, ARN, tag, and peering context without treating unresolved peers as public CIDRs.
 - Unified analysis accepts multiple positional inputs for native CloudTrail while retaining single-file behavior for simplified and other native module inputs.
+- IAM action-wildcard analysis now covers service and partial patterns independently from wildcard-resource findings.
+- IAM cross-account trust severity now distinguishes public principals, unguarded external trust, and supported equality-based trust conditions.
+- IAM MFA findings now require an active or compatibility-assumed console password, avoiding native-input false positives for programmatic-only users.
+- Native IAM group policies are analyzed once at the group resource with member context instead of being copied into every member's direct-policy list.
 
 ## 1.0.0 - 2026-06-30
 

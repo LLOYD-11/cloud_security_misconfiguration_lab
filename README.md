@@ -14,7 +14,7 @@ From the repository root, run the complete sample pipeline without installing ru
 python3 -m cloud_security_lab demo --report-date 2026-06-30
 ```
 
-This writes four versioned finding files and a 28-finding consolidated report under `reports/generated/`. The result should exactly match [`reports/cloud_security_report_sample.md`](reports/cloud_security_report_sample.md).
+This writes four versioned finding files and a 29-finding consolidated report under `reports/generated/`. The result should exactly match [`reports/cloud_security_report_sample.md`](reports/cloud_security_report_sample.md).
 
 Install the project in a virtual environment to expose the `cloud-security-lab` command:
 
@@ -30,30 +30,38 @@ python3 -m venv .venv
 
 The first module analyzes sample IAM users, identity policies, and trust policies for common cloud security risks:
 
-- Wildcard actions such as `Action: "*"`
-- Wildcard resources such as `Resource: "*"`
+- Full, service, and partial action wildcards such as `*`, `iam:*`, and `iam:Get*`
+- Unscoped resources and broad `NotAction` or `NotResource` complements
 - Administrator-style access
 - Broad S3 permissions
 - Sensitive user permissions without an MFA policy guard
-- Cross-account trust relationships
-- Long-lived access keys in sample user metadata
+- Public and cross-account role trust, with recognized trust-condition guardrails
+- Direct and group policy exposure
+- Long-lived and stale credentials, root credentials, and ineffective permissions boundaries
 
 The analyzer produces terminal findings and exports structured JSON evidence for reporting.
 
-IAM input can use either the documented simplified environment contract or native AWS `GetAccountAuthorizationDetails` plus credential-report exports. Native input resolves user, group, role, and managed-policy relationships before applying the same detection rules.
+IAM input can use either the documented simplified environment contract or native AWS `GetAccountAuthorizationDetails` plus credential-report exports. Native input preserves direct policies, IAM groups and members, role trust, permissions boundaries, console-password posture, root credentials, and access-key age and usage before applying the same detection rules.
 
 Rule catalog:
 
 | Rule | Risk Pattern |
 | --- | --- |
 | `IAM-001` | Administrator-style `Action "*"` on `Resource "*"` |
-| `IAM-002` | Wildcard action |
-| `IAM-003` | Wildcard resource |
+| `IAM-002` | Full, service, or partial wildcard action |
+| `IAM-003` | Unscoped wildcard resource |
 | `IAM-004` | Broad S3 write permission |
 | `IAM-005` | Sensitive action without MFA condition |
-| `IAM-006` | User without MFA enabled |
+| `IAM-006` | Console-enabled user without MFA |
 | `IAM-007` | Long-lived access key |
-| `IAM-008` | Cross-account role trust |
+| `IAM-008` | Public or cross-account role trust |
+| `IAM-009` | Broad allow using `NotAction` |
+| `IAM-010` | Broad allow using `NotResource` |
+| `IAM-011` | Stale active access key |
+| `IAM-012` | Stale console password |
+| `IAM-013` | Active root access key |
+| `IAM-014` | Root password without MFA |
+| `IAM-015` | Unrestricted permissions boundary |
 
 ### Module 2: Risk Report Generator
 

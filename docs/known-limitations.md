@@ -11,12 +11,15 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 ## IAM Analysis
 
 - The analyzer does not calculate effective permissions across identity policies, resource policies, service control policies, permissions boundaries, sessions, and explicit denies.
-- Native normalization resolves direct and group identity policies, but an absent referenced policy or group is skipped with a warning rather than reconstructed.
+- Permissions-boundary evidence is preserved and an explicitly unrestricted boundary is reported, but identity-policy findings are not suppressed by attempting a partial boundary intersection.
+- Native normalization preserves direct and group identity policies separately. An absent referenced policy, group, or boundary document is skipped with a warning rather than reconstructed.
 - IAM credential reports expose active-key slots rather than access-key IDs and omit service-specific credentials; normalized key identifiers are synthetic.
-- The credential-report root row is used only as collection context; root credential posture is not yet emitted as an IAM finding.
-- `NotAction`, `NotResource`, policy variables, and the full AWS action catalog are not yet modeled.
-- External trust conditions such as `sts:ExternalId` and `aws:PrincipalOrgID` do not yet lower finding confidence or severity.
-- Some AWS actions require `Resource: "*"`; the current wildcard-resource rule does not maintain a service action catalog for those exceptions.
+- Credential reports expose only a Boolean MFA state, so the analyzer cannot distinguish hardware, passkey, and virtual MFA devices.
+- Stale access-key and console-password thresholds are fixed at 90 days.
+- `NotAction` and `NotResource` are flagged as broad complements rather than expanded through the complete AWS action and resource catalog. Policy variables are preserved but not resolved.
+- Trust severity recognizes non-wildcard equality guards for `sts:ExternalId`, `aws:PrincipalOrgID`, and `aws:PrincipalArn`; it does not prove that external IDs are unique or that organization and ARN values are owned by the assessor.
+- Some AWS actions require `Resource: "*"`; the wildcard-resource rule does not maintain the complete AWS service authorization catalog needed to suppress every legitimate exception.
+- Simplified legacy user input without `password_enabled` retains the earlier console-capable assumption for backward compatibility. Native IAM input always supplies this evidence.
 
 ## Storage Analysis
 

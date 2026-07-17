@@ -10,34 +10,48 @@ The analyzer expects a JSON object with:
 
 - `account_id`
 - `users`
+- optional `groups`
 - `roles`
+- optional `root_account` credential posture
 
 Each user or role can include:
 
 - `name`
-- `mfa_enabled`
+- console-password and MFA status for users
 - `access_keys`
 - `attached_policies`
+- `permissions_boundary`
 - `trust_policy` for roles
 
-Policies use simplified IAM-style statements with `effect`, `action`, `resource`, and optional `condition` fields. Uppercase AWS-style keys such as `Effect`, `Action`, `Resource`, and `Condition` are also supported.
+Groups contain their own attached policies and a member list, so one risky group statement produces one finding with member context rather than duplicate findings for every user.
+
+Policies use simplified IAM-style statements with `effect`, `action` or `not_action`, `resource` or `not_resource`, and optional `condition` fields. Uppercase AWS-style keys such as `Effect`, `Action`, `NotAction`, `Resource`, `NotResource`, and `Condition` are also supported.
 
 ## Detection Rules
 
 | Rule | Severity | Description |
 | --- | --- | --- |
 | `IAM-001` | Critical | Allows `Action "*"` on `Resource "*"` |
-| `IAM-002` | High | Allows wildcard action |
-| `IAM-003` | Medium | Uses wildcard resource |
+| `IAM-002` | Medium/High | Allows full, service, or partial wildcard action |
+| `IAM-003` | Medium | Uses unscoped `Resource "*"` |
 | `IAM-004` | High | Allows broad S3 write access |
-| `IAM-005` | Medium | Allows a sensitive user action without an MFA policy condition |
-| `IAM-006` | Medium | User metadata shows MFA is disabled |
+| `IAM-005` | Medium | User or group policy allows a sensitive action without an MFA condition |
+| `IAM-006` | Medium | Console-enabled user does not have MFA |
 | `IAM-007` | Medium | Access key is older than 90 days |
-| `IAM-008` | High | Role trust policy allows an external AWS or federated principal |
+| `IAM-008` | Medium-Critical | Role trust allows a public or external principal |
+| `IAM-009` | Medium/High | Allow statement uses a broad `NotAction` complement |
+| `IAM-010` | Medium/High | Allow statement uses a broad `NotResource` complement |
+| `IAM-011` | Medium | Active access key is unused for more than 90 days |
+| `IAM-012` | Medium | Active console password is unused for more than 90 days |
+| `IAM-013` | Critical | Root account has an active access key |
+| `IAM-014` | Critical | Root account has a password but no MFA |
+| `IAM-015` | Medium | Permissions boundary allows `Action "*"` on `Resource "*"` |
 
 Each IAM finding includes references to the relevant MITRE ATT&CK or AWS IAM best-practice documentation where applicable.
 
-The analyzer evaluates AWS and federated principals individually, so a mixed same-account and external principal list is not treated as entirely trusted. AWS service principals such as `lambda.amazonaws.com` are not classified as cross-account principals.
+The analyzer evaluates AWS and federated principals individually, so a mixed same-account and external principal list is not treated as entirely trusted. AWS service principals such as `lambda.amazonaws.com` are not classified as cross-account principals. A public trust is critical by default, while a well-formed equality condition using `sts:ExternalId`, `aws:PrincipalOrgID`, or `aws:PrincipalArn` lowers the rule severity without hiding the trust relationship.
+
+Permissions boundaries are treated as maximum-permission context, not as grants. Boundary ARNs and document availability are attached to identity-policy findings, and only an explicitly unrestricted boundary receives its own finding.
 
 ## Run
 

@@ -28,7 +28,7 @@ class UnifiedCliTests(unittest.TestCase):
             payload = json.loads(output_path.read_text(encoding="utf-8"))
 
         self.assertEqual(0, result)
-        self.assertEqual(8, payload["finding_count"])
+        self.assertEqual(9, payload["finding_count"])
 
     def test_analyze_native_aws_iam_writes_findings_and_normalized_evidence(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -61,7 +61,7 @@ class UnifiedCliTests(unittest.TestCase):
 
         self.assertEqual(0, result)
         self.assertEqual("", stderr.getvalue())
-        self.assertEqual(8, payload["finding_count"])
+        self.assertEqual(9, payload["finding_count"])
         self.assertEqual("111122223333", normalized["account_id"])
 
     def test_analyze_native_aws_s3_writes_findings_and_normalized_evidence(self):
@@ -181,7 +181,7 @@ class UnifiedCliTests(unittest.TestCase):
 
         self.assertEqual(0, result)
         self.assertIn("Generated: 2026-06-30", report)
-        self.assertIn("consolidates 28 finding(s)", report)
+        self.assertIn("consolidates 29 finding(s)", report)
         self.assertEqual(
             {
                 "cloud_security_report.md",
@@ -221,7 +221,7 @@ class UnifiedCliTests(unittest.TestCase):
             report = report_path.read_text(encoding="utf-8")
 
         self.assertEqual(0, result)
-        self.assertIn("consolidates 8 finding(s)", report)
+        self.assertIn("consolidates 9 finding(s)", report)
 
     def test_cloudtrail_threshold_options_are_rejected_for_other_modules(self):
         with redirect_stderr(StringIO()), self.assertRaises(SystemExit) as context:

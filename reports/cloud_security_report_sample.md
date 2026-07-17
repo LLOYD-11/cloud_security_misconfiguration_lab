@@ -4,7 +4,7 @@ Generated: 2026-06-30
 
 ## Executive Summary
 
-This report consolidates 28 finding(s) from offline cloud security analyzers.
+This report consolidates 29 finding(s) from offline cloud security analyzers.
 
 ## Severity Summary
 
@@ -12,7 +12,7 @@ This report consolidates 28 finding(s) from offline cloud security analyzers.
 | --- | ---: |
 | Critical | 5 |
 | High | 10 |
-| Medium | 11 |
+| Medium | 12 |
 | Low | 2 |
 | Info | 0 |
 
@@ -21,7 +21,7 @@ This report consolidates 28 finding(s) from offline cloud security analyzers.
 | Module | Findings |
 | --- | ---: |
 | cloudtrail | 6 |
-| iam | 8 |
+| iam | 9 |
 | network | 7 |
 | storage | 7 |
 
@@ -57,7 +57,7 @@ The source files below are generated analyzer outputs and are not committed to t
 - Evidence: Allow statement grants Action "*" on Resource "*".
 - Impact: The principal may have full administrative access across the account.
 - Remediation: Replace wildcard administrator access with task-specific actions and scoped resources.
-- Metadata: policy_name: OverBroadAdminPolicy, statement_id: FullAdmin
+- Metadata: policy_arn: arn:aws:iam::111122223333:policy/OverBroadAdminPolicy, policy_name: OverBroadAdminPolicy, policy_source: managed, statement_id: FullAdmin
 - References: https://attack.mitre.org/techniques/T1078/004/, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
 #### NET-002: Security group allows all inbound ports from the internet
@@ -136,7 +136,7 @@ The source files below are generated analyzer outputs and are not committed to t
 - Evidence: S3 write action with broad resource scope: ['s3:GetObject', 's3:PutObject', 's3:DeleteObject'] on ['arn:aws:s3:::company-data-*/*'].
 - Impact: The principal may alter or delete data across a broad set of storage resources.
 - Remediation: Restrict S3 write actions to the exact bucket and prefix required for the workload.
-- Metadata: policy_name: BroadS3WritePolicy, statement_id: BroadS3
+- Metadata: boundary_document: available, permissions_boundary: arn:aws:iam::111122223333:policy/DataEngineeringBoundary, policy_name: BroadS3WritePolicy, policy_source: inline, statement_id: BroadS3
 - References: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
 #### IAM-008: Cross-account role trust
@@ -144,11 +144,11 @@ The source files below are generated analyzer outputs and are not committed to t
 - Module: `iam`
 - Category: `identity-and-access`
 - Resource: `role/third-party-audit-role`
-- Evidence: Trust policy allows external principal(s): ["arn:aws:iam::999988887777:root"].
+- Evidence: Trust policy allows external principal(s): ["arn:aws:iam::999988887777:root"]. Recognized guardrails: none.
 - Impact: An external account or principal may be able to assume this role.
-- Remediation: Require an external ID, restrict the trusted principal, and confirm the business need for cross-account access.
-- Metadata: policy_name: trust-policy, statement_id: ExternalAccountTrust
-- References: https://attack.mitre.org/techniques/T1199/, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
+- Remediation: Restrict the trusted principal, require an external ID for third-party access or an organization condition for internal multi-account access, and confirm the business need.
+- Metadata: policy_name: trust-policy, statement_id: ExternalAccountTrust, trust_guardrails: none
+- References: https://attack.mitre.org/techniques/T1199/, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_common-scenarios_third-party.html
 
 #### NET-001: Sensitive SSH port is open to the internet
 
@@ -229,6 +229,17 @@ The source files below are generated analyzer outputs and are not committed to t
 - Metadata: actor: unknown-user, error_codes: AccessDenied, UnauthorizedOperation, event_names: AssumeRole, DescribeInstances, GetUser, ListBuckets, ListUsers, failure_count: 6, source_ip: 192.0.2.44, window_minutes: 10
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://attack.mitre.org/techniques/T1110/
 
+#### IAM-002: Wildcard action allowed
+
+- Module: `iam`
+- Category: `identity-and-access`
+- Resource: `role/third-party-audit-role`
+- Evidence: Allow statement uses wildcard action pattern(s): ['iam:Get*', 'iam:List*'].
+- Impact: The policy can automatically include multiple current or future API operations that match the wildcard.
+- Remediation: Replace wildcard action patterns with the minimum explicit API actions required by the workload.
+- Metadata: policy_name: AuditReadOnly, policy_source: inline, statement_id: AuditRead
+- References: https://attack.mitre.org/techniques/T1078/004/, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
+
 #### IAM-003: Wildcard resource scope
 
 - Module: `iam`
@@ -237,7 +248,7 @@ The source files below are generated analyzer outputs and are not committed to t
 - Evidence: Allow statement uses Resource "*".
 - Impact: The permission is not limited to specific cloud resources.
 - Remediation: Scope the statement to specific ARNs wherever the service supports resource-level permissions.
-- Metadata: policy_name: AuditReadOnly, statement_id: AuditRead
+- Metadata: policy_name: AuditReadOnly, policy_source: inline, statement_id: AuditRead
 - References: https://attack.mitre.org/techniques/T1078/004/, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
 #### IAM-003: Wildcard resource scope
@@ -248,7 +259,7 @@ The source files below are generated analyzer outputs and are not committed to t
 - Evidence: Allow statement uses Resource "*".
 - Impact: The permission is not limited to specific cloud resources.
 - Remediation: Scope the statement to specific ARNs wherever the service supports resource-level permissions.
-- Metadata: policy_name: OverBroadAdminPolicy, statement_id: FullAdmin
+- Metadata: policy_arn: arn:aws:iam::111122223333:policy/OverBroadAdminPolicy, policy_name: OverBroadAdminPolicy, policy_source: managed, statement_id: FullAdmin
 - References: https://attack.mitre.org/techniques/T1078/004/, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
 #### IAM-005: Sensitive action without MFA condition
@@ -259,7 +270,7 @@ The source files below are generated analyzer outputs and are not committed to t
 - Evidence: Sensitive action is allowed without an MFA condition.
 - Impact: Compromised credentials could be used for privileged activity without an additional identity check.
 - Remediation: Add an MFA condition for sensitive IAM, STS, KMS, account, or organization actions where appropriate.
-- Metadata: policy_name: OverBroadAdminPolicy, statement_id: FullAdmin
+- Metadata: policy_arn: arn:aws:iam::111122223333:policy/OverBroadAdminPolicy, policy_name: OverBroadAdminPolicy, policy_source: managed, statement_id: FullAdmin
 - References: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
 #### IAM-006: User MFA is disabled
@@ -267,22 +278,22 @@ The source files below are generated analyzer outputs and are not committed to t
 - Module: `iam`
 - Category: `identity-and-access`
 - Resource: `user/alice-admin`
-- Evidence: User metadata shows MFA is not enabled.
-- Impact: A password or access-key compromise has less resistance without multi-factor authentication.
-- Remediation: Enable MFA for interactive users and prefer short-lived role credentials for automation.
-- Metadata: policy_name: user-metadata, statement_id: mfa
-- References: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
+- Evidence: User has an active console password without MFA.
+- Impact: A compromised console password has less resistance without MFA.
+- Remediation: Enable MFA for interactive IAM users or remove console access.
+- Metadata: policy_name: credential-report, statement_id: mfa
+- References: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html
 
 #### IAM-007: Long-lived access key
 
 - Module: `iam`
 - Category: `identity-and-access`
 - Resource: `user/alice-admin`
-- Evidence: Access key age is 142 days.
+- Evidence: Active access key age is 142 days.
 - Impact: Long-lived access keys increase the window of exposure if credentials are leaked.
-- Remediation: Rotate old access keys and prefer temporary credentials where possible.
-- Metadata: policy_name: access-key-metadata, statement_id: AKIAEXAMPLEALICE
-- References: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
+- Remediation: Rotate old access keys and prefer temporary role credentials where possible.
+- Metadata: policy_name: credential-report, statement_id: AKIAEXAMPLEALICE
+- References: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html
 
 #### NET-003: Security group allows unrestricted outbound traffic
 

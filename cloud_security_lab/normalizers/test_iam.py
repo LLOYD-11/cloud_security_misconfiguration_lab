@@ -25,14 +25,28 @@ def _authorization_details():
     return json.loads(AUTHORIZATION_PATH.read_text(encoding="utf-8"))
 
 
-def _credential_row(username, arn, *, mfa="TRUE", active="FALSE", rotated="N/A"):
+def _credential_row(
+    username,
+    arn,
+    *,
+    password="TRUE",
+    password_last_used="2026-06-28T00:00:00+00:00",
+    password_last_changed="2026-02-01T00:00:00+00:00",
+    mfa="TRUE",
+    active="FALSE",
+    rotated="N/A",
+    key_last_used="N/A",
+):
     return {
         "user": username,
         "arn": arn,
+        "password_enabled": password,
+        "password_last_used": password_last_used,
+        "password_last_changed": password_last_changed,
         "mfa_active": mfa,
         "access_key_1_active": active,
         "access_key_1_last_rotated": rotated,
-        "access_key_1_last_used_date": "N/A",
+        "access_key_1_last_used_date": key_last_used,
         "access_key_2_active": "FALSE",
         "access_key_2_last_rotated": "N/A",
         "access_key_2_last_used_date": "N/A",
@@ -44,15 +58,22 @@ def _sample_credential_rows():
         "alice-admin": _credential_row(
             "alice-admin",
             "arn:aws:iam::111122223333:user/alice-admin",
+            password_last_used="2026-06-25T00:00:00+00:00",
+            password_last_changed="2026-01-05T00:00:00+00:00",
             mfa="FALSE",
             active="TRUE",
             rotated="2026-02-08T00:00:00+00:00",
+            key_last_used="2026-06-26T00:00:00+00:00",
         ),
         "data-engineer": _credential_row(
             "data-engineer",
             "arn:aws:iam::111122223333:user/engineering/data-engineer",
+            password="FALSE",
+            password_last_used="N/A",
+            password_last_changed="N/A",
             active="TRUE",
             rotated="2026-06-18T00:00:00+00:00",
+            key_last_used="2026-06-29T00:00:00+00:00",
         ),
         "readonly-analyst": _credential_row(
             "readonly-analyst",
@@ -86,10 +107,19 @@ class NativeIamNormalizerTests(unittest.TestCase):
         self.assertEqual((), result.warnings)
         self.assertEqual("111122223333", result.environment["account_id"])
         self.assertEqual(simplified_signatures, native_signatures)
+        self.assertTrue(result.environment["root_account"]["mfa_enabled"])
         self.assertEqual(142, result.environment["users"][0]["access_keys"][0]["age_days"])
         self.assertEqual(
-            "group:ReportingReaders/ReadOnlyReports",
-            result.environment["users"][2]["attached_policies"][0]["policy_name"],
+            "ReadOnlyReports",
+            result.environment["groups"][0]["attached_policies"][0]["policy_name"],
+        )
+        self.assertEqual(
+            ["readonly-analyst"],
+            result.environment["groups"][0]["members"],
+        )
+        self.assertEqual(
+            "DataEngineeringBoundary",
+            result.environment["users"][1]["permissions_boundary"]["policy_name"],
         )
 
     def test_loader_accepts_base64_aws_cli_credential_report_json(self):
@@ -127,7 +157,7 @@ class NativeIamNormalizerTests(unittest.TestCase):
             as_of=AS_OF,
         )
 
-        self.assertEqual(8, len(analyze_environment(result.environment)))
+        self.assertEqual(9, len(analyze_environment(result.environment)))
 
     def test_decoded_policy_preserves_literal_percent_encoded_resource_text(self):
         authorization = _authorization_details()
@@ -221,6 +251,47 @@ class NativeIamNormalizerTests(unittest.TestCase):
         self.assertIn("has no readable default policy version", result.warnings[0])
         self.assertIn("but its document is absent", result.warnings[1])
 
+    def test_missing_permissions_boundary_document_is_preserved_with_warning(self):
+        authorization = _authorization_details()
+        authorization["UserDetailList"][1]["PermissionsBoundary"][
+            "PermissionsBoundaryArn"
+        ] = "arn:aws:iam::111122223333:policy/MissingBoundary"
+
+        result = normalize_aws_iam_environment(
+            authorization,
+            _sample_credential_rows(),
+            as_of=AS_OF,
+        )
+        boundary = result.environment["users"][1]["permissions_boundary"]
+
+        self.assertFalse(boundary["document_available"])
+        self.assertEqual([], boundary["statements"])
+        self.assertIn("permissions boundary", result.warnings[0])
+
+    def test_invalid_permissions_boundary_shape_is_rejected(self):
+        cases = (
+            ("not-an-object", "must be an object"),
+            (
+                {
+                    "PermissionsBoundaryType": "Policy",
+                    "PermissionsBoundaryArn": (
+                        "arn:aws:iam::111122223333:policy/DataEngineeringBoundary"
+                    ),
+                },
+                "PermissionsBoundaryType",
+            ),
+        )
+        for value, message in cases:
+            with self.subTest(message=message):
+                authorization = _authorization_details()
+                authorization["UserDetailList"][1]["PermissionsBoundary"] = value
+                with self.assertRaisesRegex(ValueError, message):
+                    normalize_aws_iam_environment(
+                        authorization,
+                        _sample_credential_rows(),
+                        as_of=AS_OF,
+                    )
+
     def test_conflicting_account_ids_are_rejected(self):
         rows = _sample_credential_rows()
         rows["data-engineer"]["arn"] = "arn:aws:iam::999988887777:user/data-engineer"
@@ -257,6 +328,8 @@ class NativeIamNormalizerTests(unittest.TestCase):
     def test_invalid_credential_values_are_rejected(self):
         cases = (
             ("mfa_active", "UNKNOWN", "must be TRUE or FALSE"),
+            ("password_enabled", "UNKNOWN", "must be TRUE or FALSE"),
+            ("password_last_changed", "N/A", "active password without"),
             ("access_key_1_last_rotated", "yesterday", "ISO 8601"),
             ("access_key_1_last_rotated", "N/A", "active access key without"),
         )
@@ -302,6 +375,12 @@ class NativeIamNormalizerTests(unittest.TestCase):
                     "GroupList", "ReportingReaders"
                 ),
                 "GroupList must be a list",
+            ),
+            (
+                lambda payload: payload["UserDetailList"][2].__setitem__(
+                    "GroupList", ["ReportingReaders", "ReportingReaders"]
+                ),
+                "duplicate group names",
             ),
         )
         for mutate, message in mutations:
@@ -355,6 +434,24 @@ class NativeIamNormalizerTests(unittest.TestCase):
         rows["alice-admin"]["access_key_1_last_rotated"] = "2026-07-01T00:00:00Z"
 
         with self.assertRaisesRegex(ValueError, "occurs after the analysis date"):
+            normalize_aws_iam_environment(
+                _authorization_details(),
+                rows,
+                as_of=AS_OF,
+            )
+
+    def test_multiple_root_rows_are_rejected(self):
+        rows = _sample_credential_rows()
+        rows["<root_account>"] = _credential_row(
+            "<root_account>",
+            "arn:aws:iam::111122223333:root",
+        )
+        rows["root_account"] = _credential_row(
+            "root_account",
+            "arn:aws:iam::111122223333:root",
+        )
+
+        with self.assertRaisesRegex(ValueError, "multiple root account rows"):
             normalize_aws_iam_environment(
                 _authorization_details(),
                 rows,
