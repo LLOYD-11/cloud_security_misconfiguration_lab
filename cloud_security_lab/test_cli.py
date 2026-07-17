@@ -91,7 +91,7 @@ class UnifiedCliTests(unittest.TestCase):
 
         self.assertEqual(0, result)
         self.assertEqual("", stderr.getvalue())
-        self.assertEqual(5, payload["finding_count"])
+        self.assertEqual(7, payload["finding_count"])
         self.assertEqual(3, len(normalized["buckets"]))
 
     def test_analyze_native_aws_ec2_writes_findings_and_normalized_evidence(self):
@@ -181,7 +181,7 @@ class UnifiedCliTests(unittest.TestCase):
 
         self.assertEqual(0, result)
         self.assertIn("Generated: 2026-06-30", report)
-        self.assertIn("consolidates 29 finding(s)", report)
+        self.assertIn("consolidates 31 finding(s)", report)
         self.assertEqual(
             {
                 "cloud_security_report.md",

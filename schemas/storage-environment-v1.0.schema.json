@@ -50,15 +50,38 @@
     "policyStatement": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["effect", "principal", "action", "resource"],
+      "required": ["effect"],
       "properties": {
         "sid": { "type": "string" },
         "effect": { "enum": ["Allow", "Deny"] },
         "principal": { "$ref": "#/$defs/principal" },
+        "not_principal": { "$ref": "#/$defs/principal" },
         "action": { "$ref": "#/$defs/stringOrStringList" },
+        "not_action": { "$ref": "#/$defs/stringOrStringList" },
         "resource": { "$ref": "#/$defs/stringOrStringList" },
+        "not_resource": { "$ref": "#/$defs/stringOrStringList" },
         "condition": { "type": "object" }
-      }
+      },
+      "allOf": [
+        {
+          "oneOf": [
+            { "required": ["principal"] },
+            { "required": ["not_principal"] }
+          ]
+        },
+        {
+          "oneOf": [
+            { "required": ["action"] },
+            { "required": ["not_action"] }
+          ]
+        },
+        {
+          "oneOf": [
+            { "required": ["resource"] },
+            { "required": ["not_resource"] }
+          ]
+        }
+      ]
     },
     "bucket": {
       "type": "object",
@@ -73,6 +96,13 @@
       ],
       "properties": {
         "name": { "type": "string", "minLength": 3 },
+        "object_ownership": {
+          "enum": [
+            "BucketOwnerEnforced",
+            "BucketOwnerPreferred",
+            "ObjectWriter"
+          ]
+        },
         "public_access_block": {
           "type": "object",
           "additionalProperties": false,

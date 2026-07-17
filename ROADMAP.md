@@ -32,7 +32,7 @@ Status: Complete.
 Status: In progress.
 
 - [x] Improve IAM wildcard, trust-condition, group, boundary, and credential analysis.
-- [ ] Add S3 policy-condition and ownership-control context.
+- [x] Add S3 policy-condition and ownership-control context.
 - [ ] Expand the network service catalog and add optional reachability context.
 - [ ] Expand CloudTrail rules and correlate related events into incidents.
 

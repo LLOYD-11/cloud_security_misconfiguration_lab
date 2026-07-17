@@ -81,6 +81,7 @@ The bundle contract is [`aws-s3-evidence-bundle-v1.0.schema.json`](../schemas/aw
 | `ListBuckets` | Complete `s3api list-buckets` response |
 | `AccountPublicAccessBlock` | `s3control get-public-access-block` response or expected not-found error |
 | `BucketEvidence[].GetPublicAccessBlock` | Bucket-level Block Public Access response or expected not-found error |
+| `BucketEvidence[].GetBucketOwnershipControls` | S3 Object Ownership response or expected not-found error |
 | `BucketEvidence[].GetBucketAcl` | Bucket ACL response |
 | `BucketEvidence[].GetBucketPolicy` | Bucket policy response or expected not-found error |
 | `BucketEvidence[].GetBucketEncryption` | Default encryption response |
@@ -92,6 +93,7 @@ Representative collection commands are:
 aws s3api list-buckets --output json
 aws s3control get-public-access-block --account-id 111122223333 --output json
 aws s3api get-public-access-block --bucket BUCKET_NAME --output json
+aws s3api get-bucket-ownership-controls --bucket BUCKET_NAME --output json
 aws s3api get-bucket-acl --bucket BUCKET_NAME --output json
 aws s3api get-bucket-policy --bucket BUCKET_NAME --output json
 aws s3api get-bucket-encryption --bucket BUCKET_NAME --output json
@@ -108,7 +110,7 @@ Run collection only against accounts you own or are authorized to assess. Store 
 }
 ```
 
-Only `NoSuchPublicAccessBlockConfiguration` and `NoSuchBucketPolicy` are interpreted as an absent optional configuration. `AccessDenied`, malformed responses, incomplete bucket coverage, and any paginated or prefix-filtered `ListBuckets` response stop analysis instead of being converted into insecure defaults.
+Only `NoSuchPublicAccessBlockConfiguration`, `NoSuchBucketPolicy`, and `OwnershipControlsNotFoundError` are interpreted as absent optional configuration. Missing ownership controls are represented as legacy ACL-enabled `ObjectWriter` behavior with a visible warning. `AccessDenied`, malformed responses, incomplete bucket coverage, and any paginated or prefix-filtered `ListBuckets` response stop analysis instead of being converted into insecure defaults.
 
 ### Analyze S3 Evidence
 
@@ -126,8 +128,9 @@ The adapter:
 
 - Requires one evidence entry for every bucket returned by a complete, unfiltered `ListBuckets` response, with no unlisted extras.
 - Combines account-level and bucket-level Block Public Access controls using S3's most-restrictive behavior.
+- Preserves `BucketOwnerEnforced`, `BucketOwnerPreferred`, or `ObjectWriter` from Object Ownership controls and makes ACL effectiveness explicit.
 - Converts AWS ACL grantee structures into stable analyzer identifiers while retaining public group URIs.
-- Parses the JSON string returned by `GetBucketPolicy` and preserves its statements.
+- Parses the JSON string returned by `GetBucketPolicy` and preserves principal, action, resource, and condition semantics, including `NotPrincipal`, `NotAction`, and `NotResource`.
 - Reads SSE-S3, SSE-KMS, and DSSE-KMS default encryption responses without claiming that baseline SSE-S3 is absent. A 2026 `BlockedEncryptionTypes`-only rule is normalized to the S3 SSE-S3 baseline with a visible warning.
 - Converts an empty `GetBucketVersioning` response to the analyzer's `Disabled` state.
 
@@ -135,6 +138,8 @@ Current S3 references:
 
 - [ListBuckets API](https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListBuckets.html)
 - [GetPublicAccessBlock API](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetPublicAccessBlock.html)
+- [GetBucketOwnershipControls API](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketOwnershipControls.html)
+- [S3 Object Ownership](https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html)
 - [GetBucketAcl CLI response](https://docs.aws.amazon.com/cli/latest/reference/s3api/get-bucket-acl.html)
 - [GetBucketPolicy API](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketPolicy.html)
 - [GetBucketEncryption CLI response](https://docs.aws.amazon.com/cli/latest/reference/s3api/get-bucket-encryption.html)

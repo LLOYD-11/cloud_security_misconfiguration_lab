@@ -364,11 +364,58 @@
       },
       "additionalProperties": true
     },
+    "bucketOwnershipControls": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "OwnershipControls"
+          ],
+          "properties": {
+            "OwnershipControls": {
+              "type": "object",
+              "required": [
+                "Rules"
+              ],
+              "properties": {
+                "Rules": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 1,
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "ObjectOwnership"
+                    ],
+                    "properties": {
+                      "ObjectOwnership": {
+                        "enum": [
+                          "BucketOwnerEnforced",
+                          "BucketOwnerPreferred",
+                          "ObjectWriter"
+                        ]
+                      }
+                    },
+                    "additionalProperties": true
+                  }
+                }
+              },
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": true
+        },
+        {
+          "$ref": "#/$defs/awsError"
+        }
+      ]
+    },
     "bucketEvidence": {
       "type": "object",
       "required": [
         "BucketName",
         "GetPublicAccessBlock",
+        "GetBucketOwnershipControls",
         "GetBucketAcl",
         "GetBucketPolicy",
         "GetBucketEncryption",
@@ -381,6 +428,9 @@
         },
         "GetPublicAccessBlock": {
           "$ref": "#/$defs/publicAccessBlockResult"
+        },
+        "GetBucketOwnershipControls": {
+          "$ref": "#/$defs/bucketOwnershipControls"
         },
         "GetBucketAcl": {
           "$ref": "#/$defs/bucketAcl"

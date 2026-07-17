@@ -12,6 +12,7 @@ from cloud_findings import write_findings
 from cloud_security_lab.normalizers.cloudtrail import load_aws_cloudtrail_environment
 from cloud_security_lab.normalizers.ec2 import load_aws_ec2_environment
 from cloud_security_lab.normalizers.iam import load_aws_iam_environment
+from cloud_security_lab.normalizers.s3 import load_aws_s3_environment
 from iam_analyzer.analyzer import analyze_environment, load_environment
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -91,6 +92,19 @@ class DataContractTests(unittest.TestCase):
 
         rules[:] = [{}]
         self.assertTrue(list(validator.iter_errors(sample)))
+
+        missing_ownership = copy.deepcopy(sample)
+        del missing_ownership["BucketEvidence"][0]["GetBucketOwnershipControls"]
+        self.assertTrue(list(validator.iter_errors(missing_ownership)))
+
+    def test_normalized_native_s3_environment_matches_storage_contract(self):
+        schema = _load_json(PROJECT_ROOT / "schemas/storage-environment-v1.0.schema.json")
+        result = load_aws_s3_environment(
+            PROJECT_ROOT / "sample_data/aws/s3/s3_security_evidence_bundle.json"
+        )
+
+        Draft202012Validator.check_schema(schema)
+        Draft202012Validator(schema).validate(result.environment)
 
     def test_normalized_native_ec2_environment_matches_network_contract(self):
         schema = _load_json(PROJECT_ROOT / "schemas/network-environment-v1.0.schema.json")

@@ -24,7 +24,11 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 ## Storage Analysis
 
 - Native S3 normalization combines account-level and bucket-level Block Public Access. Simplified storage input relies on the supplied bucket values.
-- Public-principal detection does not yet evaluate policy conditions, access points, or Object Ownership.
+- Organization-level S3 Block Public Access policy evidence is not collected separately by the current bundle.
+- Bucket-policy condition evaluation covers the fixed-value keys and network thresholds documented for S3 Block Public Access and conservatively requires `Null: false` for `ForAllValues` guards; it does not perform full IAM reasoning across SCPs, RCPs, VPC endpoint policies, KMS key policies, or identity policies.
+- A fixed condition can be non-public while still granting unintended cross-account or network access; trust-zone review remains necessary.
+- Native S3 evidence includes bucket ACLs but does not inventory every object ACL.
+- S3 access point, Multi-Region Access Point, and access point policy analysis is not yet supported.
 - Native S3 bundles currently cover general purpose buckets returned by `ListBuckets`, not S3 directory buckets.
 - The explicit-encryption rule is a key-management posture check. S3 applies SSE-S3 to new objects even when a customer-defined bucket encryption configuration is absent.
 - Versioning requirements depend on data criticality, retention requirements, and cost constraints.

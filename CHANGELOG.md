@@ -24,6 +24,9 @@ All notable changes to this project are documented in this file.
 - AWS-shape CloudTrail log samples, a versioned native schema, duplicate-event warnings, conflicting-event rejection, and native pipeline verification.
 - IAM rules for broad `NotAction` and `NotResource` allows, stale active credentials, root credentials, and unrestricted permissions boundaries.
 - IAM environment evidence for groups and members, password usage, root posture, policy origin, and resolved permissions boundaries.
+- S3 Object Ownership normalization and an ACL-enabled ownership posture rule.
+- S3 public-policy condition analysis for documented fixed-value identity, account, network, VPC, source ARN, and data access point guardrails.
+- Storage policy support for broad `NotPrincipal`, `NotAction`, and `NotResource` statements.
 
 ### Changed
 
@@ -43,6 +46,7 @@ All notable changes to this project are documented in this file.
 - IAM cross-account trust severity now distinguishes public principals, unguarded external trust, and supported equality-based trust conditions.
 - IAM MFA findings now require an active or compatibility-assumed console password, avoiding native-input false positives for programmatic-only users.
 - Native IAM group policies are analyzed once at the group resource with member context instead of being copied into every member's direct-policy list.
+- Storage ACL findings now account for `BucketOwnerEnforced`, while public-policy findings retain overbroad CIDRs, wildcard values, policy variables, negative operators, and `IfExists` conditions as public.
 
 ## 1.0.0 - 2026-06-30
 

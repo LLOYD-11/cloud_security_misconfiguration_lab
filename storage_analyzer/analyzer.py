@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import ipaddress
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -20,6 +22,8 @@ REF_AWS_S3_BUCKET_POLICIES = "https://docs.aws.amazon.com/AmazonS3/latest/usergu
 REF_AWS_S3_ENCRYPTION = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingServerSideEncryption.html"
 REF_AWS_S3_DEFAULT_ENCRYPTION = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/default-encryption-faq.html"
 REF_AWS_S3_VERSIONING = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html"
+REF_AWS_S3_OBJECT_OWNERSHIP = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html"
+REF_AWS_CONFIG_S3_ACL_PROHIBITED = "https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-acl-prohibited.html"
 REF_MITRE_CLOUD_STORAGE_DISCOVERY = "https://attack.mitre.org/techniques/T1619/"
 
 PUBLIC_ACCESS_BLOCK_KEYS = (
@@ -35,6 +39,50 @@ PUBLIC_GRANTEES = {
     "http://acs.amazonaws.com/groups/global/AllUsers",
     "http://acs.amazonaws.com/groups/global/AuthenticatedUsers",
 }
+
+FIXED_VALUE_CONDITION_KEYS = {
+    "aws:principalorgid",
+    "aws:sourceaccount",
+    "aws:sourcearn",
+    "aws:sourceowner",
+    "aws:sourcevpc",
+    "aws:sourcevpce",
+    "aws:userid",
+    "s3:dataaccesspointaccount",
+    "s3:dataaccesspointarn",
+}
+
+FIXED_VALUE_OPERATORS = {
+    "arnequals",
+    "arnlike",
+    "foranyvalue:arnequals",
+    "foranyvalue:arnlike",
+    "foranyvalue:stringequals",
+    "foranyvalue:stringlike",
+    "forallvalues:arnequals",
+    "forallvalues:arnlike",
+    "forallvalues:stringequals",
+    "forallvalues:stringlike",
+    "stringequals",
+    "stringequalsignorecase",
+    "stringlike",
+}
+
+SOURCE_IP_OPERATORS = {
+    "foranyvalue:ipaddress",
+    "forallvalues:ipaddress",
+    "ipaddress",
+}
+
+RFC1918_NETWORKS = (
+    ipaddress.IPv4Network("10.0.0.0/8"),
+    ipaddress.IPv4Network("172.16.0.0/12"),
+    ipaddress.IPv4Network("192.168.0.0/16"),
+)
+
+DATA_ACCESS_POINT_ARN_PATTERN = re.compile(
+    r"^arn:[^:*?${}]+:s3:[^:*?${}]+:\d{12}:accesspoint/(?:\*|[^*?${}]+)$"
+)
 
 
 def _as_list(value: Any) -> list[Any]:
@@ -60,6 +108,14 @@ def _principal_value(statement: dict[str, Any]) -> Any:
     return statement.get("principal", statement.get("Principal"))
 
 
+def _not_principal_value(statement: dict[str, Any]) -> Any:
+    return statement.get("not_principal", statement.get("NotPrincipal"))
+
+
+def _condition_value(statement: dict[str, Any]) -> Any:
+    return statement.get("condition", statement.get("Condition"))
+
+
 def _is_public_principal(principal: Any) -> bool:
     if principal == "*":
         return True
@@ -68,6 +124,131 @@ def _is_public_principal(principal: Any) -> bool:
     if isinstance(principal, list):
         return any(_is_public_principal(value) for value in principal)
     return False
+
+
+def _broad_principal_kind(statement: dict[str, Any]) -> str | None:
+    if _not_principal_value(statement) is not None:
+        return "NotPrincipal"
+    if _is_public_principal(_principal_value(statement)):
+        return "Principal"
+    return None
+
+
+def _condition_values(value: Any) -> list[str] | None:
+    if isinstance(value, str) and value:
+        return [value]
+    if (
+        isinstance(value, list)
+        and value
+        and all(isinstance(item, str) and item for item in value)
+    ):
+        return value
+    return None
+
+
+def _is_fixed_value(condition_key: str, value: str) -> bool:
+    if condition_key == "s3:dataaccesspointarn":
+        return DATA_ACCESS_POINT_ARN_PATTERN.fullmatch(value) is not None
+    return not any(marker in value for marker in ("*", "?", "${"))
+
+
+def _source_ip_is_non_public(value: str) -> bool:
+    try:
+        network = ipaddress.ip_network(value, strict=False)
+    except ValueError:
+        return False
+
+    if isinstance(network, ipaddress.IPv4Network):
+        if any(network.subnet_of(private_network) for private_network in RFC1918_NETWORKS):
+            return True
+        return network.prefixlen >= 8
+    return network.prefixlen >= 32
+
+
+def _fixed_condition_guard_keys(condition: Any) -> tuple[str, ...]:
+    if not isinstance(condition, dict):
+        return ()
+
+    guard_keys: set[str] = set()
+    for operator, clause in condition.items():
+        if not isinstance(operator, str) or not isinstance(clause, dict):
+            continue
+        normalized_operator = operator.lower()
+        for condition_key, raw_values in clause.items():
+            if not isinstance(condition_key, str):
+                continue
+            values = _condition_values(raw_values)
+            if values is None:
+                continue
+            normalized_key = condition_key.lower()
+            if normalized_operator.startswith(
+                "forallvalues:"
+            ) and not _condition_requires_key(condition, normalized_key):
+                continue
+            if normalized_key == "aws:sourceip":
+                if normalized_operator in SOURCE_IP_OPERATORS and all(
+                    _source_ip_is_non_public(value) for value in values
+                ):
+                    guard_keys.add(condition_key)
+            elif (
+                normalized_key in FIXED_VALUE_CONDITION_KEYS
+                and normalized_operator in FIXED_VALUE_OPERATORS
+                and all(_is_fixed_value(normalized_key, value) for value in values)
+            ):
+                guard_keys.add(condition_key)
+    return tuple(sorted(guard_keys, key=str.lower))
+
+
+def _condition_requires_key(condition: dict[Any, Any], condition_key: str) -> bool:
+    null_clause = next(
+        (
+            clause
+            for operator, clause in condition.items()
+            if isinstance(operator, str)
+            and operator.lower() == "null"
+            and isinstance(clause, dict)
+        ),
+        {},
+    )
+    raw_value = next(
+        (
+            value
+            for key, value in null_clause.items()
+            if isinstance(key, str) and key.lower() == condition_key
+        ),
+        None,
+    )
+    values = raw_value if isinstance(raw_value, list) else [raw_value]
+    return bool(values) and all(
+        value is False or (isinstance(value, str) and value.lower() == "false")
+        for value in values
+    )
+
+
+def _condition_keys(condition: Any) -> tuple[str, ...]:
+    if not isinstance(condition, dict):
+        return ()
+    keys = {
+        key
+        for clause in condition.values()
+        if isinstance(clause, dict)
+        for key in clause
+        if isinstance(key, str)
+    }
+    return tuple(sorted(keys, key=str.lower))
+
+
+def _statement_value(
+    statement: dict[str, Any],
+    normalized_key: str,
+    aws_key: str,
+    normalized_fallback: str,
+    aws_fallback: str,
+) -> Any:
+    value = statement.get(normalized_key, statement.get(aws_key))
+    if value is not None:
+        return value
+    return statement.get(normalized_fallback, statement.get(aws_fallback))
 
 
 def _add_finding(
@@ -123,42 +304,119 @@ def analyze_bucket(bucket: dict[str, Any]) -> list[Finding]:
             metadata={"disabled_controls": ", ".join(disabled_controls)},
         )
 
+    object_ownership_value = bucket.get("object_ownership")
+    object_ownership = (
+        str(object_ownership_value) if object_ownership_value is not None else None
+    )
+    acls_disabled = object_ownership == "BucketOwnerEnforced"
     ignore_public_acls = public_access_block.get("ignore_public_acls") is True
     for index, grant in enumerate(bucket.get("acl", {}).get("grants", [])):
         grantee = str(grant.get("grantee", ""))
         permission = str(grant.get("permission", ""))
-        if grantee in PUBLIC_GRANTEES and not ignore_public_acls:
+        if grantee in PUBLIC_GRANTEES and not ignore_public_acls and not acls_disabled:
+            ownership_context = (
+                f" Object Ownership is {object_ownership}."
+                if object_ownership is not None
+                else ""
+            )
             _add_finding(
                 findings,
                 severity="critical",
                 rule_id="STO-002",
                 resource_id=bucket_name,
                 title="Bucket ACL grants public access",
-                evidence=f"ACL grant {index + 1} gives {permission} permission to {grantee}.",
+                evidence=(
+                    f"ACL grant {index + 1} gives {permission} permission to {grantee}."
+                    f"{ownership_context}"
+                ),
                 impact="Objects or bucket metadata may be exposed to public or broadly authenticated users.",
                 remediation="Remove public ACL grants and rely on private bucket ownership plus scoped IAM policies.",
-                references=[REF_AWS_S3_ACLS, REF_AWS_S3_BLOCK_PUBLIC_ACCESS],
-                metadata={"grantee": grantee, "permission": permission},
+                references=[
+                    REF_AWS_S3_ACLS,
+                    REF_AWS_S3_BLOCK_PUBLIC_ACCESS,
+                    REF_AWS_S3_OBJECT_OWNERSHIP,
+                ],
+                metadata={
+                    "grantee": grantee,
+                    "permission": permission,
+                    "object_ownership": object_ownership or "not-provided",
+                },
             )
 
     restrict_public_buckets = public_access_block.get("restrict_public_buckets") is True
     for index, statement in enumerate(_statements(bucket.get("bucket_policy", {}))):
         if _statement_effect(statement) != "allow":
             continue
-        principal = _principal_value(statement)
-        if _is_public_principal(principal) and not restrict_public_buckets:
-            _add_finding(
-                findings,
-                severity="critical",
-                rule_id="STO-003",
-                resource_id=bucket_name,
-                title="Bucket policy allows public principal",
-                evidence=f"Allow statement grants access to public principal: {json.dumps(principal)}.",
-                impact="Bucket data may be publicly accessible depending on the allowed action and resource scope.",
-                remediation="Replace public principals with specific AWS principals and validate whether anonymous access is required.",
-                references=[REF_AWS_S3_BUCKET_POLICIES, REF_AWS_S3_BLOCK_PUBLIC_ACCESS],
-                metadata={"statement_index": str(index + 1)},
-            )
+        principal_kind = _broad_principal_kind(statement)
+        if principal_kind is None or restrict_public_buckets:
+            continue
+        condition = _condition_value(statement)
+        fixed_guard_keys = _fixed_condition_guard_keys(condition)
+        if fixed_guard_keys:
+            continue
+
+        principal = (
+            _not_principal_value(statement)
+            if principal_kind == "NotPrincipal"
+            else _principal_value(statement)
+        )
+        condition_keys = _condition_keys(condition)
+        condition_context = (
+            " Condition "
+            f"{json.dumps(condition, sort_keys=True)} does not establish an "
+            "AWS-recognized fixed-value guardrail."
+            if condition_keys
+            else " No AWS-recognized fixed-value condition guardrail is present."
+        )
+        action = _statement_value(
+            statement,
+            "action",
+            "Action",
+            "not_action",
+            "NotAction",
+        )
+        resource = _statement_value(
+            statement,
+            "resource",
+            "Resource",
+            "not_resource",
+            "NotResource",
+        )
+        statement_sid = statement.get("sid", statement.get("Sid"))
+        metadata = {
+            "statement_index": str(index + 1),
+            "principal_element": principal_kind,
+            "condition_keys": ", ".join(condition_keys),
+            "block_public_policy": str(
+                public_access_block.get("block_public_policy") is True
+            ).lower(),
+            "restrict_public_buckets": str(restrict_public_buckets).lower(),
+        }
+        if isinstance(statement_sid, str) and statement_sid:
+            metadata["statement_sid"] = statement_sid
+        _add_finding(
+            findings,
+            severity="critical",
+            rule_id="STO-003",
+            resource_id=bucket_name,
+            title="Bucket policy allows an effectively public principal",
+            evidence=(
+                f"Allow statement uses {principal_kind} "
+                f"{json.dumps(principal, sort_keys=True)} with action "
+                f"{json.dumps(action, sort_keys=True)} and resource "
+                f"{json.dumps(resource, sort_keys=True)}.{condition_context}"
+            ),
+            impact=(
+                "Bucket data may be publicly accessible because the statement is public "
+                "under S3 Block Public Access policy-evaluation rules."
+            ),
+            remediation=(
+                "Replace the broad principal with specific AWS principals or add a supported "
+                "fixed-value condition, then validate the result with IAM Access Analyzer for S3."
+            ),
+            references=[REF_AWS_S3_BUCKET_POLICIES, REF_AWS_S3_BLOCK_PUBLIC_ACCESS],
+            metadata=metadata,
+        )
 
     encryption = bucket.get("encryption", {})
     if encryption.get("enabled") is not True:
@@ -193,6 +451,32 @@ def analyze_bucket(bucket: dict[str, Any]) -> list[Finding]:
             remediation="Enable bucket versioning for important data and pair it with lifecycle rules if storage cost matters.",
             references=[REF_AWS_S3_VERSIONING],
             metadata={"versioning_status": versioning_status},
+        )
+
+    if object_ownership in {"BucketOwnerPreferred", "ObjectWriter"}:
+        _add_finding(
+            findings,
+            severity="medium",
+            rule_id="STO-006",
+            resource_id=bucket_name,
+            title="Bucket access control lists remain enabled",
+            evidence=(
+                f"S3 Object Ownership is {object_ownership}, so bucket and object ACLs "
+                "can still affect access."
+            ),
+            impact=(
+                "ACL-based permissions and cross-account object ownership can make access "
+                "harder to reason about and can preserve unintended grants."
+            ),
+            remediation=(
+                "Migrate required ACL permissions to policies, reset the bucket ACL to private, "
+                "and use BucketOwnerEnforced unless an ACL-dependent workload is documented."
+            ),
+            references=[
+                REF_AWS_S3_OBJECT_OWNERSHIP,
+                REF_AWS_CONFIG_S3_ACL_PROHIBITED,
+            ],
+            metadata={"object_ownership": object_ownership},
         )
 
     return findings

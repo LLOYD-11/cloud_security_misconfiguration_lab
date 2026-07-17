@@ -40,6 +40,15 @@
           "RestrictPublicBuckets": false
         }
       },
+      "GetBucketOwnershipControls": {
+        "OwnershipControls": {
+          "Rules": [
+            {
+              "ObjectOwnership": "ObjectWriter"
+            }
+          ]
+        }
+      },
       "GetBucketAcl": {
         "Owner": {
           "DisplayName": "sample-owner",
@@ -64,7 +73,7 @@
         ]
       },
       "GetBucketPolicy": {
-        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"PublicRead\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::public-customer-exports/*\"}]}"
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"PublicRead\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::public-customer-exports/*\",\"Condition\":{\"IpAddress\":{\"aws:SourceIp\":\"0.0.0.0/1\"}}}]}"
       },
       "GetBucketEncryption": {
         "ServerSideEncryptionConfiguration": {
@@ -92,6 +101,15 @@
           "RestrictPublicBuckets": true
         }
       },
+      "GetBucketOwnershipControls": {
+        "OwnershipControls": {
+          "Rules": [
+            {
+              "ObjectOwnership": "BucketOwnerEnforced"
+            }
+          ]
+        }
+      },
       "GetBucketAcl": {
         "Owner": {
           "DisplayName": "sample-owner",
@@ -109,10 +127,7 @@
         ]
       },
       "GetBucketPolicy": {
-        "Error": {
-          "Code": "NoSuchBucketPolicy",
-          "Message": "The bucket policy does not exist"
-        }
+        "Policy": "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Sid\":\"OrganizationRead\",\"Effect\":\"Allow\",\"Principal\":\"*\",\"Action\":\"s3:GetObject\",\"Resource\":\"arn:aws:s3:::internal-audit-logs/*\",\"Condition\":{\"StringEquals\":{\"aws:PrincipalOrgID\":\"o-a1b2c3d4e5\"}}}]}"
       },
       "GetBucketEncryption": {
         "ServerSideEncryptionConfiguration": {
@@ -139,6 +154,15 @@
           "IgnorePublicAcls": true,
           "BlockPublicPolicy": true,
           "RestrictPublicBuckets": true
+        }
+      },
+      "GetBucketOwnershipControls": {
+        "OwnershipControls": {
+          "Rules": [
+            {
+              "ObjectOwnership": "BucketOwnerPreferred"
+            }
+          ]
         }
       },
       "GetBucketAcl": {

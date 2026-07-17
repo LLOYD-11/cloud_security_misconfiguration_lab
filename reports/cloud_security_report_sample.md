@@ -4,7 +4,7 @@ Generated: 2026-06-30
 
 ## Executive Summary
 
-This report consolidates 29 finding(s) from offline cloud security analyzers.
+This report consolidates 31 finding(s) from offline cloud security analyzers.
 
 ## Severity Summary
 
@@ -12,7 +12,7 @@ This report consolidates 29 finding(s) from offline cloud security analyzers.
 | --- | ---: |
 | Critical | 5 |
 | High | 10 |
-| Medium | 12 |
+| Medium | 14 |
 | Low | 2 |
 | Info | 0 |
 
@@ -23,7 +23,7 @@ This report consolidates 29 finding(s) from offline cloud security analyzers.
 | cloudtrail | 6 |
 | iam | 9 |
 | network | 7 |
-| storage | 7 |
+| storage | 9 |
 
 ## Source Files
 
@@ -76,21 +76,21 @@ The source files below are generated analyzer outputs and are not committed to t
 - Module: `storage`
 - Category: `data-exposure`
 - Resource: `bucket/public-customer-exports`
-- Evidence: ACL grant 1 gives READ permission to AllUsers.
+- Evidence: ACL grant 1 gives READ permission to AllUsers. Object Ownership is ObjectWriter.
 - Impact: Objects or bucket metadata may be exposed to public or broadly authenticated users.
 - Remediation: Remove public ACL grants and rely on private bucket ownership plus scoped IAM policies.
-- Metadata: grantee: AllUsers, permission: READ
-- References: https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html, https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html
+- Metadata: grantee: AllUsers, object_ownership: ObjectWriter, permission: READ
+- References: https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html, https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html, https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html
 
-#### STO-003: Bucket policy allows public principal
+#### STO-003: Bucket policy allows an effectively public principal
 
 - Module: `storage`
 - Category: `data-exposure`
 - Resource: `bucket/public-customer-exports`
-- Evidence: Allow statement grants access to public principal: "*".
-- Impact: Bucket data may be publicly accessible depending on the allowed action and resource scope.
-- Remediation: Replace public principals with specific AWS principals and validate whether anonymous access is required.
-- Metadata: statement_index: 1
+- Evidence: Allow statement uses Principal "*" with action "s3:GetObject" and resource "arn:aws:s3:::public-customer-exports/*". Condition {"IpAddress": {"aws:SourceIp": "0.0.0.0/1"}} does not establish an AWS-recognized fixed-value guardrail.
+- Impact: Bucket data may be publicly accessible because the statement is public under S3 Block Public Access policy-evaluation rules.
+- Remediation: Replace the broad principal with specific AWS principals or add a supported fixed-value condition, then validate the result with IAM Access Analyzer for S3.
+- Metadata: block_public_policy: false, condition_keys: aws:SourceIp, principal_element: Principal, restrict_public_buckets: false, statement_index: 1, statement_sid: PublicRead
 - References: https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-policies.html, https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html
 
 ### High
@@ -338,6 +338,28 @@ The source files below are generated analyzer outputs and are not committed to t
 - Remediation: Enable bucket versioning for important data and pair it with lifecycle rules if storage cost matters.
 - Metadata: versioning_status: Suspended
 - References: https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html
+
+#### STO-006: Bucket access control lists remain enabled
+
+- Module: `storage`
+- Category: `data-exposure`
+- Resource: `bucket/analytics-raw-data`
+- Evidence: S3 Object Ownership is BucketOwnerPreferred, so bucket and object ACLs can still affect access.
+- Impact: ACL-based permissions and cross-account object ownership can make access harder to reason about and can preserve unintended grants.
+- Remediation: Migrate required ACL permissions to policies, reset the bucket ACL to private, and use BucketOwnerEnforced unless an ACL-dependent workload is documented.
+- Metadata: object_ownership: BucketOwnerPreferred
+- References: https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html, https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-acl-prohibited.html
+
+#### STO-006: Bucket access control lists remain enabled
+
+- Module: `storage`
+- Category: `data-exposure`
+- Resource: `bucket/public-customer-exports`
+- Evidence: S3 Object Ownership is ObjectWriter, so bucket and object ACLs can still affect access.
+- Impact: ACL-based permissions and cross-account object ownership can make access harder to reason about and can preserve unintended grants.
+- Remediation: Migrate required ACL permissions to policies, reset the bucket ACL to private, and use BucketOwnerEnforced unless an ACL-dependent workload is documented.
+- Metadata: object_ownership: ObjectWriter
+- References: https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html, https://docs.aws.amazon.com/config/latest/developerguide/s3-bucket-acl-prohibited.html
 
 ### Low
 

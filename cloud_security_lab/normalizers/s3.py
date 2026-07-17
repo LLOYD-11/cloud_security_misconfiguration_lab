@@ -18,6 +18,12 @@ PAB_FIELDS = {
 }
 NO_PUBLIC_ACCESS_BLOCK = "NoSuchPublicAccessBlockConfiguration"
 NO_BUCKET_POLICY = "NoSuchBucketPolicy"
+NO_OWNERSHIP_CONTROLS = "OwnershipControlsNotFoundError"
+OBJECT_OWNERSHIP_VALUES = {
+    "BucketOwnerEnforced",
+    "BucketOwnerPreferred",
+    "ObjectWriter",
+}
 
 
 @dataclass(frozen=True)
@@ -172,6 +178,34 @@ def _bucket_acl(payload: dict[str, Any], context: str) -> dict[str, Any]:
             }
         )
     return {"grants": normalized_grants}
+
+
+def _bucket_ownership(
+    payload: dict[str, Any],
+    context: str,
+    warnings: list[str],
+) -> str:
+    error_code = _error_code(payload, context)
+    if error_code == NO_OWNERSHIP_CONTROLS:
+        warnings.append(
+            f"{context} has no explicit ownership controls; "
+            "legacy ACL-enabled ObjectWriter behavior was used."
+        )
+        return "ObjectWriter"
+    if error_code is not None:
+        raise ValueError(f"{context} collection failed with AWS error {error_code}.")
+
+    controls = _required_object(payload, "OwnershipControls", context)
+    rules = _required_object_list(controls, "Rules", f"{context} OwnershipControls")
+    if len(rules) != 1:
+        raise ValueError(f"{context} OwnershipControls Rules must contain exactly one rule.")
+    ownership = _required_string(rules[0], "ObjectOwnership", f"{context} rule")
+    if ownership not in OBJECT_OWNERSHIP_VALUES:
+        raise ValueError(
+            f"{context} ObjectOwnership must be BucketOwnerEnforced, "
+            "BucketOwnerPreferred, or ObjectWriter."
+        )
+    return ownership
 
 
 def _validate_blocked_encryption_types(rule: dict[str, Any], context: str) -> bool:
@@ -335,6 +369,15 @@ def normalize_aws_s3_environment(evidence_bundle: dict[str, Any]) -> S3Normaliza
             {
                 "name": bucket_name,
                 "public_access_block": effective_pab,
+                "object_ownership": _bucket_ownership(
+                    _required_object(
+                        evidence,
+                        "GetBucketOwnershipControls",
+                        f"Bucket {bucket_name}",
+                    ),
+                    f"Bucket {bucket_name} GetBucketOwnershipControls",
+                    warnings,
+                ),
                 "acl": _bucket_acl(
                     _required_object(evidence, "GetBucketAcl", f"Bucket {bucket_name}"),
                     f"Bucket {bucket_name} GetBucketAcl",

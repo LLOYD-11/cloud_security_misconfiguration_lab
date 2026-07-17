@@ -17,7 +17,7 @@ from storage_analyzer.analyzer import main as storage_main
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 ANALYZER_CASES = (
     (iam_main, "sample_data/iam/sample_iam_environment.json", 9),
-    (storage_main, "sample_data/storage/sample_storage_environment.json", 7),
+    (storage_main, "sample_data/storage/sample_storage_environment.json", 9),
     (network_main, "sample_data/network/sample_network_environment.json", 7),
     (cloudtrail_main, "sample_data/cloudtrail/sample_cloudtrail_events.json", 6),
 )

@@ -14,7 +14,7 @@ From the repository root, run the complete sample pipeline without installing ru
 python3 -m cloud_security_lab demo --report-date 2026-06-30
 ```
 
-This writes four versioned finding files and a 29-finding consolidated report under `reports/generated/`. The result should exactly match [`reports/cloud_security_report_sample.md`](reports/cloud_security_report_sample.md).
+This writes four versioned finding files and a 31-finding consolidated report under `reports/generated/`. The result should exactly match [`reports/cloud_security_report_sample.md`](reports/cloud_security_report_sample.md).
 
 Install the project in a virtual environment to expose the `cloud-security-lab` command:
 
@@ -89,14 +89,18 @@ All analyzers should emit the same finding schema:
 The storage analyzer checks sample S3-style bucket configurations for common exposure and resilience risks:
 
 - Incomplete S3 Block Public Access controls
-- Public ACL grants
-- Bucket policies that allow `Principal: "*"`
+- Public ACL grants that remain effective under Block Public Access and Object Ownership
+- Bucket policies with unrestricted `Principal: "*"` or broad `NotPrincipal`
+- Policy conditions that do not create an AWS-recognized fixed-value access boundary
+- ACL-enabled Object Ownership modes
 - Missing an explicit bucket encryption configuration beyond the S3 SSE-S3 baseline
 - Missing or suspended versioning
 
-Storage input can use either the simplified environment contract or a versioned native evidence bundle containing `ListBuckets`, account and bucket Public Access Block, ACL, policy, default encryption, and versioning responses.
+Storage input can use either the simplified environment contract or a versioned native evidence bundle containing `ListBuckets`, account and bucket Public Access Block, Object Ownership, ACL, policy, default encryption, and versioning responses.
 
-Public ACL and bucket-policy exposure findings account for effective `IgnorePublicAcls` and `RestrictPublicBuckets` controls rather than reporting blocked access paths as active exposure.
+Public ACL and bucket-policy exposure findings account for `BucketOwnerEnforced`, effective `IgnorePublicAcls`, and effective `RestrictPublicBuckets` rather than reporting blocked access paths as active exposure. Wildcard-principal policies are treated as non-public only when a supported positive condition operator fixes access to an AWS-recognized organization, account, source ARN, VPC, VPC endpoint, data access point, or sufficiently narrow source network.
+
+In this module, non-public means that a statement is constrained under the S3 Block Public Access model; it does not mean that the named external account, organization, network, or service is automatically trusted.
 
 Rule catalog:
 
@@ -104,9 +108,10 @@ Rule catalog:
 | --- | --- |
 | `STO-001` | S3 public access block is incomplete |
 | `STO-002` | Bucket ACL grants public access |
-| `STO-003` | Bucket policy allows public principal |
+| `STO-003` | Bucket policy allows an effectively public principal |
 | `STO-004` | Bucket lacks an explicit encryption configuration |
 | `STO-005` | Bucket versioning is not enabled |
+| `STO-006` | Bucket ACLs remain enabled by Object Ownership |
 
 ### Module 4: Network Configuration Analyzer
 

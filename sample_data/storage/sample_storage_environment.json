@@ -3,6 +3,7 @@
   "buckets": [
     {
       "name": "public-customer-exports",
+      "object_ownership": "ObjectWriter",
       "public_access_block": {
         "block_public_acls": false,
         "ignore_public_acls": false,
@@ -24,7 +25,12 @@
             "effect": "Allow",
             "principal": "*",
             "action": "s3:GetObject",
-            "resource": "arn:aws:s3:::public-customer-exports/*"
+            "resource": "arn:aws:s3:::public-customer-exports/*",
+            "condition": {
+              "IpAddress": {
+                "aws:SourceIp": "0.0.0.0/1"
+              }
+            }
           }
         ]
       },
@@ -37,6 +43,7 @@
     },
     {
       "name": "internal-audit-logs",
+      "object_ownership": "BucketOwnerEnforced",
       "public_access_block": {
         "block_public_acls": true,
         "ignore_public_acls": true,
@@ -52,7 +59,20 @@
         ]
       },
       "bucket_policy": {
-        "statements": []
+        "statements": [
+          {
+            "sid": "OrganizationRead",
+            "effect": "Allow",
+            "principal": "*",
+            "action": "s3:GetObject",
+            "resource": "arn:aws:s3:::internal-audit-logs/*",
+            "condition": {
+              "StringEquals": {
+                "aws:PrincipalOrgID": "o-a1b2c3d4e5"
+              }
+            }
+          }
+        ]
       },
       "encryption": {
         "enabled": true,
@@ -64,6 +84,7 @@
     },
     {
       "name": "analytics-raw-data",
+      "object_ownership": "BucketOwnerPreferred",
       "public_access_block": {
         "block_public_acls": true,
         "ignore_public_acls": true,

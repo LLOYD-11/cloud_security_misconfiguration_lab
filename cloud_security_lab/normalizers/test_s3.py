@@ -36,9 +36,17 @@ class NativeS3NormalizerTests(unittest.TestCase):
 
         self.assertEqual((), result.warnings)
         self.assertEqual("111122223333", result.environment["account_id"])
-        self.assertEqual(5, len(findings))
+        self.assertEqual(7, len(findings))
         self.assertEqual(
-            ["STO-002", "STO-003", "STO-001", "STO-005", "STO-005"],
+            [
+                "STO-002",
+                "STO-003",
+                "STO-001",
+                "STO-005",
+                "STO-005",
+                "STO-006",
+                "STO-006",
+            ],
             [finding.rule_id for finding in findings],
         )
         self.assertTrue(
@@ -55,6 +63,15 @@ class NativeS3NormalizerTests(unittest.TestCase):
         self.assertEqual(
             "PublicRead",
             public_bucket["bucket_policy"]["statements"][0]["sid"],
+        )
+        self.assertEqual("ObjectWriter", public_bucket["object_ownership"])
+        self.assertEqual(
+            {"IpAddress": {"aws:SourceIp": "0.0.0.0/1"}},
+            public_bucket["bucket_policy"]["statements"][0]["condition"],
+        )
+        self.assertEqual(
+            "BucketOwnerEnforced",
+            result.environment["buckets"][1]["object_ownership"],
         )
         self.assertEqual(
             "arn:aws:kms:ap-southeast-2:111122223333:key/"
@@ -86,7 +103,7 @@ class NativeS3NormalizerTests(unittest.TestCase):
 
         self.assertEqual(
             [],
-            result.environment["buckets"][1]["bucket_policy"]["statements"],
+            result.environment["buckets"][2]["bucket_policy"]["statements"],
         )
 
     def test_policy_object_and_single_statement_are_supported(self):
@@ -108,6 +125,39 @@ class NativeS3NormalizerTests(unittest.TestCase):
                 "effect"
             ],
         )
+
+    def test_negative_policy_elements_and_conditions_are_preserved(self):
+        bundle = _bundle()
+        bundle["BucketEvidence"][0]["GetBucketPolicy"]["Policy"] = {
+            "Statement": {
+                "Sid": "BroadExceptOwner",
+                "Effect": "Allow",
+                "NotPrincipal": {
+                    "AWS": "arn:aws:iam::111122223333:root",
+                },
+                "NotAction": "s3:DeleteObject",
+                "NotResource": "arn:aws:s3:::public-customer-exports/private/*",
+                "Condition": {
+                    "StringLike": {"aws:SourceVpc": "vpc-*"},
+                },
+            }
+        }
+
+        result = normalize_aws_s3_environment(bundle)
+        statement = result.environment["buckets"][0]["bucket_policy"]["statements"][0]
+        findings = analyze_environment(result.environment)
+
+        self.assertEqual(
+            {
+                "AWS": "arn:aws:iam::111122223333:root",
+            },
+            statement["not_principal"],
+        )
+        self.assertEqual("s3:DeleteObject", statement["not_action"])
+        policy_finding = next(
+            finding.evidence for finding in findings if finding.rule_id == "STO-003"
+        )
+        self.assertIn("NotPrincipal", policy_finding)
 
     def test_default_encryption_can_coexist_with_an_additional_rule(self):
         bundle = _bundle()
@@ -212,6 +262,7 @@ class NativeS3NormalizerTests(unittest.TestCase):
         cases = (
             ("AccountPublicAccessBlock", None),
             ("GetPublicAccessBlock", 0),
+            ("GetBucketOwnershipControls", 0),
             ("GetBucketPolicy", 0),
             ("GetBucketAcl", 0),
             ("GetBucketEncryption", 0),
@@ -228,6 +279,58 @@ class NativeS3NormalizerTests(unittest.TestCase):
                 target[field] = {"Error": {"Code": "AccessDenied"}}
                 with self.assertRaisesRegex(ValueError, "AWS error AccessDenied"):
                     normalize_aws_s3_environment(bundle)
+
+    def test_missing_ownership_controls_use_legacy_object_writer_behavior(self):
+        bundle = _bundle()
+        bundle["BucketEvidence"][0]["GetBucketOwnershipControls"] = {
+            "Error": {"Code": "OwnershipControlsNotFoundError"}
+        }
+
+        result = normalize_aws_s3_environment(bundle)
+
+        self.assertEqual(
+            "ObjectWriter",
+            result.environment["buckets"][0]["object_ownership"],
+        )
+        self.assertIn("legacy ACL-enabled ObjectWriter", result.warnings[0])
+
+    def test_ownership_control_shape_and_value_are_validated(self):
+        cases = (
+            ({"OwnershipControls": {"Rules": []}}, "exactly one rule"),
+            (
+                {
+                    "OwnershipControls": {
+                        "Rules": [
+                            {"ObjectOwnership": "ObjectWriter"},
+                            {"ObjectOwnership": "BucketOwnerEnforced"},
+                        ]
+                    }
+                },
+                "exactly one rule",
+            ),
+            (
+                {
+                    "OwnershipControls": {
+                        "Rules": [{"ObjectOwnership": "Unknown"}]
+                    }
+                },
+                "must be BucketOwnerEnforced",
+            ),
+        )
+        for ownership_controls, message in cases:
+            with self.subTest(message=message):
+                bundle = _bundle()
+                bundle["BucketEvidence"][0]["GetBucketOwnershipControls"] = (
+                    ownership_controls
+                )
+
+                with self.assertRaisesRegex(ValueError, message):
+                    normalize_aws_s3_environment(bundle)
+
+        missing_bundle = _bundle()
+        del missing_bundle["BucketEvidence"][0]["GetBucketOwnershipControls"]
+        with self.assertRaisesRegex(ValueError, "GetBucketOwnershipControls must be an object"):
+            normalize_aws_s3_environment(missing_bundle)
 
     def test_malformed_public_access_block_is_rejected(self):
         bundle = _bundle()
