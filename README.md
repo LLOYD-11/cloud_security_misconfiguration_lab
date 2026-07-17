@@ -4,7 +4,7 @@ This project is an offline-first AWS security analysis lab for identifying risky
 
 The goal is to provide practical and explainable security findings without requiring cloud credentials or making changes to a live AWS account.
 
-The repository includes four analyzers, native AWS IAM, S3, and EC2 security-group input normalization, a versioned shared finding contract, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
+The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, a versioned shared finding contract, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
 
 ## Quick Start
 
@@ -131,6 +131,8 @@ The CloudTrail detector checks sample audit events for suspicious cloud API acti
 
 Duplicate CloudTrail events with the same `eventID` are analyzed once. Failed API calls remain available to the failure-spike detector but are not reported as successful configuration changes.
 
+CloudTrail input can use either the simplified event contract or one or more native `Records` log files in JSON or gzip format. Native normalization validates version 1.x records, UTC timestamps, identity and account context, and event GUIDs before merging files. Identical duplicate events are skipped with a warning; conflicting records sharing an ID stop analysis.
+
 Rule catalog:
 
 | Rule | Risk Pattern |
@@ -184,6 +186,17 @@ python3 -m cloud_security_lab analyze network \
   --input-format aws \
   --normalized-output reports/generated/normalized_network_environment.json \
   --output reports/generated/network_findings.json
+```
+
+Analyze the bundled native CloudTrail JSON and gzip files:
+
+```bash
+python3 -m cloud_security_lab analyze cloudtrail \
+  sample_data/aws/cloudtrail/111122223333_CloudTrail_20260630T0200Z_part1.json \
+  sample_data/aws/cloudtrail/111122223333_CloudTrail_20260630T0300Z_part2.json.gz \
+  --input-format aws \
+  --normalized-output reports/generated/normalized_cloudtrail_environment.json \
+  --output reports/generated/cloudtrail_findings.json
 ```
 
 Merge one or more versioned finding files:
@@ -254,6 +267,7 @@ cloud_security_misconfiguration_lab/
 │   ├── __main__.py
 │   ├── cli.py
 │   └── normalizers/
+│       ├── cloudtrail.py
 │       ├── common.py
 │       ├── ec2.py
 │       ├── iam.py
@@ -280,11 +294,15 @@ cloud_security_misconfiguration_lab/
 │   └── cloud_security_report_sample.md
 ├── schemas/
 │   ├── findings-v1.0.schema.json
+│   ├── aws-cloudtrail-records-v1.0.schema.json
 │   ├── aws-iam-authorization-details-v1.0.schema.json
 │   ├── aws-ec2-describe-security-groups-v1.0.schema.json
 │   ├── aws-s3-evidence-bundle-v1.0.schema.json
 │   └── *-environment-v1.0.schema.json
 ├── sample_data/
+│   ├── aws/cloudtrail/
+│   │   ├── 111122223333_CloudTrail_20260630T0200Z_part1.json
+│   │   └── 111122223333_CloudTrail_20260630T0300Z_part2.json.gz
 │   ├── aws/iam/
 │   │   ├── account_authorization_details.json
 │   │   └── credential_report.csv

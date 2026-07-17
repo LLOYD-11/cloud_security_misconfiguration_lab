@@ -1,4 +1,5 @@
 import copy
+import gzip
 import json
 import tempfile
 import unittest
@@ -7,11 +8,16 @@ from pathlib import Path
 from jsonschema import Draft202012Validator, FormatChecker
 
 from cloud_findings import write_findings
+from cloud_security_lab.normalizers.cloudtrail import load_aws_cloudtrail_environment
 from cloud_security_lab.normalizers.ec2 import load_aws_ec2_environment
 from iam_analyzer.analyzer import analyze_environment, load_environment
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SCHEMA_SAMPLE_PAIRS = (
+    (
+        "aws-cloudtrail-records-v1.0.schema.json",
+        "sample_data/aws/cloudtrail/111122223333_CloudTrail_20260630T0200Z_part1.json",
+    ),
     (
         "aws-ec2-describe-security-groups-v1.0.schema.json",
         "sample_data/aws/ec2/describe_security_groups.json",
@@ -92,6 +98,40 @@ class DataContractTests(unittest.TestCase):
 
         Draft202012Validator.check_schema(schema)
         Draft202012Validator(schema).validate(result.environment)
+
+    def test_gzip_cloudtrail_sample_and_normalized_environment_match_contracts(self):
+        native_schema = _load_json(
+            PROJECT_ROOT / "schemas/aws-cloudtrail-records-v1.0.schema.json"
+        )
+        gzip_path = (
+            PROJECT_ROOT
+            / "sample_data/aws/cloudtrail/"
+            "111122223333_CloudTrail_20260630T0300Z_part2.json.gz"
+        )
+        with gzip.open(gzip_path, "rt", encoding="utf-8") as handle:
+            gzip_payload = json.load(handle)
+
+        validator = Draft202012Validator(
+            native_schema,
+            format_checker=FormatChecker(),
+        )
+        validator.validate(gzip_payload)
+
+        normalized_schema = _load_json(
+            PROJECT_ROOT / "schemas/cloudtrail-events-v1.0.schema.json"
+        )
+        result = load_aws_cloudtrail_environment(
+            (
+                PROJECT_ROOT
+                / "sample_data/aws/cloudtrail/"
+                "111122223333_CloudTrail_20260630T0200Z_part1.json",
+                gzip_path,
+            )
+        )
+        Draft202012Validator(
+            normalized_schema,
+            format_checker=FormatChecker(),
+        ).validate(result.environment)
 
     def test_generated_findings_match_shared_contract(self):
         schema = _load_json(PROJECT_ROOT / "schemas/findings-v1.0.schema.json")

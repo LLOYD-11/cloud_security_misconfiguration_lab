@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/schemas/aws-cloudtrail-records-v1.0.schema.json",
+  "title": "AWS CloudTrail Log File Records v1.0",
+  "type": "object",
+  "required": [
+    "Records"
+  ],
+  "properties": {
+    "Records": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "awsAccountId": {
+      "type": "string",
+      "pattern": "^[0-9]{12}$"
+    },
+    "identity": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "type": "string",
+          "minLength": 1
+        },
+        "principalId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "arn": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accountId": {
+          "$ref": "#/$defs/awsAccountId"
+        },
+        "userName": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": true
+    },
+    "event": {
+      "type": "object",
+      "anyOf": [
+        {
+          "required": [
+            "recipientAccountId"
+          ]
+        },
+        {
+          "properties": {
+            "userIdentity": {
+              "required": [
+                "accountId"
+              ]
+            }
+          }
+        },
+        {
+          "properties": {
+            "userIdentity": {
+              "required": [
+                "arn"
+              ],
+              "properties": {
+                "arn": {
+                  "pattern": "^arn:[^:]+:[^:]*:[^:]*:[0-9]{12}:"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "required": [
+        "eventVersion",
+        "userIdentity",
+        "eventTime",
+        "eventSource",
+        "eventName",
+        "awsRegion",
+        "sourceIPAddress",
+        "eventID"
+      ],
+      "properties": {
+        "eventVersion": {
+          "type": "string",
+          "pattern": "^1\\.[0-9]+$"
+        },
+        "userIdentity": {
+          "$ref": "#/$defs/identity"
+        },
+        "eventTime": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "(Z|[+-]00:00)$"
+        },
+        "eventSource": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eventName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "awsRegion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceIPAddress": {
+          "type": "string",
+          "minLength": 1
+        },
+        "userAgent": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requestParameters": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "responseElements": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "errorCode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "errorMessage": {
+          "type": "string"
+        },
+        "requestID": {
+          "type": "string",
+          "minLength": 1
+        },
+        "eventID": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "eventType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "readOnly": {
+          "type": "boolean"
+        },
+        "managementEvent": {
+          "type": "boolean"
+        },
+        "recipientAccountId": {
+          "$ref": "#/$defs/awsAccountId"
+        },
+        "eventCategory": {
+          "enum": [
+            "Management",
+            "Data",
+            "NetworkActivity"
+          ]
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

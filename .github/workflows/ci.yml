@@ -76,6 +76,15 @@ jobs:
           --normalized-output reports/generated/normalized_network_environment.json
           --output reports/generated/native_network_findings.json
 
+      - name: Verify native CloudTrail input pipeline
+        run: >-
+          python -m cloud_security_lab analyze cloudtrail
+          sample_data/aws/cloudtrail/111122223333_CloudTrail_20260630T0200Z_part1.json
+          sample_data/aws/cloudtrail/111122223333_CloudTrail_20260630T0300Z_part2.json.gz
+          --input-format aws
+          --normalized-output reports/generated/normalized_cloudtrail_environment.json
+          --output reports/generated/native_cloudtrail_findings.json
+
       - name: Build wheel and source distribution
         if: matrix.python-version == '3.13'
         run: python -m build

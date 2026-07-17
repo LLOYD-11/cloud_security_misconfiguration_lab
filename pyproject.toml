@@ -63,6 +63,10 @@ include = [
 ]
 "share/cloud-security-misconfiguration-lab/sample_data/aws/s3" = ["sample_data/aws/s3/*.json"]
 "share/cloud-security-misconfiguration-lab/sample_data/aws/ec2" = ["sample_data/aws/ec2/*.json"]
+"share/cloud-security-misconfiguration-lab/sample_data/aws/cloudtrail" = [
+  "sample_data/aws/cloudtrail/*.json",
+  "sample_data/aws/cloudtrail/*.json.gz",
+]
 "share/cloud-security-misconfiguration-lab/sample_data/storage" = ["sample_data/storage/*.json"]
 "share/cloud-security-misconfiguration-lab/sample_data/network" = ["sample_data/network/*.json"]
 "share/cloud-security-misconfiguration-lab/sample_data/cloudtrail" = ["sample_data/cloudtrail/*.json"]

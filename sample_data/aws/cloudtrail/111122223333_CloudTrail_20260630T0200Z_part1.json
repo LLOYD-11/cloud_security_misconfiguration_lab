@@ -1,0 +1,201 @@
+{
+  "Records": [
+    {
+      "eventVersion": "1.11",
+      "userIdentity": {
+        "type": "Root",
+        "principalId": "111122223333",
+        "arn": "arn:aws:iam::111122223333:root",
+        "accountId": "111122223333"
+      },
+      "eventTime": "2026-06-30T01:00:00Z",
+      "eventSource": "signin.amazonaws.com",
+      "eventName": "ConsoleLogin",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "203.0.113.10",
+      "userAgent": "Mozilla/5.0",
+      "requestParameters": null,
+      "responseElements": {
+        "ConsoleLogin": "Success"
+      },
+      "eventID": "00000000-0000-4000-8000-000000000001",
+      "eventType": "AwsConsoleSignIn",
+      "readOnly": false,
+      "managementEvent": true,
+      "recipientAccountId": "111122223333",
+      "eventCategory": "Management"
+    },
+    {
+      "eventVersion": "1.11",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEALICEADMIN",
+        "arn": "arn:aws:iam::111122223333:user/alice-admin",
+        "accountId": "111122223333",
+        "userName": "alice-admin"
+      },
+      "eventTime": "2026-06-30T01:04:00Z",
+      "eventSource": "iam.amazonaws.com",
+      "eventName": "DeactivateMFADevice",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "aws-cli/2.x",
+      "requestParameters": {
+        "userName": "alice-admin",
+        "serialNumber": "arn:aws:iam::111122223333:mfa/alice-admin"
+      },
+      "responseElements": null,
+      "eventID": "00000000-0000-4000-8000-000000000002",
+      "eventType": "AwsApiCall",
+      "readOnly": false,
+      "managementEvent": true,
+      "recipientAccountId": "111122223333",
+      "eventCategory": "Management"
+    },
+    {
+      "eventVersion": "1.11",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEALICEADMIN",
+        "arn": "arn:aws:iam::111122223333:user/alice-admin",
+        "accountId": "111122223333",
+        "userName": "alice-admin"
+      },
+      "eventTime": "2026-06-30T01:09:00Z",
+      "eventSource": "ec2.amazonaws.com",
+      "eventName": "AuthorizeSecurityGroupIngress",
+      "awsRegion": "ap-southeast-2",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "aws-cli/2.x",
+      "requestParameters": {
+        "groupId": "sg-00000000000000001",
+        "ipPermissions": [
+          {
+            "fromPort": 22,
+            "toPort": 22,
+            "ipRanges": [
+              {
+                "cidrIp": "0.0.0.0/0"
+              }
+            ]
+          }
+        ]
+      },
+      "responseElements": null,
+      "eventID": "00000000-0000-4000-8000-000000000003",
+      "eventType": "AwsApiCall",
+      "readOnly": false,
+      "managementEvent": true,
+      "recipientAccountId": "111122223333",
+      "eventCategory": "Management"
+    },
+    {
+      "eventVersion": "1.11",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEALICEADMIN",
+        "arn": "arn:aws:iam::111122223333:user/alice-admin",
+        "accountId": "111122223333",
+        "userName": "alice-admin"
+      },
+      "eventTime": "2026-06-30T01:12:00Z",
+      "eventSource": "s3.amazonaws.com",
+      "eventName": "PutBucketPolicy",
+      "awsRegion": "ap-southeast-2",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "aws-cli/2.x",
+      "requestParameters": {
+        "bucketName": "public-customer-exports"
+      },
+      "responseElements": null,
+      "eventID": "00000000-0000-4000-8000-000000000004",
+      "eventType": "AwsApiCall",
+      "readOnly": false,
+      "managementEvent": true,
+      "recipientAccountId": "111122223333",
+      "eventCategory": "Management"
+    },
+    {
+      "eventVersion": "1.11",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEALICEADMIN",
+        "arn": "arn:aws:iam::111122223333:user/alice-admin",
+        "accountId": "111122223333",
+        "userName": "alice-admin"
+      },
+      "eventTime": "2026-06-30T01:15:00Z",
+      "eventSource": "iam.amazonaws.com",
+      "eventName": "CreatePolicyVersion",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "aws-cli/2.x",
+      "requestParameters": {
+        "policyArn": "arn:aws:iam::111122223333:policy/OverBroadAdminPolicy",
+        "setAsDefault": true
+      },
+      "responseElements": null,
+      "eventID": "00000000-0000-4000-8000-000000000005",
+      "eventType": "AwsApiCall",
+      "readOnly": false,
+      "managementEvent": true,
+      "recipientAccountId": "111122223333",
+      "eventCategory": "Management"
+    },
+    {
+      "eventVersion": "1.11",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEUNKNOWNUSER",
+        "arn": "arn:aws:iam::111122223333:user/unknown-user",
+        "accountId": "111122223333",
+        "userName": "unknown-user"
+      },
+      "eventTime": "2026-06-30T02:00:00Z",
+      "eventSource": "sts.amazonaws.com",
+      "eventName": "AssumeRole",
+      "awsRegion": "ap-southeast-2",
+      "sourceIPAddress": "192.0.2.44",
+      "userAgent": "aws-cli/2.x",
+      "requestParameters": {
+        "roleArn": "arn:aws:iam::111122223333:role/Admin"
+      },
+      "responseElements": null,
+      "errorCode": "AccessDenied",
+      "errorMessage": "User is not authorized to perform sts:AssumeRole",
+      "eventID": "00000000-0000-4000-8000-000000000006",
+      "eventType": "AwsApiCall",
+      "readOnly": false,
+      "managementEvent": true,
+      "recipientAccountId": "111122223333",
+      "eventCategory": "Management"
+    },
+    {
+      "eventVersion": "1.11",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEUNKNOWNUSER",
+        "arn": "arn:aws:iam::111122223333:user/unknown-user",
+        "accountId": "111122223333",
+        "userName": "unknown-user"
+      },
+      "eventTime": "2026-06-30T02:01:00Z",
+      "eventSource": "sts.amazonaws.com",
+      "eventName": "AssumeRole",
+      "awsRegion": "ap-southeast-2",
+      "sourceIPAddress": "192.0.2.44",
+      "userAgent": "aws-cli/2.x",
+      "requestParameters": {
+        "roleArn": "arn:aws:iam::111122223333:role/Admin"
+      },
+      "responseElements": null,
+      "errorCode": "AccessDenied",
+      "eventID": "00000000-0000-4000-8000-000000000007",
+      "eventType": "AwsApiCall",
+      "readOnly": false,
+      "managementEvent": true,
+      "recipientAccountId": "111122223333",
+      "eventCategory": "Management"
+    }
+  ]
+}

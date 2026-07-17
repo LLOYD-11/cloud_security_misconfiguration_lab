@@ -20,6 +20,8 @@ All notable changes to this project are documented in this file.
 - Support for the 2026 S3 `BlockedEncryptionTypes` response shape while preserving the universal SSE-S3 baseline.
 - Native EC2 `DescribeSecurityGroups` normalization with strict identity, protocol, port, CIDR, and pagination validation.
 - A versioned native EC2 schema, AWS-shape security-group sample, normalized evidence export, CI pipeline verification, and regression tests.
+- Native CloudTrail `Records` normalization for multiple JSON and gzip log files, with event-version, timestamp, identity, account, and GUID validation.
+- AWS-shape CloudTrail log samples, a versioned native schema, duplicate-event warnings, conflicting-event rejection, and native pipeline verification.
 
 ### Changed
 
@@ -34,6 +36,7 @@ All notable changes to this project are documented in this file.
 - Unversioned legacy finding lists are rejected by the report pipeline.
 - Sample data and schemas are included in built distributions so the demo command works outside a source checkout.
 - Network environments can preserve security-group and prefix-list peers plus owner, VPC, ARN, tag, and peering context without treating unresolved peers as public CIDRs.
+- Unified analysis accepts multiple positional inputs for native CloudTrail while retaining single-file behavior for simplified and other native module inputs.
 
 ## 1.0.0 - 2026-06-30
 

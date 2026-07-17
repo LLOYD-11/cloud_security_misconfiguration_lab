@@ -1,6 +1,6 @@
 # Native AWS Inputs
 
-The IAM, storage, and network analyzers can consume exported AWS API evidence without requiring the lab to hold cloud credentials or call a live account.
+All four analyzers can consume exported AWS API evidence without requiring the lab to hold cloud credentials or call a live account.
 
 ## IAM Evidence
 
@@ -189,3 +189,60 @@ Current EC2 references:
 - [DescribeSecurityGroups CLI](https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-security-groups.html)
 - [IpPermission API](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_IpPermission.html)
 - [Security group rule components](https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html)
+
+## CloudTrail Log Evidence
+
+CloudTrail trail log objects are JSON text delivered to S3 in gzip archives. Each supported file contains a top-level `Records` list. Download logs only from a trail and S3 bucket that you own or are authorized to assess. A representative collection command is:
+
+```bash
+aws s3 cp s3://authorized-cloudtrail-bucket/AWSLogs/111122223333/CloudTrail/ \
+  ./cloudtrail-logs/ \
+  --recursive \
+  --exclude "*" \
+  --include "*.json.gz"
+```
+
+The supported direct-log contract is [`aws-cloudtrail-records-v1.0.schema.json`](../schemas/aws-cloudtrail-records-v1.0.schema.json). CloudTrail Insight, aggregated-event, and digest files use different structures and are not accepted by this adapter.
+
+### Analyze CloudTrail Evidence
+
+Pass one or more downloaded `.json` or `.json.gz` files as positional inputs:
+
+```bash
+python3 -m cloud_security_lab analyze cloudtrail \
+  cloudtrail-logs/first.json.gz \
+  cloudtrail-logs/second.json.gz \
+  --input-format aws \
+  --normalized-output reports/generated/normalized_cloudtrail_environment.json \
+  --output reports/generated/cloudtrail_findings.json
+```
+
+The bundled sample demonstrates one uncompressed file and one gzip file:
+
+```bash
+python3 -m cloud_security_lab analyze cloudtrail \
+  sample_data/aws/cloudtrail/111122223333_CloudTrail_20260630T0200Z_part1.json \
+  sample_data/aws/cloudtrail/111122223333_CloudTrail_20260630T0300Z_part2.json.gz \
+  --input-format aws
+```
+
+### CloudTrail Normalization Behavior
+
+The adapter:
+
+- Reads multiple UTF-8 JSON or gzip-compressed JSON files and requires a non-empty `Records` list in each.
+- Accepts CloudTrail event format major version 1 and preserves compatible minor-version fields.
+- Validates event GUIDs, UTC timestamps, service, action, Region, source, identity, request/response shapes, and account identifiers.
+- Uses `recipientAccountId` as the evidence-account boundary, falling back to `userIdentity.accountId` or its ARN for older records.
+- Requires all unique records in one analysis to resolve to the same recipient account.
+- Removes identical duplicate records by `eventID` with a warning and rejects conflicting records that reuse an ID.
+- Writes the merged environment through `--normalized-output` so the detector input remains inspectable.
+
+The adapter loads evidence into memory and does not verify CloudTrail digest signatures. The detector still applies a selected rule catalog rather than reconstructing every request or correlating a full incident.
+
+Current CloudTrail references:
+
+- [CloudTrail record contents](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html)
+- [Getting and viewing CloudTrail log files](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/get-and-view-cloudtrail-log-files.html)
+- [CloudTrail log file examples](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-log-file-examples.html)
+- [Downloading CloudTrail log files](https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-read-log-files.html)

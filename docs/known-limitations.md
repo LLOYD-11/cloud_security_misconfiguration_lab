@@ -4,8 +4,8 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 
 ## Input Compatibility
 
-- IAM, storage, and network accept documented simplified inputs or versioned native AWS evidence. CloudTrail still requires its simplified model.
-- CloudTrail input currently expects an `events` list and does not yet read `Records` payloads or gzip archives.
+- All four analyzers accept documented simplified inputs or versioned native AWS evidence.
+- Native CloudTrail input supports standard `Records` log files in JSON or gzip form, not CloudTrail Insight, aggregated-event, or digest payloads.
 - Evidence is loaded into memory and is intended for small lab datasets.
 
 ## IAM Analysis
@@ -37,6 +37,9 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 
 ## CloudTrail Detection
 
+- Native CloudTrail normalization accepts one recipient account per analysis. Organization-trail accounts must currently be analyzed separately.
+- Identical duplicate `eventID` records are removed with a warning, while conflicting records using the same ID stop analysis.
+- The lab does not verify CloudTrail digest signatures or prove log-file integrity.
 - Change rules identify selected high-value API names but do not inspect policy diffs or all request parameters.
 - Repeated API failures can be caused by legitimate automation, probing, throttling, or configuration mistakes.
 - Related events are not yet correlated into a single incident or attack timeline.

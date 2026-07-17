@@ -2,7 +2,7 @@
 
 This module analyzes offline CloudTrail-style event data for suspicious cloud API activity.
 
-It does not call AWS APIs or require cloud credentials. The sample data models audit events commonly reviewed during cloud incident triage.
+It does not call AWS APIs or require cloud credentials. The simplified model can be analyzed directly, while the unified CLI can normalize one or more native CloudTrail `Records` files in JSON or gzip format.
 
 ## Detection Rules
 
@@ -46,6 +46,19 @@ python3 cloudtrail_detector/detector.py \
 ```
 
 The exported JSON can be passed directly to `report_generator/generate_report.py`.
+
+Analyze the bundled native JSON and gzip log files through the unified CLI:
+
+```bash
+python3 -m cloud_security_lab analyze cloudtrail \
+  sample_data/aws/cloudtrail/111122223333_CloudTrail_20260630T0200Z_part1.json \
+  sample_data/aws/cloudtrail/111122223333_CloudTrail_20260630T0300Z_part2.json.gz \
+  --input-format aws \
+  --normalized-output reports/generated/normalized_cloudtrail_environment.json \
+  --output reports/generated/cloudtrail_findings.json
+```
+
+See [`docs/native-aws-inputs.md`](../docs/native-aws-inputs.md) for collection guidance, duplicate-event handling, and evidence boundaries.
 
 ## Test
 

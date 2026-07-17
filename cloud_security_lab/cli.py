@@ -13,6 +13,7 @@ from typing import Any, Callable, Sequence
 from cloud_findings import Finding, write_findings
 from cloud_security_lab import __version__
 from cloud_security_lab.normalizers import (
+    load_aws_cloudtrail_environment,
     load_aws_ec2_environment,
     load_aws_iam_environment,
     load_aws_s3_environment,
@@ -131,6 +132,7 @@ def _analyze(
 
 
 def _run_analyze(args: argparse.Namespace) -> int:
+    input_paths: list[Path] = args.input
     if args.module != "cloudtrail" and (
         args.failure_threshold != 5 or args.failure_window_minutes != 10
     ):
@@ -139,6 +141,8 @@ def _run_analyze(args: argparse.Namespace) -> int:
         )
     native_auxiliary_options = args.credential_report is not None or args.as_of is not None
     if args.input_format == "simplified":
+        if len(input_paths) != 1:
+            raise ValueError("Simplified analyzer input accepts exactly one JSON file")
         if native_auxiliary_options or args.normalized_output is not None:
             raise ValueError(
                 "--credential-report, --as-of, and --normalized-output require "
@@ -146,16 +150,20 @@ def _run_analyze(args: argparse.Namespace) -> int:
             )
         findings = _analyze(
             args.module,
-            args.input,
+            input_paths[0],
             failure_threshold=args.failure_threshold,
             failure_window_minutes=args.failure_window_minutes,
         )
     else:
+        if args.module != "cloudtrail" and len(input_paths) != 1:
+            raise ValueError(
+                "Multiple AWS input files are supported only for the cloudtrail module"
+            )
         if args.module == "iam":
             if args.credential_report is None:
                 raise ValueError("--credential-report is required for AWS IAM input")
             iam_result = load_aws_iam_environment(
-                args.input,
+                input_paths[0],
                 args.credential_report,
                 as_of=args.as_of or date.today(),
             )
@@ -165,21 +173,32 @@ def _run_analyze(args: argparse.Namespace) -> int:
         elif args.module == "storage":
             if native_auxiliary_options:
                 raise ValueError("--credential-report and --as-of are only valid for AWS IAM input")
-            s3_result = load_aws_s3_environment(args.input)
+            s3_result = load_aws_s3_environment(input_paths[0])
             normalized_environment = s3_result.environment
             normalization_warnings = s3_result.warnings
             findings = analyze_storage(normalized_environment)
         elif args.module == "network":
             if native_auxiliary_options:
                 raise ValueError("--credential-report and --as-of are only valid for AWS IAM input")
-            ec2_result = load_aws_ec2_environment(args.input)
+            ec2_result = load_aws_ec2_environment(input_paths[0])
             normalized_environment = ec2_result.environment
             normalization_warnings = ec2_result.warnings
             findings = analyze_network(normalized_environment)
-        else:
-            raise ValueError(
-                "AWS input format is currently supported only for iam, storage, and network"
+        elif args.module == "cloudtrail":
+            if native_auxiliary_options:
+                raise ValueError(
+                    "--credential-report and --as-of are only valid for AWS IAM input"
+                )
+            cloudtrail_result = load_aws_cloudtrail_environment(input_paths)
+            normalized_environment = cloudtrail_result.environment
+            normalization_warnings = cloudtrail_result.warnings
+            findings = analyze_cloudtrail(
+                normalized_environment,
+                failure_threshold=args.failure_threshold,
+                failure_window_minutes=args.failure_window_minutes,
             )
+        else:
+            raise ValueError(f"Unsupported analyzer module: {args.module}")
 
         for warning in normalization_warnings:
             print(f"Warning: {warning}", file=sys.stderr)
@@ -240,13 +259,18 @@ def build_parser() -> argparse.ArgumentParser:
 
     analyze_parser = subparsers.add_parser("analyze", help="Run one analyzer.")
     analyze_parser.add_argument("module", choices=tuple(ANALYZERS))
-    analyze_parser.add_argument("input", type=Path, help="Path to the module input JSON file.")
+    analyze_parser.add_argument(
+        "input",
+        type=Path,
+        nargs="+",
+        help="Module input path. Native CloudTrail accepts multiple JSON or JSON.GZ files.",
+    )
     analyze_parser.add_argument("--output", type=Path, help="Optional findings JSON output path.")
     analyze_parser.add_argument(
         "--input-format",
         choices=("simplified", "aws"),
         default="simplified",
-        help="Input contract. AWS is currently supported by IAM, storage, and network.",
+        help="Input contract. AWS is supported by all four modules.",
     )
     analyze_parser.add_argument(
         "--credential-report",

@@ -125,6 +125,41 @@ class UnifiedCliTests(unittest.TestCase):
         self.assertIn("prefix-list targets", stderr.getvalue())
         self.assertIn("security-group targets", stderr.getvalue())
 
+    def test_analyze_native_cloudtrail_merges_json_and_gzip_inputs(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = Path(tmpdir) / "cloudtrail.json"
+            normalized_path = Path(tmpdir) / "normalized-cloudtrail.json"
+            sample_root = PROJECT_ROOT / "sample_data/aws/cloudtrail"
+            with redirect_stdout(StringIO()), redirect_stderr(StringIO()) as stderr:
+                result = main(
+                    [
+                        "analyze",
+                        "cloudtrail",
+                        str(
+                            sample_root
+                            / "111122223333_CloudTrail_20260630T0200Z_part1.json"
+                        ),
+                        str(
+                            sample_root
+                            / "111122223333_CloudTrail_20260630T0300Z_part2.json.gz"
+                        ),
+                        "--input-format",
+                        "aws",
+                        "--normalized-output",
+                        str(normalized_path),
+                        "--output",
+                        str(output_path),
+                    ]
+                )
+
+            payload = json.loads(output_path.read_text(encoding="utf-8"))
+            normalized = json.loads(normalized_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(0, result)
+        self.assertEqual(6, payload["finding_count"])
+        self.assertEqual(12, len(normalized["events"]))
+        self.assertIn("Skipped 1 duplicate", stderr.getvalue())
+
     def test_demo_runs_all_modules_and_writes_report(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             output_dir = Path(tmpdir) / "generated"
@@ -234,23 +269,30 @@ class UnifiedCliTests(unittest.TestCase):
 
         self.assertEqual(2, context.exception.code)
 
-    def test_aws_input_is_rejected_for_unsupported_modules(self):
+    def test_multiple_aws_inputs_are_rejected_for_non_cloudtrail_module(self):
         with redirect_stderr(StringIO()) as stderr, self.assertRaises(SystemExit) as context:
+            path = PROJECT_ROOT / "sample_data/aws/ec2/describe_security_groups.json"
             main(
                 [
                     "analyze",
-                    "cloudtrail",
-                    str(
-                        PROJECT_ROOT
-                        / "sample_data/cloudtrail/sample_cloudtrail_events.json"
-                    ),
+                    "network",
+                    str(path),
+                    str(path),
                     "--input-format",
                     "aws",
                 ]
             )
 
         self.assertEqual(2, context.exception.code)
-        self.assertIn("only for iam, storage, and network", stderr.getvalue())
+        self.assertIn("only for the cloudtrail module", stderr.getvalue())
+
+    def test_multiple_simplified_inputs_are_rejected(self):
+        with redirect_stderr(StringIO()) as stderr, self.assertRaises(SystemExit) as context:
+            path = PROJECT_ROOT / "sample_data/cloudtrail/sample_cloudtrail_events.json"
+            main(["analyze", "cloudtrail", str(path), str(path)])
+
+        self.assertEqual(2, context.exception.code)
+        self.assertIn("exactly one JSON file", stderr.getvalue())
 
 
 if __name__ == "__main__":
