@@ -166,6 +166,7 @@ Do not add `--filters`, `--group-ids`, `--max-items`, or `--no-paginate`. The in
 python3 -m cloud_security_lab analyze network \
   describe-security-groups.json \
   --input-format aws \
+  --reachability-context network-reachability-context.json \
   --normalized-output reports/generated/normalized_network_environment.json \
   --output reports/generated/network_findings.json
 ```
@@ -175,8 +176,28 @@ The bundled native-shape sample can be analyzed with the same command:
 ```bash
 python3 -m cloud_security_lab analyze network \
   sample_data/aws/ec2/describe_security_groups.json \
-  --input-format aws
+  --input-format aws \
+  --reachability-context sample_data/aws/ec2/network_reachability_context.json
 ```
+
+`--reachability-context` is optional. Without it, the analyzer reports security-group permission risk with `reachability_status: not_assessed`.
+
+### Optional Reachability Evidence
+
+`DescribeSecurityGroups` cannot prove end-to-end connectivity. Internet access can also depend on public addresses, internet gateways, routes, network interfaces, load balancers, network ACLs, and other controls. AWS Reachability Analyzer models these path components without sending packets; Network Access Analyzer can identify network paths matching a scope.
+
+The lab accepts a separate, versioned assessor-supplied conclusion through [`network-reachability-context-v1.0.schema.json`](../schemas/network-reachability-context-v1.0.schema.json). Each entry must identify:
+
+- The matching security-group ID.
+- An assessment method and RFC 3339 observation timestamp.
+- Independent ingress and egress status: `reachable`, `not_reachable`, or `inconclusive`.
+- A direction-specific scope describing the covered attachments, address families, protocols, ports, and paths.
+- At least one evidence statement per direction.
+- Optional related AWS resource IDs.
+
+The adapter rejects duplicate or unknown security-group IDs, unsupported methods and statuses, timestamps without offsets, empty scope or evidence, and extra fields. Partial context is accepted with a warning; uncovered groups remain `not_assessed`. When an auxiliary file is supplied, it replaces the environment's complete embedded context set so stale unmatched assessments cannot survive silently.
+
+This is an evidence-attestation contract, not a raw AWS export parser. A status applies to every finding covered by the stated direction scope, so use `inconclusive` unless the assessment covers every relevant attachment, address family, protocol, port, and intermediary path in that scope. AWS Reachability Analyzer and Network Access Analyzer are currently IPv4-only; they must not be cited as evidence for IPv6 conclusions. The lab does not query an account, reproduce the path calculation, or verify that the stated resource IDs and conclusions match live AWS configuration. Keep the source AWS analysis or approved topology review with the assessment record, and refresh it after network changes.
 
 ### EC2 Normalization Behavior
 
@@ -189,14 +210,18 @@ The adapter:
 - Flattens each IPv4 range, IPv6 range, prefix-list entry, and referenced security group into one normalized rule while preserving descriptions and peer context.
 - Preserves group names, descriptions, owner IDs, VPC IDs, ARNs, and tags for traceability.
 - Emits visible warnings when prefix-list or security-group targets are present.
+- Optionally attaches validated, point-in-time reachability conclusions before detection and normalized evidence export.
 
-The analyzer currently evaluates public exposure only for explicit CIDR targets. It does not retrieve prefix-list members, expand referenced security groups, or prove workload reachability through routes, public addresses, network interfaces, load balancers, or network ACLs. A filtered AWS response has no self-describing filter marker, so completeness also depends on using the documented unfiltered collection command.
+The analyzer evaluates public exposure only for explicit CIDR targets. It does not retrieve prefix-list members or expand referenced security groups. It does not independently prove workload reachability; optional context can supply a separately obtained conclusion and is reported with its method, timestamp, and evidence. A filtered AWS response has no self-describing filter marker, so completeness also depends on using the documented unfiltered collection command.
 
 Current EC2 references:
 
 - [DescribeSecurityGroups CLI](https://docs.aws.amazon.com/cli/latest/reference/ec2/describe-security-groups.html)
 - [IpPermission API](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_IpPermission.html)
 - [Security group rule components](https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html)
+- [How Reachability Analyzer works](https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html)
+- [How Network Access Analyzer works](https://docs.aws.amazon.com/vpc/latest/network-access-analyzer/how-network-access-analyzer-works.html)
+- [Internet gateway requirements](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html)
 
 ## CloudTrail Log Evidence
 

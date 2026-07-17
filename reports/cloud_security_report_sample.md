@@ -4,15 +4,15 @@ Generated: 2026-06-30
 
 ## Executive Summary
 
-This report consolidates 31 finding(s) from offline cloud security analyzers.
+This report consolidates 34 finding(s) from offline cloud security analyzers.
 
 ## Severity Summary
 
 | Severity | Count |
 | --- | ---: |
-| Critical | 5 |
+| Critical | 6 |
 | High | 10 |
-| Medium | 14 |
+| Medium | 16 |
 | Low | 2 |
 | Info | 0 |
 
@@ -22,7 +22,7 @@ This report consolidates 31 finding(s) from offline cloud security analyzers.
 | --- | ---: |
 | cloudtrail | 6 |
 | iam | 9 |
-| network | 7 |
+| network | 10 |
 | storage | 9 |
 
 ## Source Files
@@ -60,16 +60,27 @@ The source files below are generated analyzer outputs and are not committed to t
 - Metadata: policy_arn: arn:aws:iam::111122223333:policy/OverBroadAdminPolicy, policy_name: OverBroadAdminPolicy, policy_source: managed, statement_id: FullAdmin
 - References: https://attack.mitre.org/techniques/T1078/004/, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
-#### NET-002: Security group allows all inbound ports from the internet
+#### NET-001: Sensitive Docker API without TLS port is allowed on a reported internet-reachable path
+
+- Module: `network`
+- Category: `network-exposure`
+- Resource: `security_group/sg-001-admin-open`
+- Evidence: Inbound rule 3 allows tcp 2375 from 0.0.0.0/0. Supplied manual-topology-review context observed at 2026-06-30T04:00:00Z reports the ingress path as reachable for scope 'All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6': Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services.
+- Impact: The supplied context reports an active end-to-end path. Unauthorized callers can reach privileged orchestration or host operations through the exposed control-plane endpoint.
+- Remediation: Place the endpoint on a private management network, require strong authentication and encryption, and allow only specific administrative sources. Reassess the end-to-end path after remediation.
+- Metadata: exposure_scope: internet-wide, group_name: admin-open, port: 2375, protocol: tcp, reachability_direction: ingress, reachability_evidence: Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:00:00Z, reachability_resource_ids: igw-00000000000000001, eni-00000000000000001, reachability_scope: All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6., reachability_status: reachable, rule_index: 3, service: Docker API without TLS, service_category: control-plane, service_default_severity: critical
+- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html, https://docs.docker.com/engine/daemon/remote-access/
+
+#### NET-002: All inbound ports are allowed on a reported internet-reachable path
 
 - Module: `network`
 - Category: `network-exposure`
 - Resource: `security_group/sg-003-all-open`
-- Evidence: Inbound rule 1 allows -1 all from 0.0.0.0/0.
-- Impact: Any exposed service attached to this security group may be reachable from the public internet.
-- Remediation: Remove all-port public inbound access and allow only required ports from trusted CIDR ranges.
-- Metadata: exposure_scope: internet-wide, group_name: all-open, rule_index: 1
-- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://attack.mitre.org/techniques/T1578/005/
+- Evidence: Inbound rule 1 allows -1 all from 0.0.0.0/0. Supplied manual-topology-review context observed at 2026-06-30T04:10:00Z reports the ingress path as reachable for scope 'All attached resources and public IPv4 ingress rules across every protocol and port': A public ingress path from the internet gateway to an attached network interface was identified.
+- Impact: The supplied context reports an active end-to-end path. Any service attached to this security group may be reachable from the public internet.
+- Remediation: Remove all-port public inbound access and allow only required ports from trusted CIDR ranges. Reassess the end-to-end path after remediation.
+- Metadata: exposure_scope: internet-wide, group_name: all-open, reachability_direction: ingress, reachability_evidence: A public ingress path from the internet gateway to an attached network interface was identified., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:10:00Z, reachability_resource_ids: igw-00000000000000001, eni-00000000000000003, reachability_scope: All attached resources and public IPv4 ingress rules across every protocol and port., reachability_status: reachable, rule_index: 1
+- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html, https://attack.mitre.org/techniques/T1578/005/
 
 #### STO-002: Bucket ACL grants public access
 
@@ -150,49 +161,49 @@ The source files below are generated analyzer outputs and are not committed to t
 - Metadata: policy_name: trust-policy, statement_id: ExternalAccountTrust, trust_guardrails: none
 - References: https://attack.mitre.org/techniques/T1199/, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_principal.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_common-scenarios_third-party.html
 
-#### NET-001: Sensitive SSH port is open to the internet
+#### NET-001: Sensitive SSH port is allowed on a reported internet-reachable path
 
 - Module: `network`
 - Category: `network-exposure`
 - Resource: `security_group/sg-001-admin-open`
-- Evidence: Inbound rule 1 allows tcp 22 from 0.0.0.0/0.
-- Impact: SSH exposure can increase the risk of brute force, exploitation, or unauthorized administrative access.
-- Remediation: Restrict SSH access to a VPN, bastion host, private CIDR, or specific trusted IP range.
-- Metadata: exposure_scope: internet-wide, group_name: admin-open, port: 22, rule_index: 1, service: SSH
-- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
+- Evidence: Inbound rule 1 allows tcp 22 from 0.0.0.0/0. Supplied manual-topology-review context observed at 2026-06-30T04:00:00Z reports the ingress path as reachable for scope 'All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6': Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services.
+- Impact: The supplied context reports an active end-to-end path. The exposed remote-administration endpoint increases the risk of credential attacks and unauthorized host access.
+- Remediation: Restrict administration to a VPN, bastion host, private management network, or specific trusted source addresses. Reassess the end-to-end path after remediation.
+- Metadata: exposure_scope: internet-wide, group_name: admin-open, port: 22, protocol: tcp, reachability_direction: ingress, reachability_evidence: Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:00:00Z, reachability_resource_ids: igw-00000000000000001, eni-00000000000000001, reachability_scope: All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6., reachability_status: reachable, rule_index: 1, service: SSH, service_category: remote-administration, service_default_severity: high
+- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html, https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-rules-reference.html
 
-#### NET-001: Sensitive RDP port is open to the internet
+#### NET-001: Sensitive RDP port is allowed on a reported internet-reachable path
 
 - Module: `network`
 - Category: `network-exposure`
 - Resource: `security_group/sg-001-admin-open`
-- Evidence: Inbound rule 2 allows tcp 3389 from ::/0.
-- Impact: RDP exposure can increase the risk of brute force, exploitation, or unauthorized administrative access.
-- Remediation: Restrict RDP access to a VPN, bastion host, private CIDR, or specific trusted IP range.
-- Metadata: exposure_scope: internet-wide, group_name: admin-open, port: 3389, rule_index: 2, service: RDP
-- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
+- Evidence: Inbound rule 2 allows tcp 3389 from ::/0. Supplied manual-topology-review context observed at 2026-06-30T04:00:00Z reports the ingress path as reachable for scope 'All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6': Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services.
+- Impact: The supplied context reports an active end-to-end path. The exposed remote-administration endpoint increases the risk of credential attacks and unauthorized host access.
+- Remediation: Restrict administration to a VPN, bastion host, private management network, or specific trusted source addresses. Reassess the end-to-end path after remediation.
+- Metadata: exposure_scope: internet-wide, group_name: admin-open, port: 3389, protocol: tcp, reachability_direction: ingress, reachability_evidence: Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:00:00Z, reachability_resource_ids: igw-00000000000000001, eni-00000000000000001, reachability_scope: All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6., reachability_status: reachable, rule_index: 2, service: RDP, service_category: remote-administration, service_default_severity: high
+- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html, https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-rules-reference.html
 
-#### NET-001: Sensitive MySQL port is open to the internet
+#### NET-001: Sensitive Kubernetes API server port is allowed on a reported internet-reachable path
+
+- Module: `network`
+- Category: `network-exposure`
+- Resource: `security_group/sg-001-admin-open`
+- Evidence: Inbound rule 4 allows tcp 6443 from 0.0.0.0/0. Supplied manual-topology-review context observed at 2026-06-30T04:00:00Z reports the ingress path as reachable for scope 'All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6': Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services.
+- Impact: The supplied context reports an active end-to-end path. Unauthorized callers can reach privileged orchestration or host operations through the exposed control-plane endpoint.
+- Remediation: Place the endpoint on a private management network, require strong authentication and encryption, and allow only specific administrative sources. Reassess the end-to-end path after remediation.
+- Metadata: exposure_scope: internet-wide, group_name: admin-open, port: 6443, protocol: tcp, reachability_direction: ingress, reachability_evidence: Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:00:00Z, reachability_resource_ids: igw-00000000000000001, eni-00000000000000001, reachability_scope: All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6., reachability_status: reachable, rule_index: 4, service: Kubernetes API server, service_category: control-plane, service_default_severity: high
+- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html, https://kubernetes.io/docs/reference/networking/ports-and-protocols/
+
+#### NET-001: Sensitive Redis port permits public sources without a reported reachable path
 
 - Module: `network`
 - Category: `network-exposure`
 - Resource: `security_group/sg-002-database-public`
-- Evidence: Inbound rule 1 allows tcp 3306 from 0.0.0.0/0.
-- Impact: MySQL exposure can increase the risk of brute force, exploitation, or unauthorized administrative access.
-- Remediation: Restrict MySQL access to a VPN, bastion host, private CIDR, or specific trusted IP range.
-- Metadata: exposure_scope: internet-wide, group_name: database-public, port: 3306, rule_index: 1, service: MySQL
-- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
-
-#### NET-001: Sensitive PostgreSQL port is open to the internet
-
-- Module: `network`
-- Category: `network-exposure`
-- Resource: `security_group/sg-002-database-public`
-- Evidence: Inbound rule 2 allows tcp 5432 from 0.0.0.0/0.
-- Impact: PostgreSQL exposure can increase the risk of brute force, exploitation, or unauthorized administrative access.
-- Remediation: Restrict PostgreSQL access to a VPN, bastion host, private CIDR, or specific trusted IP range.
-- Metadata: exposure_scope: internet-wide, group_name: database-public, port: 5432, rule_index: 2, service: PostgreSQL
-- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
+- Evidence: Inbound rule 3 allows tcp 6379 from 0.0.0.0/0. Supplied aws-reachability-analyzer context observed at 2026-06-30T04:05:00Z reports the ingress path as not reachable for scope 'All attached resources and public IPv4 ingress rules for TCP 3306, 5432, and 6379': Separate IPv4 path analyses for all listed database ports found no route from the internet gateway to an attached interface.
+- Impact: The supplied context reports no current end-to-end path, reducing immediate exposure. The permissive rule remains a latent risk if attachments, addresses, routes, or intermediary controls change.
+- Remediation: Keep the service on private subnets, require authentication and encryption, and allow only the application security groups or trusted source ranges that need access. Reassess the end-to-end path after remediation.
+- Metadata: exposure_scope: internet-wide, group_name: database-public, port: 6379, protocol: tcp, reachability_direction: ingress, reachability_evidence: Separate IPv4 path analyses for all listed database ports found no route from the internet gateway to an attached interface., reachability_method: aws-reachability-analyzer, reachability_observed_at: 2026-06-30T04:05:00Z, reachability_resource_ids: eni-00000000000000002, rtb-00000000000000002, reachability_scope: All attached resources and public IPv4 ingress rules for TCP 3306, 5432, and 6379., reachability_status: not_reachable, rule_index: 3, service: Redis, service_category: data-service, service_default_severity: critical
+- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html, https://redis.io/docs/latest/operate/oss_and_stack/management/security/
 
 #### STO-001: S3 public access block is incomplete
 
@@ -295,27 +306,49 @@ The source files below are generated analyzer outputs and are not committed to t
 - Metadata: policy_name: credential-report, statement_id: AKIAEXAMPLEALICE
 - References: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html
 
-#### NET-003: Security group allows unrestricted outbound traffic
+#### NET-001: Sensitive MySQL/Aurora port permits public sources without a reported reachable path
+
+- Module: `network`
+- Category: `network-exposure`
+- Resource: `security_group/sg-002-database-public`
+- Evidence: Inbound rule 1 allows tcp 3306 from 0.0.0.0/0. Supplied aws-reachability-analyzer context observed at 2026-06-30T04:05:00Z reports the ingress path as not reachable for scope 'All attached resources and public IPv4 ingress rules for TCP 3306, 5432, and 6379': Separate IPv4 path analyses for all listed database ports found no route from the internet gateway to an attached interface.
+- Impact: The supplied context reports no current end-to-end path, reducing immediate exposure. The permissive rule remains a latent risk if attachments, addresses, routes, or intermediary controls change.
+- Remediation: Keep the database on private subnets and allow only the application security groups or trusted source ranges that require access. Reassess the end-to-end path after remediation.
+- Metadata: exposure_scope: internet-wide, group_name: database-public, port: 3306, protocol: tcp, reachability_direction: ingress, reachability_evidence: Separate IPv4 path analyses for all listed database ports found no route from the internet gateway to an attached interface., reachability_method: aws-reachability-analyzer, reachability_observed_at: 2026-06-30T04:05:00Z, reachability_resource_ids: eni-00000000000000002, rtb-00000000000000002, reachability_scope: All attached resources and public IPv4 ingress rules for TCP 3306, 5432, and 6379., reachability_status: not_reachable, rule_index: 1, service: MySQL/Aurora, service_category: database, service_default_severity: high
+- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html, https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-rules-reference.html
+
+#### NET-001: Sensitive PostgreSQL port permits public sources without a reported reachable path
+
+- Module: `network`
+- Category: `network-exposure`
+- Resource: `security_group/sg-002-database-public`
+- Evidence: Inbound rule 2 allows tcp 5432 from 0.0.0.0/0. Supplied aws-reachability-analyzer context observed at 2026-06-30T04:05:00Z reports the ingress path as not reachable for scope 'All attached resources and public IPv4 ingress rules for TCP 3306, 5432, and 6379': Separate IPv4 path analyses for all listed database ports found no route from the internet gateway to an attached interface.
+- Impact: The supplied context reports no current end-to-end path, reducing immediate exposure. The permissive rule remains a latent risk if attachments, addresses, routes, or intermediary controls change.
+- Remediation: Keep the database on private subnets and allow only the application security groups or trusted source ranges that require access. Reassess the end-to-end path after remediation.
+- Metadata: exposure_scope: internet-wide, group_name: database-public, port: 5432, protocol: tcp, reachability_direction: ingress, reachability_evidence: Separate IPv4 path analyses for all listed database ports found no route from the internet gateway to an attached interface., reachability_method: aws-reachability-analyzer, reachability_observed_at: 2026-06-30T04:05:00Z, reachability_resource_ids: eni-00000000000000002, rtb-00000000000000002, reachability_scope: All attached resources and public IPv4 ingress rules for TCP 3306, 5432, and 6379., reachability_status: not_reachable, rule_index: 2, service: PostgreSQL, service_category: database, service_default_severity: high
+- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html, https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-rules-reference.html
+
+#### NET-003: Unrestricted outbound traffic is allowed on a reported internet path
 
 - Module: `network`
 - Category: `network-exposure`
 - Resource: `security_group/sg-001-admin-open`
-- Evidence: Outbound rule 1 allows -1 all from 0.0.0.0/0.
-- Impact: Compromised workloads may communicate freely with internet destinations, making exfiltration or command-and-control traffic harder to contain.
-- Remediation: Restrict outbound traffic to required protocols, ports, and destination CIDR ranges where practical.
-- Metadata: exposure_scope: internet-wide, group_name: admin-open, rule_index: 1
-- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
+- Evidence: Outbound rule 1 allows -1 all from 0.0.0.0/0. Supplied manual-topology-review context observed at 2026-06-30T04:00:00Z reports the egress path as reachable for scope 'All attached resources and public IPv4 egress rules': The attached administration interface had a default route through the internet gateway.
+- Impact: The supplied context reports an active end-to-end path. Compromised workloads may communicate freely with internet destinations, making exfiltration or command-and-control traffic harder to contain.
+- Remediation: Restrict outbound traffic to required protocols, ports, and destination CIDR ranges where practical. Reassess the end-to-end path after remediation.
+- Metadata: exposure_scope: internet-wide, group_name: admin-open, reachability_direction: egress, reachability_evidence: The attached administration interface had a default route through the internet gateway., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:00:00Z, reachability_resource_ids: eni-00000000000000001, igw-00000000000000001, reachability_scope: All attached resources and public IPv4 egress rules., reachability_status: reachable, rule_index: 1
+- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html
 
-#### NET-003: Security group allows unrestricted outbound traffic
+#### NET-003: Unrestricted outbound traffic is allowed on a reported internet path
 
 - Module: `network`
 - Category: `network-exposure`
 - Resource: `security_group/sg-003-all-open`
-- Evidence: Outbound rule 1 allows -1 all from ::/0.
-- Impact: Compromised workloads may communicate freely with internet destinations, making exfiltration or command-and-control traffic harder to contain.
-- Remediation: Restrict outbound traffic to required protocols, ports, and destination CIDR ranges where practical.
-- Metadata: exposure_scope: internet-wide, group_name: all-open, rule_index: 1
-- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
+- Evidence: Outbound rule 1 allows -1 all from ::/0. Supplied manual-topology-review context observed at 2026-06-30T04:10:00Z reports the egress path as reachable for scope 'All attached resources and public IPv6 egress rules across every protocol and port': A public egress path from the attached network interface to the internet gateway was identified.
+- Impact: The supplied context reports an active end-to-end path. Compromised workloads may communicate freely with internet destinations, making exfiltration or command-and-control traffic harder to contain.
+- Remediation: Restrict outbound traffic to required protocols, ports, and destination CIDR ranges where practical. Reassess the end-to-end path after remediation.
+- Metadata: exposure_scope: internet-wide, group_name: all-open, reachability_direction: egress, reachability_evidence: A public egress path from the attached network interface to the internet gateway was identified., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:10:00Z, reachability_resource_ids: eni-00000000000000003, igw-00000000000000001, reachability_scope: All attached resources and public IPv6 egress rules across every protocol and port., reachability_status: reachable, rule_index: 1
+- References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html
 
 #### STO-005: Bucket versioning is not enabled
 

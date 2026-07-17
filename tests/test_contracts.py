@@ -12,6 +12,10 @@ from cloud_findings import write_findings
 from cloud_security_lab.normalizers.cloudtrail import load_aws_cloudtrail_environment
 from cloud_security_lab.normalizers.ec2 import load_aws_ec2_environment
 from cloud_security_lab.normalizers.iam import load_aws_iam_environment
+from cloud_security_lab.normalizers.network_context import (
+    apply_network_reachability_context,
+    load_network_reachability_context,
+)
 from cloud_security_lab.normalizers.s3 import load_aws_s3_environment
 from iam_analyzer.analyzer import analyze_environment, load_environment
 
@@ -44,6 +48,10 @@ SCHEMA_SAMPLE_PAIRS = (
     (
         "network-environment-v1.0.schema.json",
         "sample_data/network/sample_network_environment.json",
+    ),
+    (
+        "network-reachability-context-v1.0.schema.json",
+        "sample_data/aws/ec2/network_reachability_context.json",
     ),
     (
         "cloudtrail-events-v1.0.schema.json",
@@ -111,9 +119,20 @@ class DataContractTests(unittest.TestCase):
         result = load_aws_ec2_environment(
             PROJECT_ROOT / "sample_data/aws/ec2/describe_security_groups.json"
         )
+        assessments = load_network_reachability_context(
+            PROJECT_ROOT / "sample_data/aws/ec2/network_reachability_context.json"
+        )
+        enriched = apply_network_reachability_context(
+            result.environment,
+            assessments,
+        ).environment
 
         Draft202012Validator.check_schema(schema)
         Draft202012Validator(schema).validate(result.environment)
+        Draft202012Validator(
+            schema,
+            format_checker=FormatChecker(),
+        ).validate(enriched)
 
     def test_normalized_native_iam_environment_matches_iam_contract(self):
         schema = _load_json(PROJECT_ROOT / "schemas/iam-environment-v1.0.schema.json")

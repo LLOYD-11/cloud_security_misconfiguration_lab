@@ -13,10 +13,12 @@ from typing import Any, Callable, Sequence
 from cloud_findings import Finding, write_findings
 from cloud_security_lab import __version__
 from cloud_security_lab.normalizers import (
+    apply_network_reachability_context,
     load_aws_cloudtrail_environment,
     load_aws_ec2_environment,
     load_aws_iam_environment,
     load_aws_s3_environment,
+    load_network_reachability_context,
     write_normalized_environment,
 )
 from cloudtrail_detector.detector import (
@@ -139,21 +141,36 @@ def _run_analyze(args: argparse.Namespace) -> int:
         raise ValueError(
             "--failure-threshold and --failure-window-minutes are only valid for cloudtrail"
         )
-    native_auxiliary_options = args.credential_report is not None or args.as_of is not None
+    if args.reachability_context is not None and args.module != "network":
+        raise ValueError("--reachability-context is only valid for network analysis")
+
+    iam_auxiliary_options = args.credential_report is not None or args.as_of is not None
+    normalization_warnings: tuple[str, ...] = ()
     if args.input_format == "simplified":
         if len(input_paths) != 1:
             raise ValueError("Simplified analyzer input accepts exactly one JSON file")
-        if native_auxiliary_options or args.normalized_output is not None:
+        if iam_auxiliary_options or args.normalized_output is not None:
             raise ValueError(
                 "--credential-report, --as-of, and --normalized-output require "
                 "--input-format aws"
             )
-        findings = _analyze(
-            args.module,
-            input_paths[0],
-            failure_threshold=args.failure_threshold,
-            failure_window_minutes=args.failure_window_minutes,
-        )
+        normalized_environment = ANALYZERS[args.module].loader(input_paths[0])
+        if args.reachability_context is not None:
+            assessments = load_network_reachability_context(args.reachability_context)
+            reachability_result = apply_network_reachability_context(
+                normalized_environment,
+                assessments,
+            )
+            normalized_environment = reachability_result.environment
+            normalization_warnings = reachability_result.warnings
+        if args.module == "cloudtrail":
+            findings = analyze_cloudtrail(
+                normalized_environment,
+                failure_threshold=args.failure_threshold,
+                failure_window_minutes=args.failure_window_minutes,
+            )
+        else:
+            findings = ANALYZERS[args.module].analyzer(normalized_environment)
     else:
         if args.module != "cloudtrail" and len(input_paths) != 1:
             raise ValueError(
@@ -171,21 +188,29 @@ def _run_analyze(args: argparse.Namespace) -> int:
             normalization_warnings = iam_result.warnings
             findings = analyze_iam(normalized_environment)
         elif args.module == "storage":
-            if native_auxiliary_options:
+            if iam_auxiliary_options:
                 raise ValueError("--credential-report and --as-of are only valid for AWS IAM input")
             s3_result = load_aws_s3_environment(input_paths[0])
             normalized_environment = s3_result.environment
             normalization_warnings = s3_result.warnings
             findings = analyze_storage(normalized_environment)
         elif args.module == "network":
-            if native_auxiliary_options:
+            if iam_auxiliary_options:
                 raise ValueError("--credential-report and --as-of are only valid for AWS IAM input")
             ec2_result = load_aws_ec2_environment(input_paths[0])
             normalized_environment = ec2_result.environment
             normalization_warnings = ec2_result.warnings
+            if args.reachability_context is not None:
+                assessments = load_network_reachability_context(args.reachability_context)
+                reachability_result = apply_network_reachability_context(
+                    normalized_environment,
+                    assessments,
+                )
+                normalized_environment = reachability_result.environment
+                normalization_warnings += reachability_result.warnings
             findings = analyze_network(normalized_environment)
         elif args.module == "cloudtrail":
-            if native_auxiliary_options:
+            if iam_auxiliary_options:
                 raise ValueError(
                     "--credential-report and --as-of are only valid for AWS IAM input"
                 )
@@ -200,11 +225,11 @@ def _run_analyze(args: argparse.Namespace) -> int:
         else:
             raise ValueError(f"Unsupported analyzer module: {args.module}")
 
-        for warning in normalization_warnings:
-            print(f"Warning: {warning}", file=sys.stderr)
         if args.normalized_output:
             write_normalized_environment(args.normalized_output, normalized_environment)
             print(f"Normalized environment saved to {args.normalized_output}")
+    for warning in normalization_warnings:
+        print(f"Warning: {warning}", file=sys.stderr)
     ANALYZERS[args.module].printer(findings)
     if args.output:
         write_findings(args.output, findings)
@@ -286,6 +311,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--normalized-output",
         type=Path,
         help="Optional normalized analyzer environment output. Requires --input-format aws.",
+    )
+    analyze_parser.add_argument(
+        "--reachability-context",
+        type=Path,
+        help=(
+            "Optional versioned network path assessment. Valid only for network analysis and "
+            "does not replace security-group evidence."
+        ),
     )
     analyze_parser.add_argument(
         "--failure-threshold",

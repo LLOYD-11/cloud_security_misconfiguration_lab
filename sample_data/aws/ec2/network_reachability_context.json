@@ -1,0 +1,111 @@
+{
+  "schema_version": "1.0",
+  "security_groups": [
+    {
+      "group_id": "sg-00000000000000001",
+      "method": "manual-topology-review",
+      "observed_at": "2026-06-30T04:00:00Z",
+      "ingress": {
+        "status": "reachable",
+        "scope": "All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6.",
+        "evidence": [
+          "Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services."
+        ],
+        "resource_ids": [
+          "igw-00000000000000001",
+          "eni-00000000000000001"
+        ]
+      },
+      "egress": {
+        "status": "reachable",
+        "scope": "All attached resources and public IPv4 egress rules.",
+        "evidence": [
+          "The attached administration interface had a default route through the internet gateway."
+        ],
+        "resource_ids": [
+          "eni-00000000000000001",
+          "igw-00000000000000001"
+        ]
+      }
+    },
+    {
+      "group_id": "sg-00000000000000002",
+      "method": "aws-reachability-analyzer",
+      "observed_at": "2026-06-30T04:05:00Z",
+      "ingress": {
+        "status": "not_reachable",
+        "scope": "All attached resources and public IPv4 ingress rules for TCP 3306, 5432, and 6379.",
+        "evidence": [
+          "Separate IPv4 path analyses for all listed database ports found no route from the internet gateway to an attached interface."
+        ],
+        "resource_ids": [
+          "eni-00000000000000002",
+          "rtb-00000000000000002"
+        ]
+      },
+      "egress": {
+        "status": "inconclusive",
+        "scope": "All attached resources and public IPv4 egress rules.",
+        "evidence": [
+          "NAT gateway and intermediary firewall evidence was not included in the review."
+        ],
+        "resource_ids": [
+          "eni-00000000000000002"
+        ]
+      }
+    },
+    {
+      "group_id": "sg-00000000000000003",
+      "method": "manual-topology-review",
+      "observed_at": "2026-06-30T04:10:00Z",
+      "ingress": {
+        "status": "reachable",
+        "scope": "All attached resources and public IPv4 ingress rules across every protocol and port.",
+        "evidence": [
+          "A public ingress path from the internet gateway to an attached network interface was identified."
+        ],
+        "resource_ids": [
+          "igw-00000000000000001",
+          "eni-00000000000000003"
+        ]
+      },
+      "egress": {
+        "status": "reachable",
+        "scope": "All attached resources and public IPv6 egress rules across every protocol and port.",
+        "evidence": [
+          "A public egress path from the attached network interface to the internet gateway was identified."
+        ],
+        "resource_ids": [
+          "eni-00000000000000003",
+          "igw-00000000000000001"
+        ]
+      }
+    },
+    {
+      "group_id": "sg-00000000000000004",
+      "method": "manual-topology-review",
+      "observed_at": "2026-06-30T04:15:00Z",
+      "ingress": {
+        "status": "not_reachable",
+        "scope": "All attached resources and private IPv4 ingress rules.",
+        "evidence": [
+          "The attached application interface was private and had no ingress path from an internet gateway."
+        ],
+        "resource_ids": [
+          "eni-00000000000000004"
+        ]
+      },
+      "egress": {
+        "status": "not_reachable",
+        "scope": "All attached resources and private IPv4 egress rules.",
+        "evidence": [
+          "The private subnet had no internet gateway or NAT gateway route."
+        ],
+        "resource_ids": [
+          "eni-00000000000000004",
+          "rtb-00000000000000004"
+        ]
+      }
+    }
+  ]
+}

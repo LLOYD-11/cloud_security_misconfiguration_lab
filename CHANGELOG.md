@@ -27,6 +27,9 @@ All notable changes to this project are documented in this file.
 - S3 Object Ownership normalization and an ACL-enabled ownership posture rule.
 - S3 public-policy condition analysis for documented fixed-value identity, account, network, VPC, source ARN, and data access point guardrails.
 - Storage policy support for broad `NotPrincipal`, `NotAction`, and `NotResource` statements.
+- A protocol-aware 20-service network exposure catalog covering remote administration, databases, data services, and cloud control planes.
+- A versioned optional network reachability context with direction-specific status, explicit scope, assessment method, timestamp, evidence, and related resource IDs.
+- Strict reachability-context normalization, partial-coverage warnings, schema tests, sample evidence, and unified CLI support through `--reachability-context`.
 
 ### Changed
 
@@ -47,6 +50,7 @@ All notable changes to this project are documented in this file.
 - IAM MFA findings now require an active or compatibility-assumed console password, avoiding native-input false positives for programmatic-only users.
 - Native IAM group policies are analyzed once at the group resource with member context instead of being copied into every member's direct-policy list.
 - Storage ACL findings now account for `BucketOwnerEnforced`, while public-policy findings retain overbroad CIDRs, wildcard values, policy variables, negative operators, and `IfExists` conditions as public.
+- Network findings now distinguish security-group permission paths from supplied end-to-end reachability conclusions. A valid `not_reachable` assessment lowers severity by one level without suppressing the latent configuration risk.
 
 ## 1.0.0 - 2026-06-30
 

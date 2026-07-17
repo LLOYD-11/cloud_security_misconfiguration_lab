@@ -14,7 +14,7 @@ From the repository root, run the complete sample pipeline without installing ru
 python3 -m cloud_security_lab demo --report-date 2026-06-30
 ```
 
-This writes four versioned finding files and a 31-finding consolidated report under `reports/generated/`. The result should exactly match [`reports/cloud_security_report_sample.md`](reports/cloud_security_report_sample.md).
+This writes four versioned finding files and a 34-finding consolidated report under `reports/generated/`. The result should exactly match [`reports/cloud_security_report_sample.md`](reports/cloud_security_report_sample.md).
 
 Install the project in a virtual environment to expose the `cloud-security-lab` command:
 
@@ -117,19 +117,24 @@ Rule catalog:
 
 The network analyzer checks sample security group configurations for risky network exposure:
 
-- Protocol-aware sensitive ports open to internet-wide or exceptionally broad public CIDRs
+- Protocol-aware exposure across 20 remote-administration, database, data-service, and control-plane endpoints
 - All inbound ports open to the internet
 - Unrestricted outbound traffic to the internet
+- Optional, direction-specific reachability evidence that distinguishes a permitted security-group path from reported end-to-end connectivity
 
 Network input can use either the simplified environment contract or a complete native EC2 `DescribeSecurityGroups` response. Native normalization validates account, VPC, security-group, peering, protocol, port, and CIDR evidence before applying the same rules. Prefix-list and security-group targets are preserved with visible warnings but are not resolved into public reachability.
+
+An optional versioned reachability context can mark ingress and egress as `reachable`, `not_reachable`, or `inconclusive`, with an explicit scope, assessment method, timestamp, evidence, and related resource IDs. Missing context is recorded as `not_assessed`. A valid `not_reachable` assessment lowers severity by one level but never suppresses the permissive configuration finding; `reachable`, `inconclusive`, and `not_assessed` retain the service default. The lab validates and reports this supplied context but does not independently reproduce AWS path analysis.
 
 Rule catalog:
 
 | Rule | Risk Pattern |
 | --- | --- |
-| `NET-001` | Sensitive port is open to the internet |
+| `NET-001` | Sensitive service port permits traffic from an internet-wide or broad public CIDR |
 | `NET-002` | All inbound ports are open to the internet |
 | `NET-003` | Unrestricted outbound traffic is allowed |
+
+See the [Network analyzer documentation](network_analyzer/README.md) for the complete service catalog and reachability semantics.
 
 ### Module 5: CloudTrail-Style Event Detector
 
@@ -197,6 +202,7 @@ Analyze the bundled native EC2 security-group response:
 python3 -m cloud_security_lab analyze network \
   sample_data/aws/ec2/describe_security_groups.json \
   --input-format aws \
+  --reachability-context sample_data/aws/ec2/network_reachability_context.json \
   --normalized-output reports/generated/normalized_network_environment.json \
   --output reports/generated/network_findings.json
 ```
@@ -284,6 +290,7 @@ cloud_security_misconfiguration_lab/
 │       ├── common.py
 │       ├── ec2.py
 │       ├── iam.py
+│       ├── network_context.py
 │       └── s3.py
 ├── cloud_findings/
 │   └── finding.py
@@ -310,6 +317,7 @@ cloud_security_misconfiguration_lab/
 │   ├── aws-cloudtrail-records-v1.0.schema.json
 │   ├── aws-iam-authorization-details-v1.0.schema.json
 │   ├── aws-ec2-describe-security-groups-v1.0.schema.json
+│   ├── network-reachability-context-v1.0.schema.json
 │   ├── aws-s3-evidence-bundle-v1.0.schema.json
 │   └── *-environment-v1.0.schema.json
 ├── sample_data/
@@ -320,7 +328,8 @@ cloud_security_misconfiguration_lab/
 │   │   ├── account_authorization_details.json
 │   │   └── credential_report.csv
 │   ├── aws/ec2/
-│   │   └── describe_security_groups.json
+│   │   ├── describe_security_groups.json
+│   │   └── network_reachability_context.json
 │   ├── aws/s3/
 │   │   └── s3_security_evidence_bundle.json
 │   ├── cloudtrail/

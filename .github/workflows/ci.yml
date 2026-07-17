@@ -73,6 +73,7 @@ jobs:
           python -m cloud_security_lab analyze network
           sample_data/aws/ec2/describe_security_groups.json
           --input-format aws
+          --reachability-context sample_data/aws/ec2/network_reachability_context.json
           --normalized-output reports/generated/normalized_network_environment.json
           --output reports/generated/native_network_findings.json
 

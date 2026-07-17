@@ -31,6 +31,34 @@
           "PrefixListIds": [],
           "ToPort": 3389,
           "UserIdGroupPairs": []
+        },
+        {
+          "FromPort": 2375,
+          "IpProtocol": "tcp",
+          "IpRanges": [
+            {
+              "CidrIp": "0.0.0.0/0",
+              "Description": "Unencrypted Docker API from anywhere"
+            }
+          ],
+          "Ipv6Ranges": [],
+          "PrefixListIds": [],
+          "ToPort": 2375,
+          "UserIdGroupPairs": []
+        },
+        {
+          "FromPort": 6443,
+          "IpProtocol": "tcp",
+          "IpRanges": [
+            {
+              "CidrIp": "0.0.0.0/0",
+              "Description": "Kubernetes API from anywhere"
+            }
+          ],
+          "Ipv6Ranges": [],
+          "PrefixListIds": [],
+          "ToPort": 6443,
+          "UserIdGroupPairs": []
         }
       ],
       "IpPermissionsEgress": [
@@ -92,6 +120,20 @@
           "Ipv6Ranges": [],
           "PrefixListIds": [],
           "ToPort": 5432,
+          "UserIdGroupPairs": []
+        },
+        {
+          "FromPort": 6379,
+          "IpProtocol": "tcp",
+          "IpRanges": [
+            {
+              "CidrIp": "0.0.0.0/0",
+              "Description": "Redis from anywhere"
+            }
+          ],
+          "Ipv6Ranges": [],
+          "PrefixListIds": [],
+          "ToPort": 6379,
           "UserIdGroupPairs": []
         }
       ],

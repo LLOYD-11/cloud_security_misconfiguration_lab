@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/schemas/network-reachability-context-v1.0.schema.json",
+  "title": "Optional Network Reachability Context v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "security_groups"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "security_groups": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/securityGroupAssessment" }
+    }
+  },
+  "$defs": {
+    "directionAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "scope", "evidence"],
+      "properties": {
+        "status": {
+          "enum": ["reachable", "not_reachable", "inconclusive"]
+        },
+        "scope": { "type": "string", "minLength": 1 },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "resource_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "securityGroupAssessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["group_id", "method", "observed_at", "ingress", "egress"],
+      "properties": {
+        "group_id": { "type": "string", "minLength": 1 },
+        "method": {
+          "enum": [
+            "aws-network-access-analyzer",
+            "aws-reachability-analyzer",
+            "manual-topology-review",
+            "other"
+          ]
+        },
+        "observed_at": { "type": "string", "format": "date-time" },
+        "ingress": { "$ref": "#/$defs/directionAssessment" },
+        "egress": { "$ref": "#/$defs/directionAssessment" }
+      }
+    }
+  }
+}

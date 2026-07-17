@@ -35,11 +35,15 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 
 ## Network Analysis
 
-- A broad security-group rule does not prove that an attached workload is internet reachable.
-- ENIs, public addresses, load balancers, routes, network ACLs, and firewall controls are not yet correlated.
+- A broad security-group rule does not prove that an attached workload is internet reachable. Findings without auxiliary evidence are explicitly marked `not_assessed`.
+- Optional reachability context is a trusted, point-in-time assessor attestation. The lab validates its shape and group coverage but does not parse raw AWS path-analysis output, recalculate paths, inspect a live account, or verify the stated evidence.
+- A direction status is applied to all findings in its stated scope. Assessors must use `inconclusive` when attachment, address-family, protocol, port, or intermediary-path coverage is incomplete. AWS Reachability Analyzer and Network Access Analyzer currently cover IPv4 only.
+- A `not_reachable` assessment lowers severity by one level but retains the permissive rule as a latent configuration risk. Network changes can invalidate the supplied conclusion.
+- ENIs, public addresses, load balancers, routes, network ACLs, and firewall controls are not independently correlated by the lab.
 - Native prefix-list and referenced-security-group targets are preserved with warnings but are not expanded or evaluated for public exposure.
 - Native normalization accepts one owner account per snapshot. Shared-VPC or multi-owner inventories must currently be analyzed separately.
 - A filtered `DescribeSecurityGroups` response does not identify itself as filtered; users must follow the documented unfiltered collection command to avoid false negatives.
+- The sensitive-service catalog covers 20 documented default endpoints. Services on custom ports and uncatalogued protocols are not identified as `NET-001`.
 - Broad CIDR thresholds are fixed and are not yet user configurable.
 
 ## CloudTrail Detection
@@ -53,6 +57,6 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 
 ## Reporting
 
-- Severity values are rule defaults and do not yet incorporate resource criticality or confidence.
+- Severity values are primarily rule defaults and do not incorporate resource criticality. Network findings make one documented adjustment when supplied context reports `not_reachable`.
 - Module coverage currently counts findings rather than all evaluated and skipped resources.
 - A report with no findings does not prove that an AWS environment is secure.

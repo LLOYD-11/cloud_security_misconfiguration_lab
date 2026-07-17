@@ -109,6 +109,11 @@ class UnifiedCliTests(unittest.TestCase):
                         ),
                         "--input-format",
                         "aws",
+                        "--reachability-context",
+                        str(
+                            PROJECT_ROOT
+                            / "sample_data/aws/ec2/network_reachability_context.json"
+                        ),
                         "--normalized-output",
                         str(normalized_path),
                         "--output",
@@ -120,10 +125,64 @@ class UnifiedCliTests(unittest.TestCase):
             normalized = json.loads(normalized_path.read_text(encoding="utf-8"))
 
         self.assertEqual(0, result)
-        self.assertEqual(7, payload["finding_count"])
+        self.assertEqual(10, payload["finding_count"])
         self.assertEqual(4, len(normalized["security_groups"]))
+        self.assertEqual(
+            "reachable",
+            normalized["security_groups"][0]["reachability"]["ingress"]["status"],
+        )
+        self.assertTrue(
+            all(
+                "reachability_status" in finding["metadata"]
+                for finding in payload["findings"]
+            )
+        )
         self.assertIn("prefix-list targets", stderr.getvalue())
         self.assertIn("security-group targets", stderr.getvalue())
+
+    def test_simplified_network_context_replaces_embedded_context_set(self):
+        sample_path = (
+            PROJECT_ROOT / "sample_data/network/sample_network_environment.json"
+        )
+        environment = json.loads(sample_path.read_text(encoding="utf-8"))
+        first_group = environment["security_groups"][0]
+        context_payload = {
+            "schema_version": "1.0",
+            "security_groups": [
+                {
+                    "group_id": first_group["id"],
+                    **first_group["reachability"],
+                }
+            ],
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            context_path = Path(tmpdir) / "reachability.json"
+            output_path = Path(tmpdir) / "network.json"
+            context_path.write_text(json.dumps(context_payload), encoding="utf-8")
+            with redirect_stdout(StringIO()), redirect_stderr(StringIO()) as stderr:
+                result = main(
+                    [
+                        "analyze",
+                        "network",
+                        str(sample_path),
+                        "--reachability-context",
+                        str(context_path),
+                        "--output",
+                        str(output_path),
+                    ]
+                )
+            findings = json.loads(output_path.read_text(encoding="utf-8"))["findings"]
+
+        self.assertEqual(0, result)
+        self.assertIn("3 security group(s)", stderr.getvalue())
+        statuses_by_group = {
+            finding["resource_id"]: finding["metadata"]["reachability_status"]
+            for finding in findings
+        }
+        self.assertEqual("reachable", statuses_by_group["sg-001-admin-open"])
+        self.assertEqual("not_assessed", statuses_by_group["sg-002-database-public"])
+        self.assertEqual("not_assessed", statuses_by_group["sg-003-all-open"])
 
     def test_analyze_native_cloudtrail_merges_json_and_gzip_inputs(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -181,7 +240,7 @@ class UnifiedCliTests(unittest.TestCase):
 
         self.assertEqual(0, result)
         self.assertIn("Generated: 2026-06-30", report)
-        self.assertIn("consolidates 31 finding(s)", report)
+        self.assertIn("consolidates 34 finding(s)", report)
         self.assertEqual(
             {
                 "cloud_security_report.md",
@@ -268,6 +327,26 @@ class UnifiedCliTests(unittest.TestCase):
             )
 
         self.assertEqual(2, context.exception.code)
+
+    def test_reachability_context_is_rejected_for_other_modules(self):
+        with redirect_stderr(StringIO()) as stderr, self.assertRaises(
+            SystemExit
+        ) as context:
+            main(
+                [
+                    "analyze",
+                    "storage",
+                    str(PROJECT_ROOT / "sample_data/storage/sample_storage_environment.json"),
+                    "--reachability-context",
+                    str(
+                        PROJECT_ROOT
+                        / "sample_data/aws/ec2/network_reachability_context.json"
+                    ),
+                ]
+            )
+
+        self.assertEqual(2, context.exception.code)
+        self.assertIn("only valid for network analysis", stderr.getvalue())
 
     def test_multiple_aws_inputs_are_rejected_for_non_cloudtrail_module(self):
         with redirect_stderr(StringIO()) as stderr, self.assertRaises(SystemExit) as context:

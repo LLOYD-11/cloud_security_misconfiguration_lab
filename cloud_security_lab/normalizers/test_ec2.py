@@ -25,9 +25,20 @@ class NativeEc2NormalizerTests(unittest.TestCase):
 
         self.assertEqual("111122223333", result.environment["account_id"])
         self.assertEqual(4, len(result.environment["security_groups"]))
-        self.assertEqual(7, len(findings))
+        self.assertEqual(10, len(findings))
         self.assertEqual(
-            ["NET-002", "NET-001", "NET-001", "NET-001", "NET-001", "NET-003", "NET-003"],
+            [
+                "NET-001",
+                "NET-001",
+                "NET-002",
+                "NET-001",
+                "NET-001",
+                "NET-001",
+                "NET-001",
+                "NET-001",
+                "NET-003",
+                "NET-003",
+            ],
             [finding.rule_id for finding in findings],
         )
         self.assertTrue(
@@ -35,6 +46,12 @@ class NativeEc2NormalizerTests(unittest.TestCase):
         )
         self.assertTrue(
             all(finding.metadata["owner_id"] == "111122223333" for finding in findings)
+        )
+        self.assertTrue(
+            all(
+                finding.metadata["reachability_status"] == "not_assessed"
+                for finding in findings
+            )
         )
         admin_group = result.environment["security_groups"][0]
         self.assertEqual("production", admin_group["tags"]["Environment"])
