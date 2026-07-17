@@ -39,6 +39,8 @@ All notable changes to this project are documented in this file.
 - A `catalog` CLI subcommand with module filtering and Markdown or JSON output.
 - Triggered-rule context in consolidated reports, strict built-in rule/module/severity validation, and explicit compatibility for uncataloged custom rules.
 - Catalog schema, completeness, control-mapping, deterministic documentation, and wheel-content gates.
+- Deterministic P0-P3 remediation prioritization across findings and incidents, with separate response and hardening work types, conservative incident linkage, and stable action IDs.
+- A versioned remediation-plan contract, machine-readable CLI output, report integration, public prioritization documentation, and complete source-accounting tests.
 
 ### Changed
 

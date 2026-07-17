@@ -4,7 +4,7 @@ This project is an offline-first AWS security analysis lab for identifying risky
 
 The goal is to provide practical and explainable security findings without requiring cloud credentials or making changes to a live AWS account.
 
-The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, versioned finding, incident, analysis-summary, and detection-rule contracts, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
+The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, versioned finding, incident, analysis-summary, detection-rule, and remediation-plan contracts, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
 
 ## Quick Start
 
@@ -14,7 +14,7 @@ From the repository root, run the complete sample pipeline without installing ru
 python3 -m cloud_security_lab demo --report-date 2026-06-30
 ```
 
-This writes four versioned finding files, four analysis summaries, one correlated incident file, and a 39-finding consolidated report under `reports/generated/`. The result should exactly match [`reports/cloud_security_report_sample.md`](reports/cloud_security_report_sample.md).
+This writes four versioned finding files, four analysis summaries, one correlated incident file, one 36-action prioritized remediation plan, and a 39-finding consolidated report under `reports/generated/`. The result should exactly match [`reports/cloud_security_report_sample.md`](reports/cloud_security_report_sample.md).
 
 Install the project in a virtual environment to expose the `cloud-security-lab` command:
 
@@ -65,7 +65,7 @@ Rule catalog:
 
 ### Module 2: Risk Report Generator
 
-The report generator reads one or more finding JSON files and creates a consolidated Markdown risk report. Optional analysis summaries replace finding-only module counts with evaluated and discovered resource counts, coverage status, skipped evidence, and normalization warnings.
+The report generator reads one or more finding JSON files and creates a consolidated Markdown risk report. Optional analysis summaries replace finding-only module counts with evaluated and discovered resource counts, coverage status, skipped evidence, and normalization warnings. Findings and correlated incidents also produce an explainable P0-P3 work queue that separates immediate response from permanent configuration hardening.
 
 Each analyzer can write a versioned analysis summary through `--summary-output`. A summary records `complete`, `partial`, or `empty` coverage independently from the finding count, so zero findings no longer imply that evidence was complete. See [Analysis coverage](docs/analysis-coverage.md) for the status and counting rules.
 
@@ -90,6 +90,12 @@ The report validates each built-in finding's rule, module, and severity against
 the versioned [detection rule catalog](docs/rule-catalog.md), then summarizes
 triggered rule confidence and qualified control mappings. Unknown custom rule
 IDs remain report-compatible and are marked as not cataloged.
+
+The prioritizer groups equivalent remediation without losing finding or resource
+counts, preserves incident response as separate work, and raises configuration
+linked to correlated activity through published rules rather than a hidden risk
+score. It can write a versioned JSON plan through `--remediation-output`; see
+[Remediation prioritization](docs/remediation-prioritization.md).
 
 ### Module 3: Storage Exposure Analyzer
 
@@ -269,6 +275,7 @@ python3 -m cloud_security_lab report \
   --analysis-summary reports/generated/network_analysis_summary.json \
   --analysis-summary reports/generated/cloudtrail_analysis_summary.json \
   --report-date 2026-06-30 \
+  --remediation-output reports/generated/remediation_plan.json \
   --output reports/generated/cloud_security_report.md
 ```
 
@@ -292,6 +299,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [Upgrade roadmap](ROADMAP.md)
 - [Data contracts](docs/data-contracts.md)
 - [Detection rule catalog](docs/rule-catalog.md)
+- [Remediation prioritization](docs/remediation-prioritization.md)
 - [Analysis coverage](docs/analysis-coverage.md)
 - [Native AWS inputs](docs/native-aws-inputs.md)
 - [Engineering checks](docs/engineering.md)
@@ -312,7 +320,7 @@ Development and contract checks use optional tools declared in `pyproject.toml`:
 
 ```bash
 .venv/bin/ruff check .
-.venv/bin/mypy cloud_analysis cloud_security_lab cloud_findings cloud_incidents iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
+.venv/bin/mypy cloud_analysis cloud_security_lab cloud_findings cloud_incidents cloud_remediation cloud_rules iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
 ```
@@ -345,6 +353,11 @@ cloud_security_misconfiguration_lab/
 │   └── finding.py
 ├── cloud_incidents/
 │   └── incident.py
+├── cloud_remediation/
+│   └── plan.py
+├── cloud_rules/
+│   ├── catalog.py
+│   └── rules-v1.0.json
 ├── cloudtrail_detector/
 │   ├── correlation.py
 │   ├── detector.py
@@ -368,6 +381,8 @@ cloud_security_misconfiguration_lab/
 │   ├── analysis-summary-v1.0.schema.json
 │   ├── findings-v1.0.schema.json
 │   ├── incidents-v1.0.schema.json
+│   ├── remediation-plan-v1.0.schema.json
+│   ├── rule-catalog-v1.0.schema.json
 │   ├── aws-cloudtrail-records-v1.0.schema.json
 │   ├── aws-iam-authorization-details-v1.0.schema.json
 │   ├── aws-ec2-describe-security-groups-v1.0.schema.json
@@ -403,6 +418,7 @@ cloud_security_misconfiguration_lab/
 │   ├── engineering.md
 │   ├── incident-correlation.md
 │   ├── native-aws-inputs.md
+│   ├── remediation-prioritization.md
 │   └── known-limitations.md
 ├── tests/
 │   ├── test_contracts.py

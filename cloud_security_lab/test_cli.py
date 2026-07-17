@@ -299,6 +299,8 @@ class UnifiedCliTests(unittest.TestCase):
         self.assertIn("consolidates 39 findings", report)
         self.assertIn("## Analysis Coverage", report)
         self.assertIn("| cloudtrail | simplified (1 file(s)) | complete |", report)
+        self.assertIn("## Prioritized Remediation Plan", report)
+        self.assertIn("| **P0** |", report)
         self.assertIn("## Correlated Incidents", report)
         self.assertEqual(
             {
@@ -310,6 +312,7 @@ class UnifiedCliTests(unittest.TestCase):
                 "iam_findings.json",
                 "network_analysis_summary.json",
                 "network_findings.json",
+                "remediation_plan.json",
                 "storage_analysis_summary.json",
                 "storage_findings.json",
             },
@@ -320,6 +323,7 @@ class UnifiedCliTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             findings_path = Path(tmpdir) / "iam.json"
             report_path = Path(tmpdir) / "report.md"
+            remediation_path = Path(tmpdir) / "remediation.json"
             with redirect_stdout(StringIO()):
                 main(
                     [
@@ -339,12 +343,20 @@ class UnifiedCliTests(unittest.TestCase):
                         str(report_path),
                         "--report-date",
                         "2026-06-30",
+                        "--remediation-output",
+                        str(remediation_path),
                     ]
                 )
             report = report_path.read_text(encoding="utf-8")
+            remediation = json.loads(
+                remediation_path.read_text(encoding="utf-8")
+            )
 
         self.assertEqual(0, result)
         self.assertIn("consolidates 9 findings", report)
+        self.assertEqual(9, remediation["source_finding_count"])
+        self.assertEqual(0, remediation["source_incident_count"])
+        self.assertGreater(remediation["action_count"], 0)
 
     def test_cloudtrail_threshold_options_are_rejected_for_other_modules(self):
         with redirect_stderr(StringIO()), self.assertRaises(SystemExit) as context:

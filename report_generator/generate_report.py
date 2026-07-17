@@ -16,6 +16,11 @@ if str(PROJECT_ROOT) not in sys.path:
 from cloud_analysis import AnalysisSummary, load_analysis_summary_file
 from cloud_findings import Finding, load_findings_file, sort_findings
 from cloud_incidents import Incident, load_incidents_file, sort_incidents
+from cloud_remediation import (
+    RemediationPlan,
+    build_remediation_plan,
+    write_remediation_plan,
+)
 from cloud_rules import load_builtin_catalog, validate_rule_emission
 
 SEVERITY_ORDER = ("critical", "high", "medium", "low", "info")
@@ -197,6 +202,65 @@ def _resource_coverage_label(summary: AnalysisSummary) -> str:
     )
 
 
+def _escape_table_text(value: str) -> str:
+    return value.replace("|", "\\|").replace("\n", " ")
+
+
+def _render_remediation_plan(plan: RemediationPlan) -> list[str]:
+    lines = [
+        "",
+        "## Prioritized Remediation Plan",
+        "",
+        (
+            "Priorities use the transparent rules below rather than an opaque "
+            "numeric risk score. Incident response and configuration hardening "
+            "remain separate work types."
+        ),
+        "",
+        "| Priority | Meaning |",
+        "| --- | --- |",
+        (
+            "| P0 | Immediate response for critical incidents, or high-severity "
+            "incidents with high correlation confidence. |"
+        ),
+        (
+            "| P1 | Urgent investigation or hardening for other incidents, "
+            "critical findings, and configuration linked to a P0 incident. |"
+        ),
+        (
+            "| P2 | Near-term hardening for high findings and configuration "
+            "linked to another incident. |"
+        ),
+        "| P3 | Planned hardening for medium, low, and informational findings. |",
+        "",
+    ]
+    if not plan.actions:
+        lines.append("No remediation actions were generated.")
+        return lines
+
+    lines.extend(
+        [
+            (
+                "| Priority | Work Item | Type | Severity / Confidence | "
+                "Priority Basis | Required Action |"
+            ),
+            "| --- | --- | --- | --- | --- | --- |",
+        ]
+    )
+    for action in plan.actions:
+        work_type = action.work_type.replace("-", " ").capitalize()
+        required_actions = "<br>".join(
+            _escape_table_text(item) for item in action.actions
+        )
+        lines.append(
+            f"| **{action.priority}** | `{action.action_id}` "
+            f"{_escape_table_text(action.title)} | {work_type} | "
+            f"{action.severity.capitalize()} / {action.confidence.capitalize()} | "
+            f"{_escape_table_text(action.rationale)} | {required_actions} |"
+        )
+    return lines
+
+
 def render_report(
     findings: list[Finding],
     *,
@@ -222,6 +286,7 @@ def render_report(
     )
     _validate_summary_counts(sorted_items, sorted_incidents, sorted_summaries)
     _validate_rule_context(sorted_items)
+    remediation_plan = build_remediation_plan(sorted_items, sorted_incidents)
 
     lines: list[str] = [
         "# Cloud Security Risk Report",
@@ -317,6 +382,7 @@ def render_report(
         for module, count in sorted(module_counts.items()):
             lines.append(f"| {module} | {count} |")
 
+    lines.extend(_render_remediation_plan(remediation_plan))
     lines.extend(_triggered_rule_context(sorted_items))
 
     lines.extend(
@@ -447,6 +513,11 @@ def build_parser() -> argparse.ArgumentParser:
         type=_parse_report_date,
         help="Report date in YYYY-MM-DD format. Defaults to the current local date.",
     )
+    parser.add_argument(
+        "--remediation-output",
+        type=Path,
+        help="Optional versioned remediation plan JSON output path.",
+    )
     return parser
 
 
@@ -469,6 +540,10 @@ def main() -> int:
         analysis_summaries=analysis_summaries,
     )
     write_report(args.output, report)
+    if args.remediation_output is not None:
+        plan = build_remediation_plan(findings, incidents)
+        write_remediation_plan(args.remediation_output, plan)
+        print(f"Remediation plan saved to {args.remediation_output}")
     print(f"Report saved to {args.output}")
     print(f"Findings included: {len(findings)}")
     print(f"Incidents included: {len(incidents)}")

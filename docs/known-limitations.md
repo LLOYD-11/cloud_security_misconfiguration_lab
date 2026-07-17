@@ -60,6 +60,9 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 ## Reporting
 
 - Severity values are primarily rule defaults and do not incorporate resource criticality. Network findings make one documented adjustment when supplied context reports `not_reachable`.
+- Remediation priorities are deterministic triage bands, not breach-probability or business-impact scores. They do not include asset value, data classification, compensating controls outside the supplied evidence, ownership, effort, dependencies, change windows, or approval state.
+- Configuration is linked to an incident only by an exact rule ID, `resource_type/resource_id`, and shared CloudTrail event ID. This conservative join can miss relationships that require account, session, topology, or semantic analysis.
+- Equivalent remediation is grouped only when module, rule, severity, title, and action text match. The plan does not infer that different fixes can be combined into one change.
 - Rule confidence measures how directly the supplied evidence supports the detector condition. It does not measure the probability that activity is malicious or replace analyst validation.
 - `direct` control mappings indicate substantial condition alignment, not complete framework certification. `related` mappings provide security context and intentionally do not claim equivalent coverage.
 - AWS Security Hub CSPM and MITRE ATT&CK references track their live public pages. CIS mappings are pinned to the AWS-published AWS Foundations Benchmark v5.0.0 crosswalk. CIS v7.0.0 is current as of this release, but control IDs are not inferred where an authoritative public crosswalk is unavailable.

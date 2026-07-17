@@ -14,6 +14,7 @@ from typing import Any, Callable, Sequence
 from cloud_analysis import AnalysisSummary, SkippedEvidence, write_analysis_summary
 from cloud_findings import Finding, write_findings
 from cloud_incidents import Incident, write_incidents
+from cloud_remediation import build_remediation_plan, write_remediation_plan
 from cloud_rules import (
     MODULE_ORDER,
     load_builtin_catalog,
@@ -322,6 +323,10 @@ def _run_report(args: argparse.Namespace) -> int:
         analysis_summaries=analysis_summaries,
     )
     write_report(args.output, report)
+    if args.remediation_output is not None:
+        plan = build_remediation_plan(findings, incidents)
+        write_remediation_plan(args.remediation_output, plan)
+        print(f"Remediation plan saved to {args.remediation_output}")
     print(f"Report saved to {args.output}")
     print(f"Findings included: {len(findings)}")
     print(f"Incidents included: {len(incidents)}")
@@ -400,6 +405,13 @@ def _run_demo(args: argparse.Namespace) -> int:
         )
 
     report_path = args.report_output or args.output_dir / "cloud_security_report.md"
+    remediation_path = args.output_dir / "remediation_plan.json"
+    remediation_plan = build_remediation_plan(all_findings, all_incidents)
+    write_remediation_plan(remediation_path, remediation_plan)
+    print(
+        f"Prioritized remediation: {len(remediation_plan.actions)} action(s) "
+        f"-> {remediation_path}"
+    )
     report = render_report(
         all_findings,
         source_files=[*finding_paths, *incident_paths, *summary_paths],
@@ -512,6 +524,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     report_parser.add_argument("--output", type=Path, required=True)
     report_parser.add_argument("--report-date", type=_report_date)
+    report_parser.add_argument(
+        "--remediation-output",
+        type=Path,
+        help="Optional versioned remediation plan JSON output path.",
+    )
     report_parser.set_defaults(handler=_run_report)
 
     catalog_parser = subparsers.add_parser(

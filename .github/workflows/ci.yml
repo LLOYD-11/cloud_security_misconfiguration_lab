@@ -39,7 +39,8 @@ jobs:
 
       - name: Type check
         run: >-
-          mypy cloud_analysis cloud_security_lab cloud_findings cloud_incidents cloud_rules
+          mypy cloud_analysis cloud_security_lab cloud_findings cloud_incidents
+          cloud_remediation cloud_rules
           iam_analyzer storage_analyzer
           network_analyzer cloudtrail_detector report_generator
 
@@ -102,10 +103,13 @@ jobs:
         if: matrix.python-version == '3.13'
         run: python -m build
 
-      - name: Verify wheel contains the rule catalog
+      - name: Verify wheel contains packaged contracts and catalogs
         if: matrix.python-version == '3.13'
         run: >-
           python -c "import glob, zipfile;
           wheel = glob.glob('dist/*.whl')[0];
-          assert 'cloud_rules/rules-v1.0.json'
-          in zipfile.ZipFile(wheel).namelist()"
+          names = zipfile.ZipFile(wheel).namelist();
+          assert 'cloud_rules/rules-v1.0.json' in names;
+          assert 'cloud_remediation/plan.py' in names;
+          assert any(name.endswith(
+          '/schemas/remediation-plan-v1.0.schema.json') for name in names)"

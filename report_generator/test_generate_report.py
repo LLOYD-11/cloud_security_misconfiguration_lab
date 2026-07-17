@@ -85,6 +85,9 @@ class ReportGeneratorTests(unittest.TestCase):
         self.assertIn("# Cloud Security Risk Report", report)
         self.assertIn("| High | 1 |", report)
         self.assertIn("| iam | 1 |", report)
+        self.assertIn("## Prioritized Remediation Plan", report)
+        self.assertIn("| **P2** |", report)
+        self.assertIn("Restrict trusted principals and require external ID.", report)
         self.assertIn("## Triggered Rule Context", report)
         self.assertIn("MITRE ATT&CK Enterprise T1199 (related)", report)
         self.assertIn("#### IAM-008: Cross-account role trust", report)
@@ -325,6 +328,8 @@ class ReportGeneratorTests(unittest.TestCase):
         )
 
         self.assertIn("## Correlated Incidents", report)
+        self.assertIn("| **P0** |", report)
+        self.assertIn("Incident response", report)
         self.assertIn("CTI-ABCDEF123456", report)
         self.assertIn("CLD-002, CLD-005", report)
         self.assertIn("do not prove malicious intent", report)
@@ -342,12 +347,15 @@ class ReportGeneratorTests(unittest.TestCase):
                 "summary.json",
                 "--report-date",
                 "2026-06-30",
+                "--remediation-output",
+                "remediation.json",
             ]
         )
 
         self.assertEqual(date(2026, 6, 30), args.report_date)
         self.assertEqual([Path("incidents.json")], args.incidents)
         self.assertEqual([Path("summary.json")], args.analysis_summary)
+        self.assertEqual(Path("remediation.json"), args.remediation_output)
 
     def test_finding_rejects_unknown_severity(self):
         with self.assertRaisesRegex(ValueError, "severity"):

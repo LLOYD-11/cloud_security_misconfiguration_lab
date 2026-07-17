@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/schemas/remediation-plan-v1.0.schema.json",
+  "title": "Cloud Security Remediation Plan v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source_finding_count",
+    "source_incident_count",
+    "action_count",
+    "actions"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "source_finding_count": { "type": "integer", "minimum": 0 },
+    "source_incident_count": { "type": "integer", "minimum": 0 },
+    "action_count": { "type": "integer", "minimum": 0 },
+    "actions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/action" }
+    }
+  },
+  "$defs": {
+    "nonEmptyUniqueStrings": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action_id",
+        "priority",
+        "work_type",
+        "severity",
+        "confidence",
+        "module",
+        "title",
+        "rationale",
+        "finding_count",
+        "rule_ids",
+        "resources",
+        "incident_ids",
+        "actions"
+      ],
+      "properties": {
+        "action_id": {
+          "type": "string",
+          "pattern": "^REM-[0-9A-F]{12}$"
+        },
+        "priority": { "enum": ["P0", "P1", "P2", "P3"] },
+        "work_type": {
+          "enum": ["incident-response", "configuration"]
+        },
+        "severity": {
+          "enum": ["critical", "high", "medium", "low", "info"]
+        },
+        "confidence": {
+          "enum": ["high", "medium", "low", "not-assessed"]
+        },
+        "module": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "rationale": { "type": "string", "minLength": 1 },
+        "finding_count": { "type": "integer", "minimum": 1 },
+        "rule_ids": { "$ref": "#/$defs/nonEmptyUniqueStrings" },
+        "resources": { "$ref": "#/$defs/nonEmptyUniqueStrings" },
+        "incident_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^CTI-[0-9A-F]{12}$"
+          }
+        },
+        "actions": { "$ref": "#/$defs/nonEmptyUniqueStrings" }
+      }
+    }
+  }
+}
