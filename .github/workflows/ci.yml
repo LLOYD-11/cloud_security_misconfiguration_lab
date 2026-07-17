@@ -40,7 +40,7 @@ jobs:
       - name: Type check
         run: >-
           mypy cloud_analysis cloud_security_lab cloud_findings cloud_incidents
-          cloud_remediation cloud_rules
+          cloud_remediation cloud_rules cloud_timeline
           iam_analyzer storage_analyzer
           network_analyzer cloudtrail_detector report_generator
 
@@ -111,5 +111,8 @@ jobs:
           names = zipfile.ZipFile(wheel).namelist();
           assert 'cloud_rules/rules-v1.0.json' in names;
           assert 'cloud_remediation/plan.py' in names;
+          assert 'cloud_timeline/timeline.py' in names;
           assert any(name.endswith(
-          '/schemas/remediation-plan-v1.0.schema.json') for name in names)"
+          '/schemas/remediation-plan-v1.0.schema.json') for name in names);
+          assert any(name.endswith(
+          '/schemas/attack-timeline-v1.0.schema.json') for name in names)"

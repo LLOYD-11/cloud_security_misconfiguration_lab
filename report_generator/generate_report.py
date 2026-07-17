@@ -22,6 +22,13 @@ from cloud_remediation import (
     write_remediation_plan,
 )
 from cloud_rules import load_builtin_catalog, validate_rule_emission
+from cloud_timeline import (
+    AttackTimeline,
+    activity_label,
+    build_attack_timeline,
+    build_incident_narrative,
+    write_attack_timeline,
+)
 
 SEVERITY_ORDER = ("critical", "high", "medium", "low", "info")
 
@@ -261,6 +268,100 @@ def _render_remediation_plan(plan: RemediationPlan) -> list[str]:
     return lines
 
 
+def _timeline_time_label(first_seen: str, last_seen: str) -> str:
+    if first_seen == last_seen:
+        return first_seen
+    return f"{first_seen} to {last_seen}"
+
+
+def _render_attack_timeline(timeline: AttackTimeline) -> list[str]:
+    if (
+        timeline.source_cloudtrail_finding_count == 0
+        and timeline.source_incident_count == 0
+    ):
+        return []
+
+    lines = [
+        "",
+        "## Attack Timeline",
+        "",
+        (
+            "This chronology orders observed CloudTrail finding evidence. Activity "
+            "labels describe the recorded control-plane action; they do not establish "
+            "malicious intent, attack phase, or causation."
+        ),
+        "",
+        (
+            f"Timeline coverage: {len(timeline.entries)} of "
+            f"{timeline.source_cloudtrail_finding_count} CloudTrail findings included; "
+            f"{len(timeline.omissions)} omitted because required chronological evidence "
+            "was unavailable or invalid."
+        ),
+        "",
+    ]
+    if timeline.entries:
+        lines.extend(
+            [
+                (
+                    "| Time (UTC) | Activity | Observation | Signal Context | "
+                    "Why It Matters |"
+                ),
+                "| --- | --- | --- | --- | --- |",
+            ]
+        )
+        for entry in timeline.entries:
+            event_names = (
+                ", ".join(entry.event_names)
+                if entry.event_names
+                else "Event name not recorded"
+            )
+            incident_context = (
+                ", ".join(f"`{incident_id}`" for incident_id in entry.incident_ids)
+                if entry.incident_ids
+                else "No correlated incident"
+            )
+            observation = (
+                f"{entry.observation} Actor `{entry.actor}` from `{entry.source_ip}`; "
+                f"event(s): {event_names}; resource: `{entry.resource}`."
+            )
+            signal_context = (
+                f"`{entry.rule_id}`; {entry.severity.capitalize()} severity; "
+                f"{entry.confidence.capitalize()} confidence; {incident_context}"
+            )
+            lines.append(
+                f"| {_escape_table_text(_timeline_time_label(entry.first_seen, entry.last_seen))} "
+                f"| {_escape_table_text(activity_label(entry.activity_type))} "
+                f"| {_escape_table_text(observation)} "
+                f"| {_escape_table_text(signal_context)} "
+                f"| {_escape_table_text(entry.significance)} |"
+            )
+    else:
+        lines.append("No finding contained enough evidence for a timeline entry.")
+
+    if timeline.omissions:
+        lines.extend(
+            [
+                "",
+                "### Timeline Omissions",
+                "",
+                (
+                    "Omissions remain visible so missing or invalid timestamps and event "
+                    "identifiers are not mistaken for complete chronological coverage."
+                ),
+                "",
+                "| Rule | Resource | Reason |",
+                "| --- | --- | --- |",
+            ]
+        )
+        for omission in timeline.omissions:
+            lines.append(
+                f"| `{_escape_table_text(omission.rule_id)}` | "
+                f"`{_escape_table_text(omission.resource)}` | "
+                f"`{_escape_table_text(omission.reason)}` |"
+            )
+    return lines
+
+
 def render_report(
     findings: list[Finding],
     *,
@@ -286,6 +387,7 @@ def render_report(
     )
     _validate_summary_counts(sorted_items, sorted_incidents, sorted_summaries)
     _validate_rule_context(sorted_items)
+    timeline = build_attack_timeline(sorted_items, sorted_incidents)
     remediation_plan = build_remediation_plan(sorted_items, sorted_incidents)
 
     lines: list[str] = [
@@ -382,6 +484,7 @@ def render_report(
         for module, count in sorted(module_counts.items()):
             lines.append(f"| {module} | {count} |")
 
+    lines.extend(_render_attack_timeline(timeline))
     lines.extend(_render_remediation_plan(remediation_plan))
     lines.extend(_triggered_rule_context(sorted_items))
 
@@ -423,6 +526,7 @@ def render_report(
         for incident in sorted_incidents:
             event_label = "event" if incident.event_count == 1 else "events"
             finding_label = "finding" if incident.finding_count == 1 else "findings"
+            narrative = build_incident_narrative(incident, timeline)
             lines.extend(
                 [
                     "",
@@ -438,6 +542,8 @@ def render_report(
                     ),
                     f"- Resources: {', '.join(incident.resources)}",
                     f"- Summary: {incident.summary}",
+                    f"- Observed sequence: {narrative.observed_sequence}",
+                    f"- Analyst context: {narrative.analyst_context}",
                     f"- Recommended actions: {' '.join(incident.recommended_actions)}",
                     f"- References: {', '.join(incident.references)}",
                 ]
@@ -518,6 +624,11 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="Optional versioned remediation plan JSON output path.",
     )
+    parser.add_argument(
+        "--timeline-output",
+        type=Path,
+        help="Optional versioned attack timeline JSON output path.",
+    )
     return parser
 
 
@@ -544,6 +655,10 @@ def main() -> int:
         plan = build_remediation_plan(findings, incidents)
         write_remediation_plan(args.remediation_output, plan)
         print(f"Remediation plan saved to {args.remediation_output}")
+    if args.timeline_output is not None:
+        timeline = build_attack_timeline(findings, incidents)
+        write_attack_timeline(args.timeline_output, timeline)
+        print(f"Attack timeline saved to {args.timeline_output}")
     print(f"Report saved to {args.output}")
     print(f"Findings included: {len(findings)}")
     print(f"Incidents included: {len(incidents)}")

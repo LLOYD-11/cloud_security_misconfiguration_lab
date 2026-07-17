@@ -56,12 +56,16 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 - Incident correlation uses exact normalized actor and source values plus a bounded time window. Shared credentials, NAT, proxies, service-originated calls, missing fields, and delivery gaps can split or merge activity in ways that require analyst review.
 - A multi-signal incident requires distinct rules and events. It does not baseline approved administrators, working hours, expected source ranges, user agents, or change tickets.
 - Incident confidence measures correlation strength, not malicious intent. Incidents remain triage leads and do not replace investigation.
+- Timeline activity types are reviewer-facing descriptions of observed API activity, not MITRE ATT&CK tactics, inferred kill-chain phases, or attribution conclusions.
+- A timeline entry requires a valid UTC timestamp and event ID in finding metadata. Missing or invalid chronology is reported as an omission, but the lab cannot reconstruct absent events or delivery gaps.
+- The failure-spike rule produces one aggregate timeline entry for its detected window rather than one finding per failed API call.
 
 ## Reporting
 
 - Severity values are primarily rule defaults and do not incorporate resource criticality. Network findings make one documented adjustment when supplied context reports `not_reachable`.
 - Remediation priorities are deterministic triage bands, not breach-probability or business-impact scores. They do not include asset value, data classification, compensating controls outside the supplied evidence, ownership, effort, dependencies, change windows, or approval state.
 - Configuration is linked to an incident only by an exact rule ID, `resource_type/resource_id`, and shared CloudTrail event ID. This conservative join can miss relationships that require account, session, topology, or semantic analysis.
+- Timeline incident context uses the same conservative exact join. Chronological proximity alone never creates a link, and observed ordering does not prove that one action caused another.
 - Equivalent remediation is grouped only when module, rule, severity, title, and action text match. The plan does not infer that different fixes can be combined into one change.
 - Rule confidence measures how directly the supplied evidence supports the detector condition. It does not measure the probability that activity is malicious or replace analyst validation.
 - `direct` control mappings indicate substantial condition alignment, not complete framework certification. `related` mappings provide security context and intentionally do not claim equivalent coverage.

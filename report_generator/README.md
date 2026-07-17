@@ -1,6 +1,6 @@
 # Risk Report Generator
 
-This module generates a Markdown risk report from one or more shared finding JSON files, optional correlated incident files, and optional analysis-summary files. It also derives an explainable remediation queue across findings and incidents.
+This module generates a Markdown risk report from one or more shared finding JSON files, optional correlated incident files, and optional analysis-summary files. It also derives an explainable remediation queue across findings and incidents and a chronological view of eligible CloudTrail evidence.
 
 Finding inputs must use the versioned object written by the analyzers. The loader rejects unsupported schema versions, mismatched `finding_count` values, missing required fields, and unknown severities instead of silently omitting malformed findings. Known built-in rules are also checked against the versioned catalog for the correct module and allowed severity. Custom rule IDs remain supported and are labeled not cataloged.
 
@@ -54,12 +54,22 @@ python3 report_generator/generate_report.py \
   --analysis-summary reports/generated/cloudtrail_analysis_summary.json \
   --report-date 2026-06-30 \
   --remediation-output reports/generated/remediation_plan.json \
+  --timeline-output reports/generated/attack_timeline.json \
   --output reports/generated/cloud_security_report.md
 ```
 
 The `--findings`, `--incidents`, and `--analysis-summary` options can be repeated. Incident sections preserve the linked rule IDs, event counts, resources, severity, confidence, and recommended triage actions. Coverage sections distinguish complete, partial, and empty runs without treating zero findings as proof of safety. Triggered-rule context summarizes evidence-to-rule confidence and `direct` or `related` control mappings without presenting them as proof of malicious intent or full framework certification.
 
 The remediation section uses published P0-P3 rules, keeps incident response separate from configuration hardening, and groups only findings with the same rule, severity, title, and action. `--remediation-output` writes the same queue under the versioned [`remediation-plan-v1.0`](../schemas/remediation-plan-v1.0.schema.json) contract. See [Remediation prioritization](../docs/remediation-prioritization.md) for the complete algorithm and interpretation boundary.
+
+The attack timeline orders CloudTrail finding evidence by UTC time and retains
+multi-event windows such as repeated API failures. It records findings that
+cannot be placed chronologically, uses an exact rule-resource-event join for
+incident context, and does not label observed activity as proven malicious
+behavior. `--timeline-output` writes the versioned
+[`attack-timeline-v1.0`](../schemas/attack-timeline-v1.0.schema.json) artifact.
+See [Attack timeline](../docs/attack-timeline.md) for evidence and interpretation
+rules.
 
 Use `--report-date YYYY-MM-DD` for deterministic output, or omit it to use the current local date.
 

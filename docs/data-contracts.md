@@ -1,6 +1,6 @@
 # Data Contracts
 
-The repository publishes versioned JSON Schema contracts for its simplified offline inputs, supported native exports, findings, incidents, analysis summaries, rules, and remediation plans.
+The repository publishes versioned JSON Schema contracts for its simplified offline inputs, supported native exports, findings, incidents, analysis summaries, rules, remediation plans, and attack timelines.
 
 | Contract | Schema |
 | --- | --- |
@@ -18,8 +18,9 @@ The repository publishes versioned JSON Schema contracts for its simplified offl
 | Shared findings file | [`findings-v1.0.schema.json`](../schemas/findings-v1.0.schema.json) |
 | Correlated incidents file | [`incidents-v1.0.schema.json`](../schemas/incidents-v1.0.schema.json) |
 | Prioritized remediation plan | [`remediation-plan-v1.0.schema.json`](../schemas/remediation-plan-v1.0.schema.json) |
+| Attack timeline | [`attack-timeline-v1.0.schema.json`](../schemas/attack-timeline-v1.0.schema.json) |
 
-The schemas use JSON Schema Draft 2020-12. Contract tests validate every committed sample, the built-in rule catalog, and analyzer-generated findings, incident, analysis-summary, and remediation-plan files against these schemas.
+The schemas use JSON Schema Draft 2020-12. Contract tests validate every committed sample, the built-in rule catalog, and analyzer-generated findings, incident, analysis-summary, remediation-plan, and attack-timeline files against these schemas.
 
 The environment contracts describe the lab's simplified analyzer models. The native IAM contract describes the fields consumed from a non-truncated AWS `GetAccountAuthorizationDetails` snapshot; the accompanying credential report follows AWS's CSV contract and is validated by required headers and values in Python. Its normalized contract preserves root credentials, console-password usage, group membership, direct policy origin, and permissions-boundary context without treating a boundary as a grant. The S3 bundle contract groups multiple native account and per-bucket responses, including Object Ownership, without flattening collection errors into configuration values. Its normalized contract preserves positive and negative policy elements plus condition context so public-access evaluation does not reduce a policy to its principal alone. The EC2 contract represents a complete direct `DescribeSecurityGroups` response; its adapter flattens permission targets while retaining CIDR, prefix-list, and security-group peer context in the network environment. The optional reachability contract carries separately obtained, direction-specific path conclusions with scope, method, timestamp, evidence, and related resource IDs; it is an assessor attestation rather than a raw AWS API response. The CloudTrail contract describes supported `Records` entries before multiple JSON or gzip files are merged and deduplicated. All normalizers convert native evidence into versioned analyzer environments, keeping the detection interface stable.
 
@@ -30,6 +31,12 @@ The shared findings and incident loaders also verify that each declared count eq
 The remediation-plan model verifies deterministic priority ordering, stable and
 unique action IDs, complete one-time accounting of source findings in
 configuration work, and one response action for every source incident.
+
+The attack-timeline model verifies UTC chronological ordering, stable and unique
+entry IDs, valid activity classifications, exact source accounting across
+entries and omissions, and explicit incident links. The timeline is derived
+from CloudTrail findings rather than raw events so each entry retains detector
+evidence, impact, severity, and catalog confidence.
 
 The canonical [`rules-v1.0.json`](../cloud_rules/rules-v1.0.json) catalog adds
 cross-field checks for unique and deterministically ordered rule IDs, module

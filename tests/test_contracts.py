@@ -21,6 +21,7 @@ from cloud_security_lab.normalizers.network_context import (
     load_network_reachability_context,
 )
 from cloud_security_lab.normalizers.s3 import load_aws_s3_environment
+from cloud_timeline import build_attack_timeline, write_attack_timeline
 from cloudtrail_detector.detector import analyze_activity as analyze_cloudtrail_activity
 from iam_analyzer.analyzer import analyze_environment, load_environment
 
@@ -249,6 +250,35 @@ class DataContractTests(unittest.TestCase):
             schema,
             format_checker=FormatChecker(),
         ).validate(payload)
+
+    def test_generated_attack_timeline_matches_shared_contract(self):
+        schema = _load_json(
+            PROJECT_ROOT / "schemas/attack-timeline-v1.0.schema.json"
+        )
+        environment = _load_json(
+            PROJECT_ROOT / "sample_data/cloudtrail/sample_cloudtrail_events.json"
+        )
+        result = analyze_cloudtrail_activity(environment)
+        timeline = build_attack_timeline(result.findings, result.incidents)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "timeline.json"
+            write_attack_timeline(path, timeline)
+            payload = _load_json(path)
+
+        Draft202012Validator.check_schema(schema)
+        Draft202012Validator(
+            schema,
+            format_checker=FormatChecker(),
+        ).validate(payload)
+
+        non_utc = copy.deepcopy(payload)
+        non_utc["entries"][0]["first_seen"] = "2026-06-30T11:00:00+10:00"
+        validator = Draft202012Validator(
+            schema,
+            format_checker=FormatChecker(),
+        )
+        self.assertTrue(list(validator.iter_errors(non_utc)))
 
     def test_generated_analysis_summary_matches_shared_contract(self):
         schema = _load_json(

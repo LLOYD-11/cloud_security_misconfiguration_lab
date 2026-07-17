@@ -292,6 +292,9 @@ class UnifiedCliTests(unittest.TestCase):
                 )
 
             report = (output_dir / "cloud_security_report.md").read_text(encoding="utf-8")
+            timeline = json.loads(
+                (output_dir / "attack_timeline.json").read_text(encoding="utf-8")
+            )
             generated_names = {path.name for path in output_dir.iterdir()}
 
         self.assertEqual(0, result)
@@ -301,9 +304,13 @@ class UnifiedCliTests(unittest.TestCase):
         self.assertIn("| cloudtrail | simplified (1 file(s)) | complete |", report)
         self.assertIn("## Prioritized Remediation Plan", report)
         self.assertIn("| **P0** |", report)
+        self.assertIn("## Attack Timeline", report)
+        self.assertEqual(11, timeline["entry_count"])
+        self.assertEqual(0, timeline["omission_count"])
         self.assertIn("## Correlated Incidents", report)
         self.assertEqual(
             {
+                "attack_timeline.json",
                 "cloud_security_report.md",
                 "cloudtrail_analysis_summary.json",
                 "cloudtrail_incidents.json",
@@ -324,6 +331,7 @@ class UnifiedCliTests(unittest.TestCase):
             findings_path = Path(tmpdir) / "iam.json"
             report_path = Path(tmpdir) / "report.md"
             remediation_path = Path(tmpdir) / "remediation.json"
+            timeline_path = Path(tmpdir) / "timeline.json"
             with redirect_stdout(StringIO()):
                 main(
                     [
@@ -345,18 +353,23 @@ class UnifiedCliTests(unittest.TestCase):
                         "2026-06-30",
                         "--remediation-output",
                         str(remediation_path),
+                        "--timeline-output",
+                        str(timeline_path),
                     ]
                 )
             report = report_path.read_text(encoding="utf-8")
             remediation = json.loads(
                 remediation_path.read_text(encoding="utf-8")
             )
+            timeline = json.loads(timeline_path.read_text(encoding="utf-8"))
 
         self.assertEqual(0, result)
         self.assertIn("consolidates 9 findings", report)
         self.assertEqual(9, remediation["source_finding_count"])
         self.assertEqual(0, remediation["source_incident_count"])
         self.assertGreater(remediation["action_count"], 0)
+        self.assertEqual(0, timeline["source_cloudtrail_finding_count"])
+        self.assertEqual(0, timeline["entry_count"])
 
     def test_cloudtrail_threshold_options_are_rejected_for_other_modules(self):
         with redirect_stderr(StringIO()), self.assertRaises(SystemExit) as context:

@@ -4,7 +4,7 @@ This project is an offline-first AWS security analysis lab for identifying risky
 
 The goal is to provide practical and explainable security findings without requiring cloud credentials or making changes to a live AWS account.
 
-The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, versioned finding, incident, analysis-summary, detection-rule, and remediation-plan contracts, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
+The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, versioned finding, incident, analysis-summary, detection-rule, remediation-plan, and attack-timeline contracts, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
 
 ## Quick Start
 
@@ -14,7 +14,7 @@ From the repository root, run the complete sample pipeline without installing ru
 python3 -m cloud_security_lab demo --report-date 2026-06-30
 ```
 
-This writes four versioned finding files, four analysis summaries, one correlated incident file, one 36-action prioritized remediation plan, and a 39-finding consolidated report under `reports/generated/`. The result should exactly match [`reports/cloud_security_report_sample.md`](reports/cloud_security_report_sample.md).
+This writes four versioned finding files, four analysis summaries, one correlated incident file, one 36-action prioritized remediation plan, one 11-entry attack timeline, and a 39-finding consolidated report under `reports/generated/`. The result should exactly match [`reports/cloud_security_report_sample.md`](reports/cloud_security_report_sample.md).
 
 Install the project in a virtual environment to expose the `cloud-security-lab` command:
 
@@ -65,7 +65,7 @@ Rule catalog:
 
 ### Module 2: Risk Report Generator
 
-The report generator reads one or more finding JSON files and creates a consolidated Markdown risk report. Optional analysis summaries replace finding-only module counts with evaluated and discovered resource counts, coverage status, skipped evidence, and normalization warnings. Findings and correlated incidents also produce an explainable P0-P3 work queue that separates immediate response from permanent configuration hardening.
+The report generator reads one or more finding JSON files and creates a consolidated Markdown risk report. Optional analysis summaries replace finding-only module counts with evaluated and discovered resource counts, coverage status, skipped evidence, and normalization warnings. Findings and correlated incidents also produce an explainable P0-P3 work queue that separates immediate response from permanent configuration hardening. Timestamped CloudTrail findings form an evidence-preserving timeline, while incident sections explain observed sequence and triage context without presenting chronology as proof of intent or causation.
 
 Each analyzer can write a versioned analysis summary through `--summary-output`. A summary records `complete`, `partial`, or `empty` coverage independently from the finding count, so zero findings no longer imply that evidence was complete. See [Analysis coverage](docs/analysis-coverage.md) for the status and counting rules.
 
@@ -96,6 +96,11 @@ counts, preserves incident response as separate work, and raises configuration
 linked to correlated activity through published rules rather than a hidden risk
 score. It can write a versioned JSON plan through `--remediation-output`; see
 [Remediation prioritization](docs/remediation-prioritization.md).
+
+The timeline includes only CloudTrail findings with valid UTC times and event
+IDs, records every omission, and links an entry to an incident only when rule,
+resource, and event ID agree. It can write a versioned JSON artifact through
+`--timeline-output`; see [Attack timeline](docs/attack-timeline.md).
 
 ### Module 3: Storage Exposure Analyzer
 
@@ -184,7 +189,7 @@ Rule catalog:
 | `CLD-010` | Audit or threat-detection control disabled |
 | `CLD-011` | KMS key disabled or scheduled for deletion |
 
-The detector also correlates eligible findings from the same actor and source into versioned incidents. The default 30-minute window, qualification rules, deterministic IDs, confidence model, and limitations are documented in [CloudTrail incident correlation](docs/incident-correlation.md).
+The detector also correlates eligible findings from the same actor and source into versioned incidents. The default 30-minute window, qualification rules, deterministic IDs, confidence model, and limitations are documented in [CloudTrail incident correlation](docs/incident-correlation.md). The reporting pipeline separately converts timestamped findings into a chronological [attack timeline](docs/attack-timeline.md), preserving aggregate failure windows and explicit evidence gaps.
 
 ## Unified CLI
 
@@ -276,6 +281,7 @@ python3 -m cloud_security_lab report \
   --analysis-summary reports/generated/cloudtrail_analysis_summary.json \
   --report-date 2026-06-30 \
   --remediation-output reports/generated/remediation_plan.json \
+  --timeline-output reports/generated/attack_timeline.json \
   --output reports/generated/cloud_security_report.md
 ```
 
@@ -300,6 +306,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [Data contracts](docs/data-contracts.md)
 - [Detection rule catalog](docs/rule-catalog.md)
 - [Remediation prioritization](docs/remediation-prioritization.md)
+- [Attack timeline](docs/attack-timeline.md)
 - [Analysis coverage](docs/analysis-coverage.md)
 - [Native AWS inputs](docs/native-aws-inputs.md)
 - [Engineering checks](docs/engineering.md)
@@ -320,7 +327,7 @@ Development and contract checks use optional tools declared in `pyproject.toml`:
 
 ```bash
 .venv/bin/ruff check .
-.venv/bin/mypy cloud_analysis cloud_security_lab cloud_findings cloud_incidents cloud_remediation cloud_rules iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
+.venv/bin/mypy cloud_analysis cloud_security_lab cloud_findings cloud_incidents cloud_remediation cloud_rules cloud_timeline iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
 ```
@@ -358,6 +365,9 @@ cloud_security_misconfiguration_lab/
 ├── cloud_rules/
 │   ├── catalog.py
 │   └── rules-v1.0.json
+├── cloud_timeline/
+│   ├── timeline.py
+│   └── test_timeline.py
 ├── cloudtrail_detector/
 │   ├── correlation.py
 │   ├── detector.py
@@ -379,6 +389,7 @@ cloud_security_misconfiguration_lab/
 │   └── cloud_security_report_sample.md
 ├── schemas/
 │   ├── analysis-summary-v1.0.schema.json
+│   ├── attack-timeline-v1.0.schema.json
 │   ├── findings-v1.0.schema.json
 │   ├── incidents-v1.0.schema.json
 │   ├── remediation-plan-v1.0.schema.json
@@ -414,6 +425,7 @@ cloud_security_misconfiguration_lab/
 │   ├── README.md
 │   └── test_analyzer.py
 ├── docs/
+│   ├── attack-timeline.md
 │   ├── data-contracts.md
 │   ├── engineering.md
 │   ├── incident-correlation.md

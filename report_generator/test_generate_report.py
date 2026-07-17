@@ -13,6 +13,7 @@ from cloud_analysis import (
 )
 from cloud_findings import Finding, load_findings_file, write_findings
 from cloud_incidents import Incident, write_incidents
+from cloudtrail_detector.detector import analyze_activity as analyze_cloudtrail_activity
 from report_generator.generate_report import (
     build_parser,
     load_all_analysis_summaries,
@@ -333,6 +334,41 @@ class ReportGeneratorTests(unittest.TestCase):
         self.assertIn("CTI-ABCDEF123456", report)
         self.assertIn("CLD-002, CLD-005", report)
         self.assertIn("do not prove malicious intent", report)
+        self.assertIn("## Attack Timeline", report)
+        self.assertIn("No finding contained enough evidence", report)
+        self.assertIn(
+            "No timeline entry could be linked",
+            report,
+        )
+
+    def test_sample_report_includes_complete_timeline_and_incident_narrative(self):
+        environment = json.loads(
+            (
+                Path(__file__).resolve().parents[1]
+                / "sample_data/cloudtrail/sample_cloudtrail_events.json"
+            ).read_text(encoding="utf-8")
+        )
+        result = analyze_cloudtrail_activity(environment)
+
+        report = render_report(
+            list(result.findings),
+            source_files=[],
+            report_date=date(2026, 6, 30),
+            incidents=result.incidents,
+        )
+
+        self.assertIn("## Attack Timeline", report)
+        self.assertIn("Timeline coverage: 11 of 11", report)
+        self.assertLess(
+            report.index("Root account console login"),
+            report.index("MFA device was disabled or deleted"),
+        )
+        self.assertIn("8 linked timeline entries", report)
+        self.assertIn("19 minutes", report)
+        self.assertIn(
+            "not malicious intent or proof that one action caused the next",
+            report,
+        )
 
     def test_parser_accepts_explicit_report_date(self):
         args = build_parser().parse_args(
@@ -349,6 +385,8 @@ class ReportGeneratorTests(unittest.TestCase):
                 "2026-06-30",
                 "--remediation-output",
                 "remediation.json",
+                "--timeline-output",
+                "timeline.json",
             ]
         )
 
@@ -356,6 +394,7 @@ class ReportGeneratorTests(unittest.TestCase):
         self.assertEqual([Path("incidents.json")], args.incidents)
         self.assertEqual([Path("summary.json")], args.analysis_summary)
         self.assertEqual(Path("remediation.json"), args.remediation_output)
+        self.assertEqual(Path("timeline.json"), args.timeline_output)
 
     def test_finding_rejects_unknown_severity(self):
         with self.assertRaisesRegex(ValueError, "severity"):

@@ -41,6 +41,8 @@ All notable changes to this project are documented in this file.
 - Catalog schema, completeness, control-mapping, deterministic documentation, and wheel-content gates.
 - Deterministic P0-P3 remediation prioritization across findings and incidents, with separate response and hardening work types, conservative incident linkage, and stable action IDs.
 - A versioned remediation-plan contract, machine-readable CLI output, report integration, public prioritization documentation, and complete source-accounting tests.
+- A deterministic CloudTrail attack timeline with stable entry IDs, conservative activity labels, explicit evidence omissions, exact incident linkage, and richer incident narratives.
+- A versioned attack-timeline contract, machine-readable CLI output, report integration, public interpretation documentation, and CloudTrail rule-classification completeness tests.
 
 ### Changed
 

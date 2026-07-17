@@ -32,6 +32,7 @@ from cloud_security_lab.normalizers import (
     load_network_reachability_context,
     write_normalized_environment,
 )
+from cloud_timeline import build_attack_timeline, write_attack_timeline
 from cloudtrail_detector.correlation import DEFAULT_CORRELATION_WINDOW_MINUTES
 from cloudtrail_detector.detector import (
     analyze_activity as analyze_cloudtrail_activity,
@@ -327,6 +328,10 @@ def _run_report(args: argparse.Namespace) -> int:
         plan = build_remediation_plan(findings, incidents)
         write_remediation_plan(args.remediation_output, plan)
         print(f"Remediation plan saved to {args.remediation_output}")
+    if args.timeline_output is not None:
+        timeline = build_attack_timeline(findings, incidents)
+        write_attack_timeline(args.timeline_output, timeline)
+        print(f"Attack timeline saved to {args.timeline_output}")
     print(f"Report saved to {args.output}")
     print(f"Findings included: {len(findings)}")
     print(f"Incidents included: {len(incidents)}")
@@ -411,6 +416,14 @@ def _run_demo(args: argparse.Namespace) -> int:
     print(
         f"Prioritized remediation: {len(remediation_plan.actions)} action(s) "
         f"-> {remediation_path}"
+    )
+    timeline_path = args.output_dir / "attack_timeline.json"
+    timeline = build_attack_timeline(all_findings, all_incidents)
+    write_attack_timeline(timeline_path, timeline)
+    timeline_entry_label = "entry" if len(timeline.entries) == 1 else "entries"
+    print(
+        f"Attack timeline: {len(timeline.entries)} {timeline_entry_label} "
+        f"-> {timeline_path}"
     )
     report = render_report(
         all_findings,
@@ -528,6 +541,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--remediation-output",
         type=Path,
         help="Optional versioned remediation plan JSON output path.",
+    )
+    report_parser.add_argument(
+        "--timeline-output",
+        type=Path,
+        help="Optional versioned attack timeline JSON output path.",
     )
     report_parser.set_defaults(handler=_run_report)
 
