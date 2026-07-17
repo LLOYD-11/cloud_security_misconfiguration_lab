@@ -69,6 +69,8 @@ class NativeCloudTrailNormalizerTests(unittest.TestCase):
         )
         self.assertEqual(1, len(result.warnings))
         self.assertIn("Skipped 1 duplicate", result.warnings[0])
+        self.assertEqual("CLD_DUPLICATE_EVENT", result.skipped_evidence[0].code)
+        self.assertFalse(result.skipped_evidence[0].affects_coverage)
 
     def test_duplicate_input_paths_are_rejected(self):
         with self.assertRaisesRegex(ValueError, "provided more than once"):
@@ -83,6 +85,7 @@ class NativeCloudTrailNormalizerTests(unittest.TestCase):
 
         self.assertEqual(1, len(result.environment["events"]))
         self.assertIn("Skipped 1 duplicate", result.warnings[0])
+        self.assertEqual(1, result.skipped_evidence[0].count)
 
     def test_conflicting_duplicate_event_ids_are_rejected(self):
         first = _event()

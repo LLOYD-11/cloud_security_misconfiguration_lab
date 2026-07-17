@@ -8,8 +8,10 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator, FormatChecker
 
+from cloud_analysis import write_analysis_summary
 from cloud_findings import write_findings
 from cloud_incidents import write_incidents
+from cloud_security_lab.analysis import build_analysis_summary
 from cloud_security_lab.normalizers.cloudtrail import load_aws_cloudtrail_environment
 from cloud_security_lab.normalizers.ec2 import load_aws_ec2_environment
 from cloud_security_lab.normalizers.iam import load_aws_iam_environment
@@ -213,6 +215,29 @@ class DataContractTests(unittest.TestCase):
             schema,
             format_checker=FormatChecker(),
         ).validate(payload)
+
+    def test_generated_analysis_summary_matches_shared_contract(self):
+        schema = _load_json(
+            PROJECT_ROOT / "schemas/analysis-summary-v1.0.schema.json"
+        )
+        environment = _load_json(
+            PROJECT_ROOT / "sample_data/network/sample_network_environment.json"
+        )
+        summary = build_analysis_summary(
+            module="network",
+            environment=environment,
+            input_format="simplified",
+            input_file_count=1,
+            finding_count=10,
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "analysis-summary.json"
+            write_analysis_summary(path, summary)
+            payload = _load_json(path)
+
+        Draft202012Validator.check_schema(schema)
+        Draft202012Validator(schema).validate(payload)
 
 
 if __name__ == "__main__":

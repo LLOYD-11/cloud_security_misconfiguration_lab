@@ -4,7 +4,7 @@ This project is an offline-first AWS security analysis lab for identifying risky
 
 The goal is to provide practical and explainable security findings without requiring cloud credentials or making changes to a live AWS account.
 
-The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, versioned finding and incident contracts, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
+The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, versioned finding, incident, and analysis-summary contracts, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
 
 ## Quick Start
 
@@ -14,7 +14,7 @@ From the repository root, run the complete sample pipeline without installing ru
 python3 -m cloud_security_lab demo --report-date 2026-06-30
 ```
 
-This writes four versioned finding files, one correlated incident file, and a 39-finding consolidated report under `reports/generated/`. The result should exactly match [`reports/cloud_security_report_sample.md`](reports/cloud_security_report_sample.md).
+This writes four versioned finding files, four analysis summaries, one correlated incident file, and a 39-finding consolidated report under `reports/generated/`. The result should exactly match [`reports/cloud_security_report_sample.md`](reports/cloud_security_report_sample.md).
 
 Install the project in a virtual environment to expose the `cloud-security-lab` command:
 
@@ -65,7 +65,9 @@ Rule catalog:
 
 ### Module 2: Risk Report Generator
 
-The report generator reads one or more finding JSON files and creates a consolidated Markdown risk report.
+The report generator reads one or more finding JSON files and creates a consolidated Markdown risk report. Optional analysis summaries replace finding-only module counts with evaluated and discovered resource counts, coverage status, skipped evidence, and normalization warnings.
+
+Each analyzer can write a versioned analysis summary through `--summary-output`. A summary records `complete`, `partial`, or `empty` coverage independently from the finding count, so zero findings no longer imply that evidence was complete. See [Analysis coverage](docs/analysis-coverage.md) for the status and counting rules.
 
 All analyzers should emit the same finding schema:
 
@@ -180,7 +182,8 @@ Run one analyzer:
 ```bash
 python3 -m cloud_security_lab analyze iam \
   sample_data/iam/sample_iam_environment.json \
-  --output reports/generated/iam_findings.json
+  --output reports/generated/iam_findings.json \
+  --summary-output reports/generated/iam_analysis_summary.json
 ```
 
 Analyze native AWS IAM exports without connecting the lab to an account:
@@ -192,7 +195,8 @@ python3 -m cloud_security_lab analyze iam \
   --credential-report sample_data/aws/iam/credential_report.csv \
   --as-of 2026-06-30 \
   --normalized-output reports/generated/normalized_iam_environment.json \
-  --output reports/generated/iam_findings.json
+  --output reports/generated/iam_findings.json \
+  --summary-output reports/generated/iam_analysis_summary.json
 ```
 
 See [Native AWS inputs](docs/native-aws-inputs.md) for evidence collection, validation behavior, and limitations.
@@ -204,7 +208,8 @@ python3 -m cloud_security_lab analyze storage \
   sample_data/aws/s3/s3_security_evidence_bundle.json \
   --input-format aws \
   --normalized-output reports/generated/normalized_storage_environment.json \
-  --output reports/generated/storage_findings.json
+  --output reports/generated/storage_findings.json \
+  --summary-output reports/generated/storage_analysis_summary.json
 ```
 
 Analyze the bundled native EC2 security-group response:
@@ -215,7 +220,8 @@ python3 -m cloud_security_lab analyze network \
   --input-format aws \
   --reachability-context sample_data/aws/ec2/network_reachability_context.json \
   --normalized-output reports/generated/normalized_network_environment.json \
-  --output reports/generated/network_findings.json
+  --output reports/generated/network_findings.json \
+  --summary-output reports/generated/network_analysis_summary.json
 ```
 
 Analyze the bundled native CloudTrail JSON and gzip files:
@@ -227,7 +233,8 @@ python3 -m cloud_security_lab analyze cloudtrail \
   --input-format aws \
   --normalized-output reports/generated/normalized_cloudtrail_environment.json \
   --output reports/generated/cloudtrail_findings.json \
-  --incidents-output reports/generated/cloudtrail_incidents.json
+  --incidents-output reports/generated/cloudtrail_incidents.json \
+  --summary-output reports/generated/cloudtrail_analysis_summary.json
 ```
 
 Merge one or more versioned finding files:
@@ -239,6 +246,10 @@ python3 -m cloud_security_lab report \
   --findings reports/generated/network_findings.json \
   --findings reports/generated/cloudtrail_findings.json \
   --incidents reports/generated/cloudtrail_incidents.json \
+  --analysis-summary reports/generated/iam_analysis_summary.json \
+  --analysis-summary reports/generated/storage_analysis_summary.json \
+  --analysis-summary reports/generated/network_analysis_summary.json \
+  --analysis-summary reports/generated/cloudtrail_analysis_summary.json \
   --report-date 2026-06-30 \
   --output reports/generated/cloud_security_report.md
 ```
@@ -260,6 +271,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 
 - [Upgrade roadmap](ROADMAP.md)
 - [Data contracts](docs/data-contracts.md)
+- [Analysis coverage](docs/analysis-coverage.md)
 - [Native AWS inputs](docs/native-aws-inputs.md)
 - [Engineering checks](docs/engineering.md)
 - [Known limitations](docs/known-limitations.md)
@@ -279,7 +291,7 @@ Development and contract checks use optional tools declared in `pyproject.toml`:
 
 ```bash
 .venv/bin/ruff check .
-.venv/bin/mypy cloud_security_lab cloud_findings cloud_incidents iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
+.venv/bin/mypy cloud_analysis cloud_security_lab cloud_findings cloud_incidents iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
 ```
@@ -297,6 +309,7 @@ cloud_security_misconfiguration_lab/
 ├── pyproject.toml
 ├── cloud_security_lab/
 │   ├── __main__.py
+│   ├── analysis.py
 │   ├── cli.py
 │   └── normalizers/
 │       ├── cloudtrail.py
@@ -305,6 +318,8 @@ cloud_security_misconfiguration_lab/
 │       ├── iam.py
 │       ├── network_context.py
 │       └── s3.py
+├── cloud_analysis/
+│   └── summary.py
 ├── cloud_findings/
 │   └── finding.py
 ├── cloud_incidents/
@@ -329,6 +344,7 @@ cloud_security_misconfiguration_lab/
 ├── reports/
 │   └── cloud_security_report_sample.md
 ├── schemas/
+│   ├── analysis-summary-v1.0.schema.json
 │   ├── findings-v1.0.schema.json
 │   ├── incidents-v1.0.schema.json
 │   ├── aws-cloudtrail-records-v1.0.schema.json

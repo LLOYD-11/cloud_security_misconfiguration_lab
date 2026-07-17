@@ -8,6 +8,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from cloud_analysis import SkippedEvidence
+
 ACCOUNT_ID_PATTERN = re.compile(r"^\d{12}$")
 SCHEMA_VERSION = "1.0"
 PAB_FIELDS = {
@@ -32,6 +34,7 @@ class S3NormalizationResult:
 
     environment: dict[str, Any]
     warnings: tuple[str, ...]
+    skipped_evidence: tuple[SkippedEvidence, ...] = ()
 
 
 def _load_json_object(path: Path) -> dict[str, Any]:

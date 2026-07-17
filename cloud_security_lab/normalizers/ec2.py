@@ -9,6 +9,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from cloud_analysis import SkippedEvidence
+
 ACCOUNT_ID_PATTERN = re.compile(r"^\d{12}$")
 SECURITY_GROUP_ID_PATTERN = re.compile(r"^sg-(?:[0-9a-f]{8}|[0-9a-f]{17})$")
 VPC_ID_PATTERN = re.compile(r"^vpc-(?:[0-9a-f]{8}|[0-9a-f]{17})$")
@@ -29,6 +31,7 @@ class Ec2NormalizationResult:
 
     environment: dict[str, Any]
     warnings: tuple[str, ...]
+    skipped_evidence: tuple[SkippedEvidence, ...] = ()
 
 
 def _load_json_object(path: Path) -> dict[str, Any]:

@@ -10,6 +10,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Sequence
 
+from cloud_analysis import SkippedEvidence
+
 ACCOUNT_ID_PATTERN = re.compile(r"^\d{12}$")
 EVENT_ID_PATTERN = re.compile(
     r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
@@ -25,6 +27,7 @@ class CloudTrailNormalizationResult:
 
     environment: dict[str, Any]
     warnings: tuple[str, ...]
+    skipped_evidence: tuple[SkippedEvidence, ...] = ()
 
 
 def _load_json_object(path: Path) -> dict[str, Any]:
@@ -201,6 +204,7 @@ def normalize_aws_cloudtrail_environment(
     events_by_id: dict[str, dict[str, Any]] = {}
     account_ids: set[str] = set()
     duplicate_count = 0
+    duplicate_event_ids: set[str] = set()
     account_fallback_count = 0
     for file_index, payload in enumerate(log_files):
         file_context = f"CloudTrail log file {file_index + 1}"
@@ -215,6 +219,7 @@ def normalize_aws_cloudtrail_environment(
                         f"{context} conflicts with another record using eventID {event_id}."
                     )
                 duplicate_count += 1
+                duplicate_event_ids.add(event_id)
                 continue
             events_by_id[event_id] = event
             events.append(event)
@@ -238,12 +243,25 @@ def normalize_aws_cloudtrail_environment(
             f"Derived account context from userIdentity for {account_fallback_count} "
             "CloudTrail record(s) without recipientAccountId."
         )
+    skipped_evidence: tuple[SkippedEvidence, ...] = ()
+    if duplicate_count:
+        skipped_evidence = (
+            SkippedEvidence(
+                code="CLD_DUPLICATE_EVENT",
+                evidence_type="cloudtrail-event",
+                reason="Identical records sharing an event ID were analyzed once.",
+                count=duplicate_count,
+                affects_coverage=False,
+                resource_ids=sorted(duplicate_event_ids),
+            ),
+        )
     return CloudTrailNormalizationResult(
         environment={
             "account_id": next(iter(account_ids)),
             "events": events,
         },
         warnings=tuple(warnings),
+        skipped_evidence=skipped_evidence,
     )
 
 

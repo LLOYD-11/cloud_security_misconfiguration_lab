@@ -33,6 +33,8 @@ All notable changes to this project are documented in this file.
 - CloudTrail rules for password-only IAM console login, cloud credential creation, role trust changes, monitoring-control disablement, and KMS disruption.
 - Deterministic CloudTrail incident correlation by actor, source, and bounded time window, with stable IDs, inherited severity, explicit confidence, and versioned JSON output.
 - A shared incident model, Draft 2020-12 incident schema, report integration, sample attack-chain incidents, and CLI support through `--incidents-output` and `--incidents`.
+- Versioned analysis summaries for input format, analyzer version, resource coverage, skipped evidence, warnings, finding counts, and incident counts.
+- Coverage-aware report sections and CLI support through `--summary-output` and repeatable `--analysis-summary` inputs.
 
 ### Changed
 

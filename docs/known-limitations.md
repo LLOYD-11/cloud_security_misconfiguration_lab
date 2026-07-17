@@ -60,5 +60,6 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 ## Reporting
 
 - Severity values are primarily rule defaults and do not incorporate resource criticality. Network findings make one documented adjustment when supplied context reports `not_reachable`.
-- Module coverage currently counts findings rather than all evaluated and skipped resources.
+- Analysis summaries count primary resources evaluated by each module. Skipped evidence can identify narrower unevaluated policy, credential, peer-target, reachability, or event fields without pretending that every evidence unit is a separate cloud resource.
+- `complete` means that no known coverage-affecting gap was recorded for the supplied evidence. It does not prove that collection was authorized, current, account-wide, unfiltered, or free of omissions outside the supported contracts.
 - A report with no findings does not prove that an AWS environment is secure.

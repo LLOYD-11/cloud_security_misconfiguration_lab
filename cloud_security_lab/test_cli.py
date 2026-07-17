@@ -14,6 +14,7 @@ class UnifiedCliTests(unittest.TestCase):
     def test_analyze_iam_matches_module_output(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             output_path = Path(tmpdir) / "iam.json"
+            summary_path = Path(tmpdir) / "iam-summary.json"
             with redirect_stdout(StringIO()):
                 result = main(
                     [
@@ -22,18 +23,28 @@ class UnifiedCliTests(unittest.TestCase):
                         str(PROJECT_ROOT / "sample_data/iam/sample_iam_environment.json"),
                         "--output",
                         str(output_path),
+                        "--summary-output",
+                        str(summary_path),
                     ]
                 )
 
             payload = json.loads(output_path.read_text(encoding="utf-8"))
+            summary = json.loads(summary_path.read_text(encoding="utf-8"))
 
         self.assertEqual(0, result)
         self.assertEqual(9, payload["finding_count"])
+        self.assertEqual("complete", summary["coverage_status"])
+        self.assertEqual("simplified", summary["input_format"])
+        self.assertEqual(
+            ["group", "role", "root-account", "user"],
+            [item["resource_type"] for item in summary["resource_coverage"]],
+        )
 
     def test_analyze_native_aws_iam_writes_findings_and_normalized_evidence(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             output_path = Path(tmpdir) / "iam.json"
             normalized_path = Path(tmpdir) / "normalized-iam.json"
+            summary_path = Path(tmpdir) / "iam-summary.json"
             with redirect_stdout(StringIO()), redirect_stderr(StringIO()) as stderr:
                 result = main(
                     [
@@ -53,16 +64,20 @@ class UnifiedCliTests(unittest.TestCase):
                         str(normalized_path),
                         "--output",
                         str(output_path),
+                        "--summary-output",
+                        str(summary_path),
                     ]
                 )
 
             payload = json.loads(output_path.read_text(encoding="utf-8"))
             normalized = json.loads(normalized_path.read_text(encoding="utf-8"))
+            summary = json.loads(summary_path.read_text(encoding="utf-8"))
 
         self.assertEqual(0, result)
         self.assertEqual("", stderr.getvalue())
         self.assertEqual(9, payload["finding_count"])
         self.assertEqual("111122223333", normalized["account_id"])
+        self.assertEqual({"as_of": "2026-06-30"}, summary["parameters"])
 
     def test_analyze_native_aws_s3_writes_findings_and_normalized_evidence(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -98,6 +113,7 @@ class UnifiedCliTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             output_path = Path(tmpdir) / "network.json"
             normalized_path = Path(tmpdir) / "normalized-network.json"
+            summary_path = Path(tmpdir) / "network-summary.json"
             with redirect_stdout(StringIO()), redirect_stderr(StringIO()) as stderr:
                 result = main(
                     [
@@ -118,11 +134,14 @@ class UnifiedCliTests(unittest.TestCase):
                         str(normalized_path),
                         "--output",
                         str(output_path),
+                        "--summary-output",
+                        str(summary_path),
                     ]
                 )
 
             payload = json.loads(output_path.read_text(encoding="utf-8"))
             normalized = json.loads(normalized_path.read_text(encoding="utf-8"))
+            summary = json.loads(summary_path.read_text(encoding="utf-8"))
 
         self.assertEqual(0, result)
         self.assertEqual(10, payload["finding_count"])
@@ -139,6 +158,15 @@ class UnifiedCliTests(unittest.TestCase):
         )
         self.assertIn("prefix-list targets", stderr.getvalue())
         self.assertIn("security-group targets", stderr.getvalue())
+        self.assertEqual("partial", summary["coverage_status"])
+        self.assertEqual(2, summary["input_file_count"])
+        self.assertEqual(
+            {
+                "NET_PREFIX_LIST_TARGET_UNRESOLVED",
+                "NET_SECURITY_GROUP_TARGET_UNRESOLVED",
+            },
+            {item["code"] for item in summary["skipped_evidence"]},
+        )
 
     def test_simplified_network_context_replaces_embedded_context_set(self):
         sample_path = (
@@ -189,6 +217,7 @@ class UnifiedCliTests(unittest.TestCase):
             output_path = Path(tmpdir) / "cloudtrail.json"
             incidents_path = Path(tmpdir) / "cloudtrail-incidents.json"
             normalized_path = Path(tmpdir) / "normalized-cloudtrail.json"
+            summary_path = Path(tmpdir) / "cloudtrail-summary.json"
             sample_root = PROJECT_ROOT / "sample_data/aws/cloudtrail"
             with redirect_stdout(StringIO()), redirect_stderr(StringIO()) as stderr:
                 result = main(
@@ -211,18 +240,40 @@ class UnifiedCliTests(unittest.TestCase):
                         str(output_path),
                         "--incidents-output",
                         str(incidents_path),
+                        "--summary-output",
+                        str(summary_path),
                     ]
                 )
 
             payload = json.loads(output_path.read_text(encoding="utf-8"))
             incidents = json.loads(incidents_path.read_text(encoding="utf-8"))
             normalized = json.loads(normalized_path.read_text(encoding="utf-8"))
+            summary = json.loads(summary_path.read_text(encoding="utf-8"))
 
         self.assertEqual(0, result)
         self.assertEqual(11, payload["finding_count"])
         self.assertEqual(2, incidents["incident_count"])
         self.assertEqual(17, len(normalized["events"]))
         self.assertIn("Skipped 1 duplicate", stderr.getvalue())
+        self.assertEqual("complete", summary["coverage_status"])
+        self.assertEqual(
+            {
+                "discovered_count": 18,
+                "evaluated_count": 17,
+                "resource_type": "event",
+                "skipped_count": 1,
+            },
+            summary["resource_coverage"][0],
+        )
+        self.assertFalse(summary["skipped_evidence"][0]["affects_coverage"])
+        self.assertEqual(
+            {
+                "correlation_window_minutes": "30",
+                "failure_threshold": "5",
+                "failure_window_minutes": "10",
+            },
+            summary["parameters"],
+        )
 
     def test_demo_runs_all_modules_and_writes_report(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -246,14 +297,20 @@ class UnifiedCliTests(unittest.TestCase):
         self.assertEqual(0, result)
         self.assertIn("Generated: 2026-06-30", report)
         self.assertIn("consolidates 39 findings", report)
+        self.assertIn("## Analysis Coverage", report)
+        self.assertIn("| cloudtrail | simplified (1 file(s)) | complete |", report)
         self.assertIn("## Correlated Incidents", report)
         self.assertEqual(
             {
                 "cloud_security_report.md",
+                "cloudtrail_analysis_summary.json",
                 "cloudtrail_incidents.json",
                 "cloudtrail_findings.json",
+                "iam_analysis_summary.json",
                 "iam_findings.json",
+                "network_analysis_summary.json",
                 "network_findings.json",
+                "storage_analysis_summary.json",
                 "storage_findings.json",
             },
             generated_names,
@@ -302,6 +359,40 @@ class UnifiedCliTests(unittest.TestCase):
             )
 
         self.assertEqual(2, context.exception.code)
+
+    def test_cloudtrail_summary_records_custom_analysis_parameters(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            summary_path = Path(tmpdir) / "summary.json"
+            with redirect_stdout(StringIO()):
+                result = main(
+                    [
+                        "analyze",
+                        "cloudtrail",
+                        str(
+                            PROJECT_ROOT
+                            / "sample_data/cloudtrail/sample_cloudtrail_events.json"
+                        ),
+                        "--failure-threshold",
+                        "4",
+                        "--failure-window-minutes",
+                        "8",
+                        "--correlation-window-minutes",
+                        "20",
+                        "--summary-output",
+                        str(summary_path),
+                    ]
+                )
+            summary = json.loads(summary_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(0, result)
+        self.assertEqual(
+            {
+                "correlation_window_minutes": "20",
+                "failure_threshold": "4",
+                "failure_window_minutes": "8",
+            },
+            summary["parameters"],
+        )
 
     def test_cloudtrail_incident_options_are_rejected_for_other_modules(self):
         with redirect_stderr(StringIO()) as stderr, self.assertRaises(

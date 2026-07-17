@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import unquote
 
+from cloud_analysis import SkippedEvidence
 from cloud_security_lab.normalizers.common import (
     write_normalized_environment as write_normalized_environment,
 )
@@ -43,6 +44,7 @@ class IamNormalizationResult:
 
     environment: dict[str, Any]
     warnings: tuple[str, ...]
+    skipped_evidence: tuple[SkippedEvidence, ...] = ()
 
 
 def _load_json_object(path: Path, label: str) -> dict[str, Any]:
@@ -170,6 +172,7 @@ def _identity_policies(
     managed: dict[str, dict[str, Any]],
     context: str,
     warnings: list[str],
+    skipped_evidence: list[SkippedEvidence],
 ) -> list[dict[str, Any]]:
     policies: list[dict[str, Any]] = []
     inline_policies = identity.get(inline_key, [])
@@ -203,6 +206,19 @@ def _identity_policies(
         policy = managed.get(arn)
         if policy is None:
             warnings.append(f"{context} references managed policy {arn}, but its document is absent.")
+            skipped_evidence.append(
+                SkippedEvidence(
+                    code="IAM_REFERENCED_POLICY_DOCUMENT_ABSENT",
+                    evidence_type="managed-policy-document",
+                    reason=(
+                        "A referenced managed-policy document was absent, so its statements "
+                        "were not evaluated."
+                    ),
+                    count=1,
+                    affects_coverage=True,
+                    resource_ids=[f"{context}/{arn}"],
+                )
+            )
             continue
         policies.append(
             {
@@ -463,6 +479,7 @@ def normalize_aws_iam_environment(
     roles = _object_list(authorization_details, "RoleDetailList")
     policies = _object_list(authorization_details, "Policies")
     warnings: list[str] = []
+    skipped_evidence: list[SkippedEvidence] = []
     managed = _managed_policy_documents(policies, warnings)
 
     group_policies: dict[str, list[dict[str, Any]]] = {}
@@ -477,6 +494,7 @@ def normalize_aws_iam_environment(
             managed=managed,
             context=f"Group {group_name}",
             warnings=warnings,
+            skipped_evidence=skipped_evidence,
         )
         group_members[group_name] = []
 
@@ -502,6 +520,7 @@ def normalize_aws_iam_environment(
             managed=managed,
             context=f"User {username}",
             warnings=warnings,
+            skipped_evidence=skipped_evidence,
         )
         group_names = user.get("GroupList", [])
         if not isinstance(group_names, list) or not all(
@@ -546,6 +565,19 @@ def normalize_aws_iam_environment(
             "Credential report user(s) absent from authorization details: "
             + ", ".join(extra_credential_users)
         )
+        skipped_evidence.append(
+            SkippedEvidence(
+                code="IAM_IDENTITY_DETAIL_ABSENT",
+                evidence_type="iam-identity-detail",
+                reason=(
+                    "Credential-report identities absent from authorization details could not "
+                    "be evaluated for permissions."
+                ),
+                count=len(extra_credential_users),
+                affects_coverage=True,
+                resource_ids=extra_credential_users,
+            )
+        )
 
     normalized_roles: list[dict[str, Any]] = []
     seen_roles: set[str] = set()
@@ -570,6 +602,7 @@ def normalize_aws_iam_environment(
                 managed=managed,
                 context=f"Role {role_name}",
                 warnings=warnings,
+                skipped_evidence=skipped_evidence,
             ),
         }
         boundary = _permissions_boundary(
@@ -616,6 +649,7 @@ def normalize_aws_iam_environment(
     return IamNormalizationResult(
         environment=environment,
         warnings=tuple(warnings),
+        skipped_evidence=tuple(skipped_evidence),
     )
 
 

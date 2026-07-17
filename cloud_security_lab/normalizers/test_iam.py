@@ -105,6 +105,7 @@ class NativeIamNormalizerTests(unittest.TestCase):
         ]
 
         self.assertEqual((), result.warnings)
+        self.assertEqual((), result.skipped_evidence)
         self.assertEqual("111122223333", result.environment["account_id"])
         self.assertEqual(simplified_signatures, native_signatures)
         self.assertTrue(result.environment["root_account"]["mfa_enabled"])
@@ -237,6 +238,13 @@ class NativeIamNormalizerTests(unittest.TestCase):
             ),
             result.warnings,
         )
+        self.assertEqual(
+            {
+                "IAM_IDENTITY_DETAIL_ABSENT",
+                "IAM_REFERENCED_POLICY_DOCUMENT_ABSENT",
+            },
+            {item.code for item in result.skipped_evidence},
+        )
 
     def test_managed_policy_without_default_document_is_warned_and_skipped(self):
         authorization = _authorization_details()
@@ -250,6 +258,10 @@ class NativeIamNormalizerTests(unittest.TestCase):
 
         self.assertIn("has no readable default policy version", result.warnings[0])
         self.assertIn("but its document is absent", result.warnings[1])
+        self.assertEqual(
+            "IAM_REFERENCED_POLICY_DOCUMENT_ABSENT",
+            result.skipped_evidence[0].code,
+        )
 
     def test_missing_permissions_boundary_document_is_preserved_with_warning(self):
         authorization = _authorization_details()

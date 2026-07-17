@@ -39,7 +39,8 @@ jobs:
 
       - name: Type check
         run: >-
-          mypy cloud_security_lab cloud_findings cloud_incidents iam_analyzer storage_analyzer
+          mypy cloud_analysis cloud_security_lab cloud_findings cloud_incidents
+          iam_analyzer storage_analyzer
           network_analyzer cloudtrail_detector report_generator
 
       - name: Test with branch coverage
@@ -59,6 +60,7 @@ jobs:
           --as-of 2026-06-30
           --normalized-output reports/generated/normalized_iam_environment.json
           --output reports/generated/native_iam_findings.json
+          --summary-output reports/generated/native_iam_analysis_summary.json
 
       - name: Verify native S3 input pipeline
         run: >-
@@ -67,6 +69,7 @@ jobs:
           --input-format aws
           --normalized-output reports/generated/normalized_storage_environment.json
           --output reports/generated/native_storage_findings.json
+          --summary-output reports/generated/native_storage_analysis_summary.json
 
       - name: Verify native EC2 input pipeline
         run: >-
@@ -76,6 +79,7 @@ jobs:
           --reachability-context sample_data/aws/ec2/network_reachability_context.json
           --normalized-output reports/generated/normalized_network_environment.json
           --output reports/generated/native_network_findings.json
+          --summary-output reports/generated/native_network_analysis_summary.json
 
       - name: Verify native CloudTrail input pipeline
         run: >-
@@ -86,6 +90,7 @@ jobs:
           --normalized-output reports/generated/normalized_cloudtrail_environment.json
           --output reports/generated/native_cloudtrail_findings.json
           --incidents-output reports/generated/native_cloudtrail_incidents.json
+          --summary-output reports/generated/native_cloudtrail_analysis_summary.json
 
       - name: Build wheel and source distribution
         if: matrix.python-version == '3.13'

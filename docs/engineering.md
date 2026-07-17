@@ -15,7 +15,7 @@ Run these commands from the repository root:
 
 ```bash
 .venv/bin/ruff check .
-.venv/bin/mypy cloud_security_lab cloud_findings cloud_incidents iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
+.venv/bin/mypy cloud_analysis cloud_security_lab cloud_findings cloud_incidents iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
 .venv/bin/python -m cloud_security_lab demo --report-date 2026-06-30

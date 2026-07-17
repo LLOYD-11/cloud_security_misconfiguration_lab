@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/schemas/analysis-summary-v1.0.schema.json",
+  "title": "Analysis Summary v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "module",
+    "analyzer_version",
+    "input_format",
+    "input_file_count",
+    "coverage_status",
+    "finding_count",
+    "incident_count",
+    "parameters",
+    "resource_coverage",
+    "skipped_evidence",
+    "warnings"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "module": {
+      "enum": ["iam", "storage", "network", "cloudtrail"]
+    },
+    "analyzer_version": { "type": "string", "minLength": 1 },
+    "input_format": { "enum": ["simplified", "aws"] },
+    "input_file_count": { "type": "integer", "minimum": 1 },
+    "coverage_status": {
+      "enum": ["complete", "partial", "empty"]
+    },
+    "finding_count": { "type": "integer", "minimum": 0 },
+    "incident_count": { "type": "integer", "minimum": 0 },
+    "parameters": {
+      "type": "object",
+      "propertyNames": { "minLength": 1 },
+      "additionalProperties": { "type": "string", "minLength": 1 }
+    },
+    "resource_coverage": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/resourceCoverage" }
+    },
+    "skipped_evidence": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/skippedEvidence" }
+    },
+    "warnings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "$defs": {
+    "resourceCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "resource_type",
+        "discovered_count",
+        "evaluated_count",
+        "skipped_count"
+      ],
+      "properties": {
+        "resource_type": { "type": "string", "minLength": 1 },
+        "discovered_count": { "type": "integer", "minimum": 0 },
+        "evaluated_count": { "type": "integer", "minimum": 0 },
+        "skipped_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "skippedEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "evidence_type",
+        "reason",
+        "count",
+        "affects_coverage",
+        "resource_ids"
+      ],
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        },
+        "evidence_type": { "type": "string", "minLength": 1 },
+        "reason": { "type": "string", "minLength": 1 },
+        "count": { "type": "integer", "minimum": 1 },
+        "affects_coverage": { "type": "boolean" },
+        "resource_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

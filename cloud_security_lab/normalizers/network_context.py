@@ -9,6 +9,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+from cloud_analysis import SkippedEvidence
+
 SCHEMA_VERSION = "1.0"
 REACHABILITY_METHODS = frozenset(
     {
@@ -27,6 +29,7 @@ class NetworkReachabilityResult:
 
     environment: dict[str, Any]
     warnings: tuple[str, ...]
+    skipped_evidence: tuple[SkippedEvidence, ...] = ()
 
 
 def _load_json_object(path: Path) -> dict[str, Any]:

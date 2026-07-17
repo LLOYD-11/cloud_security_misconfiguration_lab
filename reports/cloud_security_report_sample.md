@@ -16,14 +16,16 @@ This report consolidates 39 findings from offline cloud security analyzers.
 | Low | 2 |
 | Info | 0 |
 
-## Module Coverage
+## Analysis Coverage
 
-| Module | Findings |
-| --- | ---: |
-| cloudtrail | 11 |
-| iam | 9 |
-| network | 10 |
-| storage | 9 |
+Resource counts use `evaluated/discovered`. A partial result means one or more evidence gaps affected analysis coverage.
+
+| Module | Input | Coverage | Evaluated Resources | Skipped Evidence | Warnings | Findings |
+| --- | --- | --- | --- | ---: | ---: | ---: |
+| cloudtrail | simplified (1 file(s)) | complete | event: 17/17 | 0 | 0 | 11 |
+| iam | simplified (1 file(s)) | complete | group: 1/1; role: 1/1; root-account: 1/1; user: 3/3 | 0 | 0 | 9 |
+| network | simplified (1 file(s)) | complete | security-group: 4/4 | 0 | 0 | 10 |
+| storage | simplified (1 file(s)) | complete | bucket: 3/3 | 0 | 0 | 9 |
 
 ## Source Files
 
@@ -34,6 +36,10 @@ The source files below are generated analyzer outputs and are not committed to t
 - `reports/generated/network_findings.json`
 - `reports/generated/cloudtrail_findings.json`
 - `reports/generated/cloudtrail_incidents.json`
+- `reports/generated/iam_analysis_summary.json`
+- `reports/generated/storage_analysis_summary.json`
+- `reports/generated/network_analysis_summary.json`
+- `reports/generated/cloudtrail_analysis_summary.json`
 
 ## Correlated Incidents
 

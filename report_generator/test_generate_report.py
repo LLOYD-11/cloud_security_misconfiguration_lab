@@ -1,13 +1,21 @@
 import json
 import tempfile
 import unittest
+from dataclasses import replace
 from datetime import date
 from pathlib import Path
 
+from cloud_analysis import (
+    AnalysisSummary,
+    ResourceCoverage,
+    SkippedEvidence,
+    write_analysis_summary,
+)
 from cloud_findings import Finding, load_findings_file, write_findings
 from cloud_incidents import Incident, write_incidents
 from report_generator.generate_report import (
     build_parser,
+    load_all_analysis_summaries,
     load_all_findings,
     load_all_incidents,
     render_report,
@@ -81,6 +89,143 @@ class ReportGeneratorTests(unittest.TestCase):
         self.assertIn("policy_name: trust-policy", report)
         self.assertIn("https://attack.mitre.org/techniques/T1199/", report)
 
+    def test_analysis_summary_replaces_finding_only_coverage(self):
+        finding = Finding(
+            rule_id="IAM-001",
+            severity="critical",
+            module="iam",
+            category="identity-and-access",
+            resource_type="user",
+            resource_id="alice",
+            title="Administrator access",
+            evidence="Administrator policy observed.",
+            impact="The user can control the account.",
+            remediation="Apply least privilege.",
+        )
+        summary = AnalysisSummary(
+            module="iam",
+            analyzer_version="2.0.0.dev0",
+            input_format="aws",
+            input_file_count=2,
+            coverage_status="partial",
+            finding_count=1,
+            incident_count=0,
+            resource_coverage=[
+                ResourceCoverage("user", 3, 3, 0),
+            ],
+            skipped_evidence=[
+                SkippedEvidence(
+                    code="IAM_POLICY_DOCUMENT_ABSENT",
+                    evidence_type="managed-policy-document",
+                    reason="One policy document was absent.",
+                    count=1,
+                    affects_coverage=True,
+                    resource_ids=["missing-policy"],
+                )
+            ],
+            warnings=["One policy attachment could not be resolved."],
+        )
+
+        report = render_report(
+            [finding],
+            source_files=[Path("iam.json"), Path("iam-summary.json")],
+            report_date=date(2026, 6, 30),
+            analysis_summaries=[summary],
+        )
+
+        self.assertIn("## Analysis Coverage", report)
+        self.assertIn("| iam | aws (2 file(s)) | partial | user: 3/3 |", report)
+        self.assertIn("`IAM_POLICY_DOCUMENT_ABSENT`", report)
+        self.assertIn("### Analysis Warnings", report)
+        self.assertNotIn("## Module Coverage", report)
+
+    def test_analysis_summary_count_mismatch_is_rejected(self):
+        summary = AnalysisSummary(
+            module="iam",
+            analyzer_version="2.0.0.dev0",
+            input_format="simplified",
+            input_file_count=1,
+            coverage_status="complete",
+            finding_count=1,
+            incident_count=0,
+            resource_coverage=[ResourceCoverage("user", 1, 1, 0)],
+        )
+
+        with self.assertRaisesRegex(ValueError, "declare 1 iam finding"):
+            render_report(
+                [],
+                source_files=[],
+                report_date=date(2026, 6, 30),
+                analysis_summaries=[summary],
+            )
+
+    def test_partial_analysis_summary_set_is_rejected(self):
+        iam_finding = Finding(
+            rule_id="IAM-001",
+            severity="critical",
+            module="iam",
+            category="identity-and-access",
+            resource_type="user",
+            resource_id="alice",
+            title="Administrator access",
+            evidence="Administrator policy observed.",
+            impact="The user can control the account.",
+            remediation="Apply least privilege.",
+        )
+        storage_finding = replace(
+            iam_finding,
+            rule_id="STO-001",
+            module="storage",
+            category="data-protection",
+            resource_type="bucket",
+            resource_id="example-bucket",
+        )
+        summary = AnalysisSummary(
+            module="iam",
+            analyzer_version="2.0.0.dev0",
+            input_format="simplified",
+            input_file_count=1,
+            coverage_status="complete",
+            finding_count=1,
+            incident_count=0,
+            resource_coverage=[ResourceCoverage("user", 1, 1, 0)],
+        )
+
+        with self.assertRaisesRegex(ValueError, "missing.*storage"):
+            render_report(
+                [iam_finding, storage_finding],
+                source_files=[],
+                report_date=date(2026, 6, 30),
+                analysis_summaries=[summary],
+            )
+
+    def test_analysis_summary_files_load_in_module_order(self):
+        summaries = [
+            AnalysisSummary(
+                module=module,
+                analyzer_version="2.0.0.dev0",
+                input_format="simplified",
+                input_file_count=1,
+                coverage_status="complete",
+                finding_count=0,
+                incident_count=0,
+                resource_coverage=[ResourceCoverage(resource_type, 1, 1, 0)],
+            )
+            for module, resource_type in (
+                ("storage", "bucket"),
+                ("iam", "user"),
+            )
+        ]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            paths = []
+            for summary in summaries:
+                path = Path(tmpdir) / f"{summary.module}.json"
+                write_analysis_summary(path, summary)
+                paths.append(path)
+            loaded = load_all_analysis_summaries(paths)
+
+        self.assertEqual(["iam", "storage"], [item.module for item in loaded])
+
     def test_write_report_creates_parent_directory(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             output_path = Path(tmpdir) / "nested" / "report.md"
@@ -136,6 +281,8 @@ class ReportGeneratorTests(unittest.TestCase):
                 "report.md",
                 "--incidents",
                 "incidents.json",
+                "--analysis-summary",
+                "summary.json",
                 "--report-date",
                 "2026-06-30",
             ]
@@ -143,6 +290,7 @@ class ReportGeneratorTests(unittest.TestCase):
 
         self.assertEqual(date(2026, 6, 30), args.report_date)
         self.assertEqual([Path("incidents.json")], args.incidents)
+        self.assertEqual([Path("summary.json")], args.analysis_summary)
 
     def test_finding_rejects_unknown_severity(self):
         with self.assertRaisesRegex(ValueError, "severity"):
