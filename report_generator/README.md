@@ -1,6 +1,6 @@
 # Risk Report Generator
 
-This module generates a Markdown risk report from one or more shared finding JSON files.
+This module generates a Markdown risk report from one or more shared finding JSON files and optional correlated incident files.
 
 Finding inputs must use the versioned object written by the analyzers. The loader rejects unsupported schema versions, mismatched `finding_count` values, missing required fields, and unknown severities instead of silently omitting malformed findings.
 
@@ -33,7 +33,8 @@ python3 network_analyzer/analyzer.py \
   --output reports/generated/network_findings.json
 python3 cloudtrail_detector/detector.py \
   sample_data/cloudtrail/sample_cloudtrail_events.json \
-  --output reports/generated/cloudtrail_findings.json
+  --output reports/generated/cloudtrail_findings.json \
+  --incidents-output reports/generated/cloudtrail_incidents.json
 ```
 
 ## Generate Report
@@ -44,11 +45,12 @@ python3 report_generator/generate_report.py \
   --findings reports/generated/storage_findings.json \
   --findings reports/generated/network_findings.json \
   --findings reports/generated/cloudtrail_findings.json \
+  --incidents reports/generated/cloudtrail_incidents.json \
   --report-date 2026-06-30 \
   --output reports/generated/cloud_security_report.md
 ```
 
-The `--findings` option can be repeated as new modules are added. Use `--report-date YYYY-MM-DD` for deterministic output, or omit it to use the current local date.
+The `--findings` and `--incidents` options can be repeated. Incident sections preserve the linked rule IDs, event counts, resources, severity, confidence, and recommended triage actions. Use `--report-date YYYY-MM-DD` for deterministic output, or omit it to use the current local date.
 
 ## Test
 

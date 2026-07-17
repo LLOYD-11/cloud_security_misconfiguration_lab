@@ -5,9 +5,11 @@ from datetime import date
 from pathlib import Path
 
 from cloud_findings import Finding, load_findings_file, write_findings
+from cloud_incidents import Incident, write_incidents
 from report_generator.generate_report import (
     build_parser,
     load_all_findings,
+    load_all_incidents,
     render_report,
     write_report,
 )
@@ -86,6 +88,45 @@ class ReportGeneratorTests(unittest.TestCase):
 
             self.assertEqual("# Report\n", output_path.read_text(encoding="utf-8"))
 
+    def test_load_and_render_correlated_incident(self):
+        incident = Incident(
+            incident_id="CTI-ABCDEF123456",
+            severity="high",
+            confidence="high",
+            module="cloudtrail",
+            category="correlated-activity",
+            title="Identity protection weakened",
+            actor="alice",
+            source_ip="192.0.2.1",
+            first_seen="2026-06-30T01:00:00Z",
+            last_seen="2026-06-30T01:05:00Z",
+            event_count=2,
+            finding_count=2,
+            rule_ids=["CLD-002", "CLD-005"],
+            event_ids=["event-1", "event-2"],
+            resources=["identity/alice", "iam_policy/example"],
+            summary="Two related signals were observed.",
+            recommended_actions=["Validate the activity."],
+            references=["https://example.com/reference"],
+        )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "incidents.json"
+            write_incidents(path, [incident])
+            incidents = load_all_incidents([path])
+
+        report = render_report(
+            [],
+            source_files=[Path("reports/generated/cloudtrail_incidents.json")],
+            report_date=date(2026, 6, 30),
+            incidents=incidents,
+        )
+
+        self.assertIn("## Correlated Incidents", report)
+        self.assertIn("CTI-ABCDEF123456", report)
+        self.assertIn("CLD-002, CLD-005", report)
+        self.assertIn("do not prove malicious intent", report)
+
     def test_parser_accepts_explicit_report_date(self):
         args = build_parser().parse_args(
             [
@@ -93,12 +134,15 @@ class ReportGeneratorTests(unittest.TestCase):
                 "findings.json",
                 "--output",
                 "report.md",
+                "--incidents",
+                "incidents.json",
                 "--report-date",
                 "2026-06-30",
             ]
         )
 
         self.assertEqual(date(2026, 6, 30), args.report_date)
+        self.assertEqual([Path("incidents.json")], args.incidents)
 
     def test_finding_rejects_unknown_severity(self):
         with self.assertRaisesRegex(ValueError, "severity"):

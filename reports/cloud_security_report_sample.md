@@ -4,14 +4,14 @@ Generated: 2026-06-30
 
 ## Executive Summary
 
-This report consolidates 34 finding(s) from offline cloud security analyzers.
+This report consolidates 39 findings from offline cloud security analyzers.
 
 ## Severity Summary
 
 | Severity | Count |
 | --- | ---: |
-| Critical | 6 |
-| High | 10 |
+| Critical | 8 |
+| High | 13 |
 | Medium | 16 |
 | Low | 2 |
 | Info | 0 |
@@ -20,7 +20,7 @@ This report consolidates 34 finding(s) from offline cloud security analyzers.
 
 | Module | Findings |
 | --- | ---: |
-| cloudtrail | 6 |
+| cloudtrail | 11 |
 | iam | 9 |
 | network | 10 |
 | storage | 9 |
@@ -33,6 +33,40 @@ The source files below are generated analyzer outputs and are not committed to t
 - `reports/generated/storage_findings.json`
 - `reports/generated/network_findings.json`
 - `reports/generated/cloudtrail_findings.json`
+- `reports/generated/cloudtrail_incidents.json`
+
+## Correlated Incidents
+
+These incidents group related CloudTrail signals by actor, source IP, and a bounded time window. They support triage and do not prove malicious intent.
+
+| Incident | Severity | Confidence | Actor | Window | Findings / Events |
+| --- | --- | --- | --- | --- | --- |
+| `CTI-B36042008211` | Critical | High | `alice-admin` | 2026-06-30T01:04:00Z to 2026-06-30T01:23:00Z | 8 / 8 |
+| `CTI-E0E40ECCC4EB` | Medium | Medium | `unknown-user` | 2026-06-30T02:00:00Z to 2026-06-30T02:08:00Z | 1 / 6 |
+
+### CTI-B36042008211: Monitoring defenses weakened during persistence activity
+
+- Actor and source: `alice-admin` from `198.51.100.20`
+- Window: 2026-06-30T01:04:00Z to 2026-06-30T01:23:00Z
+- Severity and confidence: Critical / High
+- Correlated rules: CLD-002, CLD-003, CLD-004, CLD-005, CLD-008, CLD-009, CLD-010, CLD-011
+- Events and findings: 8 events, 8 findings
+- Resources: bucket/public-customer-exports, iam_policy/arn:aws:iam::111122223333:policy/OverBroadAdminPolicy, identity/alice-admin, identity/backup-operator, kms_key/1234abcd-12ab-34cd-56ef-1234567890ab, role/production-admin, security_control/12abc34d567e8fa901bc2d34eexample, security_group/sg-001-admin-open
+- Summary: alice-admin generated 8 suspicious signals across 8 rules from 198.51.100.20 between 2026-06-30T01:04:00Z and 2026-06-30T01:23:00Z: CLD-002, CLD-003, CLD-004, CLD-005, CLD-008, CLD-009, CLD-010, CLD-011.
+- Recommended actions: Validate the actor, session context, source IP, and change authorization. Restore affected logging or detection controls and verify telemetry continuity. Contain the identity, remove unapproved credentials or trust, and restore MFA. Cancel unauthorized key deletion or re-enable the key, then assess dependent data. Preserve relevant CloudTrail records and open an incident-response case.
+- References: https://attack.mitre.org/techniques/T1098/, https://attack.mitre.org/techniques/T1098/001/, https://attack.mitre.org/techniques/T1098/003/, https://attack.mitre.org/techniques/T1485/, https://attack.mitre.org/techniques/T1565/, https://attack.mitre.org/techniques/T1578/005/, https://attack.mitre.org/techniques/T1685/, https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-policies.html, https://docs.aws.amazon.com/IAM/latest/APIReference/API_CreateAccessKey.html, https://docs.aws.amazon.com/IAM/latest/APIReference/API_UpdateAssumeRolePolicy.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://docs.aws.amazon.com/guardduty/latest/APIReference/API_DeleteDetector.html, https://docs.aws.amazon.com/kms/latest/APIReference/API_ScheduleKeyDeletion.html
+
+### CTI-E0E40ECCC4EB: Repeated failed API activity
+
+- Actor and source: `unknown-user` from `192.0.2.44`
+- Window: 2026-06-30T02:00:00Z to 2026-06-30T02:08:00Z
+- Severity and confidence: Medium / Medium
+- Correlated rules: CLD-006
+- Events and findings: 6 events, 1 finding
+- Resources: api_activity/unknown-user@192.0.2.44
+- Summary: unknown-user generated 1 suspicious signal across 1 rule from 192.0.2.44 between 2026-06-30T02:00:00Z and 2026-06-30T02:08:00Z: CLD-006.
+- Recommended actions: Validate the actor, session context, source IP, and change authorization. Review failed API names, error codes, source reputation, and related authentication. Preserve relevant CloudTrail records and open an incident-response case.
+- References: https://attack.mitre.org/techniques/T1110/, https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html
 
 ## Findings
 
@@ -46,8 +80,30 @@ The source files below are generated analyzer outputs and are not committed to t
 - Evidence: Root ConsoleLogin event from 203.0.113.10 at 2026-06-30T01:00:00Z.
 - Impact: Root account use is highly sensitive and may indicate emergency access or account compromise.
 - Remediation: Avoid routine root use, confirm the login was authorized, and require MFA on the root account.
-- Metadata: actor: arn:aws:iam::111122223333:root, event_id: ConsoleLogin-1, event_name: ConsoleLogin, event_time: 2026-06-30T01:00:00Z, source_ip: 203.0.113.10
+- Metadata: actor: arn:aws:iam::111122223333:root, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000001, event_name: ConsoleLogin, event_source: signin.amazonaws.com, event_time: 2026-06-30T01:00:00Z, identity_type: Root, source_ip: 203.0.113.10, user_agent: Mozilla/5.0 (sample)
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://attack.mitre.org/techniques/T1078/004/
+
+#### CLD-010: Audit or threat-detection control was disabled
+
+- Module: `cloudtrail`
+- Category: `audit-and-detection`
+- Resource: `security_control/12abc34d567e8fa901bc2d34eexample`
+- Evidence: DeleteDetector was called by alice-admin from 198.51.100.20 at 2026-06-30T01:21:00Z.
+- Impact: Disabling logging or detection reduces visibility and can conceal later malicious activity.
+- Remediation: Confirm authorization, restore the control, verify telemetry continuity, and investigate surrounding activity.
+- Metadata: actor: alice-admin, aws_region: ap-southeast-2, event_id: 00000000-0000-4000-8000-000000000015, event_name: DeleteDetector, event_source: guardduty.amazonaws.com, event_time: 2026-06-30T01:21:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
+- References: https://docs.aws.amazon.com/guardduty/latest/APIReference/API_DeleteDetector.html, https://attack.mitre.org/techniques/T1685/
+
+#### CLD-011: KMS key was scheduled for deletion
+
+- Module: `cloudtrail`
+- Category: `audit-and-detection`
+- Resource: `kms_key/1234abcd-12ab-34cd-56ef-1234567890ab`
+- Evidence: ScheduleKeyDeletion was called by alice-admin from 198.51.100.20 at 2026-06-30T01:23:00Z.
+- Impact: Deleting the key can permanently make dependent encrypted data unrecoverable.
+- Remediation: Validate the change, cancel unauthorized deletion or re-enable the key, and identify dependent resources.
+- Metadata: actor: alice-admin, aws_region: ap-southeast-2, event_id: 00000000-0000-4000-8000-000000000016, event_name: ScheduleKeyDeletion, event_source: kms.amazonaws.com, event_time: 2026-06-30T01:23:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
+- References: https://docs.aws.amazon.com/kms/latest/APIReference/API_ScheduleKeyDeletion.html, https://attack.mitre.org/techniques/T1485/
 
 #### IAM-001: Administrator-style wildcard permission
 
@@ -114,7 +170,7 @@ The source files below are generated analyzer outputs and are not committed to t
 - Evidence: DeactivateMFADevice was called by alice-admin from 198.51.100.20 at 2026-06-30T01:04:00Z.
 - Impact: Disabling MFA weakens account protection and may be part of account takeover or persistence activity.
 - Remediation: Confirm the MFA change was authorized and re-enable MFA for affected users.
-- Metadata: actor: alice-admin, event_id: DeactivateMFADevice-2, event_name: DeactivateMFADevice, event_time: 2026-06-30T01:04:00Z, source_ip: 198.51.100.20
+- Metadata: actor: alice-admin, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000002, event_name: DeactivateMFADevice, event_source: iam.amazonaws.com, event_time: 2026-06-30T01:04:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://attack.mitre.org/techniques/T1098/
 
 #### CLD-004: Bucket access policy changed
@@ -125,7 +181,7 @@ The source files below are generated analyzer outputs and are not committed to t
 - Evidence: PutBucketPolicy was called by alice-admin from 198.51.100.20 at 2026-06-30T01:12:00Z.
 - Impact: Bucket policy or public-access changes can expose cloud storage data.
 - Remediation: Review the bucket policy diff and restore least-privilege access if the change was not approved.
-- Metadata: actor: alice-admin, event_id: PutBucketPolicy-4, event_name: PutBucketPolicy, event_time: 2026-06-30T01:12:00Z, source_ip: 198.51.100.20
+- Metadata: actor: alice-admin, aws_region: ap-southeast-2, event_id: 00000000-0000-4000-8000-000000000004, event_name: PutBucketPolicy, event_source: s3.amazonaws.com, event_time: 2026-06-30T01:12:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-policies.html, https://attack.mitre.org/techniques/T1565/
 
 #### CLD-005: IAM policy configuration changed
@@ -136,8 +192,41 @@ The source files below are generated analyzer outputs and are not committed to t
 - Evidence: CreatePolicyVersion was called by alice-admin from 198.51.100.20 at 2026-06-30T01:15:00Z.
 - Impact: IAM policy changes can grant new permissions, create persistence, or weaken least privilege.
 - Remediation: Review the IAM policy change and confirm it matches an approved access request.
-- Metadata: actor: alice-admin, event_id: CreatePolicyVersion-5, event_name: CreatePolicyVersion, event_time: 2026-06-30T01:15:00Z, source_ip: 198.51.100.20
+- Metadata: actor: alice-admin, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000005, event_name: CreatePolicyVersion, event_source: iam.amazonaws.com, event_time: 2026-06-30T01:15:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://attack.mitre.org/techniques/T1098/
+
+#### CLD-007: IAM user console login did not use MFA
+
+- Module: `cloudtrail`
+- Category: `audit-and-detection`
+- Resource: `identity/legacy-operator`
+- Evidence: legacy-operator completed ConsoleLogin without MFA from 203.0.113.55 at 2026-06-30T01:30:00Z.
+- Impact: A password-only console session has less resistance to stolen credentials and account takeover.
+- Remediation: Validate the login, require MFA for the user, and investigate the source and subsequent activity.
+- Metadata: actor: legacy-operator, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000017, event_name: ConsoleLogin, event_source: signin.amazonaws.com, event_time: 2026-06-30T01:30:00Z, identity_type: IAMUser, source_ip: 203.0.113.55, user_agent: Mozilla/5.0 (sample)
+- References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://attack.mitre.org/techniques/T1078/004/
+
+#### CLD-008: Persistent cloud credential was created
+
+- Module: `cloudtrail`
+- Category: `audit-and-detection`
+- Resource: `identity/backup-operator`
+- Evidence: CreateAccessKey was called by alice-admin from 198.51.100.20 at 2026-06-30T01:17:00Z.
+- Impact: A new key, password, certificate, or service credential can provide persistent access outside the original session.
+- Remediation: Confirm the credential was approved, identify where it was stored, and remove or rotate it if unauthorized.
+- Metadata: actor: alice-admin, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000013, event_name: CreateAccessKey, event_source: iam.amazonaws.com, event_time: 2026-06-30T01:17:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
+- References: https://docs.aws.amazon.com/IAM/latest/APIReference/API_CreateAccessKey.html, https://attack.mitre.org/techniques/T1098/001/
+
+#### CLD-009: Role trust policy was changed
+
+- Module: `cloudtrail`
+- Category: `audit-and-detection`
+- Resource: `role/production-admin`
+- Evidence: UpdateAssumeRolePolicy was called by alice-admin from 198.51.100.20 at 2026-06-30T01:19:00Z.
+- Impact: A changed trust policy can let a new principal assume the role and retain or escalate access.
+- Remediation: Review the trust-policy diff, validate every principal and condition, and remove unapproved trust.
+- Metadata: actor: alice-admin, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000014, event_name: UpdateAssumeRolePolicy, event_source: iam.amazonaws.com, event_time: 2026-06-30T01:19:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
+- References: https://docs.aws.amazon.com/IAM/latest/APIReference/API_UpdateAssumeRolePolicy.html, https://attack.mitre.org/techniques/T1098/003/
 
 #### IAM-004: Broad S3 write permission
 
@@ -226,7 +315,7 @@ The source files below are generated analyzer outputs and are not committed to t
 - Evidence: AuthorizeSecurityGroupIngress was called by alice-admin from 198.51.100.20 at 2026-06-30T01:09:00Z.
 - Impact: Security group changes can expose services, enable lateral movement, or weaken network controls.
 - Remediation: Review the rule change, verify the business need, and revert unauthorized exposure.
-- Metadata: actor: alice-admin, event_id: AuthorizeSecurityGroupIngress-3, event_name: AuthorizeSecurityGroupIngress, event_time: 2026-06-30T01:09:00Z, source_ip: 198.51.100.20
+- Metadata: actor: alice-admin, aws_region: ap-southeast-2, event_id: 00000000-0000-4000-8000-000000000003, event_name: AuthorizeSecurityGroupIngress, event_source: ec2.amazonaws.com, event_time: 2026-06-30T01:09:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://attack.mitre.org/techniques/T1578/005/
 
 #### CLD-006: Repeated API failures from one actor and source
@@ -237,7 +326,7 @@ The source files below are generated analyzer outputs and are not committed to t
 - Evidence: 6 failed API call(s) from unknown-user at 192.0.2.44 within 10 minutes starting 2026-06-30T02:00:00Z.
 - Impact: Repeated failed API calls may indicate credential misuse, probing, or brute-force style activity.
 - Remediation: Review the source IP, actor, failed API names, and related authentication activity.
-- Metadata: actor: unknown-user, error_codes: AccessDenied, UnauthorizedOperation, event_names: AssumeRole, DescribeInstances, GetUser, ListBuckets, ListUsers, failure_count: 6, source_ip: 192.0.2.44, window_minutes: 10
+- Metadata: actor: unknown-user, error_codes: AccessDenied, UnauthorizedOperation, event_ids: 00000000-0000-4000-8000-000000000006, 00000000-0000-4000-8000-000000000007, 00000000-0000-4000-8000-000000000008, 00000000-0000-4000-8000-000000000009, 00000000-0000-4000-8000-000000000010, 00000000-0000-4000-8000-000000000011, event_names: AssumeRole, DescribeInstances, GetUser, ListBuckets, ListUsers, event_time: 2026-06-30T02:00:00Z, failure_count: 6, first_seen: 2026-06-30T02:00:00Z, last_seen: 2026-06-30T02:08:00Z, source_ip: 192.0.2.44, window_minutes: 10
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://attack.mitre.org/techniques/T1110/
 
 #### IAM-002: Wildcard action allowed

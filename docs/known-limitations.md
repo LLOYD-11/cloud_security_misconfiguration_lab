@@ -51,9 +51,11 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 - Native CloudTrail normalization accepts one recipient account per analysis. Organization-trail accounts must currently be analyzed separately.
 - Identical duplicate `eventID` records are removed with a warning, while conflicting records using the same ID stop analysis.
 - The lab does not verify CloudTrail digest signatures or prove log-file integrity.
-- Change rules identify selected high-value API names but do not inspect policy diffs or all request parameters.
+- Change rules identify selected high-value API names but do not inspect policy diffs or all request parameters. `UpdateDetector` is the exception: it requires explicit `enable: false` evidence.
 - Repeated API failures can be caused by legitimate automation, probing, throttling, or configuration mistakes.
-- Related events are not yet correlated into a single incident or attack timeline.
+- Incident correlation uses exact normalized actor and source values plus a bounded time window. Shared credentials, NAT, proxies, service-originated calls, missing fields, and delivery gaps can split or merge activity in ways that require analyst review.
+- A multi-signal incident requires distinct rules and events. It does not baseline approved administrators, working hours, expected source ranges, user agents, or change tickets.
+- Incident confidence measures correlation strength, not malicious intent. Incidents remain triage leads and do not replace investigation.
 
 ## Reporting
 

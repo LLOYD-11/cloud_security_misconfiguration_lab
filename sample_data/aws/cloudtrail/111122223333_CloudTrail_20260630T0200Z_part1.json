@@ -146,6 +146,140 @@
       "eventVersion": "1.11",
       "userIdentity": {
         "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEALICEADMIN",
+        "arn": "arn:aws:iam::111122223333:user/alice-admin",
+        "accountId": "111122223333",
+        "userName": "alice-admin"
+      },
+      "eventTime": "2026-06-30T01:17:00Z",
+      "eventSource": "iam.amazonaws.com",
+      "eventName": "CreateAccessKey",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "aws-cli/2.x",
+      "requestParameters": {
+        "userName": "backup-operator"
+      },
+      "responseElements": null,
+      "eventID": "00000000-0000-4000-8000-000000000013",
+      "eventType": "AwsApiCall",
+      "readOnly": false,
+      "managementEvent": true,
+      "recipientAccountId": "111122223333",
+      "eventCategory": "Management"
+    },
+    {
+      "eventVersion": "1.11",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEALICEADMIN",
+        "arn": "arn:aws:iam::111122223333:user/alice-admin",
+        "accountId": "111122223333",
+        "userName": "alice-admin"
+      },
+      "eventTime": "2026-06-30T01:19:00Z",
+      "eventSource": "iam.amazonaws.com",
+      "eventName": "UpdateAssumeRolePolicy",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "aws-cli/2.x",
+      "requestParameters": {
+        "roleName": "production-admin"
+      },
+      "responseElements": null,
+      "eventID": "00000000-0000-4000-8000-000000000014",
+      "eventType": "AwsApiCall",
+      "readOnly": false,
+      "managementEvent": true,
+      "recipientAccountId": "111122223333",
+      "eventCategory": "Management"
+    },
+    {
+      "eventVersion": "1.11",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEALICEADMIN",
+        "arn": "arn:aws:iam::111122223333:user/alice-admin",
+        "accountId": "111122223333",
+        "userName": "alice-admin"
+      },
+      "eventTime": "2026-06-30T01:21:00Z",
+      "eventSource": "guardduty.amazonaws.com",
+      "eventName": "DeleteDetector",
+      "awsRegion": "ap-southeast-2",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "aws-cli/2.x",
+      "requestParameters": {
+        "detectorId": "12abc34d567e8fa901bc2d34eexample"
+      },
+      "responseElements": null,
+      "eventID": "00000000-0000-4000-8000-000000000015",
+      "eventType": "AwsApiCall",
+      "readOnly": false,
+      "managementEvent": true,
+      "recipientAccountId": "111122223333",
+      "eventCategory": "Management"
+    },
+    {
+      "eventVersion": "1.11",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLEALICEADMIN",
+        "arn": "arn:aws:iam::111122223333:user/alice-admin",
+        "accountId": "111122223333",
+        "userName": "alice-admin"
+      },
+      "eventTime": "2026-06-30T01:23:00Z",
+      "eventSource": "kms.amazonaws.com",
+      "eventName": "ScheduleKeyDeletion",
+      "awsRegion": "ap-southeast-2",
+      "sourceIPAddress": "198.51.100.20",
+      "userAgent": "aws-cli/2.x",
+      "requestParameters": {
+        "keyId": "1234abcd-12ab-34cd-56ef-1234567890ab",
+        "pendingWindowInDays": 7
+      },
+      "responseElements": null,
+      "eventID": "00000000-0000-4000-8000-000000000016",
+      "eventType": "AwsApiCall",
+      "readOnly": false,
+      "managementEvent": true,
+      "recipientAccountId": "111122223333",
+      "eventCategory": "Management"
+    },
+    {
+      "eventVersion": "1.11",
+      "userIdentity": {
+        "type": "IAMUser",
+        "principalId": "AIDAEXAMPLELEGACYOPERATOR",
+        "arn": "arn:aws:iam::111122223333:user/legacy-operator",
+        "accountId": "111122223333",
+        "userName": "legacy-operator"
+      },
+      "eventTime": "2026-06-30T01:30:00Z",
+      "eventSource": "signin.amazonaws.com",
+      "eventName": "ConsoleLogin",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "203.0.113.55",
+      "userAgent": "Mozilla/5.0",
+      "requestParameters": null,
+      "responseElements": {
+        "ConsoleLogin": "Success"
+      },
+      "additionalEventData": {
+        "MFAUsed": "No"
+      },
+      "eventID": "00000000-0000-4000-8000-000000000017",
+      "eventType": "AwsConsoleSignIn",
+      "readOnly": false,
+      "managementEvent": true,
+      "recipientAccountId": "111122223333",
+      "eventCategory": "Management"
+    },
+    {
+      "eventVersion": "1.11",
+      "userIdentity": {
+        "type": "IAMUser",
         "principalId": "AIDAEXAMPLEUNKNOWNUSER",
         "arn": "arn:aws:iam::111122223333:user/unknown-user",
         "accountId": "111122223333",

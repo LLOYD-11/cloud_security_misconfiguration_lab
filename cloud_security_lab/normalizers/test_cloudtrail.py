@@ -49,10 +49,22 @@ class NativeCloudTrailNormalizerTests(unittest.TestCase):
         findings = analyze_environment(result.environment)
 
         self.assertEqual("111122223333", result.environment["account_id"])
-        self.assertEqual(12, len(result.environment["events"]))
-        self.assertEqual(6, len(findings))
+        self.assertEqual(17, len(result.environment["events"]))
+        self.assertEqual(11, len(findings))
         self.assertEqual(
-            {"CLD-001", "CLD-002", "CLD-003", "CLD-004", "CLD-005", "CLD-006"},
+            {
+                "CLD-001",
+                "CLD-002",
+                "CLD-003",
+                "CLD-004",
+                "CLD-005",
+                "CLD-006",
+                "CLD-007",
+                "CLD-008",
+                "CLD-009",
+                "CLD-010",
+                "CLD-011",
+            },
             {finding.rule_id for finding in findings},
         )
         self.assertEqual(1, len(result.warnings))
@@ -182,6 +194,7 @@ class NativeCloudTrailNormalizerTests(unittest.TestCase):
         cases = (
             ("requestParameters", [], "object or null"),
             ("responseElements", "success", "object or null"),
+            ("additionalEventData", [], "object or null"),
             ("errorCode", 403, "non-empty string"),
             ("errorMessage", {}, "must be a string"),
             ("userAgent", {}, "non-empty string"),

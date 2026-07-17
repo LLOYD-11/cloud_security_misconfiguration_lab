@@ -187,6 +187,7 @@ class UnifiedCliTests(unittest.TestCase):
     def test_analyze_native_cloudtrail_merges_json_and_gzip_inputs(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             output_path = Path(tmpdir) / "cloudtrail.json"
+            incidents_path = Path(tmpdir) / "cloudtrail-incidents.json"
             normalized_path = Path(tmpdir) / "normalized-cloudtrail.json"
             sample_root = PROJECT_ROOT / "sample_data/aws/cloudtrail"
             with redirect_stdout(StringIO()), redirect_stderr(StringIO()) as stderr:
@@ -208,15 +209,19 @@ class UnifiedCliTests(unittest.TestCase):
                         str(normalized_path),
                         "--output",
                         str(output_path),
+                        "--incidents-output",
+                        str(incidents_path),
                     ]
                 )
 
             payload = json.loads(output_path.read_text(encoding="utf-8"))
+            incidents = json.loads(incidents_path.read_text(encoding="utf-8"))
             normalized = json.loads(normalized_path.read_text(encoding="utf-8"))
 
         self.assertEqual(0, result)
-        self.assertEqual(6, payload["finding_count"])
-        self.assertEqual(12, len(normalized["events"]))
+        self.assertEqual(11, payload["finding_count"])
+        self.assertEqual(2, incidents["incident_count"])
+        self.assertEqual(17, len(normalized["events"]))
         self.assertIn("Skipped 1 duplicate", stderr.getvalue())
 
     def test_demo_runs_all_modules_and_writes_report(self):
@@ -240,10 +245,12 @@ class UnifiedCliTests(unittest.TestCase):
 
         self.assertEqual(0, result)
         self.assertIn("Generated: 2026-06-30", report)
-        self.assertIn("consolidates 34 finding(s)", report)
+        self.assertIn("consolidates 39 findings", report)
+        self.assertIn("## Correlated Incidents", report)
         self.assertEqual(
             {
                 "cloud_security_report.md",
+                "cloudtrail_incidents.json",
                 "cloudtrail_findings.json",
                 "iam_findings.json",
                 "network_findings.json",
@@ -280,7 +287,7 @@ class UnifiedCliTests(unittest.TestCase):
             report = report_path.read_text(encoding="utf-8")
 
         self.assertEqual(0, result)
-        self.assertIn("consolidates 9 finding(s)", report)
+        self.assertIn("consolidates 9 findings", report)
 
     def test_cloudtrail_threshold_options_are_rejected_for_other_modules(self):
         with redirect_stderr(StringIO()), self.assertRaises(SystemExit) as context:
@@ -295,6 +302,23 @@ class UnifiedCliTests(unittest.TestCase):
             )
 
         self.assertEqual(2, context.exception.code)
+
+    def test_cloudtrail_incident_options_are_rejected_for_other_modules(self):
+        with redirect_stderr(StringIO()) as stderr, self.assertRaises(
+            SystemExit
+        ) as context:
+            main(
+                [
+                    "analyze",
+                    "iam",
+                    str(PROJECT_ROOT / "sample_data/iam/sample_iam_environment.json"),
+                    "--incidents-output",
+                    "incidents.json",
+                ]
+            )
+
+        self.assertEqual(2, context.exception.code)
+        self.assertIn("only valid for cloudtrail", stderr.getvalue())
 
     def test_native_iam_requires_credential_report(self):
         with redirect_stderr(StringIO()) as stderr, self.assertRaises(SystemExit) as context:

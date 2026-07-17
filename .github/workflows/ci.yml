@@ -39,7 +39,7 @@ jobs:
 
       - name: Type check
         run: >-
-          mypy cloud_security_lab cloud_findings iam_analyzer storage_analyzer
+          mypy cloud_security_lab cloud_findings cloud_incidents iam_analyzer storage_analyzer
           network_analyzer cloudtrail_detector report_generator
 
       - name: Test with branch coverage
@@ -85,6 +85,7 @@ jobs:
           --input-format aws
           --normalized-output reports/generated/normalized_cloudtrail_environment.json
           --output reports/generated/native_cloudtrail_findings.json
+          --incidents-output reports/generated/native_cloudtrail_incidents.json
 
       - name: Build wheel and source distribution
         if: matrix.python-version == '3.13'

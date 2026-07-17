@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Callable, Sequence
 
 from cloud_findings import Finding, write_findings
+from cloud_incidents import Incident, write_incidents
 from cloud_security_lab import __version__
 from cloud_security_lab.normalizers import (
     apply_network_reachability_context,
@@ -21,10 +22,13 @@ from cloud_security_lab.normalizers import (
     load_network_reachability_context,
     write_normalized_environment,
 )
+from cloudtrail_detector.correlation import DEFAULT_CORRELATION_WINDOW_MINUTES
 from cloudtrail_detector.detector import (
+    analyze_activity as analyze_cloudtrail_activity,
     analyze_environment as analyze_cloudtrail,
     load_environment as load_cloudtrail,
     print_findings as print_cloudtrail,
+    print_incidents as print_cloudtrail_incidents,
 )
 from iam_analyzer.analyzer import (
     analyze_environment as analyze_iam,
@@ -36,7 +40,12 @@ from network_analyzer.analyzer import (
     load_environment as load_network,
     print_findings as print_network,
 )
-from report_generator.generate_report import load_all_findings, render_report, write_report
+from report_generator.generate_report import (
+    load_all_findings,
+    load_all_incidents,
+    render_report,
+    write_report,
+)
 from storage_analyzer.analyzer import (
     analyze_environment as analyze_storage,
     load_environment as load_storage,
@@ -136,16 +145,21 @@ def _analyze(
 def _run_analyze(args: argparse.Namespace) -> int:
     input_paths: list[Path] = args.input
     if args.module != "cloudtrail" and (
-        args.failure_threshold != 5 or args.failure_window_minutes != 10
+        args.failure_threshold != 5
+        or args.failure_window_minutes != 10
+        or args.correlation_window_minutes != DEFAULT_CORRELATION_WINDOW_MINUTES
+        or args.incidents_output is not None
     ):
         raise ValueError(
-            "--failure-threshold and --failure-window-minutes are only valid for cloudtrail"
+            "CloudTrail thresholds, correlation settings, and incident output are only "
+            "valid for cloudtrail"
         )
     if args.reachability_context is not None and args.module != "network":
         raise ValueError("--reachability-context is only valid for network analysis")
 
     iam_auxiliary_options = args.credential_report is not None or args.as_of is not None
     normalization_warnings: tuple[str, ...] = ()
+    incidents: list[Incident] = []
     if args.input_format == "simplified":
         if len(input_paths) != 1:
             raise ValueError("Simplified analyzer input accepts exactly one JSON file")
@@ -164,11 +178,14 @@ def _run_analyze(args: argparse.Namespace) -> int:
             normalized_environment = reachability_result.environment
             normalization_warnings = reachability_result.warnings
         if args.module == "cloudtrail":
-            findings = analyze_cloudtrail(
+            cloudtrail_result = analyze_cloudtrail_activity(
                 normalized_environment,
                 failure_threshold=args.failure_threshold,
                 failure_window_minutes=args.failure_window_minutes,
+                correlation_window_minutes=args.correlation_window_minutes,
             )
+            findings = list(cloudtrail_result.findings)
+            incidents = list(cloudtrail_result.incidents)
         else:
             findings = ANALYZERS[args.module].analyzer(normalized_environment)
     else:
@@ -214,14 +231,17 @@ def _run_analyze(args: argparse.Namespace) -> int:
                 raise ValueError(
                     "--credential-report and --as-of are only valid for AWS IAM input"
                 )
-            cloudtrail_result = load_aws_cloudtrail_environment(input_paths)
-            normalized_environment = cloudtrail_result.environment
-            normalization_warnings = cloudtrail_result.warnings
-            findings = analyze_cloudtrail(
+            cloudtrail_normalization = load_aws_cloudtrail_environment(input_paths)
+            normalized_environment = cloudtrail_normalization.environment
+            normalization_warnings = cloudtrail_normalization.warnings
+            cloudtrail_analysis = analyze_cloudtrail_activity(
                 normalized_environment,
                 failure_threshold=args.failure_threshold,
                 failure_window_minutes=args.failure_window_minutes,
+                correlation_window_minutes=args.correlation_window_minutes,
             )
+            findings = list(cloudtrail_analysis.findings)
+            incidents = list(cloudtrail_analysis.incidents)
         else:
             raise ValueError(f"Unsupported analyzer module: {args.module}")
 
@@ -231,32 +251,53 @@ def _run_analyze(args: argparse.Namespace) -> int:
     for warning in normalization_warnings:
         print(f"Warning: {warning}", file=sys.stderr)
     ANALYZERS[args.module].printer(findings)
+    if args.module == "cloudtrail":
+        print_cloudtrail_incidents(incidents)
     if args.output:
         write_findings(args.output, findings)
         print(f"Findings saved to {args.output}")
+    if args.incidents_output:
+        write_incidents(args.incidents_output, incidents)
+        print(f"Incidents saved to {args.incidents_output}")
     return 0
 
 
 def _run_report(args: argparse.Namespace) -> int:
     findings = load_all_findings(args.findings)
+    incidents = load_all_incidents(args.incidents)
     report = render_report(
         findings,
-        source_files=args.findings,
+        source_files=[*args.findings, *args.incidents],
         report_date=args.report_date,
+        incidents=incidents,
     )
     write_report(args.output, report)
     print(f"Report saved to {args.output}")
     print(f"Findings included: {len(findings)}")
+    print(f"Incidents included: {len(incidents)}")
     return 0
 
 
 def _run_demo(args: argparse.Namespace) -> int:
     finding_paths: list[Path] = []
+    incident_paths: list[Path] = []
     all_findings: list[Finding] = []
+    all_incidents: list[Incident] = []
 
     for module, spec in ANALYZERS.items():
         input_path = args.sample_root / spec.sample_path
-        findings = _analyze(module, input_path)
+        if module == "cloudtrail":
+            environment = spec.loader(input_path)
+            cloudtrail_result = analyze_cloudtrail_activity(environment)
+            findings = list(cloudtrail_result.findings)
+            incidents = list(cloudtrail_result.incidents)
+            incident_path = args.output_dir / "cloudtrail_incidents.json"
+            write_incidents(incident_path, incidents)
+            incident_paths.append(incident_path)
+            all_incidents.extend(incidents)
+            print(f"CloudTrail incidents: {len(incidents)} -> {incident_path}")
+        else:
+            findings = _analyze(module, input_path)
         output_path = args.output_dir / f"{module}_findings.json"
         write_findings(output_path, findings)
         finding_paths.append(output_path)
@@ -266,8 +307,9 @@ def _run_demo(args: argparse.Namespace) -> int:
     report_path = args.report_output or args.output_dir / "cloud_security_report.md"
     report = render_report(
         all_findings,
-        source_files=finding_paths,
+        source_files=[*finding_paths, *incident_paths],
         report_date=args.report_date,
+        incidents=all_incidents,
     )
     write_report(report_path, report)
     print(f"Combined report: {len(all_findings)} finding(s) -> {report_path}")
@@ -291,6 +333,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Module input path. Native CloudTrail accepts multiple JSON or JSON.GZ files.",
     )
     analyze_parser.add_argument("--output", type=Path, help="Optional findings JSON output path.")
+    analyze_parser.add_argument(
+        "--incidents-output",
+        type=Path,
+        help="Optional correlated incident JSON output. Only valid for cloudtrail.",
+    )
     analyze_parser.add_argument(
         "--input-format",
         choices=("simplified", "aws"),
@@ -332,6 +379,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=10,
         help="CloudTrail API failure window. Only valid for the cloudtrail module.",
     )
+    analyze_parser.add_argument(
+        "--correlation-window-minutes",
+        type=_positive_int,
+        default=DEFAULT_CORRELATION_WINDOW_MINUTES,
+        help="CloudTrail incident correlation window. Only valid for the cloudtrail module.",
+    )
     analyze_parser.set_defaults(handler=_run_analyze)
 
     report_parser = subparsers.add_parser("report", help="Merge findings into a report.")
@@ -341,6 +394,13 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         required=True,
         help="Findings JSON path. Repeat to merge modules.",
+    )
+    report_parser.add_argument(
+        "--incidents",
+        action="append",
+        type=Path,
+        default=[],
+        help="Optional incidents JSON path. Repeat to merge incident files.",
     )
     report_parser.add_argument("--output", type=Path, required=True)
     report_parser.add_argument("--report-date", type=_report_date)

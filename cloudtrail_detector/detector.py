@@ -6,6 +6,7 @@ import argparse
 import json
 import sys
 from collections import defaultdict
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -15,15 +16,45 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from cloud_findings import Finding, sort_findings, write_findings
+from cloud_incidents import Incident, write_incidents
+from cloudtrail_detector.correlation import (
+    DEFAULT_CORRELATION_WINDOW_MINUTES,
+    correlate_incidents,
+)
 
 REF_AWS_CLOUDTRAIL = "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html"
+REF_AWS_CLOUDTRAIL_RECORD = (
+    "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/"
+    "cloudtrail-event-reference-record-contents.html"
+)
+REF_AWS_CLOUDTRAIL_SECURITY = (
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/"
+    "logging-monitoring-for-application-owners/cloudtrail.html"
+)
 REF_AWS_IAM_BEST_PRACTICES = "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+REF_AWS_IAM_CREATE_ACCESS_KEY = (
+    "https://docs.aws.amazon.com/IAM/latest/APIReference/API_CreateAccessKey.html"
+)
+REF_AWS_IAM_UPDATE_TRUST = (
+    "https://docs.aws.amazon.com/IAM/latest/APIReference/API_UpdateAssumeRolePolicy.html"
+)
 REF_AWS_S3_BUCKET_POLICIES = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-policies.html"
+REF_AWS_GUARDDUTY_DELETE = (
+    "https://docs.aws.amazon.com/guardduty/latest/APIReference/API_DeleteDetector.html"
+)
+REF_AWS_KMS_DELETE = (
+    "https://docs.aws.amazon.com/kms/latest/APIReference/API_ScheduleKeyDeletion.html"
+)
 REF_MITRE_CLOUD_ACCOUNTS = "https://attack.mitre.org/techniques/T1078/004/"
 REF_MITRE_ACCOUNT_MANIPULATION = "https://attack.mitre.org/techniques/T1098/"
+REF_MITRE_ADDITIONAL_CREDENTIALS = "https://attack.mitre.org/techniques/T1098/001/"
+REF_MITRE_ADDITIONAL_ROLES = "https://attack.mitre.org/techniques/T1098/003/"
 REF_MITRE_DATA_MANIPULATION = "https://attack.mitre.org/techniques/T1565/"
 REF_MITRE_INFRA_MODIFY = "https://attack.mitre.org/techniques/T1578/005/"
 REF_MITRE_BRUTE_FORCE = "https://attack.mitre.org/techniques/T1110/"
+REF_MITRE_DISABLE_TOOLS = "https://attack.mitre.org/techniques/T1685/"
+REF_MITRE_DISABLE_CLOUD_LOG = "https://attack.mitre.org/techniques/T1685/002/"
+REF_MITRE_DATA_DESTRUCTION = "https://attack.mitre.org/techniques/T1485/"
 
 MFA_DISABLE_EVENTS = {"DeactivateMFADevice", "DeleteVirtualMFADevice"}
 SECURITY_GROUP_CHANGE_EVENTS = {
@@ -44,12 +75,46 @@ IAM_POLICY_CHANGE_EVENTS = {
     "PutRolePolicy",
     "SetDefaultPolicyVersion",
 }
+CREDENTIAL_CREATION_EVENTS = {
+    "CreateAccessKey",
+    "CreateLoginProfile",
+    "CreateServiceSpecificCredential",
+    "UploadSSHPublicKey",
+    "UploadSigningCertificate",
+}
+MONITORING_DISABLE_EVENTS = {
+    "DeleteConfigurationRecorder",
+    "DeleteDeliveryChannel",
+    "DeleteDetector",
+    "DeleteFlowLogs",
+    "DeleteTrail",
+    "DisableSecurityHub",
+    "StopConfigurationRecorder",
+    "StopLogging",
+}
+KMS_DISRUPTION_EVENTS = {"DisableKey", "ScheduleKeyDeletion"}
+
+
+@dataclass(frozen=True)
+class CloudTrailAnalysisResult:
+    findings: tuple[Finding, ...]
+    incidents: tuple[Incident, ...]
 
 
 def _actor(event: dict[str, Any]) -> str:
     identity = event.get("userIdentity", {})
+    if not isinstance(identity, dict):
+        return "unknown-actor"
+    session_context = identity.get("sessionContext", {})
+    if not isinstance(session_context, dict):
+        session_context = {}
+    session_issuer = session_context.get("sessionIssuer", {})
+    if not isinstance(session_issuer, dict):
+        session_issuer = {}
     return str(
         identity.get("userName")
+        or session_issuer.get("userName")
+        or session_issuer.get("arn")
         or identity.get("arn")
         or identity.get("principalId")
         or identity.get("type")
@@ -72,10 +137,13 @@ def _source_ip(event: dict[str, Any]) -> str:
     return str(event.get("sourceIPAddress", "unknown-source"))
 
 
-def _resource_from_params(event: dict[str, Any], keys: list[str]) -> str:
+def _request_parameters(event: dict[str, Any]) -> dict[str, Any]:
     params = event.get("requestParameters", {})
-    if not isinstance(params, dict):
-        return "unknown-resource"
+    return params if isinstance(params, dict) else {}
+
+
+def _resource_from_params(event: dict[str, Any], keys: list[str]) -> str:
+    params = _request_parameters(event)
     for key in keys:
         value = params.get(key)
         if value:
@@ -96,6 +164,48 @@ def _event_succeeded(event: dict[str, Any]) -> bool:
             return False
         return str(response.get("ConsoleLogin", "")).lower() == "success"
     return True
+
+
+def _event_identity_type(event: dict[str, Any]) -> str:
+    identity = event.get("userIdentity", {})
+    if not isinstance(identity, dict):
+        return "unknown"
+    return str(identity.get("type", "unknown"))
+
+
+def _console_login_without_mfa(event: dict[str, Any]) -> bool:
+    if _event_name(event) != "ConsoleLogin" or _event_identity_type(event).lower() != "iamuser":
+        return False
+    additional_data = event.get("additionalEventData", {})
+    if not isinstance(additional_data, dict):
+        return False
+    return str(additional_data.get("MFAUsed", "")).lower() == "no"
+
+
+def _monitoring_was_disabled(event: dict[str, Any]) -> bool:
+    event_name = _event_name(event)
+    if event_name in MONITORING_DISABLE_EVENTS:
+        return True
+    if event_name == "UpdateDetector":
+        return _request_parameters(event).get("enable") is False
+    return False
+
+
+def _monitoring_references(event_name: str) -> list[str]:
+    if event_name in {"StopLogging", "DeleteTrail"}:
+        return [
+            REF_AWS_CLOUDTRAIL_SECURITY,
+            REF_MITRE_DISABLE_CLOUD_LOG,
+        ]
+    if event_name in {"DeleteDetector", "UpdateDetector"}:
+        return [
+            REF_AWS_GUARDDUTY_DELETE,
+            REF_MITRE_DISABLE_TOOLS,
+        ]
+    return [
+        REF_AWS_CLOUDTRAIL,
+        REF_MITRE_DISABLE_TOOLS,
+    ]
 
 
 def _add_finding(
@@ -139,13 +249,17 @@ def analyze_single_event(event: dict[str, Any], index: int) -> list[Finding]:
     actor = _actor(event)
     source_ip = _source_ip(event)
     event_time = str(event.get("eventTime", "unknown-time"))
-    identity_type = str(event.get("userIdentity", {}).get("type", "unknown"))
+    identity_type = _event_identity_type(event)
     base_metadata = {
         "event_id": _event_id(event, index),
         "event_name": event_name,
         "event_time": event_time,
+        "event_source": str(event.get("eventSource", "unknown-source")),
+        "aws_region": str(event.get("awsRegion", "unknown-region")),
         "source_ip": source_ip,
         "actor": actor,
+        "identity_type": identity_type,
+        "user_agent": str(event.get("userAgent", "unknown-agent")),
     }
 
     if event_name == "ConsoleLogin" and identity_type.lower() == "root":
@@ -227,6 +341,130 @@ def analyze_single_event(event: dict[str, Any], index: int) -> list[Finding]:
             metadata=base_metadata,
         )
 
+    if _console_login_without_mfa(event):
+        _add_finding(
+            findings,
+            severity="high",
+            rule_id="CLD-007",
+            resource_type="identity",
+            resource_id=actor,
+            title="IAM user console login did not use MFA",
+            evidence=f"{actor} completed ConsoleLogin without MFA from {source_ip} at {event_time}.",
+            impact="A password-only console session has less resistance to stolen credentials and account takeover.",
+            remediation="Validate the login, require MFA for the user, and investigate the source and subsequent activity.",
+            references=[
+                REF_AWS_CLOUDTRAIL_RECORD,
+                REF_AWS_IAM_BEST_PRACTICES,
+                REF_MITRE_CLOUD_ACCOUNTS,
+            ],
+            metadata=base_metadata,
+        )
+
+    if event_name in CREDENTIAL_CREATION_EVENTS:
+        target_user = _resource_from_params(event, ["userName"])
+        if target_user == "unknown-resource":
+            target_user = actor
+        _add_finding(
+            findings,
+            severity="high",
+            rule_id="CLD-008",
+            resource_type="identity",
+            resource_id=target_user,
+            title="Persistent cloud credential was created",
+            evidence=f"{event_name} was called by {actor} from {source_ip} at {event_time}.",
+            impact="A new key, password, certificate, or service credential can provide persistent access outside the original session.",
+            remediation="Confirm the credential was approved, identify where it was stored, and remove or rotate it if unauthorized.",
+            references=[
+                REF_AWS_IAM_CREATE_ACCESS_KEY,
+                REF_MITRE_ADDITIONAL_CREDENTIALS,
+            ],
+            metadata=base_metadata,
+        )
+
+    if event_name == "UpdateAssumeRolePolicy":
+        role_name = _resource_from_params(event, ["roleName"])
+        _add_finding(
+            findings,
+            severity="high",
+            rule_id="CLD-009",
+            resource_type="role",
+            resource_id=role_name,
+            title="Role trust policy was changed",
+            evidence=f"UpdateAssumeRolePolicy was called by {actor} from {source_ip} at {event_time}.",
+            impact="A changed trust policy can let a new principal assume the role and retain or escalate access.",
+            remediation="Review the trust-policy diff, validate every principal and condition, and remove unapproved trust.",
+            references=[
+                REF_AWS_IAM_UPDATE_TRUST,
+                REF_MITRE_ADDITIONAL_ROLES,
+            ],
+            metadata=base_metadata,
+        )
+
+    if _monitoring_was_disabled(event):
+        control_id = _resource_from_params(
+            event,
+            [
+                "name",
+                "trailName",
+                "detectorId",
+                "configurationRecorderName",
+                "deliveryChannelName",
+                "flowLogId",
+            ],
+        )
+        _add_finding(
+            findings,
+            severity=(
+                "critical"
+                if event_name
+                in {
+                    "DeleteDetector",
+                    "DeleteTrail",
+                    "DisableSecurityHub",
+                    "StopLogging",
+                    "UpdateDetector",
+                }
+                else "high"
+            ),
+            rule_id="CLD-010",
+            resource_type="security_control",
+            resource_id=control_id,
+            title="Audit or threat-detection control was disabled",
+            evidence=f"{event_name} was called by {actor} from {source_ip} at {event_time}.",
+            impact="Disabling logging or detection reduces visibility and can conceal later malicious activity.",
+            remediation="Confirm authorization, restore the control, verify telemetry continuity, and investigate surrounding activity.",
+            references=_monitoring_references(event_name),
+            metadata=base_metadata,
+        )
+
+    if event_name in KMS_DISRUPTION_EVENTS:
+        key_id = _resource_from_params(event, ["keyId"])
+        scheduled_deletion = event_name == "ScheduleKeyDeletion"
+        _add_finding(
+            findings,
+            severity="critical" if scheduled_deletion else "high",
+            rule_id="CLD-011",
+            resource_type="kms_key",
+            resource_id=key_id,
+            title=(
+                "KMS key was scheduled for deletion"
+                if scheduled_deletion
+                else "KMS key was disabled"
+            ),
+            evidence=f"{event_name} was called by {actor} from {source_ip} at {event_time}.",
+            impact=(
+                "Deleting the key can permanently make dependent encrypted data unrecoverable."
+                if scheduled_deletion
+                else "Disabling the key can interrupt workloads and access to dependent encrypted data."
+            ),
+            remediation="Validate the change, cancel unauthorized deletion or re-enable the key, and identify dependent resources.",
+            references=[
+                REF_AWS_KMS_DELETE,
+                REF_MITRE_DATA_DESTRUCTION,
+            ],
+            metadata=base_metadata,
+        )
+
     return findings
 
 
@@ -236,23 +474,32 @@ def detect_api_failure_spikes(
     threshold: int = 5,
     window_minutes: int = 10,
 ) -> list[Finding]:
-    groups: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
-    for event in events:
+    groups: dict[tuple[str, str], list[tuple[int, dict[str, Any]]]] = defaultdict(list)
+    for index, event in enumerate(events):
         if event.get("errorCode"):
-            groups[(_actor(event), _source_ip(event))].append(event)
+            groups[(_actor(event), _source_ip(event))].append((index, event))
 
     findings: list[Finding] = []
     window = timedelta(minutes=window_minutes)
     for (actor, source_ip), group_events in groups.items():
-        ordered = sorted(group_events, key=_event_time)
-        for start_index, start_event in enumerate(ordered):
+        ordered = sorted(group_events, key=lambda item: _event_time(item[1]))
+        for start_index, (_, start_event) in enumerate(ordered):
             start_time = _event_time(start_event)
             window_events = [
-                event for event in ordered[start_index:] if _event_time(event) - start_time <= window
+                item
+                for item in ordered[start_index:]
+                if _event_time(item[1]) - start_time <= window
             ]
             if len(window_events) >= threshold:
-                event_names = sorted({_event_name(event) for event in window_events})
-                error_codes = sorted({str(event.get("errorCode")) for event in window_events})
+                event_names = sorted({_event_name(event) for _, event in window_events})
+                error_codes = sorted(
+                    {str(event.get("errorCode")) for _, event in window_events}
+                )
+                event_ids = [
+                    _event_id(event, original_index)
+                    for original_index, event in window_events
+                ]
+                last_event = window_events[-1][1]
                 _add_finding(
                     findings,
                     severity="medium",
@@ -272,6 +519,10 @@ def detect_api_failure_spikes(
                         "source_ip": source_ip,
                         "event_names": ", ".join(event_names),
                         "error_codes": ", ".join(error_codes),
+                        "event_ids": ", ".join(event_ids),
+                        "first_seen": str(start_event.get("eventTime", "unknown-time")),
+                        "last_seen": str(last_event.get("eventTime", "unknown-time")),
+                        "event_time": str(start_event.get("eventTime", "unknown-time")),
                         "window_minutes": str(window_minutes),
                         "failure_count": str(len(window_events)),
                     },
@@ -281,16 +532,11 @@ def detect_api_failure_spikes(
     return findings
 
 
-def analyze_environment(
-    environment: dict[str, Any],
-    *,
-    failure_threshold: int = 5,
-    failure_window_minutes: int = 10,
-) -> list[Finding]:
+def _deduplicate_events(environment: dict[str, Any]) -> list[dict[str, Any]]:
     raw_events = [event for event in environment.get("events", []) if isinstance(event, dict)]
     events: list[dict[str, Any]] = []
     seen_event_ids: set[str] = set()
-    for index, event in enumerate(raw_events):
+    for event in raw_events:
         event_id = event.get("eventID")
         if event_id:
             normalized_event_id = str(event_id)
@@ -298,6 +544,25 @@ def analyze_environment(
                 continue
             seen_event_ids.add(normalized_event_id)
         events.append(event)
+    return events
+
+
+def analyze_activity(
+    environment: dict[str, Any],
+    *,
+    failure_threshold: int = 5,
+    failure_window_minutes: int = 10,
+    correlation_window_minutes: int = DEFAULT_CORRELATION_WINDOW_MINUTES,
+) -> CloudTrailAnalysisResult:
+    for name, value in (
+        ("failure_threshold", failure_threshold),
+        ("failure_window_minutes", failure_window_minutes),
+        ("correlation_window_minutes", correlation_window_minutes),
+    ):
+        if value <= 0:
+            raise ValueError(f"{name} must be greater than zero.")
+
+    events = _deduplicate_events(environment)
     findings: list[Finding] = []
 
     for index, event in enumerate(events):
@@ -310,7 +575,30 @@ def analyze_environment(
             window_minutes=failure_window_minutes,
         )
     )
-    return sort_findings(findings)
+    sorted_findings = sort_findings(findings)
+    incidents = correlate_incidents(
+        sorted_findings,
+        window_minutes=correlation_window_minutes,
+    )
+    return CloudTrailAnalysisResult(
+        findings=tuple(sorted_findings),
+        incidents=tuple(incidents),
+    )
+
+
+def analyze_environment(
+    environment: dict[str, Any],
+    *,
+    failure_threshold: int = 5,
+    failure_window_minutes: int = 10,
+) -> list[Finding]:
+    return list(
+        analyze_activity(
+            environment,
+            failure_threshold=failure_threshold,
+            failure_window_minutes=failure_window_minutes,
+        ).findings
+    )
 
 
 def load_environment(path: Path) -> dict[str, Any]:
@@ -337,12 +625,34 @@ def print_findings(findings: list[Finding]) -> None:
         print()
 
 
+def print_incidents(incidents: list[Incident]) -> None:
+    if not incidents:
+        print("No correlated CloudTrail incidents detected.")
+        return
+
+    print(f"Correlated CloudTrail incidents detected: {len(incidents)}")
+    print()
+    for incident in incidents:
+        print(f"[{incident.severity.upper()}] {incident.incident_id} {incident.title}")
+        print(f"Actor: {incident.actor}")
+        print(f"Source: {incident.source_ip}")
+        print(f"Window: {incident.first_seen} to {incident.last_seen}")
+        print(f"Rules: {', '.join(incident.rule_ids)}")
+        print(f"Summary: {incident.summary}")
+        print()
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Analyze offline CloudTrail-style event JSON data for suspicious activity."
     )
     parser.add_argument("input", type=Path, help="Path to the sample CloudTrail-style event JSON file.")
     parser.add_argument("--output", type=Path, help="Optional path for JSON findings export.")
+    parser.add_argument(
+        "--incidents-output",
+        type=Path,
+        help="Optional path for correlated incident JSON export.",
+    )
     parser.add_argument(
         "--failure-threshold",
         type=int,
@@ -355,6 +665,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=10,
         help="Time window for failed API spike detection.",
     )
+    parser.add_argument(
+        "--correlation-window-minutes",
+        type=int,
+        default=DEFAULT_CORRELATION_WINDOW_MINUTES,
+        help="Bounded time window used to correlate related findings.",
+    )
     return parser
 
 
@@ -364,19 +680,26 @@ def main() -> int:
 
     try:
         environment = load_environment(args.input)
-        findings = analyze_environment(
+        result = analyze_activity(
             environment,
             failure_threshold=args.failure_threshold,
             failure_window_minutes=args.failure_window_minutes,
+            correlation_window_minutes=args.correlation_window_minutes,
         )
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         parser.error(str(exc))
 
+    findings = list(result.findings)
+    incidents = list(result.incidents)
     print_findings(findings)
+    print_incidents(incidents)
 
     if args.output:
         write_findings(args.output, findings)
         print(f"Findings saved to {args.output}")
+    if args.incidents_output:
+        write_incidents(args.incidents_output, incidents)
+        print(f"Incidents saved to {args.incidents_output}")
 
     return 0
 

@@ -14,6 +14,7 @@ The repository publishes versioned JSON Schema contracts for its simplified offl
 | Optional network reachability context | [`network-reachability-context-v1.0.schema.json`](../schemas/network-reachability-context-v1.0.schema.json) |
 | CloudTrail-style events | [`cloudtrail-events-v1.0.schema.json`](../schemas/cloudtrail-events-v1.0.schema.json) |
 | Shared findings file | [`findings-v1.0.schema.json`](../schemas/findings-v1.0.schema.json) |
+| Correlated incidents file | [`incidents-v1.0.schema.json`](../schemas/incidents-v1.0.schema.json) |
 
 The schemas use JSON Schema Draft 2020-12. Contract tests validate every committed sample and an analyzer-generated findings file against these schemas.
 
@@ -21,4 +22,4 @@ The environment contracts describe the lab's simplified analyzer models. The nat
 
 Runtime analyzers use only the Python standard library and perform lightweight top-level validation. Full JSON Schema validation is a development and CI gate supplied by the optional `dev` dependencies.
 
-The shared findings loader also verifies that `finding_count` equals the number of objects in `findings`. That cross-field equality is enforced in Python because JSON Schema does not express it directly.
+The shared findings and incident loaders also verify that each declared count equals the number of objects in its corresponding list. The incident model additionally verifies UTC time ordering and that `event_count` equals the number of unique event IDs. These cross-field relationships are enforced in Python because JSON Schema does not express them directly.

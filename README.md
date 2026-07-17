@@ -4,7 +4,7 @@ This project is an offline-first AWS security analysis lab for identifying risky
 
 The goal is to provide practical and explainable security findings without requiring cloud credentials or making changes to a live AWS account.
 
-The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, a versioned shared finding contract, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
+The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, versioned finding and incident contracts, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
 
 ## Quick Start
 
@@ -14,7 +14,7 @@ From the repository root, run the complete sample pipeline without installing ru
 python3 -m cloud_security_lab demo --report-date 2026-06-30
 ```
 
-This writes four versioned finding files and a 34-finding consolidated report under `reports/generated/`. The result should exactly match [`reports/cloud_security_report_sample.md`](reports/cloud_security_report_sample.md).
+This writes four versioned finding files, one correlated incident file, and a 39-finding consolidated report under `reports/generated/`. The result should exactly match [`reports/cloud_security_report_sample.md`](reports/cloud_security_report_sample.md).
 
 Install the project in a virtual environment to expose the `cloud-security-lab` command:
 
@@ -146,6 +146,10 @@ The CloudTrail detector checks sample audit events for suspicious cloud API acti
 - Successful bucket access changes that can weaken controls
 - Successful IAM policy changes that can add access
 - Repeated API failures from one actor and source
+- IAM user console logins explicitly recorded without MFA
+- Persistent credential creation and role trust-policy changes
+- Audit or threat-detection controls being disabled
+- KMS keys being disabled or scheduled for deletion
 
 Duplicate CloudTrail events with the same `eventID` are analyzed once. Failed API calls remain available to the failure-spike detector but are not reported as successful configuration changes.
 
@@ -161,6 +165,13 @@ Rule catalog:
 | `CLD-004` | Bucket access policy changed |
 | `CLD-005` | IAM policy configuration changed |
 | `CLD-006` | Repeated API failures |
+| `CLD-007` | IAM user console login without MFA |
+| `CLD-008` | Persistent cloud credential created |
+| `CLD-009` | Role trust policy changed |
+| `CLD-010` | Audit or threat-detection control disabled |
+| `CLD-011` | KMS key disabled or scheduled for deletion |
+
+The detector also correlates eligible findings from the same actor and source into versioned incidents. The default 30-minute window, qualification rules, deterministic IDs, confidence model, and limitations are documented in [CloudTrail incident correlation](docs/incident-correlation.md).
 
 ## Unified CLI
 
@@ -215,7 +226,8 @@ python3 -m cloud_security_lab analyze cloudtrail \
   sample_data/aws/cloudtrail/111122223333_CloudTrail_20260630T0300Z_part2.json.gz \
   --input-format aws \
   --normalized-output reports/generated/normalized_cloudtrail_environment.json \
-  --output reports/generated/cloudtrail_findings.json
+  --output reports/generated/cloudtrail_findings.json \
+  --incidents-output reports/generated/cloudtrail_incidents.json
 ```
 
 Merge one or more versioned finding files:
@@ -226,6 +238,7 @@ python3 -m cloud_security_lab report \
   --findings reports/generated/storage_findings.json \
   --findings reports/generated/network_findings.json \
   --findings reports/generated/cloudtrail_findings.json \
+  --incidents reports/generated/cloudtrail_incidents.json \
   --report-date 2026-06-30 \
   --output reports/generated/cloud_security_report.md
 ```
@@ -266,7 +279,7 @@ Development and contract checks use optional tools declared in `pyproject.toml`:
 
 ```bash
 .venv/bin/ruff check .
-.venv/bin/mypy cloud_security_lab cloud_findings iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
+.venv/bin/mypy cloud_security_lab cloud_findings cloud_incidents iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
 ```
@@ -294,7 +307,10 @@ cloud_security_misconfiguration_lab/
 │       └── s3.py
 ├── cloud_findings/
 │   └── finding.py
+├── cloud_incidents/
+│   └── incident.py
 ├── cloudtrail_detector/
+│   ├── correlation.py
 │   ├── detector.py
 │   ├── README.md
 │   └── test_detector.py
@@ -314,6 +330,7 @@ cloud_security_misconfiguration_lab/
 │   └── cloud_security_report_sample.md
 ├── schemas/
 │   ├── findings-v1.0.schema.json
+│   ├── incidents-v1.0.schema.json
 │   ├── aws-cloudtrail-records-v1.0.schema.json
 │   ├── aws-iam-authorization-details-v1.0.schema.json
 │   ├── aws-ec2-describe-security-groups-v1.0.schema.json
@@ -347,6 +364,7 @@ cloud_security_misconfiguration_lab/
 ├── docs/
 │   ├── data-contracts.md
 │   ├── engineering.md
+│   ├── incident-correlation.md
 │   ├── native-aws-inputs.md
 │   └── known-limitations.md
 ├── tests/

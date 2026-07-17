@@ -30,6 +30,9 @@ All notable changes to this project are documented in this file.
 - A protocol-aware 20-service network exposure catalog covering remote administration, databases, data services, and cloud control planes.
 - A versioned optional network reachability context with direction-specific status, explicit scope, assessment method, timestamp, evidence, and related resource IDs.
 - Strict reachability-context normalization, partial-coverage warnings, schema tests, sample evidence, and unified CLI support through `--reachability-context`.
+- CloudTrail rules for password-only IAM console login, cloud credential creation, role trust changes, monitoring-control disablement, and KMS disruption.
+- Deterministic CloudTrail incident correlation by actor, source, and bounded time window, with stable IDs, inherited severity, explicit confidence, and versioned JSON output.
+- A shared incident model, Draft 2020-12 incident schema, report integration, sample attack-chain incidents, and CLI support through `--incidents-output` and `--incidents`.
 
 ### Changed
 
@@ -51,6 +54,7 @@ All notable changes to this project are documented in this file.
 - Native IAM group policies are analyzed once at the group resource with member context instead of being copied into every member's direct-policy list.
 - Storage ACL findings now account for `BucketOwnerEnforced`, while public-policy findings retain overbroad CIDRs, wildcard values, policy variables, negative operators, and `IfExists` conditions as public.
 - Network findings now distinguish security-group permission paths from supplied end-to-end reachability conclusions. A valid `not_reachable` assessment lowers severity by one level without suppressing the latent configuration risk.
+- CloudTrail findings preserve richer event metadata and failure-spike event IDs; assumed-role actors prefer stable session-issuer identity when available.
 
 ## 1.0.0 - 2026-06-30
 

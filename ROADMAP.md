@@ -29,12 +29,12 @@ Status: Complete.
 
 ## Milestone 4: Detection Depth
 
-Status: In progress.
+Status: Complete.
 
 - [x] Improve IAM wildcard, trust-condition, group, boundary, and credential analysis.
 - [x] Add S3 policy-condition and ownership-control context.
 - [x] Expand the network service catalog and add optional reachability context.
-- [ ] Expand CloudTrail rules and correlate related events into incidents.
+- [x] Expand CloudTrail rules and correlate related events into incidents.
 
 ## Milestone 5: Reporting and Portfolio Release
 

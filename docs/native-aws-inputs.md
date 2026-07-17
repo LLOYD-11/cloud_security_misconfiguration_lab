@@ -247,7 +247,8 @@ python3 -m cloud_security_lab analyze cloudtrail \
   cloudtrail-logs/second.json.gz \
   --input-format aws \
   --normalized-output reports/generated/normalized_cloudtrail_environment.json \
-  --output reports/generated/cloudtrail_findings.json
+  --output reports/generated/cloudtrail_findings.json \
+  --incidents-output reports/generated/cloudtrail_incidents.json
 ```
 
 The bundled sample demonstrates one uncompressed file and one gzip file:
@@ -266,12 +267,15 @@ The adapter:
 - Reads multiple UTF-8 JSON or gzip-compressed JSON files and requires a non-empty `Records` list in each.
 - Accepts CloudTrail event format major version 1 and preserves compatible minor-version fields.
 - Validates event GUIDs, UTC timestamps, service, action, Region, source, identity, request/response shapes, and account identifiers.
+- Preserves variable `additionalEventData` objects, including explicit console-sign-in `MFAUsed` evidence.
 - Uses `recipientAccountId` as the evidence-account boundary, falling back to `userIdentity.accountId` or its ARN for older records.
 - Requires all unique records in one analysis to resolve to the same recipient account.
 - Removes identical duplicate records by `eventID` with a warning and rejects conflicting records that reuse an ID.
 - Writes the merged environment through `--normalized-output` so the detector input remains inspectable.
 
-The adapter loads evidence into memory and does not verify CloudTrail digest signatures. The detector still applies a selected rule catalog rather than reconstructing every request or correlating a full incident.
+The adapter loads evidence into memory and does not verify CloudTrail digest signatures. The detector applies a selected rule catalog rather than reconstructing every request. Its optional incident output correlates only the supported finding evidence under the documented actor, source, and time-window model.
+
+See [CloudTrail incident correlation](incident-correlation.md) for correlation semantics and limitations.
 
 Current CloudTrail references:
 

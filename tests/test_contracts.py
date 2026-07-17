@@ -9,6 +9,7 @@ from pathlib import Path
 from jsonschema import Draft202012Validator, FormatChecker
 
 from cloud_findings import write_findings
+from cloud_incidents import write_incidents
 from cloud_security_lab.normalizers.cloudtrail import load_aws_cloudtrail_environment
 from cloud_security_lab.normalizers.ec2 import load_aws_ec2_environment
 from cloud_security_lab.normalizers.iam import load_aws_iam_environment
@@ -17,6 +18,7 @@ from cloud_security_lab.normalizers.network_context import (
     load_network_reachability_context,
 )
 from cloud_security_lab.normalizers.s3 import load_aws_s3_environment
+from cloudtrail_detector.detector import analyze_activity as analyze_cloudtrail_activity
 from iam_analyzer.analyzer import analyze_environment, load_environment
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -193,6 +195,24 @@ class DataContractTests(unittest.TestCase):
 
         Draft202012Validator.check_schema(schema)
         Draft202012Validator(schema).validate(payload)
+
+    def test_generated_incidents_match_shared_contract(self):
+        schema = _load_json(PROJECT_ROOT / "schemas/incidents-v1.0.schema.json")
+        environment = _load_json(
+            PROJECT_ROOT / "sample_data/cloudtrail/sample_cloudtrail_events.json"
+        )
+        result = analyze_cloudtrail_activity(environment)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "incidents.json"
+            write_incidents(path, result.incidents)
+            payload = _load_json(path)
+
+        Draft202012Validator.check_schema(schema)
+        Draft202012Validator(
+            schema,
+            format_checker=FormatChecker(),
+        ).validate(payload)
 
 
 if __name__ == "__main__":

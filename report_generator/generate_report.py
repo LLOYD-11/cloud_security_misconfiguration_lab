@@ -14,6 +14,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from cloud_findings import Finding, load_findings_file, sort_findings
+from cloud_incidents import Incident, load_incidents_file, sort_incidents
 
 SEVERITY_ORDER = ("critical", "high", "medium", "low", "info")
 
@@ -32,6 +33,13 @@ def load_all_findings(paths: Iterable[Path]) -> list[Finding]:
     for path in paths:
         findings.extend(load_findings_file(path))
     return sort_findings(findings)
+
+
+def load_all_incidents(paths: Iterable[Path]) -> list[Incident]:
+    incidents: list[Incident] = []
+    for path in paths:
+        incidents.extend(load_incidents_file(path))
+    return sort_incidents(incidents)
 
 
 def _severity_counts(findings: Iterable[Finding]) -> Counter[str]:
@@ -64,12 +72,14 @@ def render_report(
     *,
     source_files: Iterable[Path],
     report_date: date | None = None,
+    incidents: Iterable[Incident] = (),
 ) -> str:
     report_date = report_date or date.today()
     sorted_items = sort_findings(findings)
     severity_counts = _severity_counts(sorted_items)
     module_counts = _module_counts(sorted_items)
     grouped = _group_by_severity(sorted_items)
+    sorted_incidents = sort_incidents(incidents)
 
     lines: list[str] = [
         "# Cloud Security Risk Report",
@@ -78,7 +88,11 @@ def render_report(
         "",
         "## Executive Summary",
         "",
-        f"This report consolidates {len(sorted_items)} finding(s) from offline cloud security analyzers.",
+        (
+            f"This report consolidates {len(sorted_items)} "
+            f"{'finding' if len(sorted_items) == 1 else 'findings'} "
+            "from offline cloud security analyzers."
+        ),
         "",
         "## Severity Summary",
         "",
@@ -113,6 +127,52 @@ def render_report(
     )
     for path in source_files:
         lines.append(f"- `{path}`")
+
+    if sorted_incidents:
+        lines.extend(
+            [
+                "",
+                "## Correlated Incidents",
+                "",
+                (
+                    "These incidents group related CloudTrail signals by actor, source IP, "
+                    "and a bounded time window. They support triage and do not prove malicious intent."
+                ),
+                "",
+                "| Incident | Severity | Confidence | Actor | Window | Findings / Events |",
+                "| --- | --- | --- | --- | --- | --- |",
+            ]
+        )
+        for incident in sorted_incidents:
+            lines.append(
+                f"| `{incident.incident_id}` | {_severity_label(incident.severity)} | "
+                f"{incident.confidence.capitalize()} | `{incident.actor}` | "
+                f"{incident.first_seen} to {incident.last_seen} | "
+                f"{incident.finding_count} / {incident.event_count} |"
+            )
+
+        for incident in sorted_incidents:
+            event_label = "event" if incident.event_count == 1 else "events"
+            finding_label = "finding" if incident.finding_count == 1 else "findings"
+            lines.extend(
+                [
+                    "",
+                    f"### {incident.incident_id}: {incident.title}",
+                    "",
+                    f"- Actor and source: `{incident.actor}` from `{incident.source_ip}`",
+                    f"- Window: {incident.first_seen} to {incident.last_seen}",
+                    f"- Severity and confidence: {incident.severity.capitalize()} / {incident.confidence.capitalize()}",
+                    f"- Correlated rules: {', '.join(incident.rule_ids)}",
+                    (
+                        f"- Events and findings: {incident.event_count} {event_label}, "
+                        f"{incident.finding_count} {finding_label}"
+                    ),
+                    f"- Resources: {', '.join(incident.resources)}",
+                    f"- Summary: {incident.summary}",
+                    f"- Recommended actions: {' '.join(incident.recommended_actions)}",
+                    f"- References: {', '.join(incident.references)}",
+                ]
+            )
 
     lines.extend(["", "## Findings", ""])
 
@@ -166,6 +226,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--output", type=Path, required=True, help="Markdown report output path.")
     parser.add_argument(
+        "--incidents",
+        action="append",
+        type=Path,
+        default=[],
+        help="Optional incidents JSON path. Repeat to merge incident files.",
+    )
+    parser.add_argument(
         "--report-date",
         type=_parse_report_date,
         help="Report date in YYYY-MM-DD format. Defaults to the current local date.",
@@ -179,17 +246,20 @@ def main() -> int:
 
     try:
         findings = load_all_findings(args.findings)
+        incidents = load_all_incidents(args.incidents)
     except (OSError, ValueError, KeyError) as exc:
         parser.error(str(exc))
 
     report = render_report(
         findings,
-        source_files=args.findings,
+        source_files=[*args.findings, *args.incidents],
         report_date=args.report_date,
+        incidents=incidents,
     )
     write_report(args.output, report)
     print(f"Report saved to {args.output}")
     print(f"Findings included: {len(findings)}")
+    print(f"Incidents included: {len(incidents)}")
     return 0
 
 

@@ -47,6 +47,7 @@ version = { attr = "cloud_security_lab.__version__" }
 include = [
   "cloud_security_lab*",
   "cloud_findings*",
+  "cloud_incidents*",
   "cloudtrail_detector*",
   "iam_analyzer*",
   "network_analyzer*",

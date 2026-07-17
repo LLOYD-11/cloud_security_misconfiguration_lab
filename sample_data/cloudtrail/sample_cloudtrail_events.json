@@ -2,6 +2,7 @@
   "account_id": "111122223333",
   "events": [
     {
+      "eventID": "00000000-0000-4000-8000-000000000001",
       "eventTime": "2026-06-30T01:00:00Z",
       "eventSource": "signin.amazonaws.com",
       "eventName": "ConsoleLogin",
@@ -13,9 +14,11 @@
       },
       "responseElements": {
         "ConsoleLogin": "Success"
-      }
+      },
+      "userAgent": "Mozilla/5.0 (sample)"
     },
     {
+      "eventID": "00000000-0000-4000-8000-000000000002",
       "eventTime": "2026-06-30T01:04:00Z",
       "eventSource": "iam.amazonaws.com",
       "eventName": "DeactivateMFADevice",
@@ -29,9 +32,11 @@
       "requestParameters": {
         "userName": "alice-admin",
         "serialNumber": "arn:aws:iam::111122223333:mfa/alice-admin"
-      }
+      },
+      "userAgent": "aws-cli/2.x"
     },
     {
+      "eventID": "00000000-0000-4000-8000-000000000003",
       "eventTime": "2026-06-30T01:09:00Z",
       "eventSource": "ec2.amazonaws.com",
       "eventName": "AuthorizeSecurityGroupIngress",
@@ -55,9 +60,11 @@
             ]
           }
         ]
-      }
+      },
+      "userAgent": "aws-cli/2.x"
     },
     {
+      "eventID": "00000000-0000-4000-8000-000000000004",
       "eventTime": "2026-06-30T01:12:00Z",
       "eventSource": "s3.amazonaws.com",
       "eventName": "PutBucketPolicy",
@@ -70,9 +77,11 @@
       },
       "requestParameters": {
         "bucketName": "public-customer-exports"
-      }
+      },
+      "userAgent": "aws-cli/2.x"
     },
     {
+      "eventID": "00000000-0000-4000-8000-000000000005",
       "eventTime": "2026-06-30T01:15:00Z",
       "eventSource": "iam.amazonaws.com",
       "eventName": "CreatePolicyVersion",
@@ -86,9 +95,100 @@
       "requestParameters": {
         "policyArn": "arn:aws:iam::111122223333:policy/OverBroadAdminPolicy",
         "setAsDefault": true
-      }
+      },
+      "userAgent": "aws-cli/2.x"
     },
     {
+      "eventID": "00000000-0000-4000-8000-000000000013",
+      "eventTime": "2026-06-30T01:17:00Z",
+      "eventSource": "iam.amazonaws.com",
+      "eventName": "CreateAccessKey",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userIdentity": {
+        "type": "IAMUser",
+        "userName": "alice-admin",
+        "arn": "arn:aws:iam::111122223333:user/alice-admin"
+      },
+      "requestParameters": {
+        "userName": "backup-operator"
+      },
+      "userAgent": "aws-cli/2.x"
+    },
+    {
+      "eventID": "00000000-0000-4000-8000-000000000014",
+      "eventTime": "2026-06-30T01:19:00Z",
+      "eventSource": "iam.amazonaws.com",
+      "eventName": "UpdateAssumeRolePolicy",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "198.51.100.20",
+      "userIdentity": {
+        "type": "IAMUser",
+        "userName": "alice-admin",
+        "arn": "arn:aws:iam::111122223333:user/alice-admin"
+      },
+      "requestParameters": {
+        "roleName": "production-admin"
+      },
+      "userAgent": "aws-cli/2.x"
+    },
+    {
+      "eventID": "00000000-0000-4000-8000-000000000015",
+      "eventTime": "2026-06-30T01:21:00Z",
+      "eventSource": "guardduty.amazonaws.com",
+      "eventName": "DeleteDetector",
+      "awsRegion": "ap-southeast-2",
+      "sourceIPAddress": "198.51.100.20",
+      "userIdentity": {
+        "type": "IAMUser",
+        "userName": "alice-admin",
+        "arn": "arn:aws:iam::111122223333:user/alice-admin"
+      },
+      "requestParameters": {
+        "detectorId": "12abc34d567e8fa901bc2d34eexample"
+      },
+      "userAgent": "aws-cli/2.x"
+    },
+    {
+      "eventID": "00000000-0000-4000-8000-000000000016",
+      "eventTime": "2026-06-30T01:23:00Z",
+      "eventSource": "kms.amazonaws.com",
+      "eventName": "ScheduleKeyDeletion",
+      "awsRegion": "ap-southeast-2",
+      "sourceIPAddress": "198.51.100.20",
+      "userIdentity": {
+        "type": "IAMUser",
+        "userName": "alice-admin",
+        "arn": "arn:aws:iam::111122223333:user/alice-admin"
+      },
+      "requestParameters": {
+        "keyId": "1234abcd-12ab-34cd-56ef-1234567890ab",
+        "pendingWindowInDays": 7
+      },
+      "userAgent": "aws-cli/2.x"
+    },
+    {
+      "eventID": "00000000-0000-4000-8000-000000000017",
+      "eventTime": "2026-06-30T01:30:00Z",
+      "eventSource": "signin.amazonaws.com",
+      "eventName": "ConsoleLogin",
+      "awsRegion": "us-east-1",
+      "sourceIPAddress": "203.0.113.55",
+      "userIdentity": {
+        "type": "IAMUser",
+        "userName": "legacy-operator",
+        "arn": "arn:aws:iam::111122223333:user/legacy-operator"
+      },
+      "responseElements": {
+        "ConsoleLogin": "Success"
+      },
+      "additionalEventData": {
+        "MFAUsed": "No"
+      },
+      "userAgent": "Mozilla/5.0 (sample)"
+    },
+    {
+      "eventID": "00000000-0000-4000-8000-000000000006",
       "eventTime": "2026-06-30T02:00:00Z",
       "eventSource": "sts.amazonaws.com",
       "eventName": "AssumeRole",
@@ -100,9 +200,11 @@
         "arn": "arn:aws:iam::111122223333:user/unknown-user"
       },
       "errorCode": "AccessDenied",
-      "errorMessage": "User is not authorized to perform sts:AssumeRole"
+      "errorMessage": "User is not authorized to perform sts:AssumeRole",
+      "userAgent": "aws-cli/2.x"
     },
     {
+      "eventID": "00000000-0000-4000-8000-000000000007",
       "eventTime": "2026-06-30T02:01:00Z",
       "eventSource": "sts.amazonaws.com",
       "eventName": "AssumeRole",
@@ -113,9 +215,11 @@
         "userName": "unknown-user",
         "arn": "arn:aws:iam::111122223333:user/unknown-user"
       },
-      "errorCode": "AccessDenied"
+      "errorCode": "AccessDenied",
+      "userAgent": "aws-cli/2.x"
     },
     {
+      "eventID": "00000000-0000-4000-8000-000000000008",
       "eventTime": "2026-06-30T02:03:00Z",
       "eventSource": "iam.amazonaws.com",
       "eventName": "ListUsers",
@@ -126,9 +230,11 @@
         "userName": "unknown-user",
         "arn": "arn:aws:iam::111122223333:user/unknown-user"
       },
-      "errorCode": "AccessDenied"
+      "errorCode": "AccessDenied",
+      "userAgent": "aws-cli/2.x"
     },
     {
+      "eventID": "00000000-0000-4000-8000-000000000009",
       "eventTime": "2026-06-30T02:04:00Z",
       "eventSource": "iam.amazonaws.com",
       "eventName": "GetUser",
@@ -139,9 +245,11 @@
         "userName": "unknown-user",
         "arn": "arn:aws:iam::111122223333:user/unknown-user"
       },
-      "errorCode": "AccessDenied"
+      "errorCode": "AccessDenied",
+      "userAgent": "aws-cli/2.x"
     },
     {
+      "eventID": "00000000-0000-4000-8000-000000000010",
       "eventTime": "2026-06-30T02:06:00Z",
       "eventSource": "ec2.amazonaws.com",
       "eventName": "DescribeInstances",
@@ -152,9 +260,11 @@
         "userName": "unknown-user",
         "arn": "arn:aws:iam::111122223333:user/unknown-user"
       },
-      "errorCode": "UnauthorizedOperation"
+      "errorCode": "UnauthorizedOperation",
+      "userAgent": "aws-cli/2.x"
     },
     {
+      "eventID": "00000000-0000-4000-8000-000000000011",
       "eventTime": "2026-06-30T02:08:00Z",
       "eventSource": "s3.amazonaws.com",
       "eventName": "ListBuckets",
@@ -165,9 +275,11 @@
         "userName": "unknown-user",
         "arn": "arn:aws:iam::111122223333:user/unknown-user"
       },
-      "errorCode": "AccessDenied"
+      "errorCode": "AccessDenied",
+      "userAgent": "aws-cli/2.x"
     },
     {
+      "eventID": "00000000-0000-4000-8000-000000000012",
       "eventTime": "2026-06-30T03:00:00Z",
       "eventSource": "ec2.amazonaws.com",
       "eventName": "DescribeSecurityGroups",
@@ -177,7 +289,8 @@
         "type": "AssumedRole",
         "userName": "readonly-audit-role",
         "arn": "arn:aws:sts::111122223333:assumed-role/readonly-audit-role/session"
-      }
+      },
+      "userAgent": "aws-sdk-python/1.x"
     }
   ]
 }

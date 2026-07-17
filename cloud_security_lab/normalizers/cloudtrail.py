@@ -101,7 +101,7 @@ def _validate_event_time(event: dict[str, Any], context: str) -> None:
 
 
 def _validate_optional_objects(event: dict[str, Any], context: str) -> None:
-    for key in ("requestParameters", "responseElements"):
+    for key in ("requestParameters", "responseElements", "additionalEventData"):
         value = event.get(key)
         if value is not None and not isinstance(value, dict):
             raise ValueError(f"{context} field {key} must be an object or null.")
