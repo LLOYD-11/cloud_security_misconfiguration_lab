@@ -19,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.13"]
+        python-version: ["3.10", "3.12", "3.13"]
 
     steps:
       - name: Check out repository
@@ -84,6 +84,7 @@ jobs:
           sample_data/aws/ec2/describe_security_groups.json
           --input-format aws
           --reachability-context sample_data/aws/ec2/network_reachability_context.json
+          --region ap-southeast-2
           --normalized-output reports/generated/normalized_network_environment.json
           --output reports/generated/native_network_findings.json
           --summary-output reports/generated/native_network_analysis_summary.json
@@ -115,4 +116,8 @@ jobs:
           assert any(name.endswith(
           '/schemas/remediation-plan-v1.0.schema.json') for name in names);
           assert any(name.endswith(
-          '/schemas/attack-timeline-v1.0.schema.json') for name in names)"
+          '/schemas/attack-timeline-v1.0.schema.json') for name in names);
+          assert any(name.endswith(
+          '/schemas/findings-v2.0.schema.json') for name in names);
+          assert any(name.endswith(
+          '/sample_data/aws/fixture-manifest-v1.0.json') for name in names)"

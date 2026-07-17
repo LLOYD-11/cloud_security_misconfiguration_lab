@@ -41,7 +41,11 @@ This conservative join avoids elevating unrelated findings merely because they s
 
 ## Confidence
 
-Incident-response confidence comes from the correlation result. Configuration confidence comes from the built-in rule catalog and describes how directly the evidence supports the rule condition. Custom rules remain compatible but use `not-assessed`; the planner does not invent confidence for external detectors.
+Incident-response confidence comes from the correlation result. Configuration
+confidence comes from findings v2 and describes how directly the evidence
+supports the rule condition. A migrated v1 finding with `unknown` confidence
+falls back to the built-in rule catalog. An unknown custom rule uses
+`not-assessed`; the planner does not invent confidence for external detectors.
 
 Confidence is a tie-breaker and explanatory field. It never overrides the published priority rules or represents certainty that activity is malicious.
 

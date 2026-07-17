@@ -3,8 +3,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from cloud_findings import findings_to_dicts, write_findings
+from cloud_findings import EvidenceReference, Finding, findings_to_dicts, write_findings
 from cloud_incidents import incidents_to_dicts, write_incidents
+from cloudtrail_detector.correlation import correlate_incidents
 from cloudtrail_detector.detector import (
     analyze_activity,
     analyze_environment,
@@ -155,6 +156,37 @@ class CloudTrailDetectorTests(unittest.TestCase):
         self.assertEqual(
             {"unknown-user@192.0.2.44", "unknown-user@198.51.100.22"},
             {finding.resource_id for finding in findings},
+        )
+
+    def test_failed_api_spikes_and_incidents_do_not_cross_account_boundaries(self):
+        events = []
+        for account_id in ("111122223333", "999988887777"):
+            for index in range(5):
+                events.append(
+                    {
+                        "eventID": f"{account_id}-failure-{index}",
+                        "eventTime": f"2026-06-30T02:0{index}:00Z",
+                        "eventName": "AssumeRole",
+                        "recipientAccountId": account_id,
+                        "sourceIPAddress": "192.0.2.44",
+                        "userIdentity": {
+                            "type": "IAMUser",
+                            "userName": "unknown-user",
+                        },
+                        "errorCode": "AccessDenied",
+                    }
+                )
+
+        result = analyze_activity({"events": events})
+
+        self.assertEqual(2, len(result.findings))
+        self.assertEqual(
+            {"111122223333", "999988887777"},
+            {finding.account_id for finding in result.findings},
+        )
+        self.assertEqual(2, len(result.incidents))
+        self.assertTrue(
+            all(incident.event_count == 5 for incident in result.incidents)
         )
 
     def test_failed_change_event_does_not_claim_resource_was_changed(self):
@@ -463,6 +495,57 @@ class CloudTrailDetectorTests(unittest.TestCase):
         self.assertEqual((), outside.incidents)
         self.assertEqual(1, len(inside.incidents))
 
+    def test_correlation_uses_v2_time_and_evidence_references(self):
+        findings = [
+            Finding(
+                rule_id=rule_id,
+                severity="high",
+                module="cloudtrail",
+                category="audit-and-detection",
+                resource_type="identity",
+                resource_id="alice",
+                title="Synthetic signal",
+                evidence="Synthetic evidence.",
+                impact="Synthetic impact.",
+                remediation="Synthetic remediation.",
+                references=["https://example.com/reference"],
+                metadata={
+                    "actor": "alice",
+                    "source_ip": "192.0.2.1",
+                    "event_time": legacy_event_time,
+                },
+                observed_at=observed_at,
+                evidence_references=[
+                    EvidenceReference(
+                        type="cloudtrail-event",
+                        id=event_id,
+                    )
+                ],
+            )
+            for rule_id, event_id, observed_at, legacy_event_time in (
+                (
+                    "CLD-002",
+                    "event-v2-1",
+                    "2026-06-30T01:00:00Z",
+                    "2026-06-30T05:00:00Z",
+                ),
+                (
+                    "CLD-008",
+                    "event-v2-2",
+                    "2026-06-30T01:01:00Z",
+                    "2026-06-30T07:00:00Z",
+                ),
+            )
+        ]
+
+        incidents = correlate_incidents(findings)
+
+        self.assertEqual(1, len(incidents))
+        self.assertEqual(
+            ["event-v2-1", "event-v2-2"],
+            incidents[0].event_ids,
+        )
+
     def test_findings_export_writes_shared_schema(self):
         environment = load_environment(SAMPLE_FILE)
         findings = analyze_environment(environment)
@@ -472,7 +555,7 @@ class CloudTrailDetectorTests(unittest.TestCase):
             write_findings(output_path, findings)
             payload = json.loads(output_path.read_text(encoding="utf-8"))
 
-        self.assertEqual("1.0", payload["schema_version"])
+            self.assertEqual("2.0", payload["schema_version"])
         self.assertEqual(len(findings), payload["finding_count"])
         self.assertEqual(findings_to_dicts(findings), payload["findings"])
 

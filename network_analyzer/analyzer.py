@@ -15,7 +15,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from cloud_findings import Finding, sort_findings, write_findings
+from cloud_findings import (
+    EvidenceReference,
+    Finding,
+    sort_findings,
+    with_findings_context,
+    write_findings,
+)
 from cloud_rules import validate_rule_emission
 
 REF_AWS_SECURITY_GROUPS = "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html"
@@ -570,7 +576,15 @@ def _add_finding(
     references: list[str],
     metadata: dict[str, str] | None = None,
 ) -> None:
-    validate_rule_emission(rule_id, "network", severity)
+    rule = validate_rule_emission(rule_id, "network", severity)
+    assert rule is not None
+    metadata_values = metadata or {}
+    direction = metadata_values.get("direction", "unknown-direction")
+    rule_index = metadata_values.get("rule_index", "unknown-rule")
+    service = metadata_values.get("service")
+    evidence_id = f"{resource_id}:{direction}:{rule_index}"
+    if service:
+        evidence_id += f":{service}"
     findings.append(
         Finding(
             rule_id=rule_id,
@@ -584,7 +598,14 @@ def _add_finding(
             impact=impact,
             remediation=remediation,
             references=references,
-            metadata=metadata or {},
+            metadata=metadata_values,
+            confidence=rule.confidence,
+            evidence_references=[
+                EvidenceReference(
+                    type="ec2-security-group-rule",
+                    id=evidence_id,
+                )
+            ],
         )
     )
 
@@ -637,6 +658,7 @@ def analyze_security_group(group: dict[str, Any]) -> list[Finding]:
                 ),
                 metadata={
                     **group_metadata,
+                    "direction": "ingress",
                     "rule_index": str(index + 1),
                     "exposure_scope": exposure_scope,
                     **_reachability_metadata(ingress_reachability, "ingress"),
@@ -694,6 +716,7 @@ def analyze_security_group(group: dict[str, Any]) -> list[Finding]:
                     ),
                     metadata={
                         **group_metadata,
+                        "direction": "ingress",
                         "rule_index": str(index + 1),
                         "port": str(service.port),
                         "protocol": protocol,
@@ -745,20 +768,34 @@ def analyze_security_group(group: dict[str, Any]) -> list[Finding]:
                 ),
                 metadata={
                     **group_metadata,
+                    "direction": "egress",
                     "rule_index": str(index + 1),
                     "exposure_scope": exposure_scope,
                     **_reachability_metadata(egress_reachability, "egress"),
                 },
             )
 
-    return findings
+    return with_findings_context(
+        findings,
+        account_id=str(group.get("owner_id") or "unknown"),
+        region=str(group.get("region") or "unknown"),
+        observed_at=ingress_reachability.observed_at
+        or egress_reachability.observed_at
+        or None,
+    )
 
 
 def analyze_environment(environment: dict[str, Any]) -> list[Finding]:
     findings: list[Finding] = []
     for group in environment.get("security_groups", []):
         findings.extend(analyze_security_group(group))
-    return sort_findings(findings)
+    return sort_findings(
+        with_findings_context(
+            findings,
+            account_id=str(environment.get("account_id") or "unknown"),
+            region=str(environment.get("region") or "unknown"),
+        )
+    )
 
 
 def load_environment(path: Path) -> dict[str, Any]:

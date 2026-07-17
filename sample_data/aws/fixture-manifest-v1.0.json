@@ -1,0 +1,248 @@
+{
+  "schema_version": "1.0",
+  "dataset_name": "cloud-security-misconfiguration-lab-aws-fixtures",
+  "description": "Synthetic, sanitized AWS-shaped evidence for reproducible offline security analysis. No record was collected from a live customer or personal AWS account.",
+  "origin": "synthetic",
+  "fixtures": [
+    {
+      "path": "sample_data/aws/cloudtrail/111122223333_CloudTrail_20260630T0200Z_part1.json",
+      "service": "cloudtrail",
+      "fixture_type": "native-aws-response",
+      "format": "json",
+      "operations": [
+        "CloudTrail log Records"
+      ],
+      "contract": "schemas/aws-cloudtrail-records-v1.0.schema.json",
+      "shape_references": [
+        "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html"
+      ],
+      "account_id": "111122223333",
+      "regions": [
+        "ap-southeast-2",
+        "us-east-1"
+      ],
+      "observed_from": "2026-06-30T01:00:00Z",
+      "observed_to": "2026-06-30T02:01:00Z",
+      "origin": "synthetic",
+      "sanitization": [
+        "Uses the AWS documentation account ID 111122223333 and fictional ARNs.",
+        "Uses RFC 5737 documentation IP addresses and synthetic event IDs.",
+        "Uses fictional identity, bucket, key, trail, and security-group names."
+      ],
+      "expected_rule_ids": [
+        "CLD-001",
+        "CLD-002",
+        "CLD-003",
+        "CLD-004",
+        "CLD-005",
+        "CLD-007",
+        "CLD-008",
+        "CLD-009",
+        "CLD-010",
+        "CLD-011"
+      ],
+      "sha256": "818287f09c6fcd12a6637a072beaeb61c9e0d12ce94a08cd1d349e2a94612698"
+    },
+    {
+      "path": "sample_data/aws/cloudtrail/111122223333_CloudTrail_20260630T0300Z_part2.json.gz",
+      "service": "cloudtrail",
+      "fixture_type": "native-aws-response",
+      "format": "json-gzip",
+      "operations": [
+        "CloudTrail log Records"
+      ],
+      "contract": "schemas/aws-cloudtrail-records-v1.0.schema.json",
+      "shape_references": [
+        "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html"
+      ],
+      "account_id": "111122223333",
+      "regions": [
+        "ap-southeast-2",
+        "us-east-1"
+      ],
+      "observed_from": "2026-06-30T01:12:00Z",
+      "observed_to": "2026-06-30T03:00:00Z",
+      "origin": "synthetic",
+      "sanitization": [
+        "Uses the AWS documentation account ID 111122223333 and fictional ARNs.",
+        "Uses RFC 5737 documentation IP addresses and synthetic event IDs.",
+        "Contains one intentional duplicate event for deduplication coverage."
+      ],
+      "expected_rule_ids": [
+        "CLD-004",
+        "CLD-006"
+      ],
+      "sha256": "df58f66474b4ae3243fd1ec6cd7b74fa5ca9c75e41e9b41f27efbfb54eb210f2"
+    },
+    {
+      "path": "sample_data/aws/ec2/describe_security_groups.json",
+      "service": "ec2",
+      "fixture_type": "native-aws-response",
+      "format": "json",
+      "operations": [
+        "DescribeSecurityGroups"
+      ],
+      "contract": "schemas/aws-ec2-describe-security-groups-v1.0.schema.json",
+      "shape_references": [
+        "https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeSecurityGroups.html"
+      ],
+      "account_id": "111122223333",
+      "regions": [
+        "ap-southeast-2"
+      ],
+      "observed_from": "2026-06-30T03:55:00Z",
+      "observed_to": "2026-06-30T03:55:00Z",
+      "origin": "synthetic",
+      "sanitization": [
+        "Uses the AWS documentation account ID 111122223333 and fictional ARNs.",
+        "Uses synthetic VPC, security-group, prefix-list, and peering identifiers.",
+        "Uses RFC 5737 documentation ranges, private CIDRs, and public wildcard CIDRs."
+      ],
+      "expected_rule_ids": [
+        "NET-001",
+        "NET-002",
+        "NET-003"
+      ],
+      "sha256": "315133d73c4237ad844bcf74ab788a613df030c14d4be439d8c6d70b1cc396e9"
+    },
+    {
+      "path": "sample_data/aws/ec2/network_reachability_context.json",
+      "service": "ec2",
+      "fixture_type": "derived-assessment",
+      "format": "json",
+      "operations": [
+        "Network Access Analyzer assessment",
+        "Reachability Analyzer assessment",
+        "Manual topology review"
+      ],
+      "contract": "schemas/network-reachability-context-v1.0.schema.json",
+      "shape_references": [
+        "https://docs.aws.amazon.com/vpc/latest/network-access-analyzer/how-network-access-analyzer-works.html",
+        "https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html"
+      ],
+      "account_id": "111122223333",
+      "regions": [
+        "ap-southeast-2"
+      ],
+      "observed_from": "2026-06-30T04:00:00Z",
+      "observed_to": "2026-06-30T04:15:00Z",
+      "origin": "synthetic",
+      "sanitization": [
+        "Contains fictional assessor conclusions rather than exported AWS results.",
+        "Uses synthetic VPC, security-group, interface, route, and gateway identifiers.",
+        "Scopes each conclusion explicitly so it is not presented as live reachability proof."
+      ],
+      "expected_rule_ids": [
+        "NET-001",
+        "NET-002",
+        "NET-003"
+      ],
+      "sha256": "af847842f7a85e5af984fc27261d6e8a13323c880aa2ca6ff2eec5fc84a88b59"
+    },
+    {
+      "path": "sample_data/aws/iam/account_authorization_details.json",
+      "service": "iam",
+      "fixture_type": "native-aws-response",
+      "format": "json",
+      "operations": [
+        "GetAccountAuthorizationDetails"
+      ],
+      "contract": "schemas/aws-iam-authorization-details-v1.0.schema.json",
+      "shape_references": [
+        "https://docs.aws.amazon.com/IAM/latest/APIReference/API_GetAccountAuthorizationDetails.html"
+      ],
+      "account_id": "111122223333",
+      "regions": [
+        "global"
+      ],
+      "observed_from": "2026-06-30T00:00:00Z",
+      "observed_to": "2026-06-30T00:00:00Z",
+      "origin": "synthetic",
+      "sanitization": [
+        "Uses the AWS documentation account ID 111122223333 and fictional ARNs.",
+        "Uses fictional users, groups, roles, policies, and external account trust.",
+        "Contains no access keys, secrets, session tokens, or customer policy documents."
+      ],
+      "expected_rule_ids": [
+        "IAM-001",
+        "IAM-002",
+        "IAM-003",
+        "IAM-004",
+        "IAM-005",
+        "IAM-008"
+      ],
+      "sha256": "ba95773f35f7266742e7d71dedea14eccd9a6f3b7e1b5cffe16c1e4b88622dba"
+    },
+    {
+      "path": "sample_data/aws/iam/credential_report.csv",
+      "service": "iam",
+      "fixture_type": "native-aws-response",
+      "format": "csv",
+      "operations": [
+        "GetCredentialReport decoded Content"
+      ],
+      "contract": "cloud_security_lab/normalizers/iam.py",
+      "shape_references": [
+        "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_getting-report.html"
+      ],
+      "account_id": "111122223333",
+      "regions": [
+        "global"
+      ],
+      "observed_from": "2026-06-30T00:00:00Z",
+      "observed_to": "2026-06-30T00:00:00Z",
+      "origin": "synthetic",
+      "sanitization": [
+        "Uses the AWS documentation account ID 111122223333 and fictional ARNs.",
+        "Uses fictional credential dates and service-use metadata.",
+        "Contains posture fields only and no credential secret material."
+      ],
+      "expected_rule_ids": [
+        "IAM-006",
+        "IAM-007"
+      ],
+      "sha256": "ab6ab55ed546e7489d4cc4fd9e806010f02510b902c68423a73bc7899fce511f"
+    },
+    {
+      "path": "sample_data/aws/s3/s3_security_evidence_bundle.json",
+      "service": "s3",
+      "fixture_type": "assembled-aws-evidence",
+      "format": "json",
+      "operations": [
+        "GetBucketAcl",
+        "GetBucketEncryption",
+        "GetBucketOwnershipControls",
+        "GetBucketPolicy",
+        "GetBucketVersioning",
+        "GetPublicAccessBlock",
+        "ListBuckets"
+      ],
+      "contract": "schemas/aws-s3-evidence-bundle-v1.0.schema.json",
+      "shape_references": [
+        "https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListBuckets.html",
+        "https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketPolicy.html",
+        "https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetPublicAccessBlock.html"
+      ],
+      "account_id": "111122223333",
+      "regions": [
+        "ap-southeast-2"
+      ],
+      "observed_from": "2026-06-30T00:30:00Z",
+      "observed_to": "2026-06-30T00:30:00Z",
+      "origin": "synthetic",
+      "sanitization": [
+        "Uses the AWS documentation account ID 111122223333 and fictional ARNs.",
+        "Uses fictional bucket, policy, and KMS key identifiers.",
+        "Uses a zeroed canonical owner ID and contains no object data."
+      ],
+      "expected_rule_ids": [
+        "STO-001",
+        "STO-002",
+        "STO-003",
+        "STO-005",
+        "STO-006"
+      ],
+      "sha256": "82133e8b7d585844e6a8d0b359df5806cf83be0167257ed513fa422e6dacf67f"
+    }
+  ]
+}

@@ -14,7 +14,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from cloud_findings import Finding, sort_findings, write_findings
+from cloud_findings import (
+    EvidenceReference,
+    Finding,
+    sort_findings,
+    with_findings_context,
+    write_findings,
+)
 from cloud_rules import validate_rule_emission
 
 SENSITIVE_ACTIONS = (
@@ -277,12 +283,24 @@ def _add_finding(
     statement_id: str = "",
     extra_metadata: dict[str, str] | None = None,
 ) -> None:
-    validate_rule_emission(rule_id, "iam", severity)
+    rule = validate_rule_emission(rule_id, "iam", severity)
+    assert rule is not None
     metadata = dict(extra_metadata or {})
     if policy_name:
         metadata["policy_name"] = policy_name
     if statement_id:
         metadata["statement_id"] = statement_id
+    if policy_name == "credential-report":
+        evidence_type = "iam-credential-report-entry"
+    elif policy_name == "trust-policy":
+        evidence_type = "iam-trust-policy-statement"
+    else:
+        evidence_type = "iam-policy-statement"
+    evidence_id = f"{resource_type}/{resource_id}"
+    if policy_name:
+        evidence_id += f":{policy_name}"
+    if statement_id:
+        evidence_id += f":{statement_id}"
 
     findings.append(
         Finding(
@@ -298,6 +316,10 @@ def _add_finding(
             remediation=remediation,
             references=references or [],
             metadata=metadata,
+            confidence=rule.confidence,
+            evidence_references=[
+                EvidenceReference(type=evidence_type, id=evidence_id)
+            ],
         )
     )
 
@@ -740,7 +762,11 @@ def analyze_principal(
     if subject_type == "role":
         findings.extend(analyze_trust_policy(principal, account_id))
 
-    return findings
+    return with_findings_context(
+        findings,
+        account_id=account_id or "unknown",
+        region="global",
+    )
 
 
 def analyze_trust_policy(role: dict[str, Any], account_id: str) -> list[Finding]:
@@ -816,7 +842,7 @@ def analyze_trust_policy(role: dict[str, Any], account_id: str) -> list[Finding]
 
 
 def analyze_environment(environment: dict[str, Any]) -> list[Finding]:
-    account_id = str(environment.get("account_id", ""))
+    account_id = str(environment.get("account_id") or "unknown")
     findings: list[Finding] = []
 
     root_account = environment.get("root_account")
@@ -832,7 +858,13 @@ def analyze_environment(environment: dict[str, Any]) -> list[Finding]:
     for role in environment.get("roles", []):
         findings.extend(analyze_principal("role", role, account_id))
 
-    return sort_findings(findings)
+    return sort_findings(
+        with_findings_context(
+            findings,
+            account_id=account_id,
+            region="global",
+        )
+    )
 
 
 def load_environment(path: Path) -> dict[str, Any]:

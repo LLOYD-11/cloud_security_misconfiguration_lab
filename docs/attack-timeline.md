@@ -23,8 +23,13 @@ The JSON output follows
 Only findings whose `module` is `cloudtrail` are timeline candidates. Each
 candidate must contain:
 
-- A valid UTC `event_time`, or a valid UTC `first_seen` and optional `last_seen`
-- At least one `event_id`, or a comma-separated `event_ids` value
+- A v2 UTC `observed_at`, or legacy metadata with a valid UTC `event_time` or
+  `first_seen` and optional `last_seen`
+- At least one v2 `cloudtrail-event` evidence reference, or legacy metadata with
+  an `event_id` or comma-separated `event_ids` value
+
+Structured v2 provenance takes precedence. Metadata remains a compatibility
+fallback for versioned v1 findings and original in-memory integrations.
 
 Single-event findings use the same first and last time. Aggregate rules retain
 their window; for example, `CLD-006` preserves all failed event IDs and the
@@ -55,7 +60,9 @@ Activity labels describe the observed control-plane action:
 
 Tests require every built-in CloudTrail rule to have a classification. An
 uncataloged custom CloudTrail rule remains compatible, receives
-`other-observed-activity`, and uses `not-assessed` confidence.
+`other-observed-activity`, and uses its v2 finding confidence or
+`not-assessed` when confidence is unknown. Migrated v1 built-in findings fall
+back to catalog confidence.
 
 These labels are not MITRE ATT&CK tactics or proof that an event was malicious.
 For example, repeated access denials can reflect probing, automation errors, or

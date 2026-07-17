@@ -290,7 +290,7 @@ def _bucket_versioning(payload: dict[str, Any], context: str) -> dict[str, str]:
     return {"status": status}
 
 
-def _bucket_names(list_buckets: dict[str, Any]) -> list[str]:
+def _bucket_inventory(list_buckets: dict[str, Any]) -> dict[str, str | None]:
     if list_buckets.get("Prefix"):
         raise ValueError("ListBuckets evidence is prefix-filtered; collect the full bucket inventory.")
     for pagination_key in ("ContinuationToken", "NextToken"):
@@ -300,15 +300,22 @@ def _bucket_names(list_buckets: dict[str, Any]) -> list[str]:
             )
 
     buckets = _required_object_list(list_buckets, "Buckets", "ListBuckets")
-    names: list[str] = []
+    inventory: dict[str, str | None] = {}
     seen: set[str] = set()
     for bucket in buckets:
         name = _required_string(bucket, "Name", "ListBuckets bucket")
         if name in seen:
             raise ValueError(f"ListBuckets contains duplicate bucket {name}.")
+        region = bucket.get("BucketRegion")
+        if region is not None and (
+            not isinstance(region, str) or not region.strip()
+        ):
+            raise ValueError(
+                f"ListBuckets bucket {name} BucketRegion must be a non-empty string."
+            )
         seen.add(name)
-        names.append(name)
-    return names
+        inventory[name] = region.lower() if isinstance(region, str) else None
+    return inventory
 
 
 def normalize_aws_s3_environment(evidence_bundle: dict[str, Any]) -> S3NormalizationResult:
@@ -324,7 +331,8 @@ def normalize_aws_s3_environment(evidence_bundle: dict[str, Any]) -> S3Normaliza
         raise ValueError("AWS S3 evidence bundle account_id must be a 12-digit string.")
 
     list_buckets = _required_object(evidence_bundle, "ListBuckets", "S3 evidence bundle")
-    bucket_names = _bucket_names(list_buckets)
+    bucket_inventory = _bucket_inventory(list_buckets)
+    bucket_names = list(bucket_inventory)
     account_pab_payload = _required_object(
         evidence_bundle,
         "AccountPublicAccessBlock",
@@ -368,38 +376,40 @@ def normalize_aws_s3_environment(evidence_bundle: dict[str, Any]) -> S3Normaliza
             key: account_pab[key] or bucket_pab[key]
             for key in account_pab
         }
-        normalized_buckets.append(
-            {
-                "name": bucket_name,
-                "public_access_block": effective_pab,
-                "object_ownership": _bucket_ownership(
-                    _required_object(
-                        evidence,
-                        "GetBucketOwnershipControls",
-                        f"Bucket {bucket_name}",
-                    ),
-                    f"Bucket {bucket_name} GetBucketOwnershipControls",
-                    warnings,
+        normalized_bucket = {
+            "name": bucket_name,
+            "public_access_block": effective_pab,
+            "object_ownership": _bucket_ownership(
+                _required_object(
+                    evidence,
+                    "GetBucketOwnershipControls",
+                    f"Bucket {bucket_name}",
                 ),
-                "acl": _bucket_acl(
-                    _required_object(evidence, "GetBucketAcl", f"Bucket {bucket_name}"),
-                    f"Bucket {bucket_name} GetBucketAcl",
-                ),
-                "bucket_policy": _bucket_policy(
-                    _required_object(evidence, "GetBucketPolicy", f"Bucket {bucket_name}"),
-                    f"Bucket {bucket_name} GetBucketPolicy",
-                ),
-                "encryption": _bucket_encryption(
-                    _required_object(evidence, "GetBucketEncryption", f"Bucket {bucket_name}"),
-                    f"Bucket {bucket_name} GetBucketEncryption",
-                    warnings,
-                ),
-                "versioning": _bucket_versioning(
-                    _required_object(evidence, "GetBucketVersioning", f"Bucket {bucket_name}"),
-                    f"Bucket {bucket_name} GetBucketVersioning",
-                ),
-            }
-        )
+                f"Bucket {bucket_name} GetBucketOwnershipControls",
+                warnings,
+            ),
+            "acl": _bucket_acl(
+                _required_object(evidence, "GetBucketAcl", f"Bucket {bucket_name}"),
+                f"Bucket {bucket_name} GetBucketAcl",
+            ),
+            "bucket_policy": _bucket_policy(
+                _required_object(evidence, "GetBucketPolicy", f"Bucket {bucket_name}"),
+                f"Bucket {bucket_name} GetBucketPolicy",
+            ),
+            "encryption": _bucket_encryption(
+                _required_object(evidence, "GetBucketEncryption", f"Bucket {bucket_name}"),
+                f"Bucket {bucket_name} GetBucketEncryption",
+                warnings,
+            ),
+            "versioning": _bucket_versioning(
+                _required_object(evidence, "GetBucketVersioning", f"Bucket {bucket_name}"),
+                f"Bucket {bucket_name} GetBucketVersioning",
+            ),
+        }
+        bucket_region = bucket_inventory[bucket_name]
+        if bucket_region is not None:
+            normalized_bucket["region"] = bucket_region
+        normalized_buckets.append(normalized_bucket)
 
     return S3NormalizationResult(
         environment={"account_id": account_id, "buckets": normalized_buckets},

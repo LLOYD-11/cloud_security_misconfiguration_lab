@@ -51,9 +51,9 @@ The canonical plan is [ROADMAP.md](../ROADMAP.md). `v2.0.0` at commit
 | M2-R1 | Add installable package metadata. | Complete | [pyproject.toml](../pyproject.toml); commit `0d981ba`. |
 | M2-R2 | Add unified analyze, report, demo, and catalog workflows. | Complete | [CLI](../cloud_security_lab/cli.py), CLI tests, and [README commands](../README.md); commits `0d981ba` and `5747c00`. |
 | M2-R3 | Publish versioned data contracts and validation warnings. | Complete | [Data contracts](data-contracts.md), `schemas/`, Python model validation, and normalizer tests. |
-| M2-R4 | Add stable finding identity and first-class account, region, time, confidence, and source provenance. | Open | The v1 finding contract has core risk fields and free-form metadata, while confidence and control mappings live in the rule catalog. A compatible v2 contract and migration path are still required. |
+| M2-R4 | Add stable finding identity and first-class account, region, time, confidence, and source provenance. | Complete | [Finding model](../cloud_findings/finding.py), [findings v2 schema](../schemas/findings-v2.0.schema.json), analyzer propagation, report rendering, and v1 migration tests. |
 | M2-R5 | Run lint, strict typing, tests, coverage, build, and end-to-end checks in CI. | Complete | [CI workflow](../.github/workflows/ci.yml) and [engineering checks](engineering.md); commit `0d981ba`. |
-| M2-R6 | Exercise Python 3.10, 3.12, and 3.13. | Partial | CI covers 3.10 and 3.13. Python 3.12 remains to be added as the midpoint compatibility job. |
+| M2-R6 | Exercise Python 3.10, 3.12, and 3.13. | Complete | The [CI matrix](../.github/workflows/ci.yml) runs quality and end-to-end checks on all three documented versions. |
 | M2-R7 | Preserve original module entry points. | Complete | Legacy CLI tests in [tests/test_legacy_clis.py](../tests/test_legacy_clis.py). |
 
 ## M3: Native AWS Evidence Adapters
@@ -66,7 +66,7 @@ The canonical plan is [ROADMAP.md](../ROADMAP.md). `v2.0.0` at commit
 | M3-R4 | Normalize multiple CloudTrail JSON and gzip files. | Complete | CloudTrail normalizer, native schema, AWS-shaped samples, and tests; commit `d399dc6`. |
 | M3-R5 | Keep analyzers independent of native AWS response shapes. | Complete | Normalizers emit the versioned canonical environments documented in [native AWS inputs](native-aws-inputs.md). |
 | M3-R6 | Document direct collection and offline safety. | Complete | Collection commands and safety boundaries in [native AWS inputs](native-aws-inputs.md) and [README](../README.md). |
-| M3-R7 | Record fixture source shape, sanitization, and expected coverage. | Open | Add a machine-readable manifest covering every sanitized AWS-shaped fixture. |
+| M3-R7 | Record fixture source shape, sanitization, and expected coverage. | Complete | [AWS fixture manifest](../sample_data/aws/fixture-manifest-v1.0.json), [manifest schema](../schemas/aws-fixture-manifest-v1.0.schema.json), exact-inventory and SHA-256 contract tests, and [native input documentation](native-aws-inputs.md). |
 
 ## M4: IAM Analyzer v2
 

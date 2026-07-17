@@ -36,6 +36,12 @@ class NativeS3NormalizerTests(unittest.TestCase):
 
         self.assertEqual((), result.warnings)
         self.assertEqual("111122223333", result.environment["account_id"])
+        self.assertTrue(
+            all(
+                bucket["region"] == "ap-southeast-2"
+                for bucket in result.environment["buckets"]
+            )
+        )
         self.assertEqual(7, len(findings))
         self.assertEqual(
             [

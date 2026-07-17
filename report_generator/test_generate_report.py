@@ -11,7 +11,12 @@ from cloud_analysis import (
     SkippedEvidence,
     write_analysis_summary,
 )
-from cloud_findings import Finding, load_findings_file, write_findings
+from cloud_findings import (
+    EvidenceReference,
+    Finding,
+    load_findings_file,
+    write_findings,
+)
 from cloud_incidents import Incident, write_incidents
 from cloudtrail_detector.detector import analyze_activity as analyze_cloudtrail_activity
 from report_generator.generate_report import (
@@ -75,6 +80,16 @@ class ReportGeneratorTests(unittest.TestCase):
             remediation="Restrict trusted principals and require external ID.",
             references=["https://attack.mitre.org/techniques/T1199/"],
             metadata={"policy_name": "trust-policy", "statement_id": "ExternalTrust"},
+            confidence="medium",
+            account_id="111122223333",
+            region="global",
+            observed_at="2026-06-30T00:00:00Z",
+            evidence_references=[
+                EvidenceReference(
+                    type="iam-trust-policy-statement",
+                    id="third-party-audit-role:ExternalTrust",
+                )
+            ],
         )
 
         report = render_report(
@@ -92,6 +107,17 @@ class ReportGeneratorTests(unittest.TestCase):
         self.assertIn("## Triggered Rule Context", report)
         self.assertIn("MITRE ATT&CK Enterprise T1199 (related)", report)
         self.assertIn("#### IAM-008: Cross-account role trust", report)
+        self.assertIn(f"- Finding ID: `{finding.finding_id}`", report)
+        self.assertIn("- Confidence: Medium", report)
+        self.assertIn(
+            "account `111122223333`, region `global`, "
+            "observed `2026-06-30T00:00:00Z`",
+            report,
+        )
+        self.assertIn(
+            "`iam-trust-policy-statement/third-party-audit-role:ExternalTrust`",
+            report,
+        )
         self.assertIn("policy_name: trust-policy", report)
         self.assertIn("https://attack.mitre.org/techniques/T1199/", report)
 
@@ -117,6 +143,7 @@ class ReportGeneratorTests(unittest.TestCase):
 
         wrong_severity = replace(
             wrong_module,
+            finding_id="",
             module="iam",
             severity="high",
         )
@@ -235,6 +262,7 @@ class ReportGeneratorTests(unittest.TestCase):
         )
         storage_finding = replace(
             iam_finding,
+            finding_id="",
             rule_id="STO-001",
             module="storage",
             category="data-protection",

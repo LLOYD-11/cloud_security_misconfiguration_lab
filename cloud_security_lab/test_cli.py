@@ -33,6 +33,16 @@ class UnifiedCliTests(unittest.TestCase):
 
         self.assertEqual(0, result)
         self.assertEqual(9, payload["finding_count"])
+        self.assertEqual("2.0", payload["schema_version"])
+        self.assertTrue(
+            all(
+                finding["account_id"] == "111122223333"
+                and finding["region"] == "global"
+                and finding["finding_id"].startswith("FND-")
+                and finding["evidence_references"]
+                for finding in payload["findings"]
+            )
+        )
         self.assertEqual("complete", summary["coverage_status"])
         self.assertEqual("simplified", summary["input_format"])
         self.assertEqual(
@@ -64,6 +74,8 @@ class UnifiedCliTests(unittest.TestCase):
                         str(normalized_path),
                         "--output",
                         str(output_path),
+                        "--observed-at",
+                        "2026-06-30T00:00:00+00:00",
                         "--summary-output",
                         str(summary_path),
                     ]
@@ -77,7 +89,19 @@ class UnifiedCliTests(unittest.TestCase):
         self.assertEqual("", stderr.getvalue())
         self.assertEqual(9, payload["finding_count"])
         self.assertEqual("111122223333", normalized["account_id"])
-        self.assertEqual({"as_of": "2026-06-30"}, summary["parameters"])
+        self.assertTrue(
+            all(
+                finding["observed_at"] == "2026-06-30T00:00:00Z"
+                for finding in payload["findings"]
+            )
+        )
+        self.assertEqual(
+            {
+                "as_of": "2026-06-30",
+                "observed_at": "2026-06-30T00:00:00Z",
+            },
+            summary["parameters"],
+        )
 
     def test_analyze_native_aws_s3_writes_findings_and_normalized_evidence(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -108,6 +132,13 @@ class UnifiedCliTests(unittest.TestCase):
         self.assertEqual("", stderr.getvalue())
         self.assertEqual(7, payload["finding_count"])
         self.assertEqual(3, len(normalized["buckets"]))
+        self.assertTrue(
+            all(
+                finding["account_id"] == "111122223333"
+                and finding["region"] == "ap-southeast-2"
+                for finding in payload["findings"]
+            )
+        )
 
     def test_analyze_native_aws_ec2_writes_findings_and_normalized_evidence(self):
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -132,6 +163,10 @@ class UnifiedCliTests(unittest.TestCase):
                         ),
                         "--normalized-output",
                         str(normalized_path),
+                        "--region",
+                        "ap-southeast-2",
+                        "--observed-at",
+                        "2026-06-30T04:00:00Z",
                         "--output",
                         str(output_path),
                         "--summary-output",
@@ -145,6 +180,20 @@ class UnifiedCliTests(unittest.TestCase):
 
         self.assertEqual(0, result)
         self.assertEqual(10, payload["finding_count"])
+        self.assertTrue(
+            all(
+                finding["region"] == "ap-southeast-2"
+                for finding in payload["findings"]
+            )
+        )
+        self.assertEqual(
+            {
+                "2026-06-30T04:00:00Z",
+                "2026-06-30T04:05:00Z",
+                "2026-06-30T04:10:00Z",
+            },
+            {finding["observed_at"] for finding in payload["findings"]},
+        )
         self.assertEqual(4, len(normalized["security_groups"]))
         self.assertEqual(
             "reachable",
@@ -160,6 +209,11 @@ class UnifiedCliTests(unittest.TestCase):
         self.assertIn("security-group targets", stderr.getvalue())
         self.assertEqual("partial", summary["coverage_status"])
         self.assertEqual(2, summary["input_file_count"])
+        self.assertEqual("ap-southeast-2", summary["parameters"]["region"])
+        self.assertEqual(
+            "2026-06-30T04:00:00Z",
+            summary["parameters"]["observed_at"],
+        )
         self.assertEqual(
             {
                 "NET_PREFIX_LIST_TARGET_UNRESOLVED",
@@ -435,6 +489,23 @@ class UnifiedCliTests(unittest.TestCase):
 
         self.assertEqual(2, context.exception.code)
         self.assertIn("only valid for cloudtrail", stderr.getvalue())
+
+    def test_analyze_rejects_non_rfc3339_observed_at(self):
+        with redirect_stderr(StringIO()), self.assertRaises(SystemExit) as context:
+            main(
+                [
+                    "analyze",
+                    "iam",
+                    str(
+                        PROJECT_ROOT
+                        / "sample_data/iam/sample_iam_environment.json"
+                    ),
+                    "--observed-at",
+                    "2026-06-30T00:00:00+0000",
+                ]
+            )
+
+        self.assertEqual(2, context.exception.code)
 
     def test_native_iam_requires_credential_report(self):
         with redirect_stderr(StringIO()) as stderr, self.assertRaises(SystemExit) as context:

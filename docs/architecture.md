@@ -76,8 +76,9 @@ flowchart TD
    canonical module environment. Simplified inputs enter at the same canonical
    boundary.
 3. An analyzer applies module-specific rules and emits shared `Finding`
-   objects. CloudTrail analysis can also correlate eligible findings into
-   `Incident` objects.
+   objects with stable IDs, confidence, account, Region, time, and structured
+   source references. CloudTrail analysis can also correlate eligible findings
+   into `Incident` objects.
 4. The coverage builder records discovered and evaluated resources, warnings,
    skipped evidence, and result counts independently from risk findings.
 5. The report loader rejects unsupported versions and count mismatches before
@@ -117,10 +118,11 @@ The pipeline uses explicit, versioned JSON boundaries:
 | --- | --- |
 | Canonical analyzer inputs | IAM, storage, network, and CloudTrail environment schemas |
 | Supported native exports | IAM authorization, S3 evidence bundle, EC2 security groups, and CloudTrail record schemas |
-| Analyzer results | Findings and analysis-summary schemas |
+| Analyzer results | Findings v2 and analysis-summary schemas |
 | Correlation results | Incident schema |
 | Rule metadata | Rule-catalog schema |
 | Derived views | Remediation-plan and attack-timeline schemas |
+| Bundled AWS-shaped evidence | Sanitized fixture-manifest schema |
 
 Python loaders enforce cross-field invariants that JSON Schema cannot express
 conveniently, such as declared-count equality, deterministic ordering, complete
@@ -154,10 +156,11 @@ Determinism makes the repository reviewable and testable:
 
 - Findings, incidents, summaries, rules, remediation actions, and timeline
   entries use stable sort keys.
-- Incident, remediation, and timeline IDs use SHA-256 digests over canonical
-  evidence fields.
+- Finding, incident, remediation, and timeline IDs use SHA-256 digests over
+  canonical identity fields.
 - Generated JSON uses stable field and list ordering.
-- Runtime timestamps are excluded from machine-readable artifacts.
+- Implicit runtime timestamps are excluded from machine-readable artifacts;
+  explicit evidence observation times are preserved.
 - The sample report receives an explicit report date.
 - CI regenerates the report and rule catalog and compares them byte-for-byte
   with committed references.

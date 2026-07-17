@@ -7,6 +7,7 @@
   "required": ["account_id", "security_groups"],
   "properties": {
     "account_id": { "type": "string", "pattern": "^[0-9]{12}$" },
+    "region": { "type": "string", "minLength": 1 },
     "security_groups": {
       "type": "array",
       "items": { "$ref": "#/$defs/securityGroup" }

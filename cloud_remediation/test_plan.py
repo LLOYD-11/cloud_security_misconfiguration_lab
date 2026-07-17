@@ -4,7 +4,7 @@ import unittest
 from dataclasses import replace
 from pathlib import Path
 
-from cloud_findings import Finding
+from cloud_findings import EvidenceReference, Finding
 from cloud_incidents import Incident
 from cloud_remediation import (
     RemediationAction,
@@ -137,6 +137,23 @@ class RemediationPlanTests(unittest.TestCase):
         self.assertEqual([], configuration.incident_ids)
         self.assertEqual("P3", configuration.priority)
 
+    def test_incident_link_uses_v2_evidence_reference(self):
+        finding = _finding(
+            metadata={},
+            evidence_references=[
+                EvidenceReference(type="cloudtrail-event", id="event-1")
+            ],
+        )
+
+        plan = build_remediation_plan([finding], [_incident()])
+
+        configuration = next(
+            action
+            for action in plan.actions
+            if action.work_type == "configuration"
+        )
+        self.assertEqual(["CTI-ABCDEF123456"], configuration.incident_ids)
+
     def test_equivalent_findings_are_grouped_without_losing_scope(self):
         first = _finding(
             rule_id="STO-005",
@@ -147,7 +164,7 @@ class RemediationPlanTests(unittest.TestCase):
             title="Bucket versioning is not enabled",
             remediation="Enable versioning.",
         )
-        second = replace(first, resource_id="bucket-a")
+        second = replace(first, finding_id="", resource_id="bucket-a")
 
         plan = build_remediation_plan([first, second], [])
 
@@ -173,6 +190,13 @@ class RemediationPlanTests(unittest.TestCase):
 
         self.assertEqual("not-assessed", plan.actions[0].confidence)
         self.assertEqual("P3", plan.actions[0].priority)
+
+    def test_configuration_action_prefers_finding_confidence(self):
+        finding = _finding(confidence="low")
+
+        plan = build_remediation_plan([finding], [])
+
+        self.assertEqual("low", plan.actions[0].confidence)
 
     def test_input_order_does_not_change_actions_or_ids(self):
         findings = [

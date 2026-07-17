@@ -96,6 +96,7 @@
       ],
       "properties": {
         "name": { "type": "string", "minLength": 3 },
+        "region": { "type": "string", "minLength": 1 },
         "object_ownership": {
           "enum": [
             "BucketOwnerEnforced",

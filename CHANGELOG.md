@@ -7,10 +7,24 @@ All notable changes to this project are documented in this file.
 ### Added
 
 - Requirement-to-evidence traceability for the original M0-M9 upgrade plan.
+- Findings v2 with deterministic IDs, first-class confidence, account, Region,
+  UTC observation time, and structured source-evidence references.
+- Strict v1-to-v2 finding migration that preserves unavailable provenance as
+  explicit unknown or null values.
+- CLI `--region` and `--observed-at` provenance defaults, with
+  evidence-specific context taking precedence.
+- A versioned, SHA-256-verified provenance manifest for every synthetic
+  AWS-shaped fixture.
+- Python 3.12 CI coverage between the supported 3.10 and 3.13 endpoints.
 
 ### Changed
 
 - Restored the original milestone numbering and recorded the remaining v2.1.0 completion scope without changing the immutable v2.0.0 release.
+- Reports, remediation plans, and timelines now consume finding-level
+  confidence and expose first-class provenance.
+- Native S3 normalization now preserves `BucketRegion`.
+- CloudTrail failure-spike detection and incident correlation now keep account
+  boundaries separate when multi-account evidence is supplied.
 
 ## 2.0.0 - 2026-07-17
 

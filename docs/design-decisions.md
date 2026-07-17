@@ -57,7 +57,9 @@ interpretation of incompatible files.
 
 **Consequences:** Producers and consumers must evolve contracts intentionally.
 Python model validation supplements JSON Schema for cross-field invariants.
-Unversioned finding lists that version 1 accepted are rejected in version 2.
+New writers emit findings v2 with stable identity and provenance. Readers accept
+versioned v1 and v2 files, migrating unavailable v1 provenance to explicit
+unknown values. Unversioned finding lists remain rejected.
 
 **Alternative not chosen:** Ad hoc per-module JSON would reduce initial code
 but force the report generator to understand every analyzer's internals.
@@ -106,7 +108,9 @@ stories but would be harder to defend and more likely to overstate evidence.
 **Status:** Accepted
 
 **Decision:** Artifacts use stable sorting, canonical hashing for derived IDs,
-explicit analysis parameters, and no implicit runtime timestamps.
+explicit analysis parameters, and no implicit runtime timestamps. Finding IDs
+include rule, resource, account, Region, observation time, and structured source
+references, but exclude descriptive text and presentation metadata.
 
 **Why:** Deterministic output enables byte-for-byte CI checks, meaningful
 reviews, repeatable demonstrations, and stable references between artifacts.
@@ -123,15 +127,18 @@ convenient but produce noisy diffs and weaken reproducibility.
 **Status:** Accepted
 
 **Decision:** The rule catalog records evidence-to-rule confidence and labels
-framework mappings as `direct` or `related`.
+framework mappings as `direct` or `related`. Built-in analyzers copy that
+confidence into each v2 finding so downstream artifacts retain the claim even
+when the catalog is not present.
 
 **Why:** A detector match is not the same as malicious intent, and a related
 MITRE or control reference is not certification. Qualified mappings make those
 boundaries visible.
 
 **Consequences:** Catalog maintenance requires authoritative references and
-careful rationale. Unknown custom rules remain report-compatible but receive no
-automatic mapping or confidence claim.
+careful rationale. Reports reject a known finding whose non-unknown confidence
+disagrees with the catalog. Unknown custom rules remain report-compatible but
+receive no automatic mapping or confidence claim.
 
 **Alternative not chosen:** Unqualified framework labels would look broader but
 risk implying complete control coverage.
@@ -179,8 +186,8 @@ current scope.
 **Status:** Accepted
 
 **Decision:** The unified CLI is the primary interface, while original analyzer
-scripts and uncataloged custom findings remain supported where their contracts
-are explicit.
+scripts, versioned findings v1 files, and uncataloged custom findings remain
+supported where their contracts are explicit.
 
 **Why:** Version 2 adds engineering structure without making the original lab
 workflows unusable. Compatibility tests make that promise executable.

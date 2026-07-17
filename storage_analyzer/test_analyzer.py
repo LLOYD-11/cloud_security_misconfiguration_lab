@@ -379,7 +379,7 @@ class StorageAnalyzerTests(unittest.TestCase):
             write_findings(output_path, findings)
             payload = json.loads(output_path.read_text(encoding="utf-8"))
 
-        self.assertEqual("1.0", payload["schema_version"])
+            self.assertEqual("2.0", payload["schema_version"])
         self.assertEqual(len(findings), payload["finding_count"])
         self.assertEqual(findings_to_dicts(findings), payload["findings"])
 

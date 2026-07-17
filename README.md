@@ -4,7 +4,7 @@ This project is an offline-first AWS security analysis lab for identifying risky
 
 The goal is to provide practical and explainable security findings without requiring cloud credentials or making changes to a live AWS account.
 
-The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, versioned finding, incident, analysis-summary, detection-rule, remediation-plan, and attack-timeline contracts, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
+The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, versioned finding, incident, analysis-summary, detection-rule, remediation-plan, and attack-timeline contracts, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10, 3.12, and 3.13.
 
 For a technical tour, start with the [system architecture](docs/architecture.md)
 and [version 2.0.0 release notes](docs/release-v2.0.0.md). Upgrade completion is
@@ -78,12 +78,18 @@ All analyzers should emit the same finding schema:
 
 | Field | Purpose |
 | --- | --- |
+| `finding_id` | Deterministic identity derived from rule, resource, provenance, and source evidence |
 | `rule_id` | Stable detection rule identifier |
 | `severity` | `critical`, `high`, `medium`, `low`, or `info` |
+| `confidence` | How directly the supplied evidence supports the rule condition |
 | `module` | Analyzer module name, such as `iam` |
 | `category` | Security domain, such as `identity-and-access` |
+| `account_id` | Evidence account, or `unknown` when it cannot be established |
+| `region` | Evidence Region, `global`, or `unknown` |
+| `observed_at` | UTC evidence observation time, or `null` when unavailable |
 | `resource_type` | Affected resource type |
 | `resource_id` | Affected resource name or identifier |
+| `evidence_references` | Structured pointers to policy statements, rules, credential rows, or events |
 | `title` | Short finding title |
 | `evidence` | Concrete observed evidence |
 | `impact` | Why the issue matters |
@@ -91,10 +97,14 @@ All analyzers should emit the same finding schema:
 | `references` | Optional reference links |
 | `metadata` | Optional module-specific details |
 
-The report validates each built-in finding's rule, module, and severity against
-the versioned [detection rule catalog](docs/rule-catalog.md), then summarizes
-triggered rule confidence and qualified control mappings. Unknown custom rule
-IDs remain report-compatible and are marked as not cataloged.
+New exports use the strict
+[`findings-v2.0`](schemas/findings-v2.0.schema.json) contract. The loader also
+accepts versioned v1 files and migrates unavailable provenance to explicit
+`unknown` or `null` values; unversioned lists remain rejected. The report
+validates each built-in finding's rule, module, severity, and non-unknown
+confidence against the versioned [detection rule catalog](docs/rule-catalog.md),
+then summarizes qualified control mappings. Unknown custom rule IDs remain
+report-compatible and are marked as not cataloged.
 
 The prioritizer groups equivalent remediation without losing finding or resource
 counts, preserves incident response as separate work, and raises configuration
@@ -215,12 +225,15 @@ python3 -m cloud_security_lab analyze iam \
   --input-format aws \
   --credential-report sample_data/aws/iam/credential_report.csv \
   --as-of 2026-06-30 \
+  --observed-at 2026-06-30T00:00:00Z \
   --normalized-output reports/generated/normalized_iam_environment.json \
   --output reports/generated/iam_findings.json \
   --summary-output reports/generated/iam_analysis_summary.json
 ```
 
-See [Native AWS inputs](docs/native-aws-inputs.md) for evidence collection, validation behavior, and limitations.
+See [Native AWS inputs](docs/native-aws-inputs.md) for evidence collection,
+validation behavior, limitations, and the machine-readable provenance manifest
+for every bundled AWS-shaped fixture.
 
 Analyze the bundled native AWS S3 evidence:
 
@@ -240,6 +253,7 @@ python3 -m cloud_security_lab analyze network \
   sample_data/aws/ec2/describe_security_groups.json \
   --input-format aws \
   --reachability-context sample_data/aws/ec2/network_reachability_context.json \
+  --region ap-southeast-2 \
   --normalized-output reports/generated/normalized_network_environment.json \
   --output reports/generated/network_findings.json \
   --summary-output reports/generated/network_analysis_summary.json
@@ -341,7 +355,9 @@ Development and contract checks use optional tools declared in `pyproject.toml`:
 .venv/bin/coverage report
 ```
 
-The coverage gate is 85% with branch coverage enabled. GitHub Actions also rebuilds the package and verifies the deterministic end-to-end report on Python 3.10 and 3.13.
+The coverage gate is 85% with branch coverage enabled. GitHub Actions runs the
+quality and deterministic pipeline on Python 3.10, 3.12, and 3.13, and builds
+the distributions on Python 3.13.
 
 ## Project Structure
 
@@ -401,7 +417,9 @@ cloud_security_misconfiguration_lab/
 ├── schemas/
 │   ├── analysis-summary-v1.0.schema.json
 │   ├── attack-timeline-v1.0.schema.json
+│   ├── aws-fixture-manifest-v1.0.schema.json
 │   ├── findings-v1.0.schema.json
+│   ├── findings-v2.0.schema.json
 │   ├── incidents-v1.0.schema.json
 │   ├── remediation-plan-v1.0.schema.json
 │   ├── rule-catalog-v1.0.schema.json
@@ -412,6 +430,7 @@ cloud_security_misconfiguration_lab/
 │   ├── aws-s3-evidence-bundle-v1.0.schema.json
 │   └── *-environment-v1.0.schema.json
 ├── sample_data/
+│   ├── aws/fixture-manifest-v1.0.json
 │   ├── aws/cloudtrail/
 │   │   ├── 111122223333_CloudTrail_20260630T0200Z_part1.json
 │   │   └── 111122223333_CloudTrail_20260630T0300Z_part2.json.gz

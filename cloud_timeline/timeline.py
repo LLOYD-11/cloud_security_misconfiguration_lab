@@ -10,7 +10,12 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterable
 
-from cloud_findings import Finding, severity_rank, sort_findings
+from cloud_findings import (
+    Finding,
+    evidence_reference_ids,
+    severity_rank,
+    sort_findings,
+)
 from cloud_incidents import Incident, sort_incidents
 from cloud_rules import get_rule
 
@@ -340,8 +345,10 @@ def _timeline_item(
     incidents: list[Incident],
 ) -> TimelineEntry | TimelineOmission:
     resource = f"{finding.resource_type}/{finding.resource_id}"
-    first_seen_raw = finding.metadata.get("first_seen") or finding.metadata.get(
-        "event_time"
+    first_seen_raw = (
+        finding.observed_at
+        or finding.metadata.get("first_seen")
+        or finding.metadata.get("event_time")
     )
     last_seen_raw = finding.metadata.get("last_seen") or first_seen_raw
     if not first_seen_raw or not last_seen_raw:
@@ -367,9 +374,12 @@ def _timeline_item(
         )
     first_seen = _isoformat_utc(first_seen_value)
     last_seen = _isoformat_utc(last_seen_value)
-    event_ids = _split_metadata_values(
-        finding.metadata.get("event_ids") or finding.metadata.get("event_id")
-    )
+    event_ids = evidence_reference_ids(finding, "cloudtrail-event")
+    if not event_ids:
+        event_ids = _split_metadata_values(
+            finding.metadata.get("event_ids")
+            or finding.metadata.get("event_id")
+        )
     if not event_ids:
         return TimelineOmission(
             rule_id=finding.rule_id,
@@ -380,7 +390,13 @@ def _timeline_item(
         finding.metadata.get("event_names") or finding.metadata.get("event_name")
     )
     rule = get_rule(finding.rule_id)
-    confidence = rule.confidence if rule is not None else "not-assessed"
+    confidence = (
+        finding.confidence
+        if finding.confidence != "unknown"
+        else rule.confidence
+        if rule is not None
+        else "not-assessed"
+    )
     activity_type = RULE_ACTIVITY_TYPES.get(
         finding.rule_id,
         "other-observed-activity",

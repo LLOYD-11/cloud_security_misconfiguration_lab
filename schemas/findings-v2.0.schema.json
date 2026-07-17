@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/schemas/findings-v2.0.schema.json",
+  "title": "Cloud Security Findings File v2.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "finding_count", "findings"],
+  "properties": {
+    "schema_version": {
+      "const": "2.0"
+    },
+    "finding_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/finding"
+      }
+    }
+  },
+  "$defs": {
+    "evidenceReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "severity",
+        "module",
+        "category",
+        "resource_type",
+        "resource_id",
+        "title",
+        "evidence",
+        "impact",
+        "remediation",
+        "references",
+        "metadata",
+        "finding_id",
+        "confidence",
+        "account_id",
+        "region",
+        "observed_at",
+        "evidence_references"
+      ],
+      "properties": {
+        "rule_id": { "type": "string", "minLength": 1 },
+        "severity": {
+          "enum": ["critical", "high", "medium", "low", "info"]
+        },
+        "module": { "type": "string", "minLength": 1 },
+        "category": { "type": "string", "minLength": 1 },
+        "resource_type": { "type": "string", "minLength": 1 },
+        "resource_id": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "evidence": { "type": "string", "minLength": 1 },
+        "impact": { "type": "string", "minLength": 1 },
+        "remediation": { "type": "string", "minLength": 1 },
+        "references": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "metadata": {
+          "type": "object",
+          "propertyNames": { "type": "string", "minLength": 1 },
+          "additionalProperties": { "type": "string" }
+        },
+        "finding_id": {
+          "type": "string",
+          "pattern": "^FND-[0-9A-F]{32}$"
+        },
+        "confidence": {
+          "enum": ["high", "medium", "low", "unknown"]
+        },
+        "account_id": {
+          "type": "string",
+          "pattern": "^(?:[0-9]{12}|unknown)$"
+        },
+        "region": {
+          "type": "string",
+          "minLength": 1
+        },
+        "observed_at": {
+          "oneOf": [
+            {
+              "type": "string",
+              "format": "date-time",
+              "pattern": "(?:Z|\\+00:00)$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_references": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/evidenceReference"
+          }
+        }
+      }
+    }
+  }
+}

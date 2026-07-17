@@ -8,7 +8,7 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 
-from cloud_findings import Finding, severity_rank
+from cloud_findings import Finding, evidence_reference_ids, severity_rank
 from cloud_incidents import Incident, sort_incidents
 
 DEFAULT_CORRELATION_WINDOW_MINUTES = 30
@@ -29,7 +29,11 @@ def _parse_metadata_time(value: str) -> datetime:
 
 def _correlation_signal(finding: Finding) -> _CorrelationSignal | None:
     metadata = finding.metadata
-    first_seen_raw = metadata.get("first_seen") or metadata.get("event_time")
+    first_seen_raw = (
+        finding.observed_at
+        or metadata.get("first_seen")
+        or metadata.get("event_time")
+    )
     last_seen_raw = metadata.get("last_seen") or first_seen_raw
     if not first_seen_raw or not last_seen_raw:
         return None
@@ -39,12 +43,18 @@ def _correlation_signal(finding: Finding) -> _CorrelationSignal | None:
     except ValueError:
         return None
 
-    event_ids_raw = metadata.get("event_ids") or metadata.get("event_id")
-    if not event_ids_raw:
-        return None
-    event_ids = tuple(
-        dict.fromkeys(item.strip() for item in event_ids_raw.split(",") if item.strip())
-    )
+    event_ids = tuple(evidence_reference_ids(finding, "cloudtrail-event"))
+    if not event_ids:
+        event_ids_raw = metadata.get("event_ids") or metadata.get("event_id")
+        if not event_ids_raw:
+            return None
+        event_ids = tuple(
+            dict.fromkeys(
+                item.strip()
+                for item in event_ids_raw.split(",")
+                if item.strip()
+            )
+        )
     if not event_ids:
         return None
     return _CorrelationSignal(
@@ -194,7 +204,7 @@ def correlate_incidents(
     *,
     window_minutes: int = DEFAULT_CORRELATION_WINDOW_MINUTES,
 ) -> list[Incident]:
-    groups: dict[tuple[str, str], list[_CorrelationSignal]] = defaultdict(list)
+    groups: dict[tuple[str, str, str], list[_CorrelationSignal]] = defaultdict(list)
     for finding in findings:
         signal = _correlation_signal(finding)
         actor = finding.metadata.get("actor")
@@ -206,11 +216,11 @@ def correlate_incidents(
             and actor != "unknown-actor"
             and source_ip != "unknown-source"
         ):
-            groups[(actor, source_ip)].append(signal)
+            groups[(finding.account_id, actor, source_ip)].append(signal)
 
     incidents: list[Incident] = []
     window = timedelta(minutes=window_minutes)
-    for (actor, source_ip), group_signals in groups.items():
+    for (_, actor, source_ip), group_signals in groups.items():
         ordered = sorted(
             group_signals,
             key=lambda item: (

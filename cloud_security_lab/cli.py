@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import sysconfig
 from dataclasses import dataclass
@@ -12,7 +13,12 @@ from pathlib import Path
 from typing import Any, Callable, Sequence
 
 from cloud_analysis import AnalysisSummary, SkippedEvidence, write_analysis_summary
-from cloud_findings import Finding, write_findings
+from cloud_findings import (
+    Finding,
+    canonicalize_utc_timestamp,
+    with_findings_context,
+    write_findings,
+)
 from cloud_incidents import Incident, write_incidents
 from cloud_remediation import build_remediation_plan, write_remediation_plan
 from cloud_rules import (
@@ -67,6 +73,7 @@ from storage_analyzer.analyzer import (
 Loader = Callable[[Path], dict[str, Any]]
 Analyzer = Callable[[dict[str, Any]], list[Finding]]
 FindingPrinter = Callable[[list[Finding]], None]
+AWS_REGION_PATTERN = re.compile(r"^[a-z]{2}(?:-[a-z0-9]+)+-\d+$")
 
 
 @dataclass(frozen=True)
@@ -134,6 +141,24 @@ def _report_date(value: str) -> date:
         return date.fromisoformat(value)
     except ValueError as exc:
         raise argparse.ArgumentTypeError("date must use YYYY-MM-DD format") from exc
+
+
+def _aws_region(value: str) -> str:
+    normalized = value.lower()
+    if AWS_REGION_PATTERN.fullmatch(normalized) is None:
+        raise argparse.ArgumentTypeError(
+            "region must use an AWS region identifier such as ap-southeast-2"
+        )
+    return normalized
+
+
+def _utc_timestamp(value: str) -> str:
+    try:
+        return canonicalize_utc_timestamp(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(
+            "timestamp must use RFC 3339 UTC format ending in Z or +00:00"
+        ) from exc
 
 
 def _analyze(
@@ -274,6 +299,24 @@ def _run_analyze(args: argparse.Namespace) -> int:
         if args.normalized_output:
             write_normalized_environment(args.normalized_output, normalized_environment)
             print(f"Normalized environment saved to {args.normalized_output}")
+
+    account_id_value = normalized_environment.get("account_id")
+    account_id = (
+        account_id_value
+        if isinstance(account_id_value, str)
+        else "unknown"
+    )
+    findings = with_findings_context(
+        findings,
+        account_id=account_id,
+        region=args.region,
+        observed_at=args.observed_at,
+    )
+    if args.region is not None:
+        analysis_parameters["region"] = args.region
+    if args.observed_at is not None:
+        analysis_parameters["observed_at"] = args.observed_at
+
     summary: AnalysisSummary | None = None
     if args.summary_output:
         input_file_count = len(input_paths)
@@ -484,6 +527,22 @@ def build_parser() -> argparse.ArgumentParser:
         "--normalized-output",
         type=Path,
         help="Optional normalized analyzer environment output. Requires --input-format aws.",
+    )
+    analyze_parser.add_argument(
+        "--region",
+        type=_aws_region,
+        help=(
+            "AWS region for evidence that does not encode one. "
+            "Evidence-specific regions take precedence."
+        ),
+    )
+    analyze_parser.add_argument(
+        "--observed-at",
+        type=_utc_timestamp,
+        help=(
+            "UTC collection time for evidence that does not encode one "
+            "(ISO 8601 with Z or +00:00)."
+        ),
     )
     analyze_parser.add_argument(
         "--reachability-context",

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from collections import defaultdict
 from dataclasses import dataclass
@@ -15,7 +16,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from cloud_findings import Finding, sort_findings, write_findings
+from cloud_findings import (
+    EvidenceReference,
+    Finding,
+    sort_findings,
+    with_findings_context,
+    write_findings,
+)
 from cloud_incidents import Incident, write_incidents
 from cloud_rules import validate_rule_emission
 from cloudtrail_detector.correlation import (
@@ -56,6 +63,7 @@ REF_MITRE_BRUTE_FORCE = "https://attack.mitre.org/techniques/T1110/"
 REF_MITRE_DISABLE_TOOLS = "https://attack.mitre.org/techniques/T1685/"
 REF_MITRE_DISABLE_CLOUD_LOG = "https://attack.mitre.org/techniques/T1685/002/"
 REF_MITRE_DATA_DESTRUCTION = "https://attack.mitre.org/techniques/T1485/"
+ARN_ACCOUNT_PATTERN = re.compile(r"^arn:[^:]+:[^:]*:[^:]*:(\d{12}):")
 
 MFA_DISABLE_EVENTS = {"DeactivateMFADevice", "DeleteVirtualMFADevice"}
 SECURITY_GROUP_CHANGE_EVENTS = {
@@ -209,6 +217,30 @@ def _monitoring_references(event_name: str) -> list[str]:
     ]
 
 
+def _event_account_id(event: dict[str, Any]) -> str:
+    recipient_account_id = event.get("recipientAccountId")
+    if isinstance(recipient_account_id, str) and re.fullmatch(
+        r"\d{12}",
+        recipient_account_id,
+    ):
+        return recipient_account_id
+    identity = event.get("userIdentity")
+    if not isinstance(identity, dict):
+        return "unknown"
+    identity_account_id = identity.get("accountId")
+    if isinstance(identity_account_id, str) and re.fullmatch(
+        r"\d{12}",
+        identity_account_id,
+    ):
+        return identity_account_id
+    identity_arn = identity.get("arn")
+    if isinstance(identity_arn, str):
+        match = ARN_ACCOUNT_PATTERN.match(identity_arn)
+        if match is not None:
+            return match.group(1)
+    return "unknown"
+
+
 def _add_finding(
     findings: list[Finding],
     *,
@@ -223,7 +255,24 @@ def _add_finding(
     references: list[str],
     metadata: dict[str, str] | None = None,
 ) -> None:
-    validate_rule_emission(rule_id, "cloudtrail", severity)
+    rule = validate_rule_emission(rule_id, "cloudtrail", severity)
+    assert rule is not None
+    metadata_values = metadata or {}
+    event_ids = metadata_values.get("event_ids") or metadata_values.get("event_id")
+    evidence_references = [
+        EvidenceReference(type="cloudtrail-event", id=event_id.strip())
+        for event_id in sorted(set((event_ids or "").split(",")))
+        if event_id.strip()
+    ]
+    observed_at_value = (
+        metadata_values.get("first_seen")
+        or metadata_values.get("event_time")
+    )
+    observed_at = (
+        observed_at_value
+        if observed_at_value and observed_at_value != "unknown-time"
+        else None
+    )
     findings.append(
         Finding(
             rule_id=rule_id,
@@ -237,7 +286,12 @@ def _add_finding(
             impact=impact,
             remediation=remediation,
             references=references,
-            metadata=metadata or {},
+            metadata=metadata_values,
+            confidence=rule.confidence,
+            account_id=metadata_values.get("account_id", "unknown"),
+            region=metadata_values.get("aws_region", "unknown"),
+            observed_at=observed_at,
+            evidence_references=evidence_references,
         )
     )
 
@@ -262,6 +316,7 @@ def analyze_single_event(event: dict[str, Any], index: int) -> list[Finding]:
         "actor": actor,
         "identity_type": identity_type,
         "user_agent": str(event.get("userAgent", "unknown-agent")),
+        "account_id": _event_account_id(event),
     }
 
     if event_name == "ConsoleLogin" and identity_type.lower() == "root":
@@ -476,14 +531,23 @@ def detect_api_failure_spikes(
     threshold: int = 5,
     window_minutes: int = 10,
 ) -> list[Finding]:
-    groups: dict[tuple[str, str], list[tuple[int, dict[str, Any]]]] = defaultdict(list)
+    groups: dict[
+        tuple[str, str, str],
+        list[tuple[int, dict[str, Any]]],
+    ] = defaultdict(list)
     for index, event in enumerate(events):
         if event.get("errorCode"):
-            groups[(_actor(event), _source_ip(event))].append((index, event))
+            groups[
+                (
+                    _event_account_id(event),
+                    _actor(event),
+                    _source_ip(event),
+                )
+            ].append((index, event))
 
     findings: list[Finding] = []
     window = timedelta(minutes=window_minutes)
-    for (actor, source_ip), group_events in groups.items():
+    for (account_id, actor, source_ip), group_events in groups.items():
         ordered = sorted(group_events, key=lambda item: _event_time(item[1]))
         for start_index, (_, start_event) in enumerate(ordered):
             start_time = _event_time(start_event)
@@ -527,6 +591,19 @@ def detect_api_failure_spikes(
                         "event_time": str(start_event.get("eventTime", "unknown-time")),
                         "window_minutes": str(window_minutes),
                         "failure_count": str(len(window_events)),
+                        "account_id": account_id,
+                        "aws_region": (
+                            next(iter(regions))
+                            if len(
+                                regions := {
+                                    str(event.get("awsRegion"))
+                                    for _, event in window_events
+                                    if event.get("awsRegion")
+                                }
+                            )
+                            == 1
+                            else "multiple"
+                        ),
                     },
                 )
                 break
@@ -577,7 +654,12 @@ def analyze_activity(
             window_minutes=failure_window_minutes,
         )
     )
-    sorted_findings = sort_findings(findings)
+    sorted_findings = sort_findings(
+        with_findings_context(
+            findings,
+            account_id=str(environment.get("account_id") or "unknown"),
+        )
+    )
     incidents = correlate_incidents(
         sorted_findings,
         window_minutes=correlation_window_minutes,

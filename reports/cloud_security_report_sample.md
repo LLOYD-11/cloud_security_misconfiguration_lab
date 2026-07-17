@@ -99,11 +99,11 @@ Priorities use the transparent rules below rather than an opaque numeric risk sc
 
 ## Triggered Rule Context
 
-Confidence describes how directly the available evidence supports the rule condition. It does not establish malicious intent.
+Finding confidence describes how directly the available evidence supports the rule condition. It does not establish malicious intent.
 
 `direct` mappings substantially match the detector condition; `related` mappings provide useful context without claiming equivalent coverage.
 
-| Rule | Catalog Title | Confidence | Finding Severities | Findings | Control Mappings |
+| Rule | Catalog Title | Finding Confidence | Finding Severities | Findings | Control Mappings |
 | --- | --- | --- | --- | ---: | --- |
 | `CLD-001` | Root account console login | High | critical | 1 | MITRE ATT&CK Enterprise T1078.004 (related) |
 | `CLD-002` | MFA device was disabled or deleted | High | high | 1 | MITRE ATT&CK Enterprise T1098 (direct) |
@@ -194,10 +194,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `cloudtrail`
 - Category: `audit-and-detection`
 - Resource: `identity/root`
+- Finding ID: `FND-DCB7AAA1B97BFEF175284F7BB5CC8DD3`
+- Confidence: High
+- Provenance: account `111122223333`, region `us-east-1`, observed `2026-06-30T01:00:00Z`
+- Evidence references: `cloudtrail-event/00000000-0000-4000-8000-000000000001`
 - Evidence: Root ConsoleLogin event from 203.0.113.10 at 2026-06-30T01:00:00Z.
 - Impact: Root account use is highly sensitive and may indicate emergency access or account compromise.
 - Remediation: Avoid routine root use, confirm the login was authorized, and require MFA on the root account.
-- Metadata: actor: arn:aws:iam::111122223333:root, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000001, event_name: ConsoleLogin, event_source: signin.amazonaws.com, event_time: 2026-06-30T01:00:00Z, identity_type: Root, source_ip: 203.0.113.10, user_agent: Mozilla/5.0 (sample)
+- Metadata: account_id: 111122223333, actor: arn:aws:iam::111122223333:root, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000001, event_name: ConsoleLogin, event_source: signin.amazonaws.com, event_time: 2026-06-30T01:00:00Z, identity_type: Root, source_ip: 203.0.113.10, user_agent: Mozilla/5.0 (sample)
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://attack.mitre.org/techniques/T1078/004/
 
 #### CLD-010: Audit or threat-detection control was disabled
@@ -205,10 +209,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `cloudtrail`
 - Category: `audit-and-detection`
 - Resource: `security_control/12abc34d567e8fa901bc2d34eexample`
+- Finding ID: `FND-34B4ABC7F95C212986EE9D8071A7A4C7`
+- Confidence: High
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `2026-06-30T01:21:00Z`
+- Evidence references: `cloudtrail-event/00000000-0000-4000-8000-000000000015`
 - Evidence: DeleteDetector was called by alice-admin from 198.51.100.20 at 2026-06-30T01:21:00Z.
 - Impact: Disabling logging or detection reduces visibility and can conceal later malicious activity.
 - Remediation: Confirm authorization, restore the control, verify telemetry continuity, and investigate surrounding activity.
-- Metadata: actor: alice-admin, aws_region: ap-southeast-2, event_id: 00000000-0000-4000-8000-000000000015, event_name: DeleteDetector, event_source: guardduty.amazonaws.com, event_time: 2026-06-30T01:21:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
+- Metadata: account_id: 111122223333, actor: alice-admin, aws_region: ap-southeast-2, event_id: 00000000-0000-4000-8000-000000000015, event_name: DeleteDetector, event_source: guardduty.amazonaws.com, event_time: 2026-06-30T01:21:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
 - References: https://docs.aws.amazon.com/guardduty/latest/APIReference/API_DeleteDetector.html, https://attack.mitre.org/techniques/T1685/
 
 #### CLD-011: KMS key was scheduled for deletion
@@ -216,10 +224,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `cloudtrail`
 - Category: `audit-and-detection`
 - Resource: `kms_key/1234abcd-12ab-34cd-56ef-1234567890ab`
+- Finding ID: `FND-8AAC0198D90FCC4B51F46DE829B94BAE`
+- Confidence: High
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `2026-06-30T01:23:00Z`
+- Evidence references: `cloudtrail-event/00000000-0000-4000-8000-000000000016`
 - Evidence: ScheduleKeyDeletion was called by alice-admin from 198.51.100.20 at 2026-06-30T01:23:00Z.
 - Impact: Deleting the key can permanently make dependent encrypted data unrecoverable.
 - Remediation: Validate the change, cancel unauthorized deletion or re-enable the key, and identify dependent resources.
-- Metadata: actor: alice-admin, aws_region: ap-southeast-2, event_id: 00000000-0000-4000-8000-000000000016, event_name: ScheduleKeyDeletion, event_source: kms.amazonaws.com, event_time: 2026-06-30T01:23:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
+- Metadata: account_id: 111122223333, actor: alice-admin, aws_region: ap-southeast-2, event_id: 00000000-0000-4000-8000-000000000016, event_name: ScheduleKeyDeletion, event_source: kms.amazonaws.com, event_time: 2026-06-30T01:23:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
 - References: https://docs.aws.amazon.com/kms/latest/APIReference/API_ScheduleKeyDeletion.html, https://attack.mitre.org/techniques/T1485/
 
 #### IAM-001: Administrator-style wildcard permission
@@ -227,6 +239,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `iam`
 - Category: `identity-and-access`
 - Resource: `user/alice-admin`
+- Finding ID: `FND-74431E9804959FE197E55F94C2087FFE`
+- Confidence: High
+- Provenance: account `111122223333`, region `global`, observed `not provided`
+- Evidence references: `iam-policy-statement/user/alice-admin:OverBroadAdminPolicy:FullAdmin`
 - Evidence: Allow statement grants Action "*" on Resource "*".
 - Impact: The principal may have full administrative access across the account.
 - Remediation: Replace wildcard administrator access with task-specific actions and scoped resources.
@@ -238,10 +254,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `network`
 - Category: `network-exposure`
 - Resource: `security_group/sg-001-admin-open`
+- Finding ID: `FND-7235683D5B763091CA6BA69123592A2E`
+- Confidence: Medium
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `2026-06-30T04:00:00Z`
+- Evidence references: `ec2-security-group-rule/sg-001-admin-open:ingress:3:Docker API without TLS`
 - Evidence: Inbound rule 3 allows tcp 2375 from 0.0.0.0/0. Supplied manual-topology-review context observed at 2026-06-30T04:00:00Z reports the ingress path as reachable for scope 'All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6': Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services.
 - Impact: The supplied context reports an active end-to-end path. Unauthorized callers can reach privileged orchestration or host operations through the exposed control-plane endpoint.
 - Remediation: Place the endpoint on a private management network, require strong authentication and encryption, and allow only specific administrative sources. Reassess the end-to-end path after remediation.
-- Metadata: exposure_scope: internet-wide, group_name: admin-open, port: 2375, protocol: tcp, reachability_direction: ingress, reachability_evidence: Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:00:00Z, reachability_resource_ids: igw-00000000000000001, eni-00000000000000001, reachability_scope: All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6., reachability_status: reachable, rule_index: 3, service: Docker API without TLS, service_category: control-plane, service_default_severity: critical
+- Metadata: direction: ingress, exposure_scope: internet-wide, group_name: admin-open, port: 2375, protocol: tcp, reachability_direction: ingress, reachability_evidence: Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:00:00Z, reachability_resource_ids: igw-00000000000000001, eni-00000000000000001, reachability_scope: All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6., reachability_status: reachable, rule_index: 3, service: Docker API without TLS, service_category: control-plane, service_default_severity: critical
 - References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html, https://docs.docker.com/engine/daemon/remote-access/
 
 #### NET-002: All inbound ports are allowed on a reported internet-reachable path
@@ -249,10 +269,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `network`
 - Category: `network-exposure`
 - Resource: `security_group/sg-003-all-open`
+- Finding ID: `FND-79ADA2AD828D8D275FF30C905F0965AF`
+- Confidence: Medium
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `2026-06-30T04:10:00Z`
+- Evidence references: `ec2-security-group-rule/sg-003-all-open:ingress:1`
 - Evidence: Inbound rule 1 allows -1 all from 0.0.0.0/0. Supplied manual-topology-review context observed at 2026-06-30T04:10:00Z reports the ingress path as reachable for scope 'All attached resources and public IPv4 ingress rules across every protocol and port': A public ingress path from the internet gateway to an attached network interface was identified.
 - Impact: The supplied context reports an active end-to-end path. Any service attached to this security group may be reachable from the public internet.
 - Remediation: Remove all-port public inbound access and allow only required ports from trusted CIDR ranges. Reassess the end-to-end path after remediation.
-- Metadata: exposure_scope: internet-wide, group_name: all-open, reachability_direction: ingress, reachability_evidence: A public ingress path from the internet gateway to an attached network interface was identified., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:10:00Z, reachability_resource_ids: igw-00000000000000001, eni-00000000000000003, reachability_scope: All attached resources and public IPv4 ingress rules across every protocol and port., reachability_status: reachable, rule_index: 1
+- Metadata: direction: ingress, exposure_scope: internet-wide, group_name: all-open, reachability_direction: ingress, reachability_evidence: A public ingress path from the internet gateway to an attached network interface was identified., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:10:00Z, reachability_resource_ids: igw-00000000000000001, eni-00000000000000003, reachability_scope: All attached resources and public IPv4 ingress rules across every protocol and port., reachability_status: reachable, rule_index: 1
 - References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html, https://attack.mitre.org/techniques/T1578/005/
 
 #### STO-002: Bucket ACL grants public access
@@ -260,6 +284,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `storage`
 - Category: `data-exposure`
 - Resource: `bucket/public-customer-exports`
+- Finding ID: `FND-BFE1FD58036C9D9EFE9CE9B5E671FFB7`
+- Confidence: High
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `not provided`
+- Evidence references: `s3-bucket-acl/public-customer-exports:grantee=AllUsers`
 - Evidence: ACL grant 1 gives READ permission to AllUsers. Object Ownership is ObjectWriter.
 - Impact: Objects or bucket metadata may be exposed to public or broadly authenticated users.
 - Remediation: Remove public ACL grants and rely on private bucket ownership plus scoped IAM policies.
@@ -271,6 +299,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `storage`
 - Category: `data-exposure`
 - Resource: `bucket/public-customer-exports`
+- Finding ID: `FND-6FF2CE311CE50786DA4EE06E596CF0C3`
+- Confidence: Medium
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `not provided`
+- Evidence references: `s3-bucket-policy-statement/public-customer-exports:statement_sid=PublicRead:statement_index=1`
 - Evidence: Allow statement uses Principal "*" with action "s3:GetObject" and resource "arn:aws:s3:::public-customer-exports/*". Condition {"IpAddress": {"aws:SourceIp": "0.0.0.0/1"}} does not establish an AWS-recognized fixed-value guardrail.
 - Impact: Bucket data may be publicly accessible because the statement is public under S3 Block Public Access policy-evaluation rules.
 - Remediation: Replace the broad principal with specific AWS principals or add a supported fixed-value condition, then validate the result with IAM Access Analyzer for S3.
@@ -284,10 +316,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `cloudtrail`
 - Category: `audit-and-detection`
 - Resource: `identity/alice-admin`
+- Finding ID: `FND-B1053ABD85C03C21FE6AE54EA1787F7D`
+- Confidence: High
+- Provenance: account `111122223333`, region `us-east-1`, observed `2026-06-30T01:04:00Z`
+- Evidence references: `cloudtrail-event/00000000-0000-4000-8000-000000000002`
 - Evidence: DeactivateMFADevice was called by alice-admin from 198.51.100.20 at 2026-06-30T01:04:00Z.
 - Impact: Disabling MFA weakens account protection and may be part of account takeover or persistence activity.
 - Remediation: Confirm the MFA change was authorized and re-enable MFA for affected users.
-- Metadata: actor: alice-admin, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000002, event_name: DeactivateMFADevice, event_source: iam.amazonaws.com, event_time: 2026-06-30T01:04:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
+- Metadata: account_id: 111122223333, actor: alice-admin, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000002, event_name: DeactivateMFADevice, event_source: iam.amazonaws.com, event_time: 2026-06-30T01:04:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://attack.mitre.org/techniques/T1098/
 
 #### CLD-004: Bucket access policy changed
@@ -295,10 +331,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `cloudtrail`
 - Category: `audit-and-detection`
 - Resource: `bucket/public-customer-exports`
+- Finding ID: `FND-5EFEFC592E524A851F232E5315DE27A6`
+- Confidence: High
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `2026-06-30T01:12:00Z`
+- Evidence references: `cloudtrail-event/00000000-0000-4000-8000-000000000004`
 - Evidence: PutBucketPolicy was called by alice-admin from 198.51.100.20 at 2026-06-30T01:12:00Z.
 - Impact: Bucket policy or public-access changes can expose cloud storage data.
 - Remediation: Review the bucket policy diff and restore least-privilege access if the change was not approved.
-- Metadata: actor: alice-admin, aws_region: ap-southeast-2, event_id: 00000000-0000-4000-8000-000000000004, event_name: PutBucketPolicy, event_source: s3.amazonaws.com, event_time: 2026-06-30T01:12:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
+- Metadata: account_id: 111122223333, actor: alice-admin, aws_region: ap-southeast-2, event_id: 00000000-0000-4000-8000-000000000004, event_name: PutBucketPolicy, event_source: s3.amazonaws.com, event_time: 2026-06-30T01:12:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucket-policies.html, https://attack.mitre.org/techniques/T1565/
 
 #### CLD-005: IAM policy configuration changed
@@ -306,10 +346,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `cloudtrail`
 - Category: `audit-and-detection`
 - Resource: `iam_policy/arn:aws:iam::111122223333:policy/OverBroadAdminPolicy`
+- Finding ID: `FND-701B53F1528A6171CA1E32D0EA03F1EE`
+- Confidence: High
+- Provenance: account `111122223333`, region `us-east-1`, observed `2026-06-30T01:15:00Z`
+- Evidence references: `cloudtrail-event/00000000-0000-4000-8000-000000000005`
 - Evidence: CreatePolicyVersion was called by alice-admin from 198.51.100.20 at 2026-06-30T01:15:00Z.
 - Impact: IAM policy changes can grant new permissions, create persistence, or weaken least privilege.
 - Remediation: Review the IAM policy change and confirm it matches an approved access request.
-- Metadata: actor: alice-admin, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000005, event_name: CreatePolicyVersion, event_source: iam.amazonaws.com, event_time: 2026-06-30T01:15:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
+- Metadata: account_id: 111122223333, actor: alice-admin, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000005, event_name: CreatePolicyVersion, event_source: iam.amazonaws.com, event_time: 2026-06-30T01:15:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://attack.mitre.org/techniques/T1098/
 
 #### CLD-007: IAM user console login did not use MFA
@@ -317,10 +361,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `cloudtrail`
 - Category: `audit-and-detection`
 - Resource: `identity/legacy-operator`
+- Finding ID: `FND-C50F07DC57133348F12487850EDB953B`
+- Confidence: High
+- Provenance: account `111122223333`, region `us-east-1`, observed `2026-06-30T01:30:00Z`
+- Evidence references: `cloudtrail-event/00000000-0000-4000-8000-000000000017`
 - Evidence: legacy-operator completed ConsoleLogin without MFA from 203.0.113.55 at 2026-06-30T01:30:00Z.
 - Impact: A password-only console session has less resistance to stolen credentials and account takeover.
 - Remediation: Validate the login, require MFA for the user, and investigate the source and subsequent activity.
-- Metadata: actor: legacy-operator, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000017, event_name: ConsoleLogin, event_source: signin.amazonaws.com, event_time: 2026-06-30T01:30:00Z, identity_type: IAMUser, source_ip: 203.0.113.55, user_agent: Mozilla/5.0 (sample)
+- Metadata: account_id: 111122223333, actor: legacy-operator, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000017, event_name: ConsoleLogin, event_source: signin.amazonaws.com, event_time: 2026-06-30T01:30:00Z, identity_type: IAMUser, source_ip: 203.0.113.55, user_agent: Mozilla/5.0 (sample)
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-event-reference-record-contents.html, https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html, https://attack.mitre.org/techniques/T1078/004/
 
 #### CLD-008: Persistent cloud credential was created
@@ -328,10 +376,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `cloudtrail`
 - Category: `audit-and-detection`
 - Resource: `identity/backup-operator`
+- Finding ID: `FND-B5B14A4310C84B2D93B713E85D751814`
+- Confidence: High
+- Provenance: account `111122223333`, region `us-east-1`, observed `2026-06-30T01:17:00Z`
+- Evidence references: `cloudtrail-event/00000000-0000-4000-8000-000000000013`
 - Evidence: CreateAccessKey was called by alice-admin from 198.51.100.20 at 2026-06-30T01:17:00Z.
 - Impact: A new key, password, certificate, or service credential can provide persistent access outside the original session.
 - Remediation: Confirm the credential was approved, identify where it was stored, and remove or rotate it if unauthorized.
-- Metadata: actor: alice-admin, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000013, event_name: CreateAccessKey, event_source: iam.amazonaws.com, event_time: 2026-06-30T01:17:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
+- Metadata: account_id: 111122223333, actor: alice-admin, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000013, event_name: CreateAccessKey, event_source: iam.amazonaws.com, event_time: 2026-06-30T01:17:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
 - References: https://docs.aws.amazon.com/IAM/latest/APIReference/API_CreateAccessKey.html, https://attack.mitre.org/techniques/T1098/001/
 
 #### CLD-009: Role trust policy was changed
@@ -339,10 +391,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `cloudtrail`
 - Category: `audit-and-detection`
 - Resource: `role/production-admin`
+- Finding ID: `FND-EF892C33E416A027BBE8C627FC49692B`
+- Confidence: High
+- Provenance: account `111122223333`, region `us-east-1`, observed `2026-06-30T01:19:00Z`
+- Evidence references: `cloudtrail-event/00000000-0000-4000-8000-000000000014`
 - Evidence: UpdateAssumeRolePolicy was called by alice-admin from 198.51.100.20 at 2026-06-30T01:19:00Z.
 - Impact: A changed trust policy can let a new principal assume the role and retain or escalate access.
 - Remediation: Review the trust-policy diff, validate every principal and condition, and remove unapproved trust.
-- Metadata: actor: alice-admin, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000014, event_name: UpdateAssumeRolePolicy, event_source: iam.amazonaws.com, event_time: 2026-06-30T01:19:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
+- Metadata: account_id: 111122223333, actor: alice-admin, aws_region: us-east-1, event_id: 00000000-0000-4000-8000-000000000014, event_name: UpdateAssumeRolePolicy, event_source: iam.amazonaws.com, event_time: 2026-06-30T01:19:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
 - References: https://docs.aws.amazon.com/IAM/latest/APIReference/API_UpdateAssumeRolePolicy.html, https://attack.mitre.org/techniques/T1098/003/
 
 #### IAM-004: Broad S3 write permission
@@ -350,6 +406,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `iam`
 - Category: `identity-and-access`
 - Resource: `user/data-engineer`
+- Finding ID: `FND-348C31861BB59633EAE5BBDD32032B9D`
+- Confidence: Medium
+- Provenance: account `111122223333`, region `global`, observed `not provided`
+- Evidence references: `iam-policy-statement/user/data-engineer:BroadS3WritePolicy:BroadS3`
 - Evidence: S3 write action with broad resource scope: ['s3:GetObject', 's3:PutObject', 's3:DeleteObject'] on ['arn:aws:s3:::company-data-*/*'].
 - Impact: The principal may alter or delete data across a broad set of storage resources.
 - Remediation: Restrict S3 write actions to the exact bucket and prefix required for the workload.
@@ -361,6 +421,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `iam`
 - Category: `identity-and-access`
 - Resource: `role/third-party-audit-role`
+- Finding ID: `FND-7D9ADEA9390306B59A976D1344E19540`
+- Confidence: Medium
+- Provenance: account `111122223333`, region `global`, observed `not provided`
+- Evidence references: `iam-trust-policy-statement/role/third-party-audit-role:trust-policy:ExternalAccountTrust`
 - Evidence: Trust policy allows external principal(s): ["arn:aws:iam::999988887777:root"]. Recognized guardrails: none.
 - Impact: An external account or principal may be able to assume this role.
 - Remediation: Restrict the trusted principal, require an external ID for third-party access or an organization condition for internal multi-account access, and confirm the business need.
@@ -372,10 +436,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `network`
 - Category: `network-exposure`
 - Resource: `security_group/sg-001-admin-open`
+- Finding ID: `FND-8D193C486C0B4F5B1E607475CA34D351`
+- Confidence: Medium
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `2026-06-30T04:00:00Z`
+- Evidence references: `ec2-security-group-rule/sg-001-admin-open:ingress:1:SSH`
 - Evidence: Inbound rule 1 allows tcp 22 from 0.0.0.0/0. Supplied manual-topology-review context observed at 2026-06-30T04:00:00Z reports the ingress path as reachable for scope 'All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6': Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services.
 - Impact: The supplied context reports an active end-to-end path. The exposed remote-administration endpoint increases the risk of credential attacks and unauthorized host access.
 - Remediation: Restrict administration to a VPN, bastion host, private management network, or specific trusted source addresses. Reassess the end-to-end path after remediation.
-- Metadata: exposure_scope: internet-wide, group_name: admin-open, port: 22, protocol: tcp, reachability_direction: ingress, reachability_evidence: Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:00:00Z, reachability_resource_ids: igw-00000000000000001, eni-00000000000000001, reachability_scope: All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6., reachability_status: reachable, rule_index: 1, service: SSH, service_category: remote-administration, service_default_severity: high
+- Metadata: direction: ingress, exposure_scope: internet-wide, group_name: admin-open, port: 22, protocol: tcp, reachability_direction: ingress, reachability_evidence: Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:00:00Z, reachability_resource_ids: igw-00000000000000001, eni-00000000000000001, reachability_scope: All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6., reachability_status: reachable, rule_index: 1, service: SSH, service_category: remote-administration, service_default_severity: high
 - References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html, https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-rules-reference.html
 
 #### NET-001: Sensitive RDP port is allowed on a reported internet-reachable path
@@ -383,10 +451,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `network`
 - Category: `network-exposure`
 - Resource: `security_group/sg-001-admin-open`
+- Finding ID: `FND-4E8108E582CFAF2CC29954D5268B610F`
+- Confidence: Medium
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `2026-06-30T04:00:00Z`
+- Evidence references: `ec2-security-group-rule/sg-001-admin-open:ingress:2:RDP`
 - Evidence: Inbound rule 2 allows tcp 3389 from ::/0. Supplied manual-topology-review context observed at 2026-06-30T04:00:00Z reports the ingress path as reachable for scope 'All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6': Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services.
 - Impact: The supplied context reports an active end-to-end path. The exposed remote-administration endpoint increases the risk of credential attacks and unauthorized host access.
 - Remediation: Restrict administration to a VPN, bastion host, private management network, or specific trusted source addresses. Reassess the end-to-end path after remediation.
-- Metadata: exposure_scope: internet-wide, group_name: admin-open, port: 3389, protocol: tcp, reachability_direction: ingress, reachability_evidence: Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:00:00Z, reachability_resource_ids: igw-00000000000000001, eni-00000000000000001, reachability_scope: All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6., reachability_status: reachable, rule_index: 2, service: RDP, service_category: remote-administration, service_default_severity: high
+- Metadata: direction: ingress, exposure_scope: internet-wide, group_name: admin-open, port: 3389, protocol: tcp, reachability_direction: ingress, reachability_evidence: Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:00:00Z, reachability_resource_ids: igw-00000000000000001, eni-00000000000000001, reachability_scope: All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6., reachability_status: reachable, rule_index: 2, service: RDP, service_category: remote-administration, service_default_severity: high
 - References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html, https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-rules-reference.html
 
 #### NET-001: Sensitive Kubernetes API server port is allowed on a reported internet-reachable path
@@ -394,10 +466,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `network`
 - Category: `network-exposure`
 - Resource: `security_group/sg-001-admin-open`
+- Finding ID: `FND-1316537BF90D0F1C2A0B3A1F69096ABF`
+- Confidence: Medium
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `2026-06-30T04:00:00Z`
+- Evidence references: `ec2-security-group-rule/sg-001-admin-open:ingress:4:Kubernetes API server`
 - Evidence: Inbound rule 4 allows tcp 6443 from 0.0.0.0/0. Supplied manual-topology-review context observed at 2026-06-30T04:00:00Z reports the ingress path as reachable for scope 'All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6': Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services.
 - Impact: The supplied context reports an active end-to-end path. Unauthorized callers can reach privileged orchestration or host operations through the exposed control-plane endpoint.
 - Remediation: Place the endpoint on a private management network, require strong authentication and encryption, and allow only specific administrative sources. Reassess the end-to-end path after remediation.
-- Metadata: exposure_scope: internet-wide, group_name: admin-open, port: 6443, protocol: tcp, reachability_direction: ingress, reachability_evidence: Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:00:00Z, reachability_resource_ids: igw-00000000000000001, eni-00000000000000001, reachability_scope: All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6., reachability_status: reachable, rule_index: 4, service: Kubernetes API server, service_category: control-plane, service_default_severity: high
+- Metadata: direction: ingress, exposure_scope: internet-wide, group_name: admin-open, port: 6443, protocol: tcp, reachability_direction: ingress, reachability_evidence: Internet-gateway paths to the attached administration interface were reported reachable for the assessed TCP services., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:00:00Z, reachability_resource_ids: igw-00000000000000001, eni-00000000000000001, reachability_scope: All attached resources and public ingress rules for TCP 22, 2375, 3389, and 6443 across IPv4 and IPv6., reachability_status: reachable, rule_index: 4, service: Kubernetes API server, service_category: control-plane, service_default_severity: high
 - References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html, https://kubernetes.io/docs/reference/networking/ports-and-protocols/
 
 #### NET-001: Sensitive Redis port permits public sources without a reported reachable path
@@ -405,10 +481,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `network`
 - Category: `network-exposure`
 - Resource: `security_group/sg-002-database-public`
+- Finding ID: `FND-4F2D4D575EF76E695AD6C9790DC2C892`
+- Confidence: Medium
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `2026-06-30T04:05:00Z`
+- Evidence references: `ec2-security-group-rule/sg-002-database-public:ingress:3:Redis`
 - Evidence: Inbound rule 3 allows tcp 6379 from 0.0.0.0/0. Supplied aws-reachability-analyzer context observed at 2026-06-30T04:05:00Z reports the ingress path as not reachable for scope 'All attached resources and public IPv4 ingress rules for TCP 3306, 5432, and 6379': Separate IPv4 path analyses for all listed database ports found no route from the internet gateway to an attached interface.
 - Impact: The supplied context reports no current end-to-end path, reducing immediate exposure. The permissive rule remains a latent risk if attachments, addresses, routes, or intermediary controls change.
 - Remediation: Keep the service on private subnets, require authentication and encryption, and allow only the application security groups or trusted source ranges that need access. Reassess the end-to-end path after remediation.
-- Metadata: exposure_scope: internet-wide, group_name: database-public, port: 6379, protocol: tcp, reachability_direction: ingress, reachability_evidence: Separate IPv4 path analyses for all listed database ports found no route from the internet gateway to an attached interface., reachability_method: aws-reachability-analyzer, reachability_observed_at: 2026-06-30T04:05:00Z, reachability_resource_ids: eni-00000000000000002, rtb-00000000000000002, reachability_scope: All attached resources and public IPv4 ingress rules for TCP 3306, 5432, and 6379., reachability_status: not_reachable, rule_index: 3, service: Redis, service_category: data-service, service_default_severity: critical
+- Metadata: direction: ingress, exposure_scope: internet-wide, group_name: database-public, port: 6379, protocol: tcp, reachability_direction: ingress, reachability_evidence: Separate IPv4 path analyses for all listed database ports found no route from the internet gateway to an attached interface., reachability_method: aws-reachability-analyzer, reachability_observed_at: 2026-06-30T04:05:00Z, reachability_resource_ids: eni-00000000000000002, rtb-00000000000000002, reachability_scope: All attached resources and public IPv4 ingress rules for TCP 3306, 5432, and 6379., reachability_status: not_reachable, rule_index: 3, service: Redis, service_category: data-service, service_default_severity: critical
 - References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html, https://redis.io/docs/latest/operate/oss_and_stack/management/security/
 
 #### STO-001: S3 public access block is incomplete
@@ -416,6 +496,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `storage`
 - Category: `data-exposure`
 - Resource: `bucket/public-customer-exports`
+- Finding ID: `FND-A46706AB8EB523C060634AC7A6A42956`
+- Confidence: High
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `not provided`
+- Evidence references: `s3-public-access-block/public-customer-exports`
 - Evidence: Disabled or missing public access block controls: ['block_public_acls', 'ignore_public_acls', 'block_public_policy', 'restrict_public_buckets'].
 - Impact: The bucket has weaker guardrails against public ACLs or public bucket policies.
 - Remediation: Enable all four S3 Block Public Access settings unless a documented exception is required.
@@ -429,10 +513,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `cloudtrail`
 - Category: `audit-and-detection`
 - Resource: `security_group/sg-001-admin-open`
+- Finding ID: `FND-21990246CBB831A351E8483647DE2F32`
+- Confidence: High
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `2026-06-30T01:09:00Z`
+- Evidence references: `cloudtrail-event/00000000-0000-4000-8000-000000000003`
 - Evidence: AuthorizeSecurityGroupIngress was called by alice-admin from 198.51.100.20 at 2026-06-30T01:09:00Z.
 - Impact: Security group changes can expose services, enable lateral movement, or weaken network controls.
 - Remediation: Review the rule change, verify the business need, and revert unauthorized exposure.
-- Metadata: actor: alice-admin, aws_region: ap-southeast-2, event_id: 00000000-0000-4000-8000-000000000003, event_name: AuthorizeSecurityGroupIngress, event_source: ec2.amazonaws.com, event_time: 2026-06-30T01:09:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
+- Metadata: account_id: 111122223333, actor: alice-admin, aws_region: ap-southeast-2, event_id: 00000000-0000-4000-8000-000000000003, event_name: AuthorizeSecurityGroupIngress, event_source: ec2.amazonaws.com, event_time: 2026-06-30T01:09:00Z, identity_type: IAMUser, source_ip: 198.51.100.20, user_agent: aws-cli/2.x
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://attack.mitre.org/techniques/T1578/005/
 
 #### CLD-006: Repeated API failures from one actor and source
@@ -440,10 +528,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `cloudtrail`
 - Category: `audit-and-detection`
 - Resource: `api_activity/unknown-user@192.0.2.44`
+- Finding ID: `FND-0D3310F8CCCB86B220682514BF6B18B2`
+- Confidence: Medium
+- Provenance: account `111122223333`, region `multiple`, observed `2026-06-30T02:00:00Z`
+- Evidence references: `cloudtrail-event/00000000-0000-4000-8000-000000000006`, `cloudtrail-event/00000000-0000-4000-8000-000000000007`, `cloudtrail-event/00000000-0000-4000-8000-000000000008`, `cloudtrail-event/00000000-0000-4000-8000-000000000009`, `cloudtrail-event/00000000-0000-4000-8000-000000000010`, `cloudtrail-event/00000000-0000-4000-8000-000000000011`
 - Evidence: 6 failed API call(s) from unknown-user at 192.0.2.44 within 10 minutes starting 2026-06-30T02:00:00Z.
 - Impact: Repeated failed API calls may indicate credential misuse, probing, or brute-force style activity.
 - Remediation: Review the source IP, actor, failed API names, and related authentication activity.
-- Metadata: actor: unknown-user, error_codes: AccessDenied, UnauthorizedOperation, event_ids: 00000000-0000-4000-8000-000000000006, 00000000-0000-4000-8000-000000000007, 00000000-0000-4000-8000-000000000008, 00000000-0000-4000-8000-000000000009, 00000000-0000-4000-8000-000000000010, 00000000-0000-4000-8000-000000000011, event_names: AssumeRole, DescribeInstances, GetUser, ListBuckets, ListUsers, event_time: 2026-06-30T02:00:00Z, failure_count: 6, first_seen: 2026-06-30T02:00:00Z, last_seen: 2026-06-30T02:08:00Z, source_ip: 192.0.2.44, window_minutes: 10
+- Metadata: account_id: 111122223333, actor: unknown-user, aws_region: multiple, error_codes: AccessDenied, UnauthorizedOperation, event_ids: 00000000-0000-4000-8000-000000000006, 00000000-0000-4000-8000-000000000007, 00000000-0000-4000-8000-000000000008, 00000000-0000-4000-8000-000000000009, 00000000-0000-4000-8000-000000000010, 00000000-0000-4000-8000-000000000011, event_names: AssumeRole, DescribeInstances, GetUser, ListBuckets, ListUsers, event_time: 2026-06-30T02:00:00Z, failure_count: 6, first_seen: 2026-06-30T02:00:00Z, last_seen: 2026-06-30T02:08:00Z, source_ip: 192.0.2.44, window_minutes: 10
 - References: https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html, https://attack.mitre.org/techniques/T1110/
 
 #### IAM-002: Wildcard action allowed
@@ -451,6 +543,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `iam`
 - Category: `identity-and-access`
 - Resource: `role/third-party-audit-role`
+- Finding ID: `FND-94E64C4AC8536BBC9C6FC28F4E5BF196`
+- Confidence: High
+- Provenance: account `111122223333`, region `global`, observed `not provided`
+- Evidence references: `iam-policy-statement/role/third-party-audit-role:AuditReadOnly:AuditRead`
 - Evidence: Allow statement uses wildcard action pattern(s): ['iam:Get*', 'iam:List*'].
 - Impact: The policy can automatically include multiple current or future API operations that match the wildcard.
 - Remediation: Replace wildcard action patterns with the minimum explicit API actions required by the workload.
@@ -462,6 +558,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `iam`
 - Category: `identity-and-access`
 - Resource: `role/third-party-audit-role`
+- Finding ID: `FND-964F988E53F4D8BA2EE0A6EE7E9DD1FC`
+- Confidence: High
+- Provenance: account `111122223333`, region `global`, observed `not provided`
+- Evidence references: `iam-policy-statement/role/third-party-audit-role:AuditReadOnly:AuditRead`
 - Evidence: Allow statement uses Resource "*".
 - Impact: The permission is not limited to specific cloud resources.
 - Remediation: Scope the statement to specific ARNs wherever the service supports resource-level permissions.
@@ -473,6 +573,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `iam`
 - Category: `identity-and-access`
 - Resource: `user/alice-admin`
+- Finding ID: `FND-196019ED1DD5254422AEAE2C6FE43577`
+- Confidence: High
+- Provenance: account `111122223333`, region `global`, observed `not provided`
+- Evidence references: `iam-policy-statement/user/alice-admin:OverBroadAdminPolicy:FullAdmin`
 - Evidence: Allow statement uses Resource "*".
 - Impact: The permission is not limited to specific cloud resources.
 - Remediation: Scope the statement to specific ARNs wherever the service supports resource-level permissions.
@@ -484,6 +588,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `iam`
 - Category: `identity-and-access`
 - Resource: `user/alice-admin`
+- Finding ID: `FND-59B1EC6388EC30AF361F9FC4FC9BFCF9`
+- Confidence: Medium
+- Provenance: account `111122223333`, region `global`, observed `not provided`
+- Evidence references: `iam-policy-statement/user/alice-admin:OverBroadAdminPolicy:FullAdmin`
 - Evidence: Sensitive action is allowed without an MFA condition.
 - Impact: Compromised credentials could be used for privileged activity without an additional identity check.
 - Remediation: Add an MFA condition for sensitive IAM, STS, KMS, account, or organization actions where appropriate.
@@ -495,6 +603,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `iam`
 - Category: `identity-and-access`
 - Resource: `user/alice-admin`
+- Finding ID: `FND-13AE64C59ADFB0CFB2C5C846AC7FD096`
+- Confidence: High
+- Provenance: account `111122223333`, region `global`, observed `not provided`
+- Evidence references: `iam-credential-report-entry/user/alice-admin:credential-report:mfa`
 - Evidence: User has an active console password without MFA.
 - Impact: A compromised console password has less resistance without MFA.
 - Remediation: Enable MFA for interactive IAM users or remove console access.
@@ -506,6 +618,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `iam`
 - Category: `identity-and-access`
 - Resource: `user/alice-admin`
+- Finding ID: `FND-DDCE1E8180E1C966568CBBAE8455FC06`
+- Confidence: High
+- Provenance: account `111122223333`, region `global`, observed `not provided`
+- Evidence references: `iam-credential-report-entry/user/alice-admin:credential-report:AKIAEXAMPLEALICE`
 - Evidence: Active access key age is 142 days.
 - Impact: Long-lived access keys increase the window of exposure if credentials are leaked.
 - Remediation: Rotate old access keys and prefer temporary role credentials where possible.
@@ -517,10 +633,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `network`
 - Category: `network-exposure`
 - Resource: `security_group/sg-002-database-public`
+- Finding ID: `FND-23CD4C73B6D3101247C766757FBC1C7B`
+- Confidence: Medium
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `2026-06-30T04:05:00Z`
+- Evidence references: `ec2-security-group-rule/sg-002-database-public:ingress:1:MySQL/Aurora`
 - Evidence: Inbound rule 1 allows tcp 3306 from 0.0.0.0/0. Supplied aws-reachability-analyzer context observed at 2026-06-30T04:05:00Z reports the ingress path as not reachable for scope 'All attached resources and public IPv4 ingress rules for TCP 3306, 5432, and 6379': Separate IPv4 path analyses for all listed database ports found no route from the internet gateway to an attached interface.
 - Impact: The supplied context reports no current end-to-end path, reducing immediate exposure. The permissive rule remains a latent risk if attachments, addresses, routes, or intermediary controls change.
 - Remediation: Keep the database on private subnets and allow only the application security groups or trusted source ranges that require access. Reassess the end-to-end path after remediation.
-- Metadata: exposure_scope: internet-wide, group_name: database-public, port: 3306, protocol: tcp, reachability_direction: ingress, reachability_evidence: Separate IPv4 path analyses for all listed database ports found no route from the internet gateway to an attached interface., reachability_method: aws-reachability-analyzer, reachability_observed_at: 2026-06-30T04:05:00Z, reachability_resource_ids: eni-00000000000000002, rtb-00000000000000002, reachability_scope: All attached resources and public IPv4 ingress rules for TCP 3306, 5432, and 6379., reachability_status: not_reachable, rule_index: 1, service: MySQL/Aurora, service_category: database, service_default_severity: high
+- Metadata: direction: ingress, exposure_scope: internet-wide, group_name: database-public, port: 3306, protocol: tcp, reachability_direction: ingress, reachability_evidence: Separate IPv4 path analyses for all listed database ports found no route from the internet gateway to an attached interface., reachability_method: aws-reachability-analyzer, reachability_observed_at: 2026-06-30T04:05:00Z, reachability_resource_ids: eni-00000000000000002, rtb-00000000000000002, reachability_scope: All attached resources and public IPv4 ingress rules for TCP 3306, 5432, and 6379., reachability_status: not_reachable, rule_index: 1, service: MySQL/Aurora, service_category: database, service_default_severity: high
 - References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html, https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-rules-reference.html
 
 #### NET-001: Sensitive PostgreSQL port permits public sources without a reported reachable path
@@ -528,10 +648,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `network`
 - Category: `network-exposure`
 - Resource: `security_group/sg-002-database-public`
+- Finding ID: `FND-24E3F0E6386B338F764EF21A53EB32BC`
+- Confidence: Medium
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `2026-06-30T04:05:00Z`
+- Evidence references: `ec2-security-group-rule/sg-002-database-public:ingress:2:PostgreSQL`
 - Evidence: Inbound rule 2 allows tcp 5432 from 0.0.0.0/0. Supplied aws-reachability-analyzer context observed at 2026-06-30T04:05:00Z reports the ingress path as not reachable for scope 'All attached resources and public IPv4 ingress rules for TCP 3306, 5432, and 6379': Separate IPv4 path analyses for all listed database ports found no route from the internet gateway to an attached interface.
 - Impact: The supplied context reports no current end-to-end path, reducing immediate exposure. The permissive rule remains a latent risk if attachments, addresses, routes, or intermediary controls change.
 - Remediation: Keep the database on private subnets and allow only the application security groups or trusted source ranges that require access. Reassess the end-to-end path after remediation.
-- Metadata: exposure_scope: internet-wide, group_name: database-public, port: 5432, protocol: tcp, reachability_direction: ingress, reachability_evidence: Separate IPv4 path analyses for all listed database ports found no route from the internet gateway to an attached interface., reachability_method: aws-reachability-analyzer, reachability_observed_at: 2026-06-30T04:05:00Z, reachability_resource_ids: eni-00000000000000002, rtb-00000000000000002, reachability_scope: All attached resources and public IPv4 ingress rules for TCP 3306, 5432, and 6379., reachability_status: not_reachable, rule_index: 2, service: PostgreSQL, service_category: database, service_default_severity: high
+- Metadata: direction: ingress, exposure_scope: internet-wide, group_name: database-public, port: 5432, protocol: tcp, reachability_direction: ingress, reachability_evidence: Separate IPv4 path analyses for all listed database ports found no route from the internet gateway to an attached interface., reachability_method: aws-reachability-analyzer, reachability_observed_at: 2026-06-30T04:05:00Z, reachability_resource_ids: eni-00000000000000002, rtb-00000000000000002, reachability_scope: All attached resources and public IPv4 ingress rules for TCP 3306, 5432, and 6379., reachability_status: not_reachable, rule_index: 2, service: PostgreSQL, service_category: database, service_default_severity: high
 - References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html, https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-group-rules-reference.html
 
 #### NET-003: Unrestricted outbound traffic is allowed on a reported internet path
@@ -539,10 +663,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `network`
 - Category: `network-exposure`
 - Resource: `security_group/sg-001-admin-open`
+- Finding ID: `FND-223528BFCE3EB153E4F57EE2A2DFF39C`
+- Confidence: Medium
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `2026-06-30T04:00:00Z`
+- Evidence references: `ec2-security-group-rule/sg-001-admin-open:egress:1`
 - Evidence: Outbound rule 1 allows -1 all from 0.0.0.0/0. Supplied manual-topology-review context observed at 2026-06-30T04:00:00Z reports the egress path as reachable for scope 'All attached resources and public IPv4 egress rules': The attached administration interface had a default route through the internet gateway.
 - Impact: The supplied context reports an active end-to-end path. Compromised workloads may communicate freely with internet destinations, making exfiltration or command-and-control traffic harder to contain.
 - Remediation: Restrict outbound traffic to required protocols, ports, and destination CIDR ranges where practical. Reassess the end-to-end path after remediation.
-- Metadata: exposure_scope: internet-wide, group_name: admin-open, reachability_direction: egress, reachability_evidence: The attached administration interface had a default route through the internet gateway., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:00:00Z, reachability_resource_ids: eni-00000000000000001, igw-00000000000000001, reachability_scope: All attached resources and public IPv4 egress rules., reachability_status: reachable, rule_index: 1
+- Metadata: direction: egress, exposure_scope: internet-wide, group_name: admin-open, reachability_direction: egress, reachability_evidence: The attached administration interface had a default route through the internet gateway., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:00:00Z, reachability_resource_ids: eni-00000000000000001, igw-00000000000000001, reachability_scope: All attached resources and public IPv4 egress rules., reachability_status: reachable, rule_index: 1
 - References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html
 
 #### NET-003: Unrestricted outbound traffic is allowed on a reported internet path
@@ -550,10 +678,14 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `network`
 - Category: `network-exposure`
 - Resource: `security_group/sg-003-all-open`
+- Finding ID: `FND-A3FB09045DBFC8B451A8A3EEECB3CED4`
+- Confidence: Medium
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `2026-06-30T04:10:00Z`
+- Evidence references: `ec2-security-group-rule/sg-003-all-open:egress:1`
 - Evidence: Outbound rule 1 allows -1 all from ::/0. Supplied manual-topology-review context observed at 2026-06-30T04:10:00Z reports the egress path as reachable for scope 'All attached resources and public IPv6 egress rules across every protocol and port': A public egress path from the attached network interface to the internet gateway was identified.
 - Impact: The supplied context reports an active end-to-end path. Compromised workloads may communicate freely with internet destinations, making exfiltration or command-and-control traffic harder to contain.
 - Remediation: Restrict outbound traffic to required protocols, ports, and destination CIDR ranges where practical. Reassess the end-to-end path after remediation.
-- Metadata: exposure_scope: internet-wide, group_name: all-open, reachability_direction: egress, reachability_evidence: A public egress path from the attached network interface to the internet gateway was identified., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:10:00Z, reachability_resource_ids: eni-00000000000000003, igw-00000000000000001, reachability_scope: All attached resources and public IPv6 egress rules across every protocol and port., reachability_status: reachable, rule_index: 1
+- Metadata: direction: egress, exposure_scope: internet-wide, group_name: all-open, reachability_direction: egress, reachability_evidence: A public egress path from the attached network interface to the internet gateway was identified., reachability_method: manual-topology-review, reachability_observed_at: 2026-06-30T04:10:00Z, reachability_resource_ids: eni-00000000000000003, igw-00000000000000001, reachability_scope: All attached resources and public IPv6 egress rules across every protocol and port., reachability_status: reachable, rule_index: 1
 - References: https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html, https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html, https://docs.aws.amazon.com/vpc/latest/reachability/how-reachability-analyzer-works.html
 
 #### STO-005: Bucket versioning is not enabled
@@ -561,6 +693,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `storage`
 - Category: `data-exposure`
 - Resource: `bucket/analytics-raw-data`
+- Finding ID: `FND-6C45B79647FFC70E492F03B3C12D4DCB`
+- Confidence: High
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `not provided`
+- Evidence references: `s3-bucket-versioning/analytics-raw-data`
 - Evidence: Bucket versioning status is Disabled.
 - Impact: Accidental deletion, overwrite, or destructive activity may be harder to recover from.
 - Remediation: Enable bucket versioning for important data and pair it with lifecycle rules if storage cost matters.
@@ -572,6 +708,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `storage`
 - Category: `data-exposure`
 - Resource: `bucket/public-customer-exports`
+- Finding ID: `FND-4B42375BD76BB20D46A175B50731B403`
+- Confidence: High
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `not provided`
+- Evidence references: `s3-bucket-versioning/public-customer-exports`
 - Evidence: Bucket versioning status is Suspended.
 - Impact: Accidental deletion, overwrite, or destructive activity may be harder to recover from.
 - Remediation: Enable bucket versioning for important data and pair it with lifecycle rules if storage cost matters.
@@ -583,6 +723,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `storage`
 - Category: `data-exposure`
 - Resource: `bucket/analytics-raw-data`
+- Finding ID: `FND-D76C418B2CB5124A18BB5B4CD4DF47AA`
+- Confidence: High
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `not provided`
+- Evidence references: `s3-object-ownership/analytics-raw-data`
 - Evidence: S3 Object Ownership is BucketOwnerPreferred, so bucket and object ACLs can still affect access.
 - Impact: ACL-based permissions and cross-account object ownership can make access harder to reason about and can preserve unintended grants.
 - Remediation: Migrate required ACL permissions to policies, reset the bucket ACL to private, and use BucketOwnerEnforced unless an ACL-dependent workload is documented.
@@ -594,6 +738,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `storage`
 - Category: `data-exposure`
 - Resource: `bucket/public-customer-exports`
+- Finding ID: `FND-40778799D5E650EE9157377349C1217E`
+- Confidence: High
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `not provided`
+- Evidence references: `s3-object-ownership/public-customer-exports`
 - Evidence: S3 Object Ownership is ObjectWriter, so bucket and object ACLs can still affect access.
 - Impact: ACL-based permissions and cross-account object ownership can make access harder to reason about and can preserve unintended grants.
 - Remediation: Migrate required ACL permissions to policies, reset the bucket ACL to private, and use BucketOwnerEnforced unless an ACL-dependent workload is documented.
@@ -607,6 +755,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `storage`
 - Category: `data-exposure`
 - Resource: `bucket/analytics-raw-data`
+- Finding ID: `FND-81B06DACEECA547901EC47C117B9148F`
+- Confidence: High
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `not provided`
+- Evidence references: `s3-bucket-encryption/analytics-raw-data`
 - Evidence: No explicit bucket-level default encryption configuration is present in the input.
 - Impact: S3 applies baseline SSE-S3 encryption to new objects, but explicit key-management requirements cannot be confirmed.
 - Remediation: For sensitive or regulated data, configure explicit default encryption with an approved KMS key and document key ownership requirements.
@@ -618,6 +770,10 @@ These incidents group related CloudTrail signals by actor, source IP, and a boun
 - Module: `storage`
 - Category: `data-exposure`
 - Resource: `bucket/public-customer-exports`
+- Finding ID: `FND-F02F2852E0F6B0D183B68B6EDC450FC9`
+- Confidence: High
+- Provenance: account `111122223333`, region `ap-southeast-2`, observed `not provided`
+- Evidence references: `s3-bucket-encryption/public-customer-exports`
 - Evidence: No explicit bucket-level default encryption configuration is present in the input.
 - Impact: S3 applies baseline SSE-S3 encryption to new objects, but explicit key-management requirements cannot be confirmed.
 - Remediation: For sensitive or regulated data, configure explicit default encryption with an approved KMS key and document key ownership requirements.

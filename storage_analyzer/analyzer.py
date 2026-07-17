@@ -14,7 +14,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from cloud_findings import Finding, sort_findings, write_findings
+from cloud_findings import (
+    EvidenceReference,
+    Finding,
+    sort_findings,
+    with_findings_context,
+    write_findings,
+)
 from cloud_rules import validate_rule_emission
 
 REF_AWS_S3_BLOCK_PUBLIC_ACCESS = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html"
@@ -265,7 +271,22 @@ def _add_finding(
     references: list[str],
     metadata: dict[str, str] | None = None,
 ) -> None:
-    validate_rule_emission(rule_id, "storage", severity)
+    rule = validate_rule_emission(rule_id, "storage", severity)
+    assert rule is not None
+    evidence_types = {
+        "STO-001": "s3-public-access-block",
+        "STO-002": "s3-bucket-acl",
+        "STO-003": "s3-bucket-policy-statement",
+        "STO-004": "s3-bucket-encryption",
+        "STO-005": "s3-bucket-versioning",
+        "STO-006": "s3-object-ownership",
+    }
+    evidence_id = resource_id
+    metadata_values = metadata or {}
+    for key in ("statement_sid", "statement_index", "grantee"):
+        value = metadata_values.get(key)
+        if value:
+            evidence_id += f":{key}={value}"
     findings.append(
         Finding(
             rule_id=rule_id,
@@ -279,7 +300,14 @@ def _add_finding(
             impact=impact,
             remediation=remediation,
             references=references,
-            metadata=metadata or {},
+            metadata=metadata_values,
+            confidence=rule.confidence,
+            evidence_references=[
+                EvidenceReference(
+                    type=evidence_types[rule_id],
+                    id=evidence_id,
+                )
+            ],
         )
     )
 
@@ -481,14 +509,23 @@ def analyze_bucket(bucket: dict[str, Any]) -> list[Finding]:
             metadata={"object_ownership": object_ownership},
         )
 
-    return findings
+    return with_findings_context(
+        findings,
+        region=str(bucket.get("region") or "unknown"),
+    )
 
 
 def analyze_environment(environment: dict[str, Any]) -> list[Finding]:
     findings: list[Finding] = []
     for bucket in environment.get("buckets", []):
         findings.extend(analyze_bucket(bucket))
-    return sort_findings(findings)
+    return sort_findings(
+        with_findings_context(
+            findings,
+            account_id=str(environment.get("account_id") or "unknown"),
+            region=str(environment.get("region") or "unknown"),
+        )
+    )
 
 
 def load_environment(path: Path) -> dict[str, Any]:

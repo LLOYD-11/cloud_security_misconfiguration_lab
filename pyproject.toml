@@ -65,6 +65,9 @@ cloud_rules = ["rules-v1.0.json"]
 [tool.setuptools.data-files]
 "share/cloud-security-misconfiguration-lab/schemas" = ["schemas/*.json"]
 "share/cloud-security-misconfiguration-lab/sample_data/iam" = ["sample_data/iam/*.json"]
+"share/cloud-security-misconfiguration-lab/sample_data/aws" = [
+  "sample_data/aws/*.json",
+]
 "share/cloud-security-misconfiguration-lab/sample_data/aws/iam" = [
   "sample_data/aws/iam/*.csv",
   "sample_data/aws/iam/*.json",

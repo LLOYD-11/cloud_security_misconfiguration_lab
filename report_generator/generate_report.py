@@ -81,12 +81,22 @@ def _module_counts(findings: Iterable[Finding]) -> Counter[str]:
 
 def _validate_rule_context(findings: Iterable[Finding]) -> None:
     for finding in findings:
-        validate_rule_emission(
+        rule = validate_rule_emission(
             finding.rule_id,
             finding.module,
             finding.severity,
             require_known=False,
         )
+        if (
+            rule is not None
+            and finding.confidence != "unknown"
+            and finding.confidence != rule.confidence
+        ):
+            raise ValueError(
+                f"Finding {finding.finding_id} confidence "
+                f"{finding.confidence!r} does not match catalog rule "
+                f"{finding.rule_id} confidence {rule.confidence!r}."
+            )
 
 
 def _triggered_rule_context(findings: Iterable[Finding]) -> list[str]:
@@ -104,7 +114,7 @@ def _triggered_rule_context(findings: Iterable[Finding]) -> list[str]:
         "## Triggered Rule Context",
         "",
         (
-            "Confidence describes how directly the available evidence supports the "
+            "Finding confidence describes how directly the available evidence supports the "
             "rule condition. It does not establish malicious intent."
         ),
         "",
@@ -114,7 +124,7 @@ def _triggered_rule_context(findings: Iterable[Finding]) -> list[str]:
         ),
         "",
         (
-            "| Rule | Catalog Title | Confidence | Finding Severities | "
+            "| Rule | Catalog Title | Finding Confidence | Finding Severities | "
             "Findings | Control Mappings |"
         ),
         "| --- | --- | --- | --- | ---: | --- |",
@@ -125,13 +135,17 @@ def _triggered_rule_context(findings: Iterable[Finding]) -> list[str]:
         severities = ", ".join(
             severity for severity in SEVERITY_ORDER if severity in severity_set
         )
+        finding_confidences = sorted(
+            {finding.confidence for finding in rule_findings}
+        )
+        confidence = ", ".join(
+            value.capitalize() for value in finding_confidences
+        )
         if rule is None:
             title = rule_findings[0].title.replace("|", "\\|")
-            confidence = "Not cataloged"
             mappings = "Not cataloged"
         else:
             title = rule.title.replace("|", "\\|")
-            confidence = rule.confidence.capitalize()
             mappings = "<br>".join(
                 (
                     f"{frameworks[mapping.framework].name} "
@@ -154,6 +168,13 @@ def _format_metadata(finding: Finding) -> str:
     if not finding.metadata:
         return "None"
     return ", ".join(f"{key}: {value}" for key, value in sorted(finding.metadata.items()))
+
+
+def _format_evidence_references(finding: Finding) -> str:
+    return ", ".join(
+        f"`{reference.type}/{reference.id}`"
+        for reference in finding.evidence_references
+    )
 
 
 def _group_by_severity(findings: Iterable[Finding]) -> dict[str, list[Finding]]:
@@ -570,6 +591,18 @@ def render_report(
                     f"- Module: `{finding.module}`",
                     f"- Category: `{finding.category}`",
                     f"- Resource: `{finding.resource_type}/{finding.resource_id}`",
+                    f"- Finding ID: `{finding.finding_id}`",
+                    f"- Confidence: {finding.confidence.capitalize()}",
+                    (
+                        "- Provenance: "
+                        f"account `{finding.account_id}`, "
+                        f"region `{finding.region}`, "
+                        f"observed `{finding.observed_at or 'not provided'}`"
+                    ),
+                    (
+                        "- Evidence references: "
+                        f"{_format_evidence_references(finding)}"
+                    ),
                     f"- Evidence: {finding.evidence}",
                     f"- Impact: {finding.impact}",
                     f"- Remediation: {finding.remediation}",

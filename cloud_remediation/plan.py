@@ -10,7 +10,12 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
-from cloud_findings import Finding, severity_rank, sort_findings
+from cloud_findings import (
+    Finding,
+    evidence_reference_ids,
+    severity_rank,
+    sort_findings,
+)
 from cloud_incidents import Incident, sort_incidents
 from cloud_rules import get_rule
 
@@ -235,16 +240,18 @@ def _finding_incident_ids(
     incidents: Iterable[Incident],
 ) -> list[str]:
     resource = f"{finding.resource_type}/{finding.resource_id}"
-    event_ids_raw = finding.metadata.get("event_ids") or finding.metadata.get(
-        "event_id"
-    )
-    if not event_ids_raw:
-        return []
-    event_ids = {
-        event_id.strip()
-        for event_id in event_ids_raw.split(",")
-        if event_id.strip()
-    }
+    event_ids = set(evidence_reference_ids(finding, "cloudtrail-event"))
+    if not event_ids:
+        event_ids_raw = finding.metadata.get("event_ids") or finding.metadata.get(
+            "event_id"
+        )
+        if not event_ids_raw:
+            return []
+        event_ids = {
+            event_id.strip()
+            for event_id in event_ids_raw.split(",")
+            if event_id.strip()
+        }
     if not event_ids:
         return []
     return sorted(
@@ -347,7 +354,18 @@ def _configuration_actions(
             p0_incident_ids,
         )
         rule = get_rule(rule_id)
-        confidence = rule.confidence if rule is not None else "not-assessed"
+        finding_confidences = {
+            finding.confidence
+            for finding, _ in group
+            if finding.confidence != "unknown"
+        }
+        confidence = (
+            next(iter(finding_confidences))
+            if len(finding_confidences) == 1
+            else rule.confidence
+            if rule is not None
+            else "not-assessed"
+        )
         finding_label = "finding" if len(group) == 1 else "findings"
         resource_label = "resource" if len(resources) == 1 else "resources"
         affect_verb = "affects" if len(group) == 1 else "affect"

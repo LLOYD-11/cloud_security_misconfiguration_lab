@@ -8,6 +8,7 @@ The repository publishes versioned JSON Schema contracts for its simplified offl
 | AWS IAM authorization details snapshot | [`aws-iam-authorization-details-v1.0.schema.json`](../schemas/aws-iam-authorization-details-v1.0.schema.json) |
 | AWS EC2 security group snapshot | [`aws-ec2-describe-security-groups-v1.0.schema.json`](../schemas/aws-ec2-describe-security-groups-v1.0.schema.json) |
 | AWS S3 security evidence bundle | [`aws-s3-evidence-bundle-v1.0.schema.json`](../schemas/aws-s3-evidence-bundle-v1.0.schema.json) |
+| Sanitized AWS fixture manifest | [`aws-fixture-manifest-v1.0.schema.json`](../schemas/aws-fixture-manifest-v1.0.schema.json) |
 | IAM environment | [`iam-environment-v1.0.schema.json`](../schemas/iam-environment-v1.0.schema.json) |
 | Storage environment | [`storage-environment-v1.0.schema.json`](../schemas/storage-environment-v1.0.schema.json) |
 | Network environment | [`network-environment-v1.0.schema.json`](../schemas/network-environment-v1.0.schema.json) |
@@ -15,7 +16,8 @@ The repository publishes versioned JSON Schema contracts for its simplified offl
 | CloudTrail-style events | [`cloudtrail-events-v1.0.schema.json`](../schemas/cloudtrail-events-v1.0.schema.json) |
 | Analysis summary | [`analysis-summary-v1.0.schema.json`](../schemas/analysis-summary-v1.0.schema.json) |
 | Detection rule catalog | [`rule-catalog-v1.0.schema.json`](../schemas/rule-catalog-v1.0.schema.json) |
-| Shared findings file | [`findings-v1.0.schema.json`](../schemas/findings-v1.0.schema.json) |
+| Shared findings file (current) | [`findings-v2.0.schema.json`](../schemas/findings-v2.0.schema.json) |
+| Shared findings file (legacy read compatibility) | [`findings-v1.0.schema.json`](../schemas/findings-v1.0.schema.json) |
 | Correlated incidents file | [`incidents-v1.0.schema.json`](../schemas/incidents-v1.0.schema.json) |
 | Prioritized remediation plan | [`remediation-plan-v1.0.schema.json`](../schemas/remediation-plan-v1.0.schema.json) |
 | Attack timeline | [`attack-timeline-v1.0.schema.json`](../schemas/attack-timeline-v1.0.schema.json) |
@@ -26,7 +28,29 @@ The environment contracts describe the lab's simplified analyzer models. The nat
 
 Runtime analyzers use only the Python standard library and perform lightweight top-level validation. Full JSON Schema validation is a development and CI gate supplied by the optional `dev` dependencies.
 
-The shared findings and incident loaders also verify that each declared count equals the number of objects in its corresponding list. The incident model additionally verifies UTC time ordering and that `event_count` equals the number of unique event IDs. The analysis-summary model verifies resource-count arithmetic, deterministic ordering, input and module values, and consistency between coverage status and coverage-affecting evidence gaps.
+New finding exports use schema v2.0. Each finding carries a deterministic
+`FND-` ID, evidence-to-rule confidence, account, Region, optional UTC
+observation time, and one or more structured evidence references. The stable ID
+is a SHA-256-derived identity over rule, module, account, Region, observation
+time, resource, and sorted evidence references. Descriptive text, severity,
+confidence, references, and metadata do not change identity.
+Equivalent UTC timestamps ending in `Z` or `+00:00` are canonicalized to `Z`
+before identity is calculated.
+
+The loader accepts versioned v1 and v2 files. V1 records are migrated in memory
+with `unknown` account, Region, and confidence, a `null` observation time, and a
+legacy evidence reference; the migration never infers unavailable provenance.
+All new writes use v2.0. Unversioned lists and unsupported versions remain
+rejected.
+
+The shared findings and incident loaders also verify that each declared count
+equals the number of objects in its corresponding list. V2 finding IDs are
+recomputed and checked so a changed identity field cannot retain a stale ID.
+The incident model additionally verifies UTC time ordering and that
+`event_count` equals the number of unique event IDs. The analysis-summary model
+verifies resource-count arithmetic, deterministic ordering, input and module
+values, and consistency between coverage status and coverage-affecting evidence
+gaps.
 
 The remediation-plan model verifies deterministic priority ordering, stable and
 unique action IDs, complete one-time accounting of source findings in
@@ -36,7 +60,15 @@ The attack-timeline model verifies UTC chronological ordering, stable and unique
 entry IDs, valid activity classifications, exact source accounting across
 entries and omissions, and explicit incident links. The timeline is derived
 from CloudTrail findings rather than raw events so each entry retains detector
-evidence, impact, severity, and catalog confidence.
+evidence, impact, severity, and finding confidence. Versioned v1 findings with
+unknown confidence fall back to the built-in catalog; custom unknown rules use
+`not-assessed`.
+
+The AWS fixture manifest records the operation or assessment shape, local
+contract, authoritative shape references, synthetic origin, account and Region
+scope, observation range, sanitization, expected rule coverage, and SHA-256 for
+every bundled AWS-shaped file. Contract tests require the manifest inventory to
+exactly match the files under `sample_data/aws/` and verify every digest.
 
 The canonical [`rules-v1.0.json`](../cloud_rules/rules-v1.0.json) catalog adds
 cross-field checks for unique and deterministically ordered rule IDs, module

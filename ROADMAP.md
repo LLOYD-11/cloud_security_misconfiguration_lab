@@ -39,20 +39,20 @@ Status: Complete in `v2.0.0`.
 
 ## M2: Engineering Foundation, CLI, Schema, and CI
 
-Status: Substantially complete; remaining work is planned for `v2.1.0`.
+Status: Complete for `v2.1.0`.
 
 - [x] Add installable package metadata and optional development dependencies.
 - [x] Add the unified `analyze`, `report`, `demo`, and `catalog` CLI workflows.
 - [x] Publish versioned JSON Schema contracts and Python validation.
 - [x] Add lint, strict type, unit, branch-coverage, package-build, and deterministic end-to-end CI checks.
 - [x] Keep the original module scripts as compatibility entry points.
-- [ ] Add first-class finding provenance: stable finding ID, account, region, observation time, and source evidence.
-- [ ] Define the compatibility and migration behavior for the revised finding contract.
-- [ ] Add Python 3.12 to the CI matrix so the documented 3.10-3.13 support range is exercised at its midpoint.
+- [x] Add first-class finding provenance: stable finding ID, account, region, observation time, and source evidence.
+- [x] Define the compatibility and migration behavior for the revised finding contract.
+- [x] Add Python 3.12 to the CI matrix so the documented 3.10-3.13 support range is exercised at its midpoint.
 
 ## M3: Native AWS Evidence Adapters
 
-Status: Substantially complete; fixture provenance remains open for `v2.1.0`.
+Status: Complete for `v2.1.0`.
 
 - [x] Normalize IAM account-authorization details and credential-report evidence.
 - [x] Normalize S3 account and bucket security evidence.
@@ -60,7 +60,7 @@ Status: Substantially complete; fixture provenance remains open for `v2.1.0`.
 - [x] Read CloudTrail `Records` payloads from multiple JSON and gzip files.
 - [x] Keep analyzer inputs stable by normalizing AWS-shaped evidence into canonical environments.
 - [x] Document collection commands, validation behavior, and offline safety boundaries.
-- [ ] Add a manifest for each sanitized AWS-shaped fixture that records its operation, shape, sanitization, and expected coverage.
+- [x] Add a manifest for each sanitized AWS-shaped fixture that records its operation, shape, sanitization, and expected coverage.
 
 ## M4: IAM Analyzer v2
 
@@ -132,7 +132,7 @@ Status: In progress; `v2.0.0` is the release checkpoint and `v2.1.0` is the comp
 ## v2.1 Completion Sequence
 
 1. **C0 - Governance:** restore M0-M9 and add requirement-to-evidence traceability.
-2. **C1 - Provenance:** complete M2 and M3 finding provenance, contract migration, Python 3.12 CI, and fixture manifests.
+2. **C1 - Provenance (complete):** complete M2 and M3 finding provenance, contract migration, Python 3.12 CI, and fixture manifests.
 3. **C2 - Detection performance:** complete the M6 failure-window optimization and equivalence tests.
 4. **C3 - Benchmarking:** complete M8 benchmark, scale, resilience, and coverage evidence.
 5. **C4 - Portfolio presentation:** complete the remaining M9 README, visual, and repository-metadata work.

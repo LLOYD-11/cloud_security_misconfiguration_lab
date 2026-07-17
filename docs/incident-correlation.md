@@ -5,7 +5,10 @@ The CloudTrail detector produces two related but distinct artifacts:
 - Findings describe one rule match or one bounded aggregate such as an API failure spike.
 - Incidents group related findings into a triage unit without discarding the underlying evidence.
 
-Incident output uses [`incidents-v1.0.schema.json`](../schemas/incidents-v1.0.schema.json). The original findings interface remains unchanged for compatibility.
+Incident output uses
+[`incidents-v1.0.schema.json`](../schemas/incidents-v1.0.schema.json).
+Correlation consumes findings v2 provenance while retaining versioned v1
+compatibility.
 
 ## Correlation Keys and Window
 
@@ -13,15 +16,23 @@ The default correlation window is 30 minutes and can be changed with `--correlat
 
 Signals are eligible for the same incident only when they have:
 
-1. The same normalized actor.
-2. The same source IP or source name.
-3. Start times within one bounded window anchored at the first signal.
+1. The same finding account, including `unknown` when unavailable.
+2. The same normalized actor.
+3. The same source IP or source name.
+4. Start times within one bounded window anchored at the first signal.
 
 Signals are assigned to deterministic, non-overlapping clusters. When the next signal falls outside the anchor window, it starts a new cluster instead of being reused in two incidents.
 
+Signal time and event identity come first from v2 `observed_at` and
+`cloudtrail-event` evidence references. Legacy `event_time`, `first_seen`,
+`last_seen`, `event_id`, and `event_ids` metadata remain a fallback for
+versioned v1 findings.
+
 The actor is derived from `userIdentity.userName`, then the assumed-role session issuer, ARN, principal ID, or identity type. Source values come directly from CloudTrail `sourceIPAddress`; AWS service names are therefore possible as well as IP addresses.
 
-The grouping intentionally does not correlate on actor alone. A principal used from two sources can represent different sessions, automation, or concurrent activity and remains separate.
+The grouping intentionally does not correlate on actor alone. A principal used
+from two accounts or two sources can represent different sessions, automation,
+or concurrent activity and remains separate.
 
 ## Qualification
 

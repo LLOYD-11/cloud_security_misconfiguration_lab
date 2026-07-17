@@ -2,6 +2,35 @@
 
 All four analyzers can consume exported AWS API evidence without requiring the lab to hold cloud credentials or call a live account.
 
+## Bundled Fixture Provenance
+
+Every file under `sample_data/aws/` is synthetic. None was collected from a
+customer, employer, school, or personal AWS account. The versioned
+[`fixture-manifest-v1.0.json`](../sample_data/aws/fixture-manifest-v1.0.json)
+records each file's operation or assessment shape, local contract,
+authoritative AWS shape references, fictional account and Region scope,
+observation range, sanitization, expected rule coverage, and SHA-256 digest.
+
+Contract tests require the manifest to list every bundled AWS-shaped file
+exactly once and reject stale hashes. This proves repository consistency; it
+does not authenticate evidence collected outside the repository.
+
+### Finding Provenance Options
+
+Native records preserve account, Region, timestamp, and source identifiers when
+their shape contains those values. For configuration snapshots that do not
+encode Region or collection time, callers can supply:
+
+```bash
+--region ap-southeast-2 \
+--observed-at 2026-06-30T04:00:00Z
+```
+
+`--observed-at` requires RFC 3339 UTC (`Z` or `+00:00`) and is stored in
+canonical `Z` form. Evidence-specific values take precedence over CLI defaults.
+Omit either option when the value is not known; the finding will say `unknown`
+or `null` rather than infer provenance.
+
 ## IAM Evidence
 
 ### Collect IAM Evidence
@@ -37,6 +66,7 @@ python3 -m cloud_security_lab analyze iam \
   --input-format aws \
   --credential-report credential-report.json \
   --as-of 2026-06-30 \
+  --observed-at 2026-06-30T00:00:00Z \
   --normalized-output reports/generated/normalized_iam_environment.json \
   --output reports/generated/iam_findings.json
 ```
@@ -50,7 +80,8 @@ python3 -m cloud_security_lab analyze iam \
   sample_data/aws/iam/account_authorization_details.json \
   --input-format aws \
   --credential-report sample_data/aws/iam/credential_report.csv \
-  --as-of 2026-06-30
+  --as-of 2026-06-30 \
+  --observed-at 2026-06-30T00:00:00Z
 ```
 
 ### IAM Normalization Behavior
@@ -127,6 +158,7 @@ python3 -m cloud_security_lab analyze storage \
 The adapter:
 
 - Requires one evidence entry for every bucket returned by a complete, unfiltered `ListBuckets` response, with no unlisted extras.
+- Preserves `BucketRegion` as finding provenance when it is present.
 - Combines account-level and bucket-level Block Public Access controls using S3's most-restrictive behavior.
 - Preserves `BucketOwnerEnforced`, `BucketOwnerPreferred`, or `ObjectWriter` from Object Ownership controls and makes ACL effectiveness explicit.
 - Converts AWS ACL grantee structures into stable analyzer identifiers while retaining public group URIs.
@@ -167,6 +199,7 @@ python3 -m cloud_security_lab analyze network \
   describe-security-groups.json \
   --input-format aws \
   --reachability-context network-reachability-context.json \
+  --region ap-southeast-2 \
   --normalized-output reports/generated/normalized_network_environment.json \
   --output reports/generated/network_findings.json
 ```
@@ -177,7 +210,8 @@ The bundled native-shape sample can be analyzed with the same command:
 python3 -m cloud_security_lab analyze network \
   sample_data/aws/ec2/describe_security_groups.json \
   --input-format aws \
-  --reachability-context sample_data/aws/ec2/network_reachability_context.json
+  --reachability-context sample_data/aws/ec2/network_reachability_context.json \
+  --region ap-southeast-2
 ```
 
 `--reachability-context` is optional. Without it, the analyzer reports security-group permission risk with `reachability_status: not_assessed`.

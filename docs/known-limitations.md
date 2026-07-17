@@ -7,6 +7,14 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 - All four analyzers accept documented simplified inputs or versioned native AWS evidence.
 - Native CloudTrail input supports standard `Records` log files in JSON or gzip form, not CloudTrail Insight, aggregated-event, or digest payloads.
 - Evidence is loaded into memory and is intended for small lab datasets.
+- Findings v2 preserve provenance only when the source evidence or explicit CLI
+  options provide it. Versioned v1 findings migrate with `unknown` account,
+  Region, and confidence plus a `null` observation time.
+- `--region` and `--observed-at` are assessor-supplied context. The lab validates
+  their syntax but cannot prove that they describe the input file.
+- A stable finding ID identifies the same rule, resource, provenance, and source
+  references. It is not a case-management ID and intentionally changes when
+  those identity fields change.
 
 ## IAM Analysis
 
@@ -53,11 +61,11 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 - The lab does not verify CloudTrail digest signatures or prove log-file integrity.
 - Change rules identify selected high-value API names but do not inspect policy diffs or all request parameters. `UpdateDetector` is the exception: it requires explicit `enable: false` evidence.
 - Repeated API failures can be caused by legitimate automation, probing, throttling, or configuration mistakes.
-- Incident correlation uses exact normalized actor and source values plus a bounded time window. Shared credentials, NAT, proxies, service-originated calls, missing fields, and delivery gaps can split or merge activity in ways that require analyst review.
+- Incident correlation uses exact finding account, normalized actor, and source values plus a bounded time window. Shared credentials, NAT, proxies, service-originated calls, unknown accounts, missing fields, and delivery gaps can split or merge activity in ways that require analyst review.
 - A multi-signal incident requires distinct rules and events. It does not baseline approved administrators, working hours, expected source ranges, user agents, or change tickets.
 - Incident confidence measures correlation strength, not malicious intent. Incidents remain triage leads and do not replace investigation.
 - Timeline activity types are reviewer-facing descriptions of observed API activity, not MITRE ATT&CK tactics, inferred kill-chain phases, or attribution conclusions.
-- A timeline entry requires a valid UTC timestamp and event ID in finding metadata. Missing or invalid chronology is reported as an omission, but the lab cannot reconstruct absent events or delivery gaps.
+- A timeline entry requires a valid UTC observation time and CloudTrail event evidence reference, with legacy metadata accepted as a compatibility fallback. Missing or invalid chronology is reported as an omission, but the lab cannot reconstruct absent events or delivery gaps.
 - The failure-spike rule produces one aggregate timeline entry for its detected window rather than one finding per failed API call.
 
 ## Reporting
@@ -67,7 +75,7 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 - Configuration is linked to an incident only by an exact rule ID, `resource_type/resource_id`, and shared CloudTrail event ID. This conservative join can miss relationships that require account, session, topology, or semantic analysis.
 - Timeline incident context uses the same conservative exact join. Chronological proximity alone never creates a link, and observed ordering does not prove that one action caused another.
 - Equivalent remediation is grouped only when module, rule, severity, title, and action text match. The plan does not infer that different fixes can be combined into one change.
-- Rule confidence measures how directly the supplied evidence supports the detector condition. It does not measure the probability that activity is malicious or replace analyst validation.
+- Finding confidence measures how directly the supplied evidence supports the detector condition. It does not measure the probability that activity is malicious or replace analyst validation. Legacy v1 findings with unknown confidence fall back to catalog confidence in derived remediation and timeline views.
 - `direct` control mappings indicate substantial condition alignment, not complete framework certification. `related` mappings provide security context and intentionally do not claim equivalent coverage.
 - AWS Security Hub CSPM and MITRE ATT&CK references track their live public pages. CIS mappings are pinned to the AWS-published AWS Foundations Benchmark v5.0.0 crosswalk. CIS v7.0.0 is current as of this release, but control IDs are not inferred where an authoritative public crosswalk is unavailable.
 - The catalog covers the 35 built-in rules. Custom findings remain report-compatible but are labeled not cataloged and receive no automatic control context.

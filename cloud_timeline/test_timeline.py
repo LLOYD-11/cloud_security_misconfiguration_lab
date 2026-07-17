@@ -4,7 +4,7 @@ import unittest
 from dataclasses import replace
 from pathlib import Path
 
-from cloud_findings import Finding
+from cloud_findings import EvidenceReference, Finding
 from cloud_incidents import Incident
 from cloud_rules import load_builtin_catalog
 from cloud_timeline import (
@@ -144,6 +144,39 @@ class AttackTimelineTests(unittest.TestCase):
         self.assertEqual(6, len(entry.event_ids))
         self.assertEqual("discovery-and-probing", entry.activity_type)
         self.assertEqual(1, len(entry.incident_ids))
+
+    def test_timeline_prefers_finding_confidence(self):
+        finding = replace(_finding(), confidence="low")
+
+        timeline = build_attack_timeline([finding], [])
+
+        self.assertEqual("low", timeline.entries[0].confidence)
+
+    def test_timeline_uses_v2_provenance_without_legacy_metadata(self):
+        finding = _finding(
+            event_time="2026-06-30T05:04:00Z",
+            event_id="legacy-event",
+        )
+        finding = replace(
+            finding,
+            finding_id="",
+            observed_at="2026-06-30T01:04:00Z",
+            evidence_references=[
+                EvidenceReference(type="cloudtrail-event", id="event-v2")
+            ],
+        )
+
+        timeline = build_attack_timeline([finding], [])
+
+        self.assertEqual(1, len(timeline.entries))
+        self.assertEqual(
+            "2026-06-30T01:04:00Z",
+            timeline.entries[0].first_seen,
+        )
+        self.assertEqual(
+            ["event-v2"],
+            timeline.entries[0].event_ids,
+        )
 
     def test_missing_or_invalid_chronology_becomes_explicit_omission(self):
         reversed_range = _finding()

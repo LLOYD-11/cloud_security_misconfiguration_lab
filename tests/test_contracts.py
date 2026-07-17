@@ -1,5 +1,6 @@
 import copy
 import gzip
+import hashlib
 import json
 import tempfile
 import unittest
@@ -63,6 +64,10 @@ SCHEMA_SAMPLE_PAIRS = (
         "cloudtrail-events-v1.0.schema.json",
         "sample_data/cloudtrail/sample_cloudtrail_events.json",
     ),
+    (
+        "aws-fixture-manifest-v1.0.schema.json",
+        "sample_data/aws/fixture-manifest-v1.0.json",
+    ),
 )
 
 
@@ -81,6 +86,33 @@ class DataContractTests(unittest.TestCase):
                     schema,
                     format_checker=FormatChecker(),
                 ).validate(sample)
+
+    def test_aws_fixture_manifest_is_complete_and_integrity_checked(self):
+        manifest = _load_json(
+            PROJECT_ROOT / "sample_data/aws/fixture-manifest-v1.0.json"
+        )
+        fixtures = manifest["fixtures"]
+        declared_paths = [item["path"] for item in fixtures]
+        discovered_paths = sorted(
+            str(path.relative_to(PROJECT_ROOT))
+            for path in (PROJECT_ROOT / "sample_data/aws").rglob("*")
+            if path.is_file() and path.name != "fixture-manifest-v1.0.json"
+        )
+
+        self.assertEqual(sorted(declared_paths), discovered_paths)
+        self.assertEqual(len(declared_paths), len(set(declared_paths)))
+        for fixture in fixtures:
+            with self.subTest(path=fixture["path"]):
+                fixture_path = PROJECT_ROOT / fixture["path"]
+                contract_path = PROJECT_ROOT / fixture["contract"]
+                digest = hashlib.sha256(fixture_path.read_bytes()).hexdigest()
+
+                self.assertTrue(contract_path.is_file())
+                self.assertEqual(fixture["sha256"], digest)
+                self.assertLessEqual(
+                    fixture["observed_from"],
+                    fixture["observed_to"],
+                )
 
     def test_s3_contract_supports_blocked_encryption_rules_and_rejects_empty_rules(self):
         schema = _load_json(
@@ -186,7 +218,7 @@ class DataContractTests(unittest.TestCase):
         ).validate(result.environment)
 
     def test_generated_findings_match_shared_contract(self):
-        schema = _load_json(PROJECT_ROOT / "schemas/findings-v1.0.schema.json")
+        schema = _load_json(PROJECT_ROOT / "schemas/findings-v2.0.schema.json")
         environment = load_environment(
             PROJECT_ROOT / "sample_data/iam/sample_iam_environment.json"
         )
