@@ -38,10 +38,10 @@ Status: Complete.
 
 ## Milestone 5: Reporting and Portfolio Release
 
-Status: In Progress.
+Status: Complete in v2.0.0 on 2026-07-17.
 
 - [x] Publish versioned analysis summaries for evaluated resources, skipped evidence, warnings, and coverage status.
 - [x] Add a versioned rule catalog with confidence and qualified control mappings.
 - [x] Add prioritized remediation across findings and correlated incidents.
 - [x] Add an attack timeline and richer explanatory context to the deterministic sample report.
-- Publish architecture, rule-catalog, and design-decision documentation with a v2 release.
+- [x] Publish architecture, rule-catalog, and design-decision documentation with a v2 release.

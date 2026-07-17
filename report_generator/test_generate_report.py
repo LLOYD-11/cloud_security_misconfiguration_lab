@@ -165,7 +165,7 @@ class ReportGeneratorTests(unittest.TestCase):
         )
         summary = AnalysisSummary(
             module="iam",
-            analyzer_version="2.0.0.dev0",
+            analyzer_version="2.0.0",
             input_format="aws",
             input_file_count=2,
             coverage_status="partial",
@@ -203,7 +203,7 @@ class ReportGeneratorTests(unittest.TestCase):
     def test_analysis_summary_count_mismatch_is_rejected(self):
         summary = AnalysisSummary(
             module="iam",
-            analyzer_version="2.0.0.dev0",
+            analyzer_version="2.0.0",
             input_format="simplified",
             input_file_count=1,
             coverage_status="complete",
@@ -243,7 +243,7 @@ class ReportGeneratorTests(unittest.TestCase):
         )
         summary = AnalysisSummary(
             module="iam",
-            analyzer_version="2.0.0.dev0",
+            analyzer_version="2.0.0",
             input_format="simplified",
             input_file_count=1,
             coverage_status="complete",
@@ -264,7 +264,7 @@ class ReportGeneratorTests(unittest.TestCase):
         summaries = [
             AnalysisSummary(
                 module=module,
-                analyzer_version="2.0.0.dev0",
+                analyzer_version="2.0.0",
                 input_format="simplified",
                 input_file_count=1,
                 coverage_status="complete",

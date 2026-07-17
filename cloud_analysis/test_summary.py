@@ -17,7 +17,7 @@ from cloud_analysis import (
 def _summary(**overrides):
     values = {
         "module": "iam",
-        "analyzer_version": "2.0.0.dev0",
+        "analyzer_version": "2.0.0",
         "input_format": "aws",
         "input_file_count": 2,
         "coverage_status": "partial",

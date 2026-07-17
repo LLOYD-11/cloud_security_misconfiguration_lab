@@ -1,0 +1,93 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Verify and publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install project and development tools
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
+
+      - name: Verify tag, package version, and release notes
+        run: >-
+          python -c "import os, pathlib, cloud_security_lab;
+          tag = os.environ['GITHUB_REF_NAME'];
+          expected = f'v{cloud_security_lab.__version__}';
+          assert tag == expected, f'{tag} does not match {expected}';
+          notes = pathlib.Path(f'docs/release-{tag}.md');
+          assert notes.is_file(), f'{notes} is missing'"
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Type check
+        run: >-
+          mypy cloud_analysis cloud_security_lab cloud_findings cloud_incidents
+          cloud_remediation cloud_rules cloud_timeline
+          iam_analyzer storage_analyzer
+          network_analyzer cloudtrail_detector report_generator
+
+      - name: Test with branch coverage
+        run: coverage run -m unittest discover && coverage report
+
+      - name: Verify deterministic artifacts
+        run: >-
+          python -m cloud_security_lab demo --report-date 2026-06-30 &&
+          cmp reports/cloud_security_report_sample.md
+          reports/generated/cloud_security_report.md &&
+          python -m cloud_security_lab catalog
+          --output reports/generated/rule_catalog.md &&
+          cmp docs/rule-catalog.md reports/generated/rule_catalog.md
+
+      - name: Build wheel and source distribution
+        run: python -m build
+
+      - name: Verify installed wheel
+        run: >-
+          python -m venv /tmp/cloud-security-release &&
+          /tmp/cloud-security-release/bin/python -m pip install
+          --no-deps dist/*.whl &&
+          cd /tmp &&
+          /tmp/cloud-security-release/bin/cloud-security-lab
+          demo --report-date 2026-06-30
+          --output-dir cloud-security-release-output &&
+          /tmp/cloud-security-release/bin/python -c
+          "import json, pathlib;
+          output = pathlib.Path('/tmp/cloud-security-release-output');
+          timeline = json.loads((output / 'attack_timeline.json').read_text());
+          assert timeline['entry_count'] == 11;
+          assert timeline['omission_count'] == 0;
+          assert '## Attack Timeline' in
+          (output / 'cloud_security_report.md').read_text()"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "$GITHUB_REF_NAME"
+          dist/*.whl dist/*.tar.gz
+          --verify-tag
+          --title "Cloud Security Misconfiguration Lab $GITHUB_REF_NAME"
+          --notes-file "docs/release-$GITHUB_REF_NAME.md"

@@ -6,6 +6,9 @@ The goal is to provide practical and explainable security findings without requi
 
 The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, versioned finding, incident, analysis-summary, detection-rule, remediation-plan, and attack-timeline contracts, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
 
+For a technical tour, start with the [system architecture](docs/architecture.md)
+and [version 2.0.0 release notes](docs/release-v2.0.0.md).
+
 ## Quick Start
 
 From the repository root, run the complete sample pipeline without installing runtime dependencies:
@@ -303,6 +306,9 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 ## Project Documentation
 
 - [Upgrade roadmap](ROADMAP.md)
+- [System architecture](docs/architecture.md)
+- [Design decisions](docs/design-decisions.md)
+- [Version 2.0.0 release notes](docs/release-v2.0.0.md)
 - [Data contracts](docs/data-contracts.md)
 - [Detection rule catalog](docs/rule-catalog.md)
 - [Remediation prioritization](docs/remediation-prioritization.md)
@@ -338,7 +344,9 @@ The coverage gate is 85% with branch coverage enabled. GitHub Actions also rebui
 
 ```text
 cloud_security_misconfiguration_lab/
-├── .github/workflows/ci.yml
+├── .github/workflows/
+│   ├── ci.yml
+│   └── release.yml
 ├── README.md
 ├── ROADMAP.md
 ├── CHANGELOG.md
@@ -426,11 +434,14 @@ cloud_security_misconfiguration_lab/
 │   └── test_analyzer.py
 ├── docs/
 │   ├── attack-timeline.md
+│   ├── architecture.md
 │   ├── data-contracts.md
+│   ├── design-decisions.md
 │   ├── engineering.md
 │   ├── incident-correlation.md
 │   ├── native-aws-inputs.md
 │   ├── remediation-prioritization.md
+│   ├── release-v2.0.0.md
 │   └── known-limitations.md
 ├── tests/
 │   ├── test_contracts.py

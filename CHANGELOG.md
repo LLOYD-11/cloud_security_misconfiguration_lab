@@ -4,6 +4,8 @@ All notable changes to this project are documented in this file.
 
 ## Unreleased
 
+## 2.0.0 - 2026-07-17
+
 ### Added
 
 - Regression tests for IAM trust, MFA conditions, S3 action wildcards, storage principals, network protocols and CIDRs, CloudTrail outcomes, duplicate events, and finding-schema validation.
@@ -43,6 +45,7 @@ All notable changes to this project are documented in this file.
 - A versioned remediation-plan contract, machine-readable CLI output, report integration, public prioritization documentation, and complete source-accounting tests.
 - A deterministic CloudTrail attack timeline with stable entry IDs, conservative activity labels, explicit evidence omissions, exact incident linkage, and richer incident narratives.
 - A versioned attack-timeline contract, machine-readable CLI output, report integration, public interpretation documentation, and CloudTrail rule-classification completeness tests.
+- System architecture, design-decision, and release documentation for the v2 portfolio release.
 
 ### Changed
 

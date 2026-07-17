@@ -32,3 +32,22 @@ Coverage uses branch measurement and fails below 85%. Contract tests validate al
 GitHub Actions runs the same lint, type, test, coverage, and end-to-end checks on Python 3.10 and 3.13. The Python 3.13 job also builds the wheel and source distribution. Workflow permissions are limited to read-only repository contents.
 
 The deterministic end-to-end check fixes the report date to the sample event date and compares the generated Markdown, including the prioritized work queue and attack timeline, byte-for-byte with the committed report. A second byte-for-byte check regenerates the human-readable rule catalog from its packaged JSON source. The build gate also confirms that the wheel contains the rule catalog, remediation and timeline modules, and their schemas.
+
+## Release Process
+
+1. Set `cloud_security_lab.__version__`, close the changelog section, complete
+   the roadmap milestone, and add `docs/release-vX.Y.Z.md`.
+2. Run the complete local release gate and install the wheel into a clean
+   environment for one deterministic demo.
+3. Commit and push the release candidate branch, then require both Python
+   matrix jobs to pass.
+4. Fast-forward `main` to the verified commit and require the main-branch CI run
+   to pass.
+5. Create and push an annotated `vX.Y.Z` tag.
+
+The tag starts `.github/workflows/release.yml`. That workflow verifies the tag
+against the installed package version, requires the matching release-notes
+file, repeats the full quality and deterministic gates, builds the wheel and
+source distribution, runs the installed-wheel demo, and then creates a GitHub
+Release with both distributions attached. Its write permission is scoped to
+repository contents.

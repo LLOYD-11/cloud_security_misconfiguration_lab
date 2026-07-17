@@ -1,0 +1,207 @@
+# Design Decisions
+
+This document records the architectural choices that shape version 2.0.0.
+Each decision is accepted for the current project scope and includes the
+tradeoffs a future maintainer should understand before changing it.
+
+## DD-001: Analyze Exported Evidence Offline
+
+**Status:** Accepted
+
+**Decision:** The runtime consumes files and never authenticates to AWS or
+changes cloud resources.
+
+**Why:** Offline analysis avoids credential handling, accidental changes,
+unbounded collection scope, and cloud charges. It also makes the sample
+pipeline reproducible for students, reviewers, and CI.
+
+**Consequences:** Evidence collection remains a separate authorized activity.
+The lab cannot prove freshness, account-wide coverage, or live state. Native
+adapters therefore reject known truncation and incomplete collection patterns.
+
+**Alternative not chosen:** A live boto3 collector would improve convenience
+but add credentials, permissions, pagination, network failures, and account
+safety to the trusted runtime.
+
+## DD-002: Normalize Native Exports Before Detection
+
+**Status:** Accepted
+
+**Decision:** AWS-shaped adapters translate supported exports into canonical
+IAM, storage, network, and CloudTrail environments. Analyzers operate on those
+canonical structures.
+
+**Why:** Detection rules should not duplicate AWS response parsing or depend on
+one collection representation. Simplified fixtures and native exports can
+exercise the same rule logic.
+
+**Consequences:** Normalizers must preserve security-relevant context instead
+of flattening it away. A contract change may require adapter and analyzer
+updates, but AWS-shape churn remains outside detector code.
+
+**Alternative not chosen:** Running rules directly over each native API shape
+would couple detection to collection details and create separate behavior for
+sample and native inputs.
+
+## DD-003: Use Shared, Versioned Result Models
+
+**Status:** Accepted
+
+**Decision:** All analyzers emit the same `Finding` model. Coverage, incidents,
+rules, remediation plans, and timelines use separate versioned models and JSON
+Schemas.
+
+**Why:** Shared artifacts make report assembly module-neutral and give
+reviewers explicit machine-readable contracts. Version checks prevent silent
+interpretation of incompatible files.
+
+**Consequences:** Producers and consumers must evolve contracts intentionally.
+Python model validation supplements JSON Schema for cross-field invariants.
+Unversioned finding lists that version 1 accepted are rejected in version 2.
+
+**Alternative not chosen:** Ad hoc per-module JSON would reduce initial code
+but force the report generator to understand every analyzer's internals.
+
+## DD-004: Separate Detection, Correlation, and Presentation
+
+**Status:** Accepted
+
+**Decision:** Analyzers create findings, CloudTrail correlation creates
+incidents, and the report layer derives timeline and remediation views.
+
+**Why:** A rule match, a correlated triage lead, and a presentation narrative
+make different claims. Keeping them separate preserves the original evidence
+and lets each layer use an appropriate confidence model.
+
+**Consequences:** The pipeline produces several artifacts rather than one
+opaque result. Report inputs are cross-checked so mismatched artifacts fail
+instead of being combined silently.
+
+**Alternative not chosen:** Emitting only incidents or a final report would
+discard reusable finding evidence and make correlation behavior difficult to
+test independently.
+
+## DD-005: Prefer Conservative Evidence Joins
+
+**Status:** Accepted
+
+**Decision:** Incident grouping uses normalized actor, source, and a bounded
+window. Event IDs de-duplicate and qualify the group and contribute to its
+stable ID. Timeline and remediation incident context require exact rule,
+resource, and event-ID agreement.
+
+**Why:** A portfolio security tool should avoid manufacturing attack chains
+from title similarity or chronological proximity. Exact keys make every link
+explainable.
+
+**Consequences:** The model can miss relationships that require session,
+account, topology, or semantic context. Documentation presents correlation as
+a triage lead, not proof of compromise.
+
+**Alternative not chosen:** Fuzzy or score-based joins could create richer
+stories but would be harder to defend and more likely to overstate evidence.
+
+## DD-006: Make Outputs Deterministic
+
+**Status:** Accepted
+
+**Decision:** Artifacts use stable sorting, canonical hashing for derived IDs,
+explicit analysis parameters, and no implicit runtime timestamps.
+
+**Why:** Deterministic output enables byte-for-byte CI checks, meaningful
+reviews, repeatable demonstrations, and stable references between artifacts.
+
+**Consequences:** Callers must provide dates such as credential `as_of` and
+sample report date when time affects a result. IDs change when material evidence
+changes.
+
+**Alternative not chosen:** Random UUIDs and generation timestamps would be
+convenient but produce noisy diffs and weaken reproducibility.
+
+## DD-007: Publish Confidence and Mapping Qualifications
+
+**Status:** Accepted
+
+**Decision:** The rule catalog records evidence-to-rule confidence and labels
+framework mappings as `direct` or `related`.
+
+**Why:** A detector match is not the same as malicious intent, and a related
+MITRE or control reference is not certification. Qualified mappings make those
+boundaries visible.
+
+**Consequences:** Catalog maintenance requires authoritative references and
+careful rationale. Unknown custom rules remain report-compatible but receive no
+automatic mapping or confidence claim.
+
+**Alternative not chosen:** Unqualified framework labels would look broader but
+risk implying complete control coverage.
+
+## DD-008: Use Explainable Priority Bands
+
+**Status:** Accepted
+
+**Decision:** Remediation uses published P0-P3 rules and keeps incident response
+separate from permanent configuration work.
+
+**Why:** The available evidence does not support a mathematically defensible
+breach-probability or business-impact score. Priority bands can state exactly
+why a work item is urgent.
+
+**Consequences:** Asset value, ownership, effort, dependencies, compensating
+controls, and change windows remain analyst inputs. The plan is a triage queue,
+not an autonomous change plan.
+
+**Alternative not chosen:** A weighted numeric score would create false
+precision unless the project collected substantially more business context.
+
+## DD-009: Keep the Runtime Dependency-Free
+
+**Status:** Accepted
+
+**Decision:** Runtime parsing, analysis, correlation, and reporting use the
+Python standard library. Development tools remain optional dependencies.
+
+**Why:** A dependency-free runtime is easy to inspect, install, and run in
+restricted teaching or review environments. It also reduces supply-chain and
+versioning surface for a small offline tool.
+
+**Consequences:** Full JSON Schema validation belongs to development and CI;
+runtime models implement focused validation in Python. A proven library should
+still be adopted if future scope makes a standard-library implementation less
+safe or maintainable.
+
+**Alternative not chosen:** Making boto3, pydantic, or a policy engine mandatory
+would add capabilities but also substantial runtime weight not required by the
+current scope.
+
+## DD-010: Preserve Compatibility at the Edges
+
+**Status:** Accepted
+
+**Decision:** The unified CLI is the primary interface, while original analyzer
+scripts and uncataloged custom findings remain supported where their contracts
+are explicit.
+
+**Why:** Version 2 adds engineering structure without making the original lab
+workflows unusable. Compatibility tests make that promise executable.
+
+**Consequences:** Some wrapper code remains. Compatibility does not extend to
+ambiguous unversioned result files, because silently guessing their meaning
+would weaken report integrity.
+
+**Alternative not chosen:** Removing legacy entry points would simplify the
+tree but create unnecessary migration cost for existing users and examples.
+
+## Revisit Triggers
+
+These decisions should be revisited if the project adds:
+
+- A live, authorized collection service
+- Multi-account or organization-wide analysis
+- A proven IAM policy-evaluation engine
+- Raw AWS reachability-analysis parsing
+- Persistent case management or analyst collaboration
+- Business-criticality, ownership, and remediation-workflow data
+
+Those capabilities would change trust boundaries and may justify new
+dependencies, storage, APIs, or deployment architecture.
