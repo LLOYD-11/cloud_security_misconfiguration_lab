@@ -7,7 +7,9 @@ The goal is to provide practical and explainable security findings without requi
 The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, versioned finding, incident, analysis-summary, detection-rule, remediation-plan, and attack-timeline contracts, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
 
 For a technical tour, start with the [system architecture](docs/architecture.md)
-and [version 2.0.0 release notes](docs/release-v2.0.0.md).
+and [version 2.0.0 release notes](docs/release-v2.0.0.md). Upgrade completion is
+tracked against the original M0-M9 plan in the [roadmap](ROADMAP.md) and
+[traceability matrix](docs/traceability.md).
 
 ## Quick Start
 
@@ -306,6 +308,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 ## Project Documentation
 
 - [Upgrade roadmap](ROADMAP.md)
+- [Upgrade traceability](docs/traceability.md)
 - [System architecture](docs/architecture.md)
 - [Design decisions](docs/design-decisions.md)
 - [Version 2.0.0 release notes](docs/release-v2.0.0.md)
@@ -433,16 +436,19 @@ cloud_security_misconfiguration_lab/
 │   ├── README.md
 │   └── test_analyzer.py
 ├── docs/
+│   ├── analysis-coverage.md
 │   ├── attack-timeline.md
 │   ├── architecture.md
 │   ├── data-contracts.md
 │   ├── design-decisions.md
 │   ├── engineering.md
 │   ├── incident-correlation.md
+│   ├── known-limitations.md
 │   ├── native-aws-inputs.md
 │   ├── remediation-prioritization.md
 │   ├── release-v2.0.0.md
-│   └── known-limitations.md
+│   ├── rule-catalog.md
+│   └── traceability.md
 ├── tests/
 │   ├── test_contracts.py
 │   └── test_legacy_clis.py

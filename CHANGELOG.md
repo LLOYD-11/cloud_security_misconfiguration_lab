@@ -4,6 +4,14 @@ All notable changes to this project are documented in this file.
 
 ## Unreleased
 
+### Added
+
+- Requirement-to-evidence traceability for the original M0-M9 upgrade plan.
+
+### Changed
+
+- Restored the original milestone numbering and recorded the remaining v2.1.0 completion scope without changing the immutable v2.0.0 release.
+
 ## 2.0.0 - 2026-07-17
 
 ### Added
