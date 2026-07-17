@@ -15,6 +15,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from cloud_findings import Finding, sort_findings, write_findings
+from cloud_rules import validate_rule_emission
 
 SENSITIVE_ACTIONS = (
     "iam:attachrolepolicy",
@@ -276,6 +277,7 @@ def _add_finding(
     statement_id: str = "",
     extra_metadata: dict[str, str] | None = None,
 ) -> None:
+    validate_rule_emission(rule_id, "iam", severity)
     metadata = dict(extra_metadata or {})
     if policy_name:
         metadata["policy_name"] = policy_name

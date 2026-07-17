@@ -198,6 +198,18 @@ class DataContractTests(unittest.TestCase):
         Draft202012Validator.check_schema(schema)
         Draft202012Validator(schema).validate(payload)
 
+    def test_builtin_rule_catalog_matches_versioned_contract(self):
+        schema = _load_json(
+            PROJECT_ROOT / "schemas/rule-catalog-v1.0.schema.json"
+        )
+        catalog = _load_json(PROJECT_ROOT / "cloud_rules/rules-v1.0.json")
+
+        Draft202012Validator.check_schema(schema)
+        Draft202012Validator(
+            schema,
+            format_checker=FormatChecker(),
+        ).validate(catalog)
+
     def test_generated_incidents_match_shared_contract(self):
         schema = _load_json(PROJECT_ROOT / "schemas/incidents-v1.0.schema.json")
         environment = _load_json(

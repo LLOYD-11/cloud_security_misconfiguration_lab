@@ -27,6 +27,43 @@ Resource counts use `evaluated/discovered`. A partial result means one or more e
 | network | simplified (1 file(s)) | complete | security-group: 4/4 | 0 | 0 | 10 |
 | storage | simplified (1 file(s)) | complete | bucket: 3/3 | 0 | 0 | 9 |
 
+## Triggered Rule Context
+
+Confidence describes how directly the available evidence supports the rule condition. It does not establish malicious intent.
+
+`direct` mappings substantially match the detector condition; `related` mappings provide useful context without claiming equivalent coverage.
+
+| Rule | Catalog Title | Confidence | Finding Severities | Findings | Control Mappings |
+| --- | --- | --- | --- | ---: | --- |
+| `CLD-001` | Root account console login | High | critical | 1 | MITRE ATT&CK Enterprise T1078.004 (related) |
+| `CLD-002` | MFA device was disabled or deleted | High | high | 1 | MITRE ATT&CK Enterprise T1098 (direct) |
+| `CLD-003` | Security group configuration changed | High | medium | 1 | MITRE ATT&CK Enterprise T1578.005 (direct) |
+| `CLD-004` | Bucket access policy changed | High | high | 1 | MITRE ATT&CK Enterprise T1565 (related) |
+| `CLD-005` | IAM policy configuration changed | High | high | 1 | MITRE ATT&CK Enterprise T1098 (direct) |
+| `CLD-006` | Repeated API failures from one actor and source | Medium | medium | 1 | MITRE ATT&CK Enterprise T1110 (related) |
+| `CLD-007` | IAM user console login did not use MFA | High | high | 1 | MITRE ATT&CK Enterprise T1078.004 (related) |
+| `CLD-008` | Persistent cloud credential was created | High | high | 1 | MITRE ATT&CK Enterprise T1098.001 (direct) |
+| `CLD-009` | Role trust policy was changed | High | high | 1 | MITRE ATT&CK Enterprise T1098.003 (direct) |
+| `CLD-010` | Audit or threat-detection control was disabled | High | critical | 1 | MITRE ATT&CK Enterprise T1685 (direct)<br>MITRE ATT&CK Enterprise T1685.002 (related) |
+| `CLD-011` | KMS key was disabled or scheduled for deletion | High | critical | 1 | MITRE ATT&CK Enterprise T1485 (related) |
+| `IAM-001` | Administrator-style wildcard permission | High | critical | 1 | AWS Security Hub CSPM IAM.1 (direct) |
+| `IAM-002` | Wildcard action allowed | High | medium | 1 | AWS Security Hub CSPM IAM.21 (related) |
+| `IAM-003` | Wildcard resource scope | High | medium | 2 | AWS Security Hub CSPM IAM.1 (related) |
+| `IAM-004` | Broad S3 write permission | Medium | high | 1 | MITRE ATT&CK Enterprise T1485 (related) |
+| `IAM-005` | Sensitive action without MFA condition | Medium | medium | 1 | AWS Security Hub CSPM IAM.5 (related) |
+| `IAM-006` | User MFA is disabled | High | medium | 1 | AWS Security Hub CSPM IAM.5 (direct)<br>CIS AWS Foundations Benchmark 1.9 (direct) |
+| `IAM-007` | Long-lived access key | High | medium | 1 | AWS Security Hub CSPM IAM.3 (direct)<br>CIS AWS Foundations Benchmark 1.13 (direct) |
+| `IAM-008` | Broad or external role trust | Medium | high | 1 | MITRE ATT&CK Enterprise T1199 (related) |
+| `NET-001` | Sensitive service port permits public traffic | Medium | critical, high, medium | 7 | AWS Security Hub CSPM EC2.18 (related)<br>AWS Security Hub CSPM EC2.19 (related)<br>AWS Security Hub CSPM EC2.53 (related)<br>AWS Security Hub CSPM EC2.54 (related)<br>CIS AWS Foundations Benchmark 5.3 (related)<br>CIS AWS Foundations Benchmark 5.4 (related) |
+| `NET-002` | All inbound ports permit public traffic | Medium | critical | 1 | AWS Security Hub CSPM EC2.18 (direct)<br>AWS Security Hub CSPM EC2.19 (direct) |
+| `NET-003` | Security group permits unrestricted outbound traffic | Medium | medium | 2 | MITRE ATT&CK Enterprise T1041 (related) |
+| `STO-001` | S3 public access block is incomplete | High | high | 1 | AWS Security Hub CSPM S3.1 (related)<br>AWS Security Hub CSPM S3.8 (direct)<br>CIS AWS Foundations Benchmark 2.1.4 (direct) |
+| `STO-002` | Bucket ACL grants public access | High | critical | 1 | AWS Security Hub CSPM S3.2 (related)<br>AWS Security Hub CSPM S3.3 (related)<br>CIS AWS Foundations Benchmark 2.1.4 (related) |
+| `STO-003` | Bucket policy allows an effectively public principal | Medium | critical | 1 | AWS Security Hub CSPM S3.2 (related)<br>AWS Security Hub CSPM S3.3 (related)<br>AWS Security Hub CSPM S3.8 (direct)<br>CIS AWS Foundations Benchmark 2.1.4 (direct) |
+| `STO-004` | Bucket lacks an explicit encryption configuration | High | low | 2 | AWS Security Hub CSPM S3.17 (related) |
+| `STO-005` | Bucket versioning is not enabled | High | medium | 2 | AWS Security Hub CSPM S3.14 (direct) |
+| `STO-006` | Bucket access control lists remain enabled | High | medium | 2 | AWS Security Hub CSPM S3.12 (direct) |
+
 ## Source Files
 
 The source files below are generated analyzer outputs and are not committed to the repository.

@@ -60,6 +60,10 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 ## Reporting
 
 - Severity values are primarily rule defaults and do not incorporate resource criticality. Network findings make one documented adjustment when supplied context reports `not_reachable`.
+- Rule confidence measures how directly the supplied evidence supports the detector condition. It does not measure the probability that activity is malicious or replace analyst validation.
+- `direct` control mappings indicate substantial condition alignment, not complete framework certification. `related` mappings provide security context and intentionally do not claim equivalent coverage.
+- AWS Security Hub CSPM and MITRE ATT&CK references track their live public pages. CIS mappings are pinned to the AWS-published AWS Foundations Benchmark v5.0.0 crosswalk. CIS v7.0.0 is current as of this release, but control IDs are not inferred where an authoritative public crosswalk is unavailable.
+- The catalog covers the 35 built-in rules. Custom findings remain report-compatible but are labeled not cataloged and receive no automatic control context.
 - Analysis summaries count primary resources evaluated by each module. Skipped evidence can identify narrower unevaluated policy, credential, peer-target, reachability, or event fields without pretending that every evidence unit is a separate cloud resource.
 - `complete` means that no known coverage-affecting gap was recorded for the supplied evidence. It does not prove that collection was authorized, current, account-wide, unfiltered, or free of omissions outside the supported contracts.
 - A report with no findings does not prove that an AWS environment is secure.

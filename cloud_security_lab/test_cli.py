@@ -488,6 +488,44 @@ class UnifiedCliTests(unittest.TestCase):
         self.assertEqual(2, context.exception.code)
         self.assertIn("exactly one JSON file", stderr.getvalue())
 
+    def test_catalog_defaults_to_markdown_stdout(self):
+        stdout = StringIO()
+        with redirect_stdout(stdout):
+            result = main(["catalog", "--module", "network"])
+
+        output = stdout.getvalue()
+        self.assertEqual(0, result)
+        self.assertIn("# Detection Rule Catalog", output)
+        self.assertIn("## Network", output)
+        self.assertIn("`NET-001`", output)
+        self.assertNotIn("`IAM-001`", output)
+
+    def test_catalog_json_filter_has_consistent_count(self):
+        stdout = StringIO()
+        with redirect_stdout(stdout):
+            result = main(
+                ["catalog", "--module", "storage", "--format", "json"]
+            )
+        payload = json.loads(stdout.getvalue())
+
+        self.assertEqual(0, result)
+        self.assertEqual("1.0", payload["schema_version"])
+        self.assertEqual(6, payload["rule_count"])
+        self.assertTrue(
+            all(rule["module"] == "storage" for rule in payload["rules"])
+        )
+
+    def test_catalog_writes_requested_output(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = Path(tmpdir) / "docs" / "catalog.md"
+            with redirect_stdout(StringIO()) as stdout:
+                result = main(["catalog", "--output", str(output_path)])
+            output = output_path.read_text(encoding="utf-8")
+
+        self.assertEqual(0, result)
+        self.assertIn("Rule catalog saved", stdout.getvalue())
+        self.assertIn("### CLD-011", output)
+
 
 if __name__ == "__main__":
     unittest.main()

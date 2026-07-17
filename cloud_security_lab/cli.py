@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 import sysconfig
 from dataclasses import dataclass
@@ -13,6 +14,12 @@ from typing import Any, Callable, Sequence
 from cloud_analysis import AnalysisSummary, SkippedEvidence, write_analysis_summary
 from cloud_findings import Finding, write_findings
 from cloud_incidents import Incident, write_incidents
+from cloud_rules import (
+    MODULE_ORDER,
+    load_builtin_catalog,
+    render_rule_catalog_markdown,
+    rule_catalog_to_dict,
+)
 from cloud_security_lab import __version__
 from cloud_security_lab.analysis import build_analysis_summary
 from cloud_security_lab.normalizers import (
@@ -322,6 +329,22 @@ def _run_report(args: argparse.Namespace) -> int:
     return 0
 
 
+def _run_catalog(args: argparse.Namespace) -> int:
+    catalog = load_builtin_catalog().filtered(args.module)
+    if args.format == "json":
+        content = json.dumps(rule_catalog_to_dict(catalog), indent=2) + "\n"
+    else:
+        content = render_rule_catalog_markdown(catalog)
+
+    if args.output is None:
+        print(content, end="")
+    else:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(content, encoding="utf-8")
+        print(f"Rule catalog saved to {args.output}")
+    return 0
+
+
 def _run_demo(args: argparse.Namespace) -> int:
     finding_paths: list[Path] = []
     incident_paths: list[Path] = []
@@ -490,6 +513,28 @@ def build_parser() -> argparse.ArgumentParser:
     report_parser.add_argument("--output", type=Path, required=True)
     report_parser.add_argument("--report-date", type=_report_date)
     report_parser.set_defaults(handler=_run_report)
+
+    catalog_parser = subparsers.add_parser(
+        "catalog",
+        help="Inspect built-in detection rules and framework mappings.",
+    )
+    catalog_parser.add_argument(
+        "--module",
+        choices=MODULE_ORDER,
+        help="Optional analyzer module filter.",
+    )
+    catalog_parser.add_argument(
+        "--format",
+        choices=("markdown", "json"),
+        default="markdown",
+        help="Catalog output format.",
+    )
+    catalog_parser.add_argument(
+        "--output",
+        type=Path,
+        help="Optional output path. The default is standard output.",
+    )
+    catalog_parser.set_defaults(handler=_run_catalog)
 
     demo_parser = subparsers.add_parser("demo", help="Run all bundled repository samples.")
     demo_parser.add_argument(

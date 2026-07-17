@@ -16,6 +16,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from cloud_findings import Finding, sort_findings, write_findings
+from cloud_rules import validate_rule_emission
 
 REF_AWS_SECURITY_GROUPS = "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html"
 REF_AWS_SECURITY_GROUP_RULES = "https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html"
@@ -569,6 +570,7 @@ def _add_finding(
     references: list[str],
     metadata: dict[str, str] | None = None,
 ) -> None:
+    validate_rule_emission(rule_id, "network", severity)
     findings.append(
         Finding(
             rule_id=rule_id,

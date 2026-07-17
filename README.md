@@ -4,7 +4,7 @@ This project is an offline-first AWS security analysis lab for identifying risky
 
 The goal is to provide practical and explainable security findings without requiring cloud credentials or making changes to a live AWS account.
 
-The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, versioned finding, incident, and analysis-summary contracts, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
+The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, versioned finding, incident, analysis-summary, and detection-rule contracts, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10 and 3.13.
 
 ## Quick Start
 
@@ -85,6 +85,11 @@ All analyzers should emit the same finding schema:
 | `remediation` | Recommended fix |
 | `references` | Optional reference links |
 | `metadata` | Optional module-specific details |
+
+The report validates each built-in finding's rule, module, and severity against
+the versioned [detection rule catalog](docs/rule-catalog.md), then summarizes
+triggered rule confidence and qualified control mappings. Unknown custom rule
+IDs remain report-compatible and are marked as not cataloged.
 
 ### Module 3: Storage Exposure Analyzer
 
@@ -237,6 +242,19 @@ python3 -m cloud_security_lab analyze cloudtrail \
   --summary-output reports/generated/cloudtrail_analysis_summary.json
 ```
 
+Inspect the complete built-in rule catalog or filter it by analyzer:
+
+```bash
+python3 -m cloud_security_lab catalog
+python3 -m cloud_security_lab catalog --module storage --format json
+```
+
+The catalog records each rule's allowed severities, evidence-to-rule confidence,
+confidence basis, and `direct` or `related` mappings to AWS Security Hub CSPM,
+MITRE ATT&CK, and a verified CIS AWS Foundations Benchmark crosswalk. The
+committed [catalog reference](docs/rule-catalog.md) is generated from the same
+JSON used by the analyzers and report generator.
+
 Merge one or more versioned finding files:
 
 ```bash
@@ -254,7 +272,9 @@ python3 -m cloud_security_lab report \
   --output reports/generated/cloud_security_report.md
 ```
 
-The installed `cloud-security-lab` command exposes the same `analyze`, `report`, and `demo` subcommands. The explicit report date makes sample output reproducible; omit `--report-date` to use the current local date.
+The installed `cloud-security-lab` command exposes the same `analyze`, `report`,
+`catalog`, and `demo` subcommands. The explicit report date makes sample output
+reproducible; omit `--report-date` to use the current local date.
 
 ## Compatibility Entrypoints
 
@@ -271,6 +291,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 
 - [Upgrade roadmap](ROADMAP.md)
 - [Data contracts](docs/data-contracts.md)
+- [Detection rule catalog](docs/rule-catalog.md)
 - [Analysis coverage](docs/analysis-coverage.md)
 - [Native AWS inputs](docs/native-aws-inputs.md)
 - [Engineering checks](docs/engineering.md)

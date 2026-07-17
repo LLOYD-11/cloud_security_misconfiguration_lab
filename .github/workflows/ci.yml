@@ -39,7 +39,7 @@ jobs:
 
       - name: Type check
         run: >-
-          mypy cloud_analysis cloud_security_lab cloud_findings cloud_incidents
+          mypy cloud_analysis cloud_security_lab cloud_findings cloud_incidents cloud_rules
           iam_analyzer storage_analyzer
           network_analyzer cloudtrail_detector report_generator
 
@@ -50,6 +50,12 @@ jobs:
         run: >-
           python -m cloud_security_lab demo --report-date 2026-06-30 &&
           cmp reports/cloud_security_report_sample.md reports/generated/cloud_security_report.md
+
+      - name: Verify deterministic rule catalog documentation
+        run: >-
+          python -m cloud_security_lab catalog
+          --output reports/generated/rule_catalog.md &&
+          cmp docs/rule-catalog.md reports/generated/rule_catalog.md
 
       - name: Verify native IAM input pipeline
         run: >-
@@ -95,3 +101,11 @@ jobs:
       - name: Build wheel and source distribution
         if: matrix.python-version == '3.13'
         run: python -m build
+
+      - name: Verify wheel contains the rule catalog
+        if: matrix.python-version == '3.13'
+        run: >-
+          python -c "import glob, zipfile;
+          wheel = glob.glob('dist/*.whl')[0];
+          assert 'cloud_rules/rules-v1.0.json'
+          in zipfile.ZipFile(wheel).namelist()"

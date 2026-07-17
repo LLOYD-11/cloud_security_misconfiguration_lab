@@ -16,6 +16,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from cloud_analysis import AnalysisSummary, load_analysis_summary_file
 from cloud_findings import Finding, load_findings_file, sort_findings
 from cloud_incidents import Incident, load_incidents_file, sort_incidents
+from cloud_rules import load_builtin_catalog, validate_rule_emission
 
 SEVERITY_ORDER = ("critical", "high", "medium", "low", "info")
 
@@ -64,6 +65,73 @@ def _severity_counts(findings: Iterable[Finding]) -> Counter[str]:
 
 def _module_counts(findings: Iterable[Finding]) -> Counter[str]:
     return Counter(finding.module for finding in findings)
+
+
+def _validate_rule_context(findings: Iterable[Finding]) -> None:
+    for finding in findings:
+        validate_rule_emission(
+            finding.rule_id,
+            finding.module,
+            finding.severity,
+            require_known=False,
+        )
+
+
+def _triggered_rule_context(findings: Iterable[Finding]) -> list[str]:
+    grouped: dict[str, list[Finding]] = defaultdict(list)
+    for finding in findings:
+        grouped[finding.rule_id].append(finding)
+
+    if not grouped:
+        return []
+
+    catalog = load_builtin_catalog()
+    frameworks = {framework.id: framework for framework in catalog.frameworks}
+    lines = [
+        "",
+        "## Triggered Rule Context",
+        "",
+        (
+            "Confidence describes how directly the available evidence supports the "
+            "rule condition. It does not establish malicious intent."
+        ),
+        "",
+        (
+            "`direct` mappings substantially match the detector condition; `related` "
+            "mappings provide useful context without claiming equivalent coverage."
+        ),
+        "",
+        (
+            "| Rule | Catalog Title | Confidence | Finding Severities | "
+            "Findings | Control Mappings |"
+        ),
+        "| --- | --- | --- | --- | ---: | --- |",
+    ]
+    for rule_id, rule_findings in sorted(grouped.items()):
+        rule = catalog.get(rule_id)
+        severity_set = {finding.severity for finding in rule_findings}
+        severities = ", ".join(
+            severity for severity in SEVERITY_ORDER if severity in severity_set
+        )
+        if rule is None:
+            title = rule_findings[0].title.replace("|", "\\|")
+            confidence = "Not cataloged"
+            mappings = "Not cataloged"
+        else:
+            title = rule.title.replace("|", "\\|")
+            confidence = rule.confidence.capitalize()
+            mappings = "<br>".join(
+                (
+                    f"{frameworks[mapping.framework].name} "
+                    f"{mapping.control_id} ({mapping.relationship})"
+                )
+                for mapping in rule.mappings
+            )
+        lines.append(
+            f"| `{rule_id}` | {title} | {confidence} | {severities} | "
+            f"{len(rule_findings)} | {mappings} |"
+        )
+    return lines
 
 
 def _severity_label(severity: str) -> str:
@@ -153,6 +221,7 @@ def render_report(
         ),
     )
     _validate_summary_counts(sorted_items, sorted_incidents, sorted_summaries)
+    _validate_rule_context(sorted_items)
 
     lines: list[str] = [
         "# Cloud Security Risk Report",
@@ -247,6 +316,8 @@ def render_report(
 
         for module, count in sorted(module_counts.items()):
             lines.append(f"| {module} | {count} |")
+
+    lines.extend(_triggered_rule_context(sorted_items))
 
     lines.extend(
         [

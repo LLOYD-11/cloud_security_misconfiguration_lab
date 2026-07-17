@@ -15,6 +15,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from cloud_findings import Finding, sort_findings, write_findings
+from cloud_rules import validate_rule_emission
 
 REF_AWS_S3_BLOCK_PUBLIC_ACCESS = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html"
 REF_AWS_S3_ACLS = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/acl-overview.html"
@@ -264,6 +265,7 @@ def _add_finding(
     references: list[str],
     metadata: dict[str, str] | None = None,
 ) -> None:
+    validate_rule_emission(rule_id, "storage", severity)
     findings.append(
         Finding(
             rule_id=rule_id,

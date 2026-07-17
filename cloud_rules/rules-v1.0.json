@@ -1,0 +1,886 @@
+{
+  "schema_version": "1.0",
+  "frameworks": [
+    {
+      "id": "aws-security-hub",
+      "name": "AWS Security Hub CSPM",
+      "version": "live",
+      "source_url": "https://docs.aws.amazon.com/securityhub/latest/userguide/securityhub-controls-reference.html"
+    },
+    {
+      "id": "cis-aws-foundations",
+      "name": "CIS AWS Foundations Benchmark",
+      "version": "5.0.0",
+      "source_url": "https://docs.aws.amazon.com/securityhub/latest/userguide/cis-aws-foundations-benchmark.html"
+    },
+    {
+      "id": "mitre-attack",
+      "name": "MITRE ATT&CK Enterprise",
+      "version": "live",
+      "source_url": "https://attack.mitre.org/"
+    }
+  ],
+  "rule_count": 35,
+  "rules": [
+    {
+      "rule_id": "IAM-001",
+      "module": "iam",
+      "title": "Administrator-style wildcard permission",
+      "summary": "Detects an Allow statement that grants every action against every resource.",
+      "default_severity": "critical",
+      "allowed_severities": ["critical"],
+      "confidence": "high",
+      "confidence_basis": "The analyzer observes an explicit Allow with both Action and Resource set to a full wildcard.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "IAM.1",
+          "title": "IAM policies should not allow full administrative privileges",
+          "relationship": "direct",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-1",
+          "rationale": "Both checks identify customer-managed IAM policy statements that allow all actions on all resources."
+        }
+      ]
+    },
+    {
+      "rule_id": "IAM-002",
+      "module": "iam",
+      "title": "Wildcard action allowed",
+      "summary": "Detects wildcard patterns in allowed IAM actions, including service-wide and partial wildcards.",
+      "default_severity": "medium",
+      "allowed_severities": ["medium", "high"],
+      "confidence": "high",
+      "confidence_basis": "The action pattern is explicit policy evidence; severity rises for full or service-wide wildcards.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "IAM.21",
+          "title": "IAM customer managed policies that you create should not allow wildcard actions for services",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-21",
+          "rationale": "The lab also flags partial wildcard action patterns, so its condition is broader than the Security Hub control."
+        }
+      ]
+    },
+    {
+      "rule_id": "IAM-003",
+      "module": "iam",
+      "title": "Wildcard resource scope",
+      "summary": "Detects allowed actions that apply to every resource.",
+      "default_severity": "medium",
+      "allowed_severities": ["medium"],
+      "confidence": "high",
+      "confidence_basis": "The Resource wildcard is explicit, although some AWS actions do not support resource-level scoping.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "IAM.1",
+          "title": "IAM policies should not allow full administrative privileges",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-1",
+          "rationale": "Wildcard resource scope contributes to administrative breadth, but this rule can trigger without Action being a full wildcard."
+        }
+      ]
+    },
+    {
+      "rule_id": "IAM-004",
+      "module": "iam",
+      "title": "Broad S3 write permission",
+      "summary": "Detects write-capable S3 actions granted across wildcard bucket or object resources.",
+      "default_severity": "high",
+      "allowed_severities": ["high"],
+      "confidence": "medium",
+      "confidence_basis": "The policy grants broad S3 write capability, but effective access can still be reduced by boundaries, resource policies, or explicit denies.",
+      "mappings": [
+        {
+          "framework": "mitre-attack",
+          "control_id": "T1485",
+          "title": "Data Destruction",
+          "relationship": "related",
+          "url": "https://attack.mitre.org/techniques/T1485/",
+          "rationale": "Broad S3 write and delete capability can enable destructive impact, but the rule identifies permission rather than observed destruction."
+        }
+      ]
+    },
+    {
+      "rule_id": "IAM-005",
+      "module": "iam",
+      "title": "Sensitive action without MFA condition",
+      "summary": "Detects privileged user or group permissions that do not require an MFA-present condition.",
+      "default_severity": "medium",
+      "allowed_severities": ["medium"],
+      "confidence": "medium",
+      "confidence_basis": "The statement lacks an MFA condition, but other identity controls or session policies may still require MFA.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "IAM.5",
+          "title": "MFA should be enabled for all IAM users that have a console password",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-5",
+          "rationale": "Both concern MFA protection for IAM users, while this rule evaluates policy conditions rather than credential-report enrollment."
+        }
+      ]
+    },
+    {
+      "rule_id": "IAM-006",
+      "module": "iam",
+      "title": "User MFA is disabled",
+      "summary": "Detects an IAM user with console-password access and no registered MFA device.",
+      "default_severity": "medium",
+      "allowed_severities": ["medium"],
+      "confidence": "high",
+      "confidence_basis": "Credential-report evidence directly states password and MFA status when native AWS input is used.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "IAM.5",
+          "title": "MFA should be enabled for all IAM users that have a console password",
+          "relationship": "direct",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-5",
+          "rationale": "The rule and control evaluate the same console-password and MFA enrollment condition."
+        },
+        {
+          "framework": "cis-aws-foundations",
+          "control_id": "1.9",
+          "title": "Ensure MFA is enabled for all IAM users that have a console password",
+          "relationship": "direct",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/cis-aws-foundations-benchmark.html",
+          "rationale": "The analyzer directly evaluates the credential-report fields used by this benchmark recommendation."
+        }
+      ]
+    },
+    {
+      "rule_id": "IAM-007",
+      "module": "iam",
+      "title": "Long-lived access key",
+      "summary": "Detects an active IAM access key older than the analyzer rotation threshold.",
+      "default_severity": "medium",
+      "allowed_severities": ["medium"],
+      "confidence": "high",
+      "confidence_basis": "The active status and key age are derived directly from credential-report timestamps.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "IAM.3",
+          "title": "IAM users' access keys should be rotated every 90 days or less",
+          "relationship": "direct",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-3",
+          "rationale": "The lab uses the same 90-day rotation threshold as this Security Hub control."
+        },
+        {
+          "framework": "cis-aws-foundations",
+          "control_id": "1.13",
+          "title": "Ensure access keys are rotated every 90 days or less",
+          "relationship": "direct",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/cis-aws-foundations-benchmark.html",
+          "rationale": "The analyzer and benchmark recommendation use the same 90-day access-key rotation threshold."
+        }
+      ]
+    },
+    {
+      "rule_id": "IAM-008",
+      "module": "iam",
+      "title": "Broad or external role trust",
+      "summary": "Detects role trust policies that allow public or cross-account principals, with severity adjusted for recognized guardrails.",
+      "default_severity": "high",
+      "allowed_severities": ["medium", "high", "critical"],
+      "confidence": "medium",
+      "confidence_basis": "The external principal is explicit, but effective assumability also depends on caller permissions, conditions, organization boundaries, and external IDs.",
+      "mappings": [
+        {
+          "framework": "mitre-attack",
+          "control_id": "T1199",
+          "title": "Trusted Relationship",
+          "relationship": "related",
+          "url": "https://attack.mitre.org/techniques/T1199/",
+          "rationale": "Cross-account role trust can expose a trusted access path, but the rule does not establish that an adversary has compromised the trusted party."
+        }
+      ]
+    },
+    {
+      "rule_id": "IAM-009",
+      "module": "iam",
+      "title": "Broad allow uses NotAction",
+      "summary": "Detects Allow statements that grant the complement of an excluded action list.",
+      "default_severity": "medium",
+      "allowed_severities": ["medium", "high"],
+      "confidence": "high",
+      "confidence_basis": "NotAction is explicit policy syntax; severity rises when the statement also applies to every resource.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "IAM.1",
+          "title": "IAM policies should not allow full administrative privileges",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-1",
+          "rationale": "An Allow with NotAction can approach administrative breadth, but it is not necessarily equivalent to allowing every action."
+        }
+      ]
+    },
+    {
+      "rule_id": "IAM-010",
+      "module": "iam",
+      "title": "Broad allow uses NotResource",
+      "summary": "Detects Allow statements that apply to every applicable resource except an exclusion list.",
+      "default_severity": "medium",
+      "allowed_severities": ["medium", "high"],
+      "confidence": "high",
+      "confidence_basis": "NotResource is explicit policy syntax; severity rises for sensitive or wildcard action sets.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "IAM.1",
+          "title": "IAM policies should not allow full administrative privileges",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-1",
+          "rationale": "A broad NotResource allow can undermine least privilege, but it does not always provide full administrative access."
+        }
+      ]
+    },
+    {
+      "rule_id": "IAM-011",
+      "module": "iam",
+      "title": "Stale active access key",
+      "summary": "Detects an active access key that has not been used within the analyzer inactivity threshold.",
+      "default_severity": "medium",
+      "allowed_severities": ["medium"],
+      "confidence": "high",
+      "confidence_basis": "Key status and last-used age come directly from credential-report evidence.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "IAM.22",
+          "title": "Unused IAM user credentials should be removed",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-22",
+          "rationale": "Both detect unused active credentials, but the lab uses a 90-day threshold while the Security Hub parameter can differ."
+        },
+        {
+          "framework": "cis-aws-foundations",
+          "control_id": "1.11",
+          "title": "Ensure credentials unused for 45 days or greater are disabled",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/cis-aws-foundations-benchmark.html",
+          "rationale": "The benchmark uses 45 days, while this analyzer intentionally uses a 90-day inactivity threshold."
+        }
+      ]
+    },
+    {
+      "rule_id": "IAM-012",
+      "module": "iam",
+      "title": "Stale console password",
+      "summary": "Detects an active IAM console password that has not been used within the analyzer inactivity threshold.",
+      "default_severity": "medium",
+      "allowed_severities": ["medium"],
+      "confidence": "high",
+      "confidence_basis": "Password status and last-used age come directly from credential-report evidence.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "IAM.22",
+          "title": "Unused IAM user credentials should be removed",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-22",
+          "rationale": "Both detect unused IAM credentials, but evaluation thresholds and evidence collection can differ."
+        },
+        {
+          "framework": "cis-aws-foundations",
+          "control_id": "1.11",
+          "title": "Ensure credentials unused for 45 days or greater are disabled",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/cis-aws-foundations-benchmark.html",
+          "rationale": "The benchmark uses 45 days, while this analyzer intentionally uses a 90-day inactivity threshold."
+        }
+      ]
+    },
+    {
+      "rule_id": "IAM-013",
+      "module": "iam",
+      "title": "Root account has an active access key",
+      "summary": "Detects an active programmatic access key for the AWS account root user.",
+      "default_severity": "critical",
+      "allowed_severities": ["critical"],
+      "confidence": "high",
+      "confidence_basis": "Credential-report evidence directly identifies active root access-key slots.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "IAM.4",
+          "title": "IAM root user access key should not exist",
+          "relationship": "direct",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-4",
+          "rationale": "The rule and control evaluate the same root access-key condition."
+        },
+        {
+          "framework": "cis-aws-foundations",
+          "control_id": "1.3",
+          "title": "Ensure no access keys are associated with the root user account",
+          "relationship": "direct",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/cis-aws-foundations-benchmark.html",
+          "rationale": "The analyzer directly detects active root access keys from the credential report."
+        }
+      ]
+    },
+    {
+      "rule_id": "IAM-014",
+      "module": "iam",
+      "title": "Root account MFA is disabled",
+      "summary": "Detects an AWS root user with an active console password and no MFA device.",
+      "default_severity": "critical",
+      "allowed_severities": ["critical"],
+      "confidence": "high",
+      "confidence_basis": "Credential-report evidence directly states root password and MFA status.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "IAM.9",
+          "title": "MFA should be enabled for the root user",
+          "relationship": "direct",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-9",
+          "rationale": "The rule and control evaluate the same root MFA condition without claiming hardware-MFA coverage."
+        },
+        {
+          "framework": "cis-aws-foundations",
+          "control_id": "1.4",
+          "title": "Ensure MFA is enabled for the root user account",
+          "relationship": "direct",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/cis-aws-foundations-benchmark.html",
+          "rationale": "The analyzer directly evaluates root MFA enrollment from credential-report evidence."
+        }
+      ]
+    },
+    {
+      "rule_id": "IAM-015",
+      "module": "iam",
+      "title": "Permissions boundary does not constrain access",
+      "summary": "Detects a permissions boundary that itself allows every action against every resource.",
+      "default_severity": "medium",
+      "allowed_severities": ["medium"],
+      "confidence": "high",
+      "confidence_basis": "The boundary document explicitly allows full wildcard access, so it does not lower the maximum permission set.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "IAM.1",
+          "title": "IAM policies should not allow full administrative privileges",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/iam-controls.html#iam-1",
+          "rationale": "The wildcard syntax matches administrative breadth, but a permissions boundary limits rather than directly grants effective permissions."
+        }
+      ]
+    },
+    {
+      "rule_id": "STO-001",
+      "module": "storage",
+      "title": "S3 public access block is incomplete",
+      "summary": "Detects an S3 bucket with one or more Block Public Access controls disabled or missing.",
+      "default_severity": "high",
+      "allowed_severities": ["high"],
+      "confidence": "high",
+      "confidence_basis": "The rule directly evaluates all four bucket-level Block Public Access booleans.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "S3.1",
+          "title": "S3 general purpose buckets should have block public access settings enabled",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-1",
+          "rationale": "Both evaluate S3 Block Public Access, but Security Hub can incorporate account-level settings that this bucket evidence does not model."
+        },
+        {
+          "framework": "aws-security-hub",
+          "control_id": "S3.8",
+          "title": "S3 general purpose buckets should block public access",
+          "relationship": "direct",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-8",
+          "rationale": "The rule checks whether the bucket-level public-access protections required by this control are all enabled."
+        },
+        {
+          "framework": "cis-aws-foundations",
+          "control_id": "2.1.4",
+          "title": "Ensure that S3 Buckets are configured with Block public access",
+          "relationship": "direct",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/cis-aws-foundations-benchmark.html",
+          "rationale": "The analyzer directly evaluates the bucket-level configuration named by this benchmark recommendation."
+        }
+      ]
+    },
+    {
+      "rule_id": "STO-002",
+      "module": "storage",
+      "title": "Bucket ACL grants public access",
+      "summary": "Detects an effective public or broadly authenticated S3 ACL grant.",
+      "default_severity": "critical",
+      "allowed_severities": ["critical"],
+      "confidence": "high",
+      "confidence_basis": "The ACL grantee is explicitly public and the analyzer confirms that ACLs are neither ignored nor disabled by Object Ownership.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "S3.2",
+          "title": "S3 general purpose buckets should block public read access",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-2",
+          "rationale": "A public ACL can grant read access, but this rule also detects other public ACL permissions."
+        },
+        {
+          "framework": "aws-security-hub",
+          "control_id": "S3.3",
+          "title": "S3 general purpose buckets should block public write access",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-3",
+          "rationale": "A public ACL can grant write access, but this rule also detects public read or metadata permissions."
+        },
+        {
+          "framework": "cis-aws-foundations",
+          "control_id": "2.1.4",
+          "title": "Ensure that S3 Buckets are configured with Block public access",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/cis-aws-foundations-benchmark.html",
+          "rationale": "Public ACL exposure is a condition the benchmark's Block Public Access recommendation is intended to prevent."
+        }
+      ]
+    },
+    {
+      "rule_id": "STO-003",
+      "module": "storage",
+      "title": "Bucket policy allows an effectively public principal",
+      "summary": "Detects an S3 bucket-policy Allow whose broad principal lacks an AWS-recognized fixed-value guardrail.",
+      "default_severity": "critical",
+      "allowed_severities": ["critical"],
+      "confidence": "medium",
+      "confidence_basis": "The policy is public under modeled S3 policy rules, but account-level Block Public Access and unmodeled policy context can affect runtime exposure.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "S3.2",
+          "title": "S3 general purpose buckets should block public read access",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-2",
+          "rationale": "A public bucket policy can grant read access, while this rule also covers non-read actions."
+        },
+        {
+          "framework": "aws-security-hub",
+          "control_id": "S3.3",
+          "title": "S3 general purpose buckets should block public write access",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-3",
+          "rationale": "A public bucket policy can grant write access, while this rule also covers non-write actions."
+        },
+        {
+          "framework": "aws-security-hub",
+          "control_id": "S3.8",
+          "title": "S3 general purpose buckets should block public access",
+          "relationship": "direct",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-8",
+          "rationale": "The rule identifies the effective public policy exposure that S3 Block Public Access is designed to prevent."
+        },
+        {
+          "framework": "cis-aws-foundations",
+          "control_id": "2.1.4",
+          "title": "Ensure that S3 Buckets are configured with Block public access",
+          "relationship": "direct",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/cis-aws-foundations-benchmark.html",
+          "rationale": "The detected public policy is directly addressed by enabling and enforcing Block Public Access."
+        }
+      ]
+    },
+    {
+      "rule_id": "STO-004",
+      "module": "storage",
+      "title": "Bucket lacks an explicit encryption configuration",
+      "summary": "Detects the absence of an explicit bucket-level default encryption configuration.",
+      "default_severity": "low",
+      "allowed_severities": ["low"],
+      "confidence": "high",
+      "confidence_basis": "The configuration absence is explicit in the evidence, while the low severity acknowledges S3 baseline SSE-S3 encryption.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "S3.17",
+          "title": "S3 general purpose buckets should be encrypted at rest with AWS KMS keys",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-17",
+          "rationale": "The rule identifies missing explicit encryption configuration but does not require KMS or claim that objects are stored unencrypted."
+        }
+      ]
+    },
+    {
+      "rule_id": "STO-005",
+      "module": "storage",
+      "title": "Bucket versioning is not enabled",
+      "summary": "Detects an S3 bucket whose versioning status is disabled or suspended.",
+      "default_severity": "medium",
+      "allowed_severities": ["medium"],
+      "confidence": "high",
+      "confidence_basis": "The bucket versioning state is directly represented in the normalized evidence.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "S3.14",
+          "title": "S3 general purpose buckets should have versioning enabled",
+          "relationship": "direct",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-14",
+          "rationale": "The rule and control evaluate the same bucket versioning condition."
+        }
+      ]
+    },
+    {
+      "rule_id": "STO-006",
+      "module": "storage",
+      "title": "Bucket access control lists remain enabled",
+      "summary": "Detects an S3 Object Ownership mode that leaves ACL-based access control active.",
+      "default_severity": "medium",
+      "allowed_severities": ["medium"],
+      "confidence": "high",
+      "confidence_basis": "The Object Ownership setting directly determines whether ACLs can affect authorization.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "S3.12",
+          "title": "ACLs should not be used to manage user access to S3 general purpose buckets",
+          "relationship": "direct",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/s3-controls.html#s3-12",
+          "rationale": "The rule detects the ACL-enabled ownership modes that this control recommends replacing with BucketOwnerEnforced."
+        }
+      ]
+    },
+    {
+      "rule_id": "NET-001",
+      "module": "network",
+      "title": "Sensitive service port permits public traffic",
+      "summary": "Detects public IPv4 or IPv6 ingress to cataloged administrative, database, or control-plane service ports.",
+      "default_severity": "high",
+      "allowed_severities": ["medium", "high", "critical"],
+      "confidence": "medium",
+      "confidence_basis": "The security-group source and port are explicit, but end-to-end exposure depends on optional reachability context and attached resources.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "EC2.18",
+          "title": "Security groups should only allow unrestricted incoming traffic for authorized ports",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-18",
+          "rationale": "Both flag unrestricted ingress, while this rule targets a curated sensitive-service catalog and supports broad public CIDRs."
+        },
+        {
+          "framework": "aws-security-hub",
+          "control_id": "EC2.19",
+          "title": "Security groups should not allow unrestricted access to ports with high risk",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-19",
+          "rationale": "The rule covers high-risk ports and additional service categories, with context-sensitive severity."
+        },
+        {
+          "framework": "aws-security-hub",
+          "control_id": "EC2.53",
+          "title": "Security groups should not allow ingress from 0.0.0.0/0 to remote server administration ports",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-53",
+          "rationale": "The rule includes public IPv4 access to SSH and RDP, but also evaluates other sensitive services."
+        },
+        {
+          "framework": "aws-security-hub",
+          "control_id": "EC2.54",
+          "title": "Security groups should not allow ingress from ::/0 to remote server administration ports",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-54",
+          "rationale": "The rule includes public IPv6 access to SSH and RDP, but also evaluates other sensitive services."
+        },
+        {
+          "framework": "cis-aws-foundations",
+          "control_id": "5.3",
+          "title": "Ensure no security groups allow ingress from 0.0.0.0/0 to remote server administration ports",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/cis-aws-foundations-benchmark.html",
+          "rationale": "The analyzer covers the benchmark's IPv4 SSH and RDP cases plus additional public CIDRs and services."
+        },
+        {
+          "framework": "cis-aws-foundations",
+          "control_id": "5.4",
+          "title": "Ensure no security groups allow ingress from ::/0 to remote server administration ports",
+          "relationship": "related",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/cis-aws-foundations-benchmark.html",
+          "rationale": "The analyzer covers the benchmark's IPv6 SSH and RDP cases plus additional public networks and services."
+        }
+      ]
+    },
+    {
+      "rule_id": "NET-002",
+      "module": "network",
+      "title": "All inbound ports permit public traffic",
+      "summary": "Detects a security-group ingress rule that allows every port from a public IPv4 or IPv6 network.",
+      "default_severity": "critical",
+      "allowed_severities": ["high", "critical"],
+      "confidence": "medium",
+      "confidence_basis": "The all-port public rule is explicit, but actual internet reachability depends on routing, attached resources, and optional path evidence.",
+      "mappings": [
+        {
+          "framework": "aws-security-hub",
+          "control_id": "EC2.18",
+          "title": "Security groups should only allow unrestricted incoming traffic for authorized ports",
+          "relationship": "direct",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-18",
+          "rationale": "An all-port public rule is a direct unrestricted-ingress condition."
+        },
+        {
+          "framework": "aws-security-hub",
+          "control_id": "EC2.19",
+          "title": "Security groups should not allow unrestricted access to ports with high risk",
+          "relationship": "direct",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-19",
+          "rationale": "Allowing all ports necessarily includes every high-risk port evaluated by the control."
+        }
+      ]
+    },
+    {
+      "rule_id": "NET-003",
+      "module": "network",
+      "title": "Security group permits unrestricted outbound traffic",
+      "summary": "Detects all-protocol, all-port egress from a security group to a public IPv4 or IPv6 network.",
+      "default_severity": "medium",
+      "allowed_severities": ["low", "medium"],
+      "confidence": "medium",
+      "confidence_basis": "The egress permission is explicit, but an exploitable exfiltration path depends on workload compromise and end-to-end network routing.",
+      "mappings": [
+        {
+          "framework": "mitre-attack",
+          "control_id": "T1041",
+          "title": "Exfiltration Over C2 Channel",
+          "relationship": "related",
+          "url": "https://attack.mitre.org/techniques/T1041/",
+          "rationale": "Unrestricted egress can enable exfiltration or command-and-control traffic, but the rule does not observe data transfer."
+        }
+      ]
+    },
+    {
+      "rule_id": "CLD-001",
+      "module": "cloudtrail",
+      "title": "Root account console login",
+      "summary": "Detects a successful AWS ConsoleLogin event performed by the root identity.",
+      "default_severity": "critical",
+      "allowed_severities": ["critical"],
+      "confidence": "high",
+      "confidence_basis": "CloudTrail explicitly records the successful root identity type and ConsoleLogin event.",
+      "mappings": [
+        {
+          "framework": "mitre-attack",
+          "control_id": "T1078.004",
+          "title": "Valid Accounts: Cloud Accounts",
+          "relationship": "related",
+          "url": "https://attack.mitre.org/techniques/T1078/004/",
+          "rationale": "Root console use can represent use of a valid cloud account, but the event alone does not prove credential compromise."
+        }
+      ]
+    },
+    {
+      "rule_id": "CLD-002",
+      "module": "cloudtrail",
+      "title": "MFA device was disabled or deleted",
+      "summary": "Detects a successful API event that deactivates or deletes an IAM MFA device.",
+      "default_severity": "high",
+      "allowed_severities": ["high"],
+      "confidence": "high",
+      "confidence_basis": "The successful CloudTrail event directly records an MFA defense being removed.",
+      "mappings": [
+        {
+          "framework": "mitre-attack",
+          "control_id": "T1098",
+          "title": "Account Manipulation",
+          "relationship": "direct",
+          "url": "https://attack.mitre.org/techniques/T1098/",
+          "rationale": "Removing MFA changes an account security property in a way that can support persistence or continued access."
+        }
+      ]
+    },
+    {
+      "rule_id": "CLD-003",
+      "module": "cloudtrail",
+      "title": "Security group configuration changed",
+      "summary": "Detects successful CloudTrail events that add, remove, or modify security-group rules.",
+      "default_severity": "medium",
+      "allowed_severities": ["medium"],
+      "confidence": "high",
+      "confidence_basis": "The successful event directly records a cloud network-control modification, though the resulting exposure requires separate analysis.",
+      "mappings": [
+        {
+          "framework": "mitre-attack",
+          "control_id": "T1578.005",
+          "title": "Modify Cloud Compute Configurations",
+          "relationship": "direct",
+          "url": "https://attack.mitre.org/techniques/T1578/005/",
+          "rationale": "Changing security-group rules is a direct modification of cloud compute networking configuration."
+        }
+      ]
+    },
+    {
+      "rule_id": "CLD-004",
+      "module": "cloudtrail",
+      "title": "Bucket access policy changed",
+      "summary": "Detects successful changes to S3 bucket policy or public-access settings.",
+      "default_severity": "high",
+      "allowed_severities": ["high"],
+      "confidence": "high",
+      "confidence_basis": "The successful CloudTrail event directly records an S3 access-control change, while the resulting policy effect requires configuration analysis.",
+      "mappings": [
+        {
+          "framework": "mitre-attack",
+          "control_id": "T1565",
+          "title": "Data Manipulation",
+          "relationship": "related",
+          "url": "https://attack.mitre.org/techniques/T1565/",
+          "rationale": "Changing bucket access policy can enable later data manipulation or exposure, but the event does not itself show data modification."
+        }
+      ]
+    },
+    {
+      "rule_id": "CLD-005",
+      "module": "cloudtrail",
+      "title": "IAM policy configuration changed",
+      "summary": "Detects successful IAM policy creation, attachment, version, or inline-policy changes.",
+      "default_severity": "high",
+      "allowed_severities": ["high"],
+      "confidence": "high",
+      "confidence_basis": "The successful event directly records a permission-policy change, while its privilege impact requires policy-diff analysis.",
+      "mappings": [
+        {
+          "framework": "mitre-attack",
+          "control_id": "T1098",
+          "title": "Account Manipulation",
+          "relationship": "direct",
+          "url": "https://attack.mitre.org/techniques/T1098/",
+          "rationale": "IAM policy changes can alter account or role permissions to support persistence or privilege escalation."
+        }
+      ]
+    },
+    {
+      "rule_id": "CLD-006",
+      "module": "cloudtrail",
+      "title": "Repeated API failures from one actor and source",
+      "summary": "Detects a threshold burst of failed AWS API calls grouped by actor and source IP within a sliding time window.",
+      "default_severity": "medium",
+      "allowed_severities": ["medium"],
+      "confidence": "medium",
+      "confidence_basis": "The failure burst is measured directly, but benign automation errors and permission drift can produce the same pattern.",
+      "mappings": [
+        {
+          "framework": "mitre-attack",
+          "control_id": "T1110",
+          "title": "Brute Force",
+          "relationship": "related",
+          "url": "https://attack.mitre.org/techniques/T1110/",
+          "rationale": "Repeated failures can indicate credential guessing or probing, but the detector also includes non-authentication API errors."
+        }
+      ]
+    },
+    {
+      "rule_id": "CLD-007",
+      "module": "cloudtrail",
+      "title": "IAM user console login did not use MFA",
+      "summary": "Detects a successful IAM-user ConsoleLogin event whose additional event data records MFA as unused.",
+      "default_severity": "high",
+      "allowed_severities": ["high"],
+      "confidence": "high",
+      "confidence_basis": "CloudTrail directly records both the successful IAM-user login and MFAUsed value.",
+      "mappings": [
+        {
+          "framework": "mitre-attack",
+          "control_id": "T1078.004",
+          "title": "Valid Accounts: Cloud Accounts",
+          "relationship": "related",
+          "url": "https://attack.mitre.org/techniques/T1078/004/",
+          "rationale": "A password-only console login can reflect use of a valid cloud account, but the event alone does not establish adversary control."
+        }
+      ]
+    },
+    {
+      "rule_id": "CLD-008",
+      "module": "cloudtrail",
+      "title": "Persistent cloud credential was created",
+      "summary": "Detects successful creation of IAM access keys, login profiles, signing certificates, or service-specific credentials.",
+      "default_severity": "high",
+      "allowed_severities": ["high"],
+      "confidence": "high",
+      "confidence_basis": "The successful event directly records creation of a durable authentication credential.",
+      "mappings": [
+        {
+          "framework": "mitre-attack",
+          "control_id": "T1098.001",
+          "title": "Account Manipulation: Additional Cloud Credentials",
+          "relationship": "direct",
+          "url": "https://attack.mitre.org/techniques/T1098/001/",
+          "rationale": "The event creates an additional credential that can preserve cloud account access."
+        }
+      ]
+    },
+    {
+      "rule_id": "CLD-009",
+      "module": "cloudtrail",
+      "title": "Role trust policy was changed",
+      "summary": "Detects a successful UpdateAssumeRolePolicy event.",
+      "default_severity": "high",
+      "allowed_severities": ["high"],
+      "confidence": "high",
+      "confidence_basis": "The successful event directly records a role trust-policy modification.",
+      "mappings": [
+        {
+          "framework": "mitre-attack",
+          "control_id": "T1098.003",
+          "title": "Account Manipulation: Additional Cloud Roles",
+          "relationship": "direct",
+          "url": "https://attack.mitre.org/techniques/T1098/003/",
+          "rationale": "Changing a role trust relationship can grant a new principal access through the cloud role."
+        }
+      ]
+    },
+    {
+      "rule_id": "CLD-010",
+      "module": "cloudtrail",
+      "title": "Audit or threat-detection control was disabled",
+      "summary": "Detects successful events that stop, delete, or disable CloudTrail, Config, VPC Flow Logs, Security Hub, or GuardDuty controls.",
+      "default_severity": "high",
+      "allowed_severities": ["high", "critical"],
+      "confidence": "high",
+      "confidence_basis": "The successful event directly records a monitoring or detection control being weakened; severity rises for the most disruptive actions.",
+      "mappings": [
+        {
+          "framework": "mitre-attack",
+          "control_id": "T1685",
+          "title": "Disable or Modify Tools",
+          "relationship": "direct",
+          "url": "https://attack.mitre.org/techniques/T1685/",
+          "rationale": "The detector directly observes successful actions that disable cloud logging, monitoring, or threat-detection tooling."
+        },
+        {
+          "framework": "mitre-attack",
+          "control_id": "T1685.002",
+          "title": "Disable or Modify Tools: Disable or Modify Cloud Log",
+          "relationship": "related",
+          "url": "https://attack.mitre.org/techniques/T1685/002/",
+          "rationale": "The sub-technique precisely describes the logging events covered by this broader rule, but not every supported threat-detection event."
+        }
+      ]
+    },
+    {
+      "rule_id": "CLD-011",
+      "module": "cloudtrail",
+      "title": "KMS key was disabled or scheduled for deletion",
+      "summary": "Detects a successful DisableKey or ScheduleKeyDeletion event for an AWS KMS key.",
+      "default_severity": "high",
+      "allowed_severities": ["high", "critical"],
+      "confidence": "high",
+      "confidence_basis": "The successful event directly records KMS key disruption; scheduled deletion raises severity because it can make data unrecoverable.",
+      "mappings": [
+        {
+          "framework": "mitre-attack",
+          "control_id": "T1485",
+          "title": "Data Destruction",
+          "relationship": "related",
+          "url": "https://attack.mitre.org/techniques/T1485/",
+          "rationale": "Disabling or deleting a KMS key can deny access to dependent encrypted data, but impact depends on timing, recovery, and key dependencies."
+        }
+      ]
+    }
+  ]
+}

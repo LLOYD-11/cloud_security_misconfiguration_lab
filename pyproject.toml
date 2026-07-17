@@ -49,12 +49,16 @@ include = [
   "cloud_security_lab*",
   "cloud_findings*",
   "cloud_incidents*",
+  "cloud_rules*",
   "cloudtrail_detector*",
   "iam_analyzer*",
   "network_analyzer*",
   "report_generator*",
   "storage_analyzer*",
 ]
+
+[tool.setuptools.package-data]
+cloud_rules = ["rules-v1.0.json"]
 
 [tool.setuptools.data-files]
 "share/cloud-security-misconfiguration-lab/schemas" = ["schemas/*.json"]
@@ -101,6 +105,7 @@ source = [
   "cloud_security_lab",
   "cloud_findings",
   "cloud_incidents",
+  "cloud_rules",
   "cloudtrail_detector",
   "iam_analyzer",
   "network_analyzer",

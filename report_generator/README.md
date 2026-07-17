@@ -2,7 +2,7 @@
 
 This module generates a Markdown risk report from one or more shared finding JSON files, optional correlated incident files, and optional analysis-summary files.
 
-Finding inputs must use the versioned object written by the analyzers. The loader rejects unsupported schema versions, mismatched `finding_count` values, missing required fields, and unknown severities instead of silently omitting malformed findings.
+Finding inputs must use the versioned object written by the analyzers. The loader rejects unsupported schema versions, mismatched `finding_count` values, missing required fields, and unknown severities instead of silently omitting malformed findings. Known built-in rules are also checked against the versioned catalog for the correct module and allowed severity. Custom rule IDs remain supported and are labeled not cataloged.
 
 Analysis summaries add evaluated and discovered resources, skipped evidence, normalization warnings, input format, and coverage status. The report rejects a summary whose declared finding or incident counts do not match the supplied result files. If any summary is supplied, every module represented by the supplied findings or incidents must have one.
 
@@ -56,7 +56,7 @@ python3 report_generator/generate_report.py \
   --output reports/generated/cloud_security_report.md
 ```
 
-The `--findings`, `--incidents`, and `--analysis-summary` options can be repeated. Incident sections preserve the linked rule IDs, event counts, resources, severity, confidence, and recommended triage actions. Coverage sections distinguish complete, partial, and empty runs without treating zero findings as proof of safety. Use `--report-date YYYY-MM-DD` for deterministic output, or omit it to use the current local date.
+The `--findings`, `--incidents`, and `--analysis-summary` options can be repeated. Incident sections preserve the linked rule IDs, event counts, resources, severity, confidence, and recommended triage actions. Coverage sections distinguish complete, partial, and empty runs without treating zero findings as proof of safety. Triggered-rule context summarizes evidence-to-rule confidence and `direct` or `related` control mappings without presenting them as proof of malicious intent or full framework certification. Use `--report-date YYYY-MM-DD` for deterministic output, or omit it to use the current local date.
 
 ## Test
 

@@ -17,6 +17,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from cloud_findings import Finding, sort_findings, write_findings
 from cloud_incidents import Incident, write_incidents
+from cloud_rules import validate_rule_emission
 from cloudtrail_detector.correlation import (
     DEFAULT_CORRELATION_WINDOW_MINUTES,
     correlate_incidents,
@@ -222,6 +223,7 @@ def _add_finding(
     references: list[str],
     metadata: dict[str, str] | None = None,
 ) -> None:
+    validate_rule_emission(rule_id, "cloudtrail", severity)
     findings.append(
         Finding(
             rule_id=rule_id,

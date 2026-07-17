@@ -35,6 +35,10 @@ All notable changes to this project are documented in this file.
 - A shared incident model, Draft 2020-12 incident schema, report integration, sample attack-chain incidents, and CLI support through `--incidents-output` and `--incidents`.
 - Versioned analysis summaries for input format, analyzer version, resource coverage, skipped evidence, warnings, finding counts, and incident counts.
 - Coverage-aware report sections and CLI support through `--summary-output` and repeatable `--analysis-summary` inputs.
+- A versioned catalog for all 35 built-in rules with allowed severities, evidence-to-rule confidence, confidence rationale, and qualified AWS Security Hub CSPM, CIS AWS Foundations Benchmark, and MITRE ATT&CK mappings.
+- A `catalog` CLI subcommand with module filtering and Markdown or JSON output.
+- Triggered-rule context in consolidated reports, strict built-in rule/module/severity validation, and explicit compatibility for uncataloged custom rules.
+- Catalog schema, completeness, control-mapping, deterministic documentation, and wheel-content gates.
 
 ### Changed
 

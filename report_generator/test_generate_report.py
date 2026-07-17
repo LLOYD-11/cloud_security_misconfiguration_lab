@@ -85,9 +85,66 @@ class ReportGeneratorTests(unittest.TestCase):
         self.assertIn("# Cloud Security Risk Report", report)
         self.assertIn("| High | 1 |", report)
         self.assertIn("| iam | 1 |", report)
+        self.assertIn("## Triggered Rule Context", report)
+        self.assertIn("MITRE ATT&CK Enterprise T1199 (related)", report)
         self.assertIn("#### IAM-008: Cross-account role trust", report)
         self.assertIn("policy_name: trust-policy", report)
         self.assertIn("https://attack.mitre.org/techniques/T1199/", report)
+
+    def test_known_rule_context_rejects_wrong_module_or_severity(self):
+        wrong_module = Finding(
+            rule_id="IAM-001",
+            severity="critical",
+            module="storage",
+            category="test",
+            resource_type="bucket",
+            resource_id="example",
+            title="Wrong module",
+            evidence="Synthetic evidence.",
+            impact="Synthetic impact.",
+            remediation="Synthetic remediation.",
+        )
+        with self.assertRaisesRegex(ValueError, "belongs to module iam"):
+            render_report(
+                [wrong_module],
+                source_files=[],
+                report_date=date(2026, 6, 30),
+            )
+
+        wrong_severity = replace(
+            wrong_module,
+            module="iam",
+            severity="high",
+        )
+        with self.assertRaisesRegex(ValueError, "severity 'high' is not allowed"):
+            render_report(
+                [wrong_severity],
+                source_files=[],
+                report_date=date(2026, 6, 30),
+            )
+
+    def test_custom_rule_remains_report_compatible(self):
+        custom = Finding(
+            rule_id="CUSTOM-001",
+            severity="info",
+            module="custom",
+            category="test",
+            resource_type="fixture",
+            resource_id="example",
+            title="Custom extension rule",
+            evidence="Synthetic evidence.",
+            impact="Synthetic impact.",
+            remediation="Synthetic remediation.",
+        )
+
+        report = render_report(
+            [custom],
+            source_files=[],
+            report_date=date(2026, 6, 30),
+        )
+
+        self.assertIn("`CUSTOM-001`", report)
+        self.assertIn("Not cataloged", report)
 
     def test_analysis_summary_replaces_finding_only_coverage(self):
         finding = Finding(
