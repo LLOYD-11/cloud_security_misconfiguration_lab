@@ -178,6 +178,7 @@ The wheel contains:
 
 - All analyzer, model, CLI, and reporting packages
 - The built-in rule catalog
+- The benchmark runner and committed expectation manifest
 - Versioned JSON Schemas
 - Simplified and AWS-shaped sample evidence
 
@@ -192,9 +193,11 @@ Adding a built-in rule requires:
 1. Implementing the detector condition in the owning analyzer.
 2. Registering the rule, allowed severities, confidence basis, and qualified
    mappings in `cloud_rules/rules-v1.0.json`.
-3. Adding positive, negative, boundary, and rule-interaction tests.
+3. Adding positive, negative, boundary, malformed, and rule-interaction tests.
 4. Updating sample evidence only when the sample narrative benefits.
-5. Regenerating the catalog and deterministic report.
+5. Adding the rule-specific positive and boundary benchmark profiles.
+6. Regenerating and reviewing the catalog, benchmark manifest, and
+   deterministic report.
 
 Adding a new analyzer also requires a canonical input contract, a shared
 finding output, analysis-summary coverage rules, CLI registration, packaging,

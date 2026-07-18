@@ -106,15 +106,15 @@ Status: Complete in `v2.0.0`.
 
 ## M8: Tests, Benchmark, Performance, and Fault Tolerance
 
-Status: In progress; completion is planned for `v2.1.0`.
+Status: Complete for `v2.1.0`.
 
 - [x] Build broad unit, contract, schema, CLI, native-adapter, integration, malformed-input, duplicate-input, and deterministic-output coverage.
 - [x] Run branch-enabled coverage and enforce the current CI quality gate.
-- [ ] Publish a machine-readable benchmark manifest with exact expected findings for curated positive, negative, boundary, and malformed cases.
-- [ ] Document false-positive rationale and intentionally unsupported evidence for benchmark cases.
-- [ ] Add defined small and large corpora with repeatable runtime and memory measurements.
-- [ ] Add performance and fault-tolerance acceptance budgets to CI without introducing unstable wall-clock tests.
-- [ ] Record separate line and branch coverage results against the original 90% and 85% targets.
+- [x] Publish a machine-readable benchmark manifest with exact expected findings for curated positive, negative, boundary, and malformed cases.
+- [x] Document false-positive rationale and intentionally unsupported evidence for benchmark cases.
+- [x] Add defined small and large corpora with repeatable runtime and memory measurements.
+- [x] Add performance and fault-tolerance acceptance budgets to CI without introducing unstable wall-clock tests.
+- [x] Record separate line and branch coverage results against the original 90% and 85% targets.
 
 ## M9: GitHub Application Presentation and Final v2 Release
 
@@ -134,7 +134,7 @@ Status: In progress; `v2.0.0` is the release checkpoint and `v2.1.0` is the comp
 1. **C0 - Governance:** restore M0-M9 and add requirement-to-evidence traceability.
 2. **C1 - Provenance (complete):** complete M2 and M3 finding provenance, contract migration, Python 3.12 CI, and fixture manifests.
 3. **C2 - Detection performance (complete):** complete the M6 failure-window optimization and equivalence tests.
-4. **C3 - Benchmarking:** complete M8 benchmark, scale, resilience, and coverage evidence.
+4. **C3 - Benchmarking (complete):** complete M8 benchmark, scale, resilience, and coverage evidence.
 5. **C4 - Portfolio presentation:** complete the remaining M9 README, visual, and repository-metadata work.
 6. **C5 - Release:** run the full release gate and publish `v2.1.0`.
 

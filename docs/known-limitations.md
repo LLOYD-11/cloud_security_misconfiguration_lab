@@ -82,3 +82,17 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 - Analysis summaries count primary resources evaluated by each module. Skipped evidence can identify narrower unevaluated policy, credential, peer-target, reachability, or event fields without pretending that every evidence unit is a separate cloud resource.
 - `complete` means that no known coverage-affecting gap was recorded for the supplied evidence. It does not prove that collection was authorized, current, account-wide, unfiltered, or free of omissions outside the supported contracts.
 - A report with no findings does not prove that an AWS environment is secure.
+
+## Benchmarking
+
+- Benchmark profiles are synthetic and intentionally isolate documented
+  conditions. They do not estimate false-positive rates in real AWS accounts or
+  represent every policy, topology, workload, and user-behavior interaction.
+- Runtime measurements are hardware and load dependent, so elapsed time is
+  recorded but not used as a CI acceptance threshold.
+- Peak-memory budgets use `tracemalloc` around analyzer execution after input
+  construction. They bound traced Python allocations for the measured pass, not
+  total process RSS, fixture construction cost, or operating-system memory.
+- The large profiles exercise up to 10,000 inputs in memory. Passing them is not
+  a claim that arbitrary production-scale exports can be processed without
+  separate capacity testing.

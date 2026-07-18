@@ -46,6 +46,7 @@ version = { attr = "cloud_security_lab.__version__" }
 [tool.setuptools.packages.find]
 include = [
   "cloud_analysis*",
+  "cloud_benchmarks*",
   "cloud_security_lab*",
   "cloud_findings*",
   "cloud_incidents*",
@@ -60,6 +61,7 @@ include = [
 ]
 
 [tool.setuptools.package-data]
+cloud_benchmarks = ["benchmark-manifest-v1.0.json"]
 cloud_rules = ["rules-v1.0.json"]
 
 [tool.setuptools.data-files]
@@ -107,6 +109,7 @@ warn_unused_ignores = true
 branch = true
 source = [
   "cloud_analysis",
+  "cloud_benchmarks",
   "cloud_security_lab",
   "cloud_findings",
   "cloud_incidents",

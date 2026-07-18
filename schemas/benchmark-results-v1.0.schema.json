@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/schemas/benchmark-results-v1.0.schema.json",
+  "title": "Cloud Security Benchmark Results v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "benchmark_manifest_version",
+    "functional_case_count",
+    "functional_passed_count",
+    "malformed_case_count",
+    "malformed_rejected_count",
+    "scale_case_count",
+    "scale_passed_count",
+    "passed",
+    "functional_results",
+    "scale_results"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "benchmark_manifest_version": { "const": "1.0" },
+    "functional_case_count": { "type": "integer", "minimum": 0 },
+    "functional_passed_count": { "type": "integer", "minimum": 0 },
+    "malformed_case_count": { "type": "integer", "minimum": 0 },
+    "malformed_rejected_count": { "type": "integer", "minimum": 0 },
+    "scale_case_count": { "type": "integer", "minimum": 0 },
+    "scale_passed_count": { "type": "integer", "minimum": 0 },
+    "passed": { "type": "boolean" },
+    "functional_results": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/functionalResult" }
+    },
+    "scale_results": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/scaleResult" }
+    }
+  },
+  "$defs": {
+    "ruleCounts": {
+      "type": "object",
+      "patternProperties": {
+        "^(IAM|STO|NET|CLD)-[0-9]{3}$": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "functionalResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "passed", "message"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "passed": { "type": "boolean" },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "scaleResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "module",
+        "size",
+        "input_count",
+        "finding_count",
+        "rule_counts",
+        "finding_amplification",
+        "elapsed_seconds",
+        "peak_memory_bytes",
+        "deterministic",
+        "passed",
+        "message"
+      ],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "module": {
+          "enum": ["iam", "storage", "network", "cloudtrail"]
+        },
+        "size": { "enum": ["small", "large"] },
+        "input_count": { "type": "integer", "minimum": 1 },
+        "finding_count": { "type": "integer", "minimum": 0 },
+        "rule_counts": { "$ref": "#/$defs/ruleCounts" },
+        "finding_amplification": {
+          "type": "number",
+          "minimum": 0
+        },
+        "elapsed_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "peak_memory_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "deterministic": { "type": "boolean" },
+        "passed": { "type": "boolean" },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

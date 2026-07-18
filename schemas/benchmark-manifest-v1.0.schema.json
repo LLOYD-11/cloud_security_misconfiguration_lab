@@ -1,0 +1,240 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/schemas/benchmark-manifest-v1.0.schema.json",
+  "title": "Cloud Security Benchmark Manifest v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "catalog_schema_version",
+    "rule_count",
+    "case_count",
+    "scale_case_count",
+    "acceptance_budgets",
+    "cases",
+    "rule_coverage",
+    "scale_cases"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "catalog_schema_version": { "const": "1.0" },
+    "rule_count": { "type": "integer", "minimum": 1 },
+    "case_count": { "type": "integer", "minimum": 1 },
+    "scale_case_count": { "type": "integer", "minimum": 1 },
+    "acceptance_budgets": { "$ref": "#/$defs/acceptanceBudgets" },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/case" }
+    },
+    "rule_coverage": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/ruleCoverage" }
+    },
+    "scale_cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/scaleCase" }
+    }
+  },
+  "$defs": {
+    "module": {
+      "enum": ["iam", "storage", "network", "cloudtrail"]
+    },
+    "ruleId": {
+      "type": "string",
+      "pattern": "^(IAM|STO|NET|CLD)-[0-9]{3}$"
+    },
+    "acceptanceBudgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minimum_statement_coverage_percent",
+        "minimum_branch_coverage_percent",
+        "required_functional_pass_rate",
+        "required_malformed_rejection_rate",
+        "require_scale_determinism",
+        "wall_clock_gate_enabled"
+      ],
+      "properties": {
+        "minimum_statement_coverage_percent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "minimum_branch_coverage_percent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "required_functional_pass_rate": {
+          "const": 1.0
+        },
+        "required_malformed_rejection_rate": {
+          "const": 1.0
+        },
+        "require_scale_determinism": { "const": true },
+        "wall_clock_gate_enabled": { "const": false }
+      }
+    },
+    "findingSignature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "severity",
+        "resource_type",
+        "resource_id",
+        "count"
+      ],
+      "properties": {
+        "rule_id": { "$ref": "#/$defs/ruleId" },
+        "severity": {
+          "enum": ["critical", "high", "medium", "low", "info"]
+        },
+        "resource_type": { "type": "string", "minLength": 1 },
+        "resource_id": { "type": "string", "minLength": 1 },
+        "count": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "expectedError": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "message"],
+      "properties": {
+        "type": { "const": "ValueError" },
+        "message": { "type": "string", "minLength": 1 }
+      }
+    },
+    "case": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "module",
+        "classification",
+        "profile",
+        "covers_rules",
+        "description",
+        "false_positive_rationale",
+        "unsupported_evidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*$"
+        },
+        "module": { "$ref": "#/$defs/module" },
+        "classification": {
+          "enum": ["positive", "negative", "boundary", "malformed"]
+        },
+        "profile": {
+          "type": "string",
+          "pattern": "^(rule:(IAM|STO|NET|CLD)-[0-9]{3}:(positive|boundary)|module:(iam|storage|network|cloudtrail):(negative|malformed))$"
+        },
+        "covers_rules": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/ruleId" }
+        },
+        "description": { "type": "string", "minLength": 1 },
+        "expected_findings": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/findingSignature" }
+        },
+        "expected_error": { "$ref": "#/$defs/expectedError" },
+        "false_positive_rationale": { "type": "string", "minLength": 1 },
+        "unsupported_evidence": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      },
+      "oneOf": [
+        {
+          "required": ["expected_findings"],
+          "not": { "required": ["expected_error"] }
+        },
+        {
+          "required": ["expected_error"],
+          "not": { "required": ["expected_findings"] }
+        }
+      ]
+    },
+    "ruleCoverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "module",
+        "positive_case",
+        "negative_case",
+        "boundary_case",
+        "malformed_case"
+      ],
+      "properties": {
+        "rule_id": { "$ref": "#/$defs/ruleId" },
+        "module": { "$ref": "#/$defs/module" },
+        "positive_case": { "type": "string", "minLength": 1 },
+        "negative_case": { "type": "string", "minLength": 1 },
+        "boundary_case": { "type": "string", "minLength": 1 },
+        "malformed_case": { "type": "string", "minLength": 1 }
+      }
+    },
+    "ruleCounts": {
+      "type": "object",
+      "minProperties": 1,
+      "patternProperties": {
+        "^(IAM|STO|NET|CLD)-[0-9]{3}$": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "scaleCase": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "module",
+        "size",
+        "input_count",
+        "expected_finding_count",
+        "expected_rule_counts",
+        "max_findings_per_input",
+        "max_peak_memory_bytes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^(iam|storage|network|cloudtrail)-(small|large)$"
+        },
+        "module": { "$ref": "#/$defs/module" },
+        "size": { "enum": ["small", "large"] },
+        "input_count": {
+          "type": "integer",
+          "minimum": 10,
+          "multipleOf": 10
+        },
+        "expected_finding_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "expected_rule_counts": { "$ref": "#/$defs/ruleCounts" },
+        "max_findings_per_input": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "max_peak_memory_bytes": {
+          "type": "integer",
+          "minimum": 1048576
+        }
+      }
+    }
+  }
+}

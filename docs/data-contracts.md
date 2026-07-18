@@ -21,8 +21,10 @@ The repository publishes versioned JSON Schema contracts for its simplified offl
 | Correlated incidents file | [`incidents-v1.0.schema.json`](../schemas/incidents-v1.0.schema.json) |
 | Prioritized remediation plan | [`remediation-plan-v1.0.schema.json`](../schemas/remediation-plan-v1.0.schema.json) |
 | Attack timeline | [`attack-timeline-v1.0.schema.json`](../schemas/attack-timeline-v1.0.schema.json) |
+| Benchmark manifest | [`benchmark-manifest-v1.0.schema.json`](../schemas/benchmark-manifest-v1.0.schema.json) |
+| Benchmark results | [`benchmark-results-v1.0.schema.json`](../schemas/benchmark-results-v1.0.schema.json) |
 
-The schemas use JSON Schema Draft 2020-12. Contract tests validate every committed sample, the built-in rule catalog, and analyzer-generated findings, incident, analysis-summary, remediation-plan, and attack-timeline files against these schemas.
+The schemas use JSON Schema Draft 2020-12. Contract tests validate every committed sample, the built-in rule catalog, the benchmark manifest, and analyzer-generated findings, incident, analysis-summary, remediation-plan, attack-timeline, and benchmark-result files against these schemas.
 
 The environment contracts describe the lab's simplified analyzer models. The native IAM contract describes the fields consumed from a non-truncated AWS `GetAccountAuthorizationDetails` snapshot; the accompanying credential report follows AWS's CSV contract and is validated by required headers and values in Python. Its normalized contract preserves root credentials, console-password usage, group membership, direct policy origin, and permissions-boundary context without treating a boundary as a grant. The S3 bundle contract groups multiple native account and per-bucket responses, including Object Ownership, without flattening collection errors into configuration values. Its normalized contract preserves positive and negative policy elements plus condition context so public-access evaluation does not reduce a policy to its principal alone. The EC2 contract represents a complete direct `DescribeSecurityGroups` response; its adapter flattens permission targets while retaining CIDR, prefix-list, and security-group peer context in the network environment. The optional reachability contract carries separately obtained, direction-specific path conclusions with scope, method, timestamp, evidence, and related resource IDs; it is an assessor attestation rather than a raw AWS API response. The CloudTrail contract describes supported `Records` entries before multiple JSON or gzip files are merged and deduplicated. All normalizers convert native evidence into versioned analyzer environments, keeping the detection interface stable.
 
@@ -69,6 +71,14 @@ contract, authoritative shape references, synthetic origin, account and Region
 scope, observation range, sanitization, expected rule coverage, and SHA-256 for
 every bundled AWS-shaped file. Contract tests require the manifest inventory to
 exactly match the files under `sample_data/aws/` and verify every digest.
+
+The benchmark manifest records exact positive and boundary expectations for
+every built-in rule, module-level hardened and malformed evidence, false-positive
+rationale, unsupported evidence, a rule-to-case matrix, separate coverage
+thresholds, and deterministic scale budgets. The benchmark-result contract
+records functional and malformed case outcomes plus scale counts, amplification,
+elapsed time, traced peak memory, and repeated-run determinism. See
+[Benchmarking and resilience](benchmarking.md).
 
 The canonical [`rules-v1.0.json`](../cloud_rules/rules-v1.0.json) catalog adds
 cross-field checks for unique and deterministically ordered rule IDs, module

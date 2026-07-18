@@ -44,13 +44,24 @@ jobs:
 
       - name: Type check
         run: >-
-          mypy cloud_analysis cloud_security_lab cloud_findings cloud_incidents
-          cloud_remediation cloud_rules cloud_timeline
+          mypy cloud_analysis cloud_benchmarks cloud_security_lab cloud_findings
+          cloud_incidents cloud_remediation cloud_rules cloud_timeline
           iam_analyzer storage_analyzer
           network_analyzer cloudtrail_detector report_generator
 
       - name: Test with branch coverage
-        run: coverage run -m unittest discover && coverage report
+        run: >-
+          mkdir -p reports/generated &&
+          coverage run -m unittest discover &&
+          coverage report &&
+          coverage json -o reports/generated/coverage.json &&
+          python -m cloud_benchmarks.coverage_gate
+          reports/generated/coverage.json
+
+      - name: Verify functional, fault-tolerance, and scale benchmarks
+        run: >-
+          python -m cloud_benchmarks.runner
+          --output reports/generated/benchmark_results.json
 
       - name: Verify deterministic artifacts
         run: >-
@@ -73,9 +84,16 @@ jobs:
           /tmp/cloud-security-release/bin/cloud-security-lab
           demo --report-date 2026-06-30
           --output-dir cloud-security-release-output &&
+          /tmp/cloud-security-release/bin/python -m cloud_benchmarks.runner
+          --skip-scale
+          --output cloud-security-release-output/benchmark_results.json &&
           /tmp/cloud-security-release/bin/python -c
           "import json, pathlib;
           output = pathlib.Path('/tmp/cloud-security-release-output');
+          benchmark = json.loads(
+          (output / 'benchmark_results.json').read_text());
+          assert benchmark['functional_passed_count'] == 78;
+          assert benchmark['malformed_rejected_count'] == 4;
           timeline = json.loads((output / 'attack_timeline.json').read_text());
           assert timeline['entry_count'] == 11;
           assert timeline['omission_count'] == 0;

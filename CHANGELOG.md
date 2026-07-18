@@ -18,6 +18,14 @@ All notable changes to this project are documented in this file.
 - Python 3.12 CI coverage between the supported 3.10 and 3.13 endpoints.
 - Exact old/new CloudTrail failure-window equivalence tests, explicit boundary
   cases, and a deterministic 10,000-point structural operation bound.
+- A versioned benchmark manifest mapping all 35 rules to positive, boundary,
+  hardened-negative, and native-malformed evidence with exact expectations,
+  false-positive rationale, and unsupported-evidence declarations.
+- Deterministic small and large scale corpora, machine-readable benchmark
+  results, calibrated memory and amplification budgets, and published reference
+  measurements.
+- Independent 90% statement and 85% branch coverage gates backed by
+  machine-readable coverage evidence.
 
 ### Changed
 
@@ -29,6 +37,8 @@ All notable changes to this project are documented in this file.
   boundaries separate when multi-account evidence is supplied.
 - CloudTrail failure-spike detection now uses a monotonic bounded-window scan
   after per-group sorting instead of repeatedly rescanning ordered suffixes.
+- CI now runs the complete functional, fault-tolerance, and scale benchmark
+  suite across Python 3.10, 3.12, and 3.13 without an unstable wall-clock gate.
 
 ## 2.0.0 - 2026-07-17
 

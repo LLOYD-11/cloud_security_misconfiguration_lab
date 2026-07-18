@@ -113,12 +113,12 @@ The canonical plan is [ROADMAP.md](../ROADMAP.md). `v2.0.0` at commit
 
 | ID | Requirement | Status | Evidence or Remaining Work |
 | --- | --- | --- | --- |
-| M8-R1 | Cover every rule with positive, negative, boundary, and malformed cases. | Partial | The v2.0 checkpoint contains 268 test methods and broad rule coverage, but no machine-readable matrix proves all four case classes for every rule. |
+| M8-R1 | Cover every rule with positive, negative, boundary, and malformed cases. | Complete | The [benchmark manifest](../cloud_benchmarks/benchmark-manifest-v1.0.json) maps all 35 rules to positive, boundary, hardened-negative, and native-malformed cases; contract tests verify the complete matrix. |
 | M8-R2 | Verify native fixtures, CLI, schemas, golden output, and integration. | Complete | Normalizer tests, CLI tests, contract tests, legacy CLI tests, and deterministic demo comparison in CI. |
 | M8-R3 | Verify duplicate, invalid, incomplete, and deterministic behavior. | Complete | Analysis-summary, normalizer, finding, incident, remediation, timeline, and report tests. |
-| M8-R4 | Verify large-input behavior and define performance budgets. | Open | Add repeatable corpora, measurements, and stable acceptance budgets after the M6 optimization. |
-| M8-R5 | Demonstrate at least 90% line and 85% branch coverage. | Partial | Branch coverage is enabled and CI enforces an 85% combined gate. Separate line and branch results still need to be recorded against the original targets. |
-| M8-R6 | Publish exact benchmark expectations and false-positive rationale. | Open | Add a benchmark manifest and accompanying methodology. |
+| M8-R4 | Verify large-input behavior and define performance budgets. | Complete | Eight deterministic scale profiles exercise 100 to 10,000 inputs with exact counts, 0.10 amplification ceilings, repeated-output equality, 16/64 MiB traced-memory budgets, CI execution, and published [measurements](benchmarking.md). |
+| M8-R5 | Demonstrate at least 90% line and 85% branch coverage. | Complete | The independent coverage gate records 4,477/4,703 statements (95.19%) and 1,694/1,900 branches (89.16%); see [benchmarking](benchmarking.md) and [engineering checks](engineering.md). |
+| M8-R6 | Publish exact benchmark expectations and false-positive rationale. | Complete | The versioned [manifest](../cloud_benchmarks/benchmark-manifest-v1.0.json), [schemas](data-contracts.md), and [methodology](benchmarking.md) publish exact signatures, false-positive rationale, unsupported evidence, and fail-closed error contracts. |
 
 ## M9: GitHub Application Presentation and Final v2 Release
 

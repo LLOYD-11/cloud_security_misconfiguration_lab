@@ -4,7 +4,7 @@ This project is an offline-first AWS security analysis lab for identifying risky
 
 The goal is to provide practical and explainable security findings without requiring cloud credentials or making changes to a live AWS account.
 
-The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, versioned finding, incident, analysis-summary, detection-rule, remediation-plan, and attack-timeline contracts, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10, 3.12, and 3.13.
+The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, versioned finding, incident, analysis-summary, detection-rule, remediation-plan, attack-timeline, and benchmark contracts, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10, 3.12, and 3.13.
 
 For a technical tour, start with the [system architecture](docs/architecture.md)
 and [version 2.0.0 release notes](docs/release-v2.0.0.md). Upgrade completion is
@@ -338,6 +338,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [Analysis coverage](docs/analysis-coverage.md)
 - [Native AWS inputs](docs/native-aws-inputs.md)
 - [CloudTrail failure-window performance](docs/detection-performance.md)
+- [Benchmarking and resilience](docs/benchmarking.md)
 - [Engineering checks](docs/engineering.md)
 - [Known limitations](docs/known-limitations.md)
 - [Change log](CHANGELOG.md)
@@ -355,15 +356,21 @@ Development and contract checks use optional tools declared in `pyproject.toml`:
 ## Quality Checks
 
 ```bash
+mkdir -p reports/generated
 .venv/bin/ruff check .
-.venv/bin/mypy cloud_analysis cloud_security_lab cloud_findings cloud_incidents cloud_remediation cloud_rules cloud_timeline iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
+.venv/bin/mypy cloud_analysis cloud_benchmarks cloud_security_lab cloud_findings cloud_incidents cloud_remediation cloud_rules cloud_timeline iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
+.venv/bin/coverage json -o reports/generated/coverage.json
+.venv/bin/python -m cloud_benchmarks.coverage_gate reports/generated/coverage.json
+.venv/bin/python -m cloud_benchmarks.runner
 ```
 
-The coverage gate is 85% with branch coverage enabled. GitHub Actions runs the
-quality and deterministic pipeline on Python 3.10, 3.12, and 3.13, and builds
-the distributions on Python 3.13.
+The benchmark gate covers all 35 built-in rules through 78 exact functional
+cases plus eight deterministic scale profiles. Coverage is enforced separately
+at 90% for statements and 85% for branches. GitHub Actions runs the quality,
+benchmark, and deterministic pipeline on Python 3.10, 3.12, and 3.13, and
+builds the distributions on Python 3.13.
 
 ## Project Structure
 
@@ -387,6 +394,12 @@ cloud_security_misconfiguration_lab/
 │       ├── iam.py
 │       ├── network_context.py
 │       └── s3.py
+├── cloud_benchmarks/
+│   ├── benchmark-manifest-v1.0.json
+│   ├── coverage_gate.py
+│   ├── manifest_builder.py
+│   ├── profiles.py
+│   └── runner.py
 ├── cloud_analysis/
 │   └── summary.py
 ├── cloud_findings/
@@ -424,6 +437,8 @@ cloud_security_misconfiguration_lab/
 │   ├── analysis-summary-v1.0.schema.json
 │   ├── attack-timeline-v1.0.schema.json
 │   ├── aws-fixture-manifest-v1.0.schema.json
+│   ├── benchmark-manifest-v1.0.schema.json
+│   ├── benchmark-results-v1.0.schema.json
 │   ├── findings-v1.0.schema.json
 │   ├── findings-v2.0.schema.json
 │   ├── incidents-v1.0.schema.json
@@ -464,6 +479,7 @@ cloud_security_misconfiguration_lab/
 │   ├── analysis-coverage.md
 │   ├── attack-timeline.md
 │   ├── architecture.md
+│   ├── benchmarking.md
 │   ├── data-contracts.md
 │   ├── design-decisions.md
 │   ├── engineering.md
@@ -475,6 +491,7 @@ cloud_security_misconfiguration_lab/
 │   ├── rule-catalog.md
 │   └── traceability.md
 ├── tests/
+│   ├── test_benchmarks.py
 │   ├── test_contracts.py
 │   └── test_legacy_clis.py
 ├── LICENSE

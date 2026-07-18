@@ -1,0 +1,2065 @@
+{
+  "schema_version": "1.0",
+  "catalog_schema_version": "1.0",
+  "rule_count": 35,
+  "case_count": 78,
+  "scale_case_count": 8,
+  "acceptance_budgets": {
+    "minimum_statement_coverage_percent": 90.0,
+    "minimum_branch_coverage_percent": 85.0,
+    "required_functional_pass_rate": 1.0,
+    "required_malformed_rejection_rate": 1.0,
+    "require_scale_determinism": true,
+    "wall_clock_gate_enabled": false
+  },
+  "cases": [
+    {
+      "id": "IAM-001-positive",
+      "module": "iam",
+      "classification": "positive",
+      "profile": "rule:IAM-001:positive",
+      "covers_rules": [
+        "IAM-001"
+      ],
+      "description": "Minimal deterministic evidence that exercises IAM-001.",
+      "expected_findings": [
+        {
+          "rule_id": "IAM-001",
+          "severity": "critical",
+          "resource_type": "role",
+          "resource_id": "positive-iam-001",
+          "count": 1
+        },
+        {
+          "rule_id": "IAM-003",
+          "severity": "medium",
+          "resource_type": "role",
+          "resource_id": "positive-iam-001",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The analyzer observes an explicit Allow with both Action and Resource set to a full wildcard. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-001-boundary",
+      "module": "iam",
+      "classification": "boundary",
+      "profile": "rule:IAM-001:boundary",
+      "covers_rules": [
+        "IAM-001"
+      ],
+      "description": "Near-miss or exact-threshold evidence for IAM-001.",
+      "expected_findings": [
+        {
+          "rule_id": "IAM-002",
+          "severity": "high",
+          "resource_type": "role",
+          "resource_id": "boundary-iam-001",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The profile isolates the decision boundary for IAM-001; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-002-positive",
+      "module": "iam",
+      "classification": "positive",
+      "profile": "rule:IAM-002:positive",
+      "covers_rules": [
+        "IAM-002"
+      ],
+      "description": "Minimal deterministic evidence that exercises IAM-002.",
+      "expected_findings": [
+        {
+          "rule_id": "IAM-002",
+          "severity": "high",
+          "resource_type": "role",
+          "resource_id": "positive-iam-002",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The action pattern is explicit policy evidence; severity rises for full or service-wide wildcards. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-002-boundary",
+      "module": "iam",
+      "classification": "boundary",
+      "profile": "rule:IAM-002:boundary",
+      "covers_rules": [
+        "IAM-002"
+      ],
+      "description": "Near-miss or exact-threshold evidence for IAM-002.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for IAM-002; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-003-positive",
+      "module": "iam",
+      "classification": "positive",
+      "profile": "rule:IAM-003:positive",
+      "covers_rules": [
+        "IAM-003"
+      ],
+      "description": "Minimal deterministic evidence that exercises IAM-003.",
+      "expected_findings": [
+        {
+          "rule_id": "IAM-003",
+          "severity": "medium",
+          "resource_type": "role",
+          "resource_id": "positive-iam-003",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The Resource wildcard is explicit, although some AWS actions do not support resource-level scoping. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-003-boundary",
+      "module": "iam",
+      "classification": "boundary",
+      "profile": "rule:IAM-003:boundary",
+      "covers_rules": [
+        "IAM-003"
+      ],
+      "description": "Near-miss or exact-threshold evidence for IAM-003.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for IAM-003; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-004-positive",
+      "module": "iam",
+      "classification": "positive",
+      "profile": "rule:IAM-004:positive",
+      "covers_rules": [
+        "IAM-004"
+      ],
+      "description": "Minimal deterministic evidence that exercises IAM-004.",
+      "expected_findings": [
+        {
+          "rule_id": "IAM-004",
+          "severity": "high",
+          "resource_type": "role",
+          "resource_id": "positive-iam-004",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The policy grants broad S3 write capability, but effective access can still be reduced by boundaries, resource policies, or explicit denies. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-004-boundary",
+      "module": "iam",
+      "classification": "boundary",
+      "profile": "rule:IAM-004:boundary",
+      "covers_rules": [
+        "IAM-004"
+      ],
+      "description": "Near-miss or exact-threshold evidence for IAM-004.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for IAM-004; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-005-positive",
+      "module": "iam",
+      "classification": "positive",
+      "profile": "rule:IAM-005:positive",
+      "covers_rules": [
+        "IAM-005"
+      ],
+      "description": "Minimal deterministic evidence that exercises IAM-005.",
+      "expected_findings": [
+        {
+          "rule_id": "IAM-005",
+          "severity": "medium",
+          "resource_type": "user",
+          "resource_id": "positive-iam-005",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The statement lacks an MFA condition, but other identity controls or session policies may still require MFA. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-005-boundary",
+      "module": "iam",
+      "classification": "boundary",
+      "profile": "rule:IAM-005:boundary",
+      "covers_rules": [
+        "IAM-005"
+      ],
+      "description": "Near-miss or exact-threshold evidence for IAM-005.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for IAM-005; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-006-positive",
+      "module": "iam",
+      "classification": "positive",
+      "profile": "rule:IAM-006:positive",
+      "covers_rules": [
+        "IAM-006"
+      ],
+      "description": "Minimal deterministic evidence that exercises IAM-006.",
+      "expected_findings": [
+        {
+          "rule_id": "IAM-006",
+          "severity": "medium",
+          "resource_type": "user",
+          "resource_id": "positive-iam-006",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "Credential-report evidence directly states password and MFA status when native AWS input is used. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-006-boundary",
+      "module": "iam",
+      "classification": "boundary",
+      "profile": "rule:IAM-006:boundary",
+      "covers_rules": [
+        "IAM-006"
+      ],
+      "description": "Near-miss or exact-threshold evidence for IAM-006.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for IAM-006; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-007-positive",
+      "module": "iam",
+      "classification": "positive",
+      "profile": "rule:IAM-007:positive",
+      "covers_rules": [
+        "IAM-007"
+      ],
+      "description": "Minimal deterministic evidence that exercises IAM-007.",
+      "expected_findings": [
+        {
+          "rule_id": "IAM-007",
+          "severity": "medium",
+          "resource_type": "user",
+          "resource_id": "positive-iam-007",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The active status and key age are derived directly from credential-report timestamps. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-007-boundary",
+      "module": "iam",
+      "classification": "boundary",
+      "profile": "rule:IAM-007:boundary",
+      "covers_rules": [
+        "IAM-007"
+      ],
+      "description": "Near-miss or exact-threshold evidence for IAM-007.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for IAM-007; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-008-positive",
+      "module": "iam",
+      "classification": "positive",
+      "profile": "rule:IAM-008:positive",
+      "covers_rules": [
+        "IAM-008"
+      ],
+      "description": "Minimal deterministic evidence that exercises IAM-008.",
+      "expected_findings": [
+        {
+          "rule_id": "IAM-008",
+          "severity": "high",
+          "resource_type": "role",
+          "resource_id": "positive-iam-008",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The external principal is explicit, but effective assumability also depends on caller permissions, conditions, organization boundaries, and external IDs. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-008-boundary",
+      "module": "iam",
+      "classification": "boundary",
+      "profile": "rule:IAM-008:boundary",
+      "covers_rules": [
+        "IAM-008"
+      ],
+      "description": "Near-miss or exact-threshold evidence for IAM-008.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for IAM-008; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-009-positive",
+      "module": "iam",
+      "classification": "positive",
+      "profile": "rule:IAM-009:positive",
+      "covers_rules": [
+        "IAM-009"
+      ],
+      "description": "Minimal deterministic evidence that exercises IAM-009.",
+      "expected_findings": [
+        {
+          "rule_id": "IAM-009",
+          "severity": "medium",
+          "resource_type": "role",
+          "resource_id": "positive-iam-009",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "NotAction is explicit policy syntax; severity rises when the statement also applies to every resource. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-009-boundary",
+      "module": "iam",
+      "classification": "boundary",
+      "profile": "rule:IAM-009:boundary",
+      "covers_rules": [
+        "IAM-009"
+      ],
+      "description": "Near-miss or exact-threshold evidence for IAM-009.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for IAM-009; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-010-positive",
+      "module": "iam",
+      "classification": "positive",
+      "profile": "rule:IAM-010:positive",
+      "covers_rules": [
+        "IAM-010"
+      ],
+      "description": "Minimal deterministic evidence that exercises IAM-010.",
+      "expected_findings": [
+        {
+          "rule_id": "IAM-010",
+          "severity": "medium",
+          "resource_type": "role",
+          "resource_id": "positive-iam-010",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "NotResource is explicit policy syntax; severity rises for sensitive or wildcard action sets. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-010-boundary",
+      "module": "iam",
+      "classification": "boundary",
+      "profile": "rule:IAM-010:boundary",
+      "covers_rules": [
+        "IAM-010"
+      ],
+      "description": "Near-miss or exact-threshold evidence for IAM-010.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for IAM-010; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-011-positive",
+      "module": "iam",
+      "classification": "positive",
+      "profile": "rule:IAM-011:positive",
+      "covers_rules": [
+        "IAM-011"
+      ],
+      "description": "Minimal deterministic evidence that exercises IAM-011.",
+      "expected_findings": [
+        {
+          "rule_id": "IAM-007",
+          "severity": "medium",
+          "resource_type": "user",
+          "resource_id": "positive-iam-011",
+          "count": 1
+        },
+        {
+          "rule_id": "IAM-011",
+          "severity": "medium",
+          "resource_type": "user",
+          "resource_id": "positive-iam-011",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "Key status and last-used age come directly from credential-report evidence. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-011-boundary",
+      "module": "iam",
+      "classification": "boundary",
+      "profile": "rule:IAM-011:boundary",
+      "covers_rules": [
+        "IAM-011"
+      ],
+      "description": "Near-miss or exact-threshold evidence for IAM-011.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for IAM-011; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-012-positive",
+      "module": "iam",
+      "classification": "positive",
+      "profile": "rule:IAM-012:positive",
+      "covers_rules": [
+        "IAM-012"
+      ],
+      "description": "Minimal deterministic evidence that exercises IAM-012.",
+      "expected_findings": [
+        {
+          "rule_id": "IAM-012",
+          "severity": "medium",
+          "resource_type": "user",
+          "resource_id": "positive-iam-012",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "Password status and last-used age come directly from credential-report evidence. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-012-boundary",
+      "module": "iam",
+      "classification": "boundary",
+      "profile": "rule:IAM-012:boundary",
+      "covers_rules": [
+        "IAM-012"
+      ],
+      "description": "Near-miss or exact-threshold evidence for IAM-012.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for IAM-012; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-013-positive",
+      "module": "iam",
+      "classification": "positive",
+      "profile": "rule:IAM-013:positive",
+      "covers_rules": [
+        "IAM-013"
+      ],
+      "description": "Minimal deterministic evidence that exercises IAM-013.",
+      "expected_findings": [
+        {
+          "rule_id": "IAM-013",
+          "severity": "critical",
+          "resource_type": "root-account",
+          "resource_id": "root",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "Credential-report evidence directly identifies active root access-key slots. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-013-boundary",
+      "module": "iam",
+      "classification": "boundary",
+      "profile": "rule:IAM-013:boundary",
+      "covers_rules": [
+        "IAM-013"
+      ],
+      "description": "Near-miss or exact-threshold evidence for IAM-013.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for IAM-013; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-014-positive",
+      "module": "iam",
+      "classification": "positive",
+      "profile": "rule:IAM-014:positive",
+      "covers_rules": [
+        "IAM-014"
+      ],
+      "description": "Minimal deterministic evidence that exercises IAM-014.",
+      "expected_findings": [
+        {
+          "rule_id": "IAM-014",
+          "severity": "critical",
+          "resource_type": "root-account",
+          "resource_id": "root",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "Credential-report evidence directly states root password and MFA status. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-014-boundary",
+      "module": "iam",
+      "classification": "boundary",
+      "profile": "rule:IAM-014:boundary",
+      "covers_rules": [
+        "IAM-014"
+      ],
+      "description": "Near-miss or exact-threshold evidence for IAM-014.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for IAM-014; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-015-positive",
+      "module": "iam",
+      "classification": "positive",
+      "profile": "rule:IAM-015:positive",
+      "covers_rules": [
+        "IAM-015"
+      ],
+      "description": "Minimal deterministic evidence that exercises IAM-015.",
+      "expected_findings": [
+        {
+          "rule_id": "IAM-015",
+          "severity": "medium",
+          "resource_type": "role",
+          "resource_id": "positive-iam-015",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The boundary document explicitly allows full wildcard access, so it does not lower the maximum permission set. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "IAM-015-boundary",
+      "module": "iam",
+      "classification": "boundary",
+      "profile": "rule:IAM-015:boundary",
+      "covers_rules": [
+        "IAM-015"
+      ],
+      "description": "Near-miss or exact-threshold evidence for IAM-015.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for IAM-015; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "iam-hardened-negative",
+      "module": "iam",
+      "classification": "negative",
+      "profile": "module:iam:negative",
+      "covers_rules": [
+        "IAM-001",
+        "IAM-002",
+        "IAM-003",
+        "IAM-004",
+        "IAM-005",
+        "IAM-006",
+        "IAM-007",
+        "IAM-008",
+        "IAM-009",
+        "IAM-010",
+        "IAM-011",
+        "IAM-012",
+        "IAM-013",
+        "IAM-014",
+        "IAM-015"
+      ],
+      "description": "Hardened iam baseline expected to produce no findings.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile contains intentionally safe evidence. Any finding would be treated as an analyzer false positive or contract drift.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "iam-native-malformed",
+      "module": "iam",
+      "classification": "malformed",
+      "profile": "module:iam:malformed",
+      "covers_rules": [
+        "IAM-001",
+        "IAM-002",
+        "IAM-003",
+        "IAM-004",
+        "IAM-005",
+        "IAM-006",
+        "IAM-007",
+        "IAM-008",
+        "IAM-009",
+        "IAM-010",
+        "IAM-011",
+        "IAM-012",
+        "IAM-013",
+        "IAM-014",
+        "IAM-015"
+      ],
+      "description": "Malformed or incomplete native iam evidence must fail closed.",
+      "expected_error": {
+        "type": "ValueError",
+        "message": "AWS IAM authorization details are truncated; collect all pages before analysis."
+      },
+      "false_positive_rationale": "No security conclusion is allowed because malformed evidence is rejected before analyzer findings are produced.",
+      "unsupported_evidence": [
+        "Effective authorization across SCPs, RCPs, resource policies, session policies, and explicit denies is not fully modeled.",
+        "Credential posture is limited to the supplied snapshot and does not prove credential compromise."
+      ]
+    },
+    {
+      "id": "STO-001-positive",
+      "module": "storage",
+      "classification": "positive",
+      "profile": "rule:STO-001:positive",
+      "covers_rules": [
+        "STO-001"
+      ],
+      "description": "Minimal deterministic evidence that exercises STO-001.",
+      "expected_findings": [
+        {
+          "rule_id": "STO-001",
+          "severity": "high",
+          "resource_type": "bucket",
+          "resource_id": "positive-sto-001-bucket",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The rule directly evaluates all four bucket-level Block Public Access booleans. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "The offline bucket snapshot does not reproduce full IAM authorization or live S3 reachability.",
+        "Organization policies, VPC endpoint policies, KMS key policies, and later configuration changes are outside the case."
+      ]
+    },
+    {
+      "id": "STO-001-boundary",
+      "module": "storage",
+      "classification": "boundary",
+      "profile": "rule:STO-001:boundary",
+      "covers_rules": [
+        "STO-001"
+      ],
+      "description": "Near-miss or exact-threshold evidence for STO-001.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for STO-001; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "The offline bucket snapshot does not reproduce full IAM authorization or live S3 reachability.",
+        "Organization policies, VPC endpoint policies, KMS key policies, and later configuration changes are outside the case."
+      ]
+    },
+    {
+      "id": "STO-002-positive",
+      "module": "storage",
+      "classification": "positive",
+      "profile": "rule:STO-002:positive",
+      "covers_rules": [
+        "STO-002"
+      ],
+      "description": "Minimal deterministic evidence that exercises STO-002.",
+      "expected_findings": [
+        {
+          "rule_id": "STO-001",
+          "severity": "high",
+          "resource_type": "bucket",
+          "resource_id": "positive-sto-002-bucket",
+          "count": 1
+        },
+        {
+          "rule_id": "STO-002",
+          "severity": "critical",
+          "resource_type": "bucket",
+          "resource_id": "positive-sto-002-bucket",
+          "count": 1
+        },
+        {
+          "rule_id": "STO-006",
+          "severity": "medium",
+          "resource_type": "bucket",
+          "resource_id": "positive-sto-002-bucket",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The ACL grantee is explicitly public and the analyzer confirms that ACLs are neither ignored nor disabled by Object Ownership. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "The offline bucket snapshot does not reproduce full IAM authorization or live S3 reachability.",
+        "Organization policies, VPC endpoint policies, KMS key policies, and later configuration changes are outside the case."
+      ]
+    },
+    {
+      "id": "STO-002-boundary",
+      "module": "storage",
+      "classification": "boundary",
+      "profile": "rule:STO-002:boundary",
+      "covers_rules": [
+        "STO-002"
+      ],
+      "description": "Near-miss or exact-threshold evidence for STO-002.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for STO-002; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "The offline bucket snapshot does not reproduce full IAM authorization or live S3 reachability.",
+        "Organization policies, VPC endpoint policies, KMS key policies, and later configuration changes are outside the case."
+      ]
+    },
+    {
+      "id": "STO-003-positive",
+      "module": "storage",
+      "classification": "positive",
+      "profile": "rule:STO-003:positive",
+      "covers_rules": [
+        "STO-003"
+      ],
+      "description": "Minimal deterministic evidence that exercises STO-003.",
+      "expected_findings": [
+        {
+          "rule_id": "STO-001",
+          "severity": "high",
+          "resource_type": "bucket",
+          "resource_id": "positive-sto-003-bucket",
+          "count": 1
+        },
+        {
+          "rule_id": "STO-003",
+          "severity": "critical",
+          "resource_type": "bucket",
+          "resource_id": "positive-sto-003-bucket",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The policy is public under modeled S3 policy rules, but account-level Block Public Access and unmodeled policy context can affect runtime exposure. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "The offline bucket snapshot does not reproduce full IAM authorization or live S3 reachability.",
+        "Organization policies, VPC endpoint policies, KMS key policies, and later configuration changes are outside the case."
+      ]
+    },
+    {
+      "id": "STO-003-boundary",
+      "module": "storage",
+      "classification": "boundary",
+      "profile": "rule:STO-003:boundary",
+      "covers_rules": [
+        "STO-003"
+      ],
+      "description": "Near-miss or exact-threshold evidence for STO-003.",
+      "expected_findings": [
+        {
+          "rule_id": "STO-001",
+          "severity": "high",
+          "resource_type": "bucket",
+          "resource_id": "boundary-sto-003-bucket",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The profile isolates the decision boundary for STO-003; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "The offline bucket snapshot does not reproduce full IAM authorization or live S3 reachability.",
+        "Organization policies, VPC endpoint policies, KMS key policies, and later configuration changes are outside the case."
+      ]
+    },
+    {
+      "id": "STO-004-positive",
+      "module": "storage",
+      "classification": "positive",
+      "profile": "rule:STO-004:positive",
+      "covers_rules": [
+        "STO-004"
+      ],
+      "description": "Minimal deterministic evidence that exercises STO-004.",
+      "expected_findings": [
+        {
+          "rule_id": "STO-004",
+          "severity": "low",
+          "resource_type": "bucket",
+          "resource_id": "positive-sto-004-bucket",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The configuration absence is explicit in the evidence, while the low severity acknowledges S3 baseline SSE-S3 encryption. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "The offline bucket snapshot does not reproduce full IAM authorization or live S3 reachability.",
+        "Organization policies, VPC endpoint policies, KMS key policies, and later configuration changes are outside the case."
+      ]
+    },
+    {
+      "id": "STO-004-boundary",
+      "module": "storage",
+      "classification": "boundary",
+      "profile": "rule:STO-004:boundary",
+      "covers_rules": [
+        "STO-004"
+      ],
+      "description": "Near-miss or exact-threshold evidence for STO-004.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for STO-004; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "The offline bucket snapshot does not reproduce full IAM authorization or live S3 reachability.",
+        "Organization policies, VPC endpoint policies, KMS key policies, and later configuration changes are outside the case."
+      ]
+    },
+    {
+      "id": "STO-005-positive",
+      "module": "storage",
+      "classification": "positive",
+      "profile": "rule:STO-005:positive",
+      "covers_rules": [
+        "STO-005"
+      ],
+      "description": "Minimal deterministic evidence that exercises STO-005.",
+      "expected_findings": [
+        {
+          "rule_id": "STO-005",
+          "severity": "medium",
+          "resource_type": "bucket",
+          "resource_id": "positive-sto-005-bucket",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The bucket versioning state is directly represented in the normalized evidence. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "The offline bucket snapshot does not reproduce full IAM authorization or live S3 reachability.",
+        "Organization policies, VPC endpoint policies, KMS key policies, and later configuration changes are outside the case."
+      ]
+    },
+    {
+      "id": "STO-005-boundary",
+      "module": "storage",
+      "classification": "boundary",
+      "profile": "rule:STO-005:boundary",
+      "covers_rules": [
+        "STO-005"
+      ],
+      "description": "Near-miss or exact-threshold evidence for STO-005.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for STO-005; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "The offline bucket snapshot does not reproduce full IAM authorization or live S3 reachability.",
+        "Organization policies, VPC endpoint policies, KMS key policies, and later configuration changes are outside the case."
+      ]
+    },
+    {
+      "id": "STO-006-positive",
+      "module": "storage",
+      "classification": "positive",
+      "profile": "rule:STO-006:positive",
+      "covers_rules": [
+        "STO-006"
+      ],
+      "description": "Minimal deterministic evidence that exercises STO-006.",
+      "expected_findings": [
+        {
+          "rule_id": "STO-006",
+          "severity": "medium",
+          "resource_type": "bucket",
+          "resource_id": "positive-sto-006-bucket",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The Object Ownership setting directly determines whether ACLs can affect authorization. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "The offline bucket snapshot does not reproduce full IAM authorization or live S3 reachability.",
+        "Organization policies, VPC endpoint policies, KMS key policies, and later configuration changes are outside the case."
+      ]
+    },
+    {
+      "id": "STO-006-boundary",
+      "module": "storage",
+      "classification": "boundary",
+      "profile": "rule:STO-006:boundary",
+      "covers_rules": [
+        "STO-006"
+      ],
+      "description": "Near-miss or exact-threshold evidence for STO-006.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for STO-006; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "The offline bucket snapshot does not reproduce full IAM authorization or live S3 reachability.",
+        "Organization policies, VPC endpoint policies, KMS key policies, and later configuration changes are outside the case."
+      ]
+    },
+    {
+      "id": "storage-hardened-negative",
+      "module": "storage",
+      "classification": "negative",
+      "profile": "module:storage:negative",
+      "covers_rules": [
+        "STO-001",
+        "STO-002",
+        "STO-003",
+        "STO-004",
+        "STO-005",
+        "STO-006"
+      ],
+      "description": "Hardened storage baseline expected to produce no findings.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile contains intentionally safe evidence. Any finding would be treated as an analyzer false positive or contract drift.",
+      "unsupported_evidence": [
+        "The offline bucket snapshot does not reproduce full IAM authorization or live S3 reachability.",
+        "Organization policies, VPC endpoint policies, KMS key policies, and later configuration changes are outside the case."
+      ]
+    },
+    {
+      "id": "storage-native-malformed",
+      "module": "storage",
+      "classification": "malformed",
+      "profile": "module:storage:malformed",
+      "covers_rules": [
+        "STO-001",
+        "STO-002",
+        "STO-003",
+        "STO-004",
+        "STO-005",
+        "STO-006"
+      ],
+      "description": "Malformed or incomplete native storage evidence must fail closed.",
+      "expected_error": {
+        "type": "ValueError",
+        "message": "AWS S3 evidence bundle must use schema_version '1.0'."
+      },
+      "false_positive_rationale": "No security conclusion is allowed because malformed evidence is rejected before analyzer findings are produced.",
+      "unsupported_evidence": [
+        "The offline bucket snapshot does not reproduce full IAM authorization or live S3 reachability.",
+        "Organization policies, VPC endpoint policies, KMS key policies, and later configuration changes are outside the case."
+      ]
+    },
+    {
+      "id": "NET-001-positive",
+      "module": "network",
+      "classification": "positive",
+      "profile": "rule:NET-001:positive",
+      "covers_rules": [
+        "NET-001"
+      ],
+      "description": "Minimal deterministic evidence that exercises NET-001.",
+      "expected_findings": [
+        {
+          "rule_id": "NET-001",
+          "severity": "high",
+          "resource_type": "security_group",
+          "resource_id": "sg-positive-net-001",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The security-group source and port are explicit, but end-to-end exposure depends on optional reachability context and attached resources. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "A security-group permission is not proof of end-to-end reachability without separate path evidence.",
+        "Routes, network ACLs, public addresses, load balancers, and later topology changes are outside the case."
+      ]
+    },
+    {
+      "id": "NET-001-boundary",
+      "module": "network",
+      "classification": "boundary",
+      "profile": "rule:NET-001:boundary",
+      "covers_rules": [
+        "NET-001"
+      ],
+      "description": "Near-miss or exact-threshold evidence for NET-001.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for NET-001; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "A security-group permission is not proof of end-to-end reachability without separate path evidence.",
+        "Routes, network ACLs, public addresses, load balancers, and later topology changes are outside the case."
+      ]
+    },
+    {
+      "id": "NET-002-positive",
+      "module": "network",
+      "classification": "positive",
+      "profile": "rule:NET-002:positive",
+      "covers_rules": [
+        "NET-002"
+      ],
+      "description": "Minimal deterministic evidence that exercises NET-002.",
+      "expected_findings": [
+        {
+          "rule_id": "NET-002",
+          "severity": "critical",
+          "resource_type": "security_group",
+          "resource_id": "sg-positive-net-002",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The all-port public rule is explicit, but actual internet reachability depends on routing, attached resources, and optional path evidence. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "A security-group permission is not proof of end-to-end reachability without separate path evidence.",
+        "Routes, network ACLs, public addresses, load balancers, and later topology changes are outside the case."
+      ]
+    },
+    {
+      "id": "NET-002-boundary",
+      "module": "network",
+      "classification": "boundary",
+      "profile": "rule:NET-002:boundary",
+      "covers_rules": [
+        "NET-002"
+      ],
+      "description": "Near-miss or exact-threshold evidence for NET-002.",
+      "expected_findings": [
+        {
+          "rule_id": "NET-001",
+          "severity": "critical",
+          "resource_type": "security_group",
+          "resource_id": "sg-boundary-net-002",
+          "count": 4
+        },
+        {
+          "rule_id": "NET-001",
+          "severity": "high",
+          "resource_type": "security_group",
+          "resource_id": "sg-boundary-net-002",
+          "count": 16
+        }
+      ],
+      "false_positive_rationale": "The profile isolates the decision boundary for NET-002; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "A security-group permission is not proof of end-to-end reachability without separate path evidence.",
+        "Routes, network ACLs, public addresses, load balancers, and later topology changes are outside the case."
+      ]
+    },
+    {
+      "id": "NET-003-positive",
+      "module": "network",
+      "classification": "positive",
+      "profile": "rule:NET-003:positive",
+      "covers_rules": [
+        "NET-003"
+      ],
+      "description": "Minimal deterministic evidence that exercises NET-003.",
+      "expected_findings": [
+        {
+          "rule_id": "NET-003",
+          "severity": "medium",
+          "resource_type": "security_group",
+          "resource_id": "sg-positive-net-003",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The egress permission is explicit, but an exploitable exfiltration path depends on workload compromise and end-to-end network routing. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "A security-group permission is not proof of end-to-end reachability without separate path evidence.",
+        "Routes, network ACLs, public addresses, load balancers, and later topology changes are outside the case."
+      ]
+    },
+    {
+      "id": "NET-003-boundary",
+      "module": "network",
+      "classification": "boundary",
+      "profile": "rule:NET-003:boundary",
+      "covers_rules": [
+        "NET-003"
+      ],
+      "description": "Near-miss or exact-threshold evidence for NET-003.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for NET-003; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "A security-group permission is not proof of end-to-end reachability without separate path evidence.",
+        "Routes, network ACLs, public addresses, load balancers, and later topology changes are outside the case."
+      ]
+    },
+    {
+      "id": "network-hardened-negative",
+      "module": "network",
+      "classification": "negative",
+      "profile": "module:network:negative",
+      "covers_rules": [
+        "NET-001",
+        "NET-002",
+        "NET-003"
+      ],
+      "description": "Hardened network baseline expected to produce no findings.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile contains intentionally safe evidence. Any finding would be treated as an analyzer false positive or contract drift.",
+      "unsupported_evidence": [
+        "A security-group permission is not proof of end-to-end reachability without separate path evidence.",
+        "Routes, network ACLs, public addresses, load balancers, and later topology changes are outside the case."
+      ]
+    },
+    {
+      "id": "network-native-malformed",
+      "module": "network",
+      "classification": "malformed",
+      "profile": "module:network:malformed",
+      "covers_rules": [
+        "NET-001",
+        "NET-002",
+        "NET-003"
+      ],
+      "description": "Malformed or incomplete native network evidence must fail closed.",
+      "expected_error": {
+        "type": "ValueError",
+        "message": "DescribeSecurityGroups response is paginated; collect all pages before analysis."
+      },
+      "false_positive_rationale": "No security conclusion is allowed because malformed evidence is rejected before analyzer findings are produced.",
+      "unsupported_evidence": [
+        "A security-group permission is not proof of end-to-end reachability without separate path evidence.",
+        "Routes, network ACLs, public addresses, load balancers, and later topology changes are outside the case."
+      ]
+    },
+    {
+      "id": "CLD-001-positive",
+      "module": "cloudtrail",
+      "classification": "positive",
+      "profile": "rule:CLD-001:positive",
+      "covers_rules": [
+        "CLD-001"
+      ],
+      "description": "Minimal deterministic evidence that exercises CLD-001.",
+      "expected_findings": [
+        {
+          "rule_id": "CLD-001",
+          "severity": "critical",
+          "resource_type": "identity",
+          "resource_id": "root",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "CloudTrail explicitly records the successful root identity type and ConsoleLogin event. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-001-boundary",
+      "module": "cloudtrail",
+      "classification": "boundary",
+      "profile": "rule:CLD-001:boundary",
+      "covers_rules": [
+        "CLD-001"
+      ],
+      "description": "Near-miss or exact-threshold evidence for CLD-001.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for CLD-001; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-002-positive",
+      "module": "cloudtrail",
+      "classification": "positive",
+      "profile": "rule:CLD-002:positive",
+      "covers_rules": [
+        "CLD-002"
+      ],
+      "description": "Minimal deterministic evidence that exercises CLD-002.",
+      "expected_findings": [
+        {
+          "rule_id": "CLD-002",
+          "severity": "high",
+          "resource_type": "identity",
+          "resource_id": "benchmark-user",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The successful CloudTrail event directly records an MFA defense being removed. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-002-boundary",
+      "module": "cloudtrail",
+      "classification": "boundary",
+      "profile": "rule:CLD-002:boundary",
+      "covers_rules": [
+        "CLD-002"
+      ],
+      "description": "Near-miss or exact-threshold evidence for CLD-002.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for CLD-002; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-003-positive",
+      "module": "cloudtrail",
+      "classification": "positive",
+      "profile": "rule:CLD-003:positive",
+      "covers_rules": [
+        "CLD-003"
+      ],
+      "description": "Minimal deterministic evidence that exercises CLD-003.",
+      "expected_findings": [
+        {
+          "rule_id": "CLD-003",
+          "severity": "medium",
+          "resource_type": "security_group",
+          "resource_id": "sg-benchmark",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The successful event directly records a cloud network-control modification, though the resulting exposure requires separate analysis. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-003-boundary",
+      "module": "cloudtrail",
+      "classification": "boundary",
+      "profile": "rule:CLD-003:boundary",
+      "covers_rules": [
+        "CLD-003"
+      ],
+      "description": "Near-miss or exact-threshold evidence for CLD-003.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for CLD-003; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-004-positive",
+      "module": "cloudtrail",
+      "classification": "positive",
+      "profile": "rule:CLD-004:positive",
+      "covers_rules": [
+        "CLD-004"
+      ],
+      "description": "Minimal deterministic evidence that exercises CLD-004.",
+      "expected_findings": [
+        {
+          "rule_id": "CLD-004",
+          "severity": "high",
+          "resource_type": "bucket",
+          "resource_id": "benchmark-bucket",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The successful CloudTrail event directly records an S3 access-control change, while the resulting policy effect requires configuration analysis. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-004-boundary",
+      "module": "cloudtrail",
+      "classification": "boundary",
+      "profile": "rule:CLD-004:boundary",
+      "covers_rules": [
+        "CLD-004"
+      ],
+      "description": "Near-miss or exact-threshold evidence for CLD-004.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for CLD-004; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-005-positive",
+      "module": "cloudtrail",
+      "classification": "positive",
+      "profile": "rule:CLD-005:positive",
+      "covers_rules": [
+        "CLD-005"
+      ],
+      "description": "Minimal deterministic evidence that exercises CLD-005.",
+      "expected_findings": [
+        {
+          "rule_id": "CLD-005",
+          "severity": "high",
+          "resource_type": "iam_policy",
+          "resource_id": "arn:aws:iam::111122223333:policy/BenchmarkPolicy",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The successful event directly records a permission-policy change, while its privilege impact requires policy-diff analysis. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-005-boundary",
+      "module": "cloudtrail",
+      "classification": "boundary",
+      "profile": "rule:CLD-005:boundary",
+      "covers_rules": [
+        "CLD-005"
+      ],
+      "description": "Near-miss or exact-threshold evidence for CLD-005.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for CLD-005; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-006-positive",
+      "module": "cloudtrail",
+      "classification": "positive",
+      "profile": "rule:CLD-006:positive",
+      "covers_rules": [
+        "CLD-006"
+      ],
+      "description": "Minimal deterministic evidence that exercises CLD-006.",
+      "expected_findings": [
+        {
+          "rule_id": "CLD-006",
+          "severity": "medium",
+          "resource_type": "api_activity",
+          "resource_id": "failure-benchmark@192.0.2.44",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The failure burst is measured directly, but benign automation errors and permission drift can produce the same pattern. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-006-boundary",
+      "module": "cloudtrail",
+      "classification": "boundary",
+      "profile": "rule:CLD-006:boundary",
+      "covers_rules": [
+        "CLD-006"
+      ],
+      "description": "Near-miss or exact-threshold evidence for CLD-006.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for CLD-006; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-007-positive",
+      "module": "cloudtrail",
+      "classification": "positive",
+      "profile": "rule:CLD-007:positive",
+      "covers_rules": [
+        "CLD-007"
+      ],
+      "description": "Minimal deterministic evidence that exercises CLD-007.",
+      "expected_findings": [
+        {
+          "rule_id": "CLD-007",
+          "severity": "high",
+          "resource_type": "identity",
+          "resource_id": "benchmark-user",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "CloudTrail directly records both the successful IAM-user login and MFAUsed value. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-007-boundary",
+      "module": "cloudtrail",
+      "classification": "boundary",
+      "profile": "rule:CLD-007:boundary",
+      "covers_rules": [
+        "CLD-007"
+      ],
+      "description": "Near-miss or exact-threshold evidence for CLD-007.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for CLD-007; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-008-positive",
+      "module": "cloudtrail",
+      "classification": "positive",
+      "profile": "rule:CLD-008:positive",
+      "covers_rules": [
+        "CLD-008"
+      ],
+      "description": "Minimal deterministic evidence that exercises CLD-008.",
+      "expected_findings": [
+        {
+          "rule_id": "CLD-008",
+          "severity": "high",
+          "resource_type": "identity",
+          "resource_id": "benchmark-target",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The successful event directly records creation of a durable authentication credential. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-008-boundary",
+      "module": "cloudtrail",
+      "classification": "boundary",
+      "profile": "rule:CLD-008:boundary",
+      "covers_rules": [
+        "CLD-008"
+      ],
+      "description": "Near-miss or exact-threshold evidence for CLD-008.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for CLD-008; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-009-positive",
+      "module": "cloudtrail",
+      "classification": "positive",
+      "profile": "rule:CLD-009:positive",
+      "covers_rules": [
+        "CLD-009"
+      ],
+      "description": "Minimal deterministic evidence that exercises CLD-009.",
+      "expected_findings": [
+        {
+          "rule_id": "CLD-009",
+          "severity": "high",
+          "resource_type": "role",
+          "resource_id": "benchmark-role",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The successful event directly records a role trust-policy modification. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-009-boundary",
+      "module": "cloudtrail",
+      "classification": "boundary",
+      "profile": "rule:CLD-009:boundary",
+      "covers_rules": [
+        "CLD-009"
+      ],
+      "description": "Near-miss or exact-threshold evidence for CLD-009.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for CLD-009; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-010-positive",
+      "module": "cloudtrail",
+      "classification": "positive",
+      "profile": "rule:CLD-010:positive",
+      "covers_rules": [
+        "CLD-010"
+      ],
+      "description": "Minimal deterministic evidence that exercises CLD-010.",
+      "expected_findings": [
+        {
+          "rule_id": "CLD-010",
+          "severity": "critical",
+          "resource_type": "security_control",
+          "resource_id": "benchmark-trail",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The successful event directly records a monitoring or detection control being weakened; severity rises for the most disruptive actions. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-010-boundary",
+      "module": "cloudtrail",
+      "classification": "boundary",
+      "profile": "rule:CLD-010:boundary",
+      "covers_rules": [
+        "CLD-010"
+      ],
+      "description": "Near-miss or exact-threshold evidence for CLD-010.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for CLD-010; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-011-positive",
+      "module": "cloudtrail",
+      "classification": "positive",
+      "profile": "rule:CLD-011:positive",
+      "covers_rules": [
+        "CLD-011"
+      ],
+      "description": "Minimal deterministic evidence that exercises CLD-011.",
+      "expected_findings": [
+        {
+          "rule_id": "CLD-011",
+          "severity": "critical",
+          "resource_type": "kms_key",
+          "resource_id": "benchmark-key",
+          "count": 1
+        }
+      ],
+      "false_positive_rationale": "The successful event directly records KMS key disruption; scheduled deletion raises severity because it can make data unrecoverable. The benchmark proves rule matching, not that the observed condition is malicious.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "CLD-011-boundary",
+      "module": "cloudtrail",
+      "classification": "boundary",
+      "profile": "rule:CLD-011:boundary",
+      "covers_rules": [
+        "CLD-011"
+      ],
+      "description": "Near-miss or exact-threshold evidence for CLD-011.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile isolates the decision boundary for CLD-011; companion findings remain explicit, but this rule must not cross its documented boundary.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "cloudtrail-hardened-negative",
+      "module": "cloudtrail",
+      "classification": "negative",
+      "profile": "module:cloudtrail:negative",
+      "covers_rules": [
+        "CLD-001",
+        "CLD-002",
+        "CLD-003",
+        "CLD-004",
+        "CLD-005",
+        "CLD-006",
+        "CLD-007",
+        "CLD-008",
+        "CLD-009",
+        "CLD-010",
+        "CLD-011"
+      ],
+      "description": "Hardened cloudtrail baseline expected to produce no findings.",
+      "expected_findings": [],
+      "false_positive_rationale": "The profile contains intentionally safe evidence. Any finding would be treated as an analyzer false positive or contract drift.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    },
+    {
+      "id": "cloudtrail-native-malformed",
+      "module": "cloudtrail",
+      "classification": "malformed",
+      "profile": "module:cloudtrail:malformed",
+      "covers_rules": [
+        "CLD-001",
+        "CLD-002",
+        "CLD-003",
+        "CLD-004",
+        "CLD-005",
+        "CLD-006",
+        "CLD-007",
+        "CLD-008",
+        "CLD-009",
+        "CLD-010",
+        "CLD-011"
+      ],
+      "description": "Malformed or incomplete native cloudtrail evidence must fail closed.",
+      "expected_error": {
+        "type": "ValueError",
+        "message": "CloudTrail log file 1 field Records must contain at least one event."
+      },
+      "false_positive_rationale": "No security conclusion is allowed because malformed evidence is rejected before analyzer findings are produced.",
+      "unsupported_evidence": [
+        "The event cases do not baseline approved administrative changes, user behavior, or source reputation.",
+        "Missing log delivery, disabled trails, and activity outside the supplied time range cannot be inferred."
+      ]
+    }
+  ],
+  "rule_coverage": [
+    {
+      "rule_id": "IAM-001",
+      "module": "iam",
+      "positive_case": "IAM-001-positive",
+      "negative_case": "iam-hardened-negative",
+      "boundary_case": "IAM-001-boundary",
+      "malformed_case": "iam-native-malformed"
+    },
+    {
+      "rule_id": "IAM-002",
+      "module": "iam",
+      "positive_case": "IAM-002-positive",
+      "negative_case": "iam-hardened-negative",
+      "boundary_case": "IAM-002-boundary",
+      "malformed_case": "iam-native-malformed"
+    },
+    {
+      "rule_id": "IAM-003",
+      "module": "iam",
+      "positive_case": "IAM-003-positive",
+      "negative_case": "iam-hardened-negative",
+      "boundary_case": "IAM-003-boundary",
+      "malformed_case": "iam-native-malformed"
+    },
+    {
+      "rule_id": "IAM-004",
+      "module": "iam",
+      "positive_case": "IAM-004-positive",
+      "negative_case": "iam-hardened-negative",
+      "boundary_case": "IAM-004-boundary",
+      "malformed_case": "iam-native-malformed"
+    },
+    {
+      "rule_id": "IAM-005",
+      "module": "iam",
+      "positive_case": "IAM-005-positive",
+      "negative_case": "iam-hardened-negative",
+      "boundary_case": "IAM-005-boundary",
+      "malformed_case": "iam-native-malformed"
+    },
+    {
+      "rule_id": "IAM-006",
+      "module": "iam",
+      "positive_case": "IAM-006-positive",
+      "negative_case": "iam-hardened-negative",
+      "boundary_case": "IAM-006-boundary",
+      "malformed_case": "iam-native-malformed"
+    },
+    {
+      "rule_id": "IAM-007",
+      "module": "iam",
+      "positive_case": "IAM-007-positive",
+      "negative_case": "iam-hardened-negative",
+      "boundary_case": "IAM-007-boundary",
+      "malformed_case": "iam-native-malformed"
+    },
+    {
+      "rule_id": "IAM-008",
+      "module": "iam",
+      "positive_case": "IAM-008-positive",
+      "negative_case": "iam-hardened-negative",
+      "boundary_case": "IAM-008-boundary",
+      "malformed_case": "iam-native-malformed"
+    },
+    {
+      "rule_id": "IAM-009",
+      "module": "iam",
+      "positive_case": "IAM-009-positive",
+      "negative_case": "iam-hardened-negative",
+      "boundary_case": "IAM-009-boundary",
+      "malformed_case": "iam-native-malformed"
+    },
+    {
+      "rule_id": "IAM-010",
+      "module": "iam",
+      "positive_case": "IAM-010-positive",
+      "negative_case": "iam-hardened-negative",
+      "boundary_case": "IAM-010-boundary",
+      "malformed_case": "iam-native-malformed"
+    },
+    {
+      "rule_id": "IAM-011",
+      "module": "iam",
+      "positive_case": "IAM-011-positive",
+      "negative_case": "iam-hardened-negative",
+      "boundary_case": "IAM-011-boundary",
+      "malformed_case": "iam-native-malformed"
+    },
+    {
+      "rule_id": "IAM-012",
+      "module": "iam",
+      "positive_case": "IAM-012-positive",
+      "negative_case": "iam-hardened-negative",
+      "boundary_case": "IAM-012-boundary",
+      "malformed_case": "iam-native-malformed"
+    },
+    {
+      "rule_id": "IAM-013",
+      "module": "iam",
+      "positive_case": "IAM-013-positive",
+      "negative_case": "iam-hardened-negative",
+      "boundary_case": "IAM-013-boundary",
+      "malformed_case": "iam-native-malformed"
+    },
+    {
+      "rule_id": "IAM-014",
+      "module": "iam",
+      "positive_case": "IAM-014-positive",
+      "negative_case": "iam-hardened-negative",
+      "boundary_case": "IAM-014-boundary",
+      "malformed_case": "iam-native-malformed"
+    },
+    {
+      "rule_id": "IAM-015",
+      "module": "iam",
+      "positive_case": "IAM-015-positive",
+      "negative_case": "iam-hardened-negative",
+      "boundary_case": "IAM-015-boundary",
+      "malformed_case": "iam-native-malformed"
+    },
+    {
+      "rule_id": "STO-001",
+      "module": "storage",
+      "positive_case": "STO-001-positive",
+      "negative_case": "storage-hardened-negative",
+      "boundary_case": "STO-001-boundary",
+      "malformed_case": "storage-native-malformed"
+    },
+    {
+      "rule_id": "STO-002",
+      "module": "storage",
+      "positive_case": "STO-002-positive",
+      "negative_case": "storage-hardened-negative",
+      "boundary_case": "STO-002-boundary",
+      "malformed_case": "storage-native-malformed"
+    },
+    {
+      "rule_id": "STO-003",
+      "module": "storage",
+      "positive_case": "STO-003-positive",
+      "negative_case": "storage-hardened-negative",
+      "boundary_case": "STO-003-boundary",
+      "malformed_case": "storage-native-malformed"
+    },
+    {
+      "rule_id": "STO-004",
+      "module": "storage",
+      "positive_case": "STO-004-positive",
+      "negative_case": "storage-hardened-negative",
+      "boundary_case": "STO-004-boundary",
+      "malformed_case": "storage-native-malformed"
+    },
+    {
+      "rule_id": "STO-005",
+      "module": "storage",
+      "positive_case": "STO-005-positive",
+      "negative_case": "storage-hardened-negative",
+      "boundary_case": "STO-005-boundary",
+      "malformed_case": "storage-native-malformed"
+    },
+    {
+      "rule_id": "STO-006",
+      "module": "storage",
+      "positive_case": "STO-006-positive",
+      "negative_case": "storage-hardened-negative",
+      "boundary_case": "STO-006-boundary",
+      "malformed_case": "storage-native-malformed"
+    },
+    {
+      "rule_id": "NET-001",
+      "module": "network",
+      "positive_case": "NET-001-positive",
+      "negative_case": "network-hardened-negative",
+      "boundary_case": "NET-001-boundary",
+      "malformed_case": "network-native-malformed"
+    },
+    {
+      "rule_id": "NET-002",
+      "module": "network",
+      "positive_case": "NET-002-positive",
+      "negative_case": "network-hardened-negative",
+      "boundary_case": "NET-002-boundary",
+      "malformed_case": "network-native-malformed"
+    },
+    {
+      "rule_id": "NET-003",
+      "module": "network",
+      "positive_case": "NET-003-positive",
+      "negative_case": "network-hardened-negative",
+      "boundary_case": "NET-003-boundary",
+      "malformed_case": "network-native-malformed"
+    },
+    {
+      "rule_id": "CLD-001",
+      "module": "cloudtrail",
+      "positive_case": "CLD-001-positive",
+      "negative_case": "cloudtrail-hardened-negative",
+      "boundary_case": "CLD-001-boundary",
+      "malformed_case": "cloudtrail-native-malformed"
+    },
+    {
+      "rule_id": "CLD-002",
+      "module": "cloudtrail",
+      "positive_case": "CLD-002-positive",
+      "negative_case": "cloudtrail-hardened-negative",
+      "boundary_case": "CLD-002-boundary",
+      "malformed_case": "cloudtrail-native-malformed"
+    },
+    {
+      "rule_id": "CLD-003",
+      "module": "cloudtrail",
+      "positive_case": "CLD-003-positive",
+      "negative_case": "cloudtrail-hardened-negative",
+      "boundary_case": "CLD-003-boundary",
+      "malformed_case": "cloudtrail-native-malformed"
+    },
+    {
+      "rule_id": "CLD-004",
+      "module": "cloudtrail",
+      "positive_case": "CLD-004-positive",
+      "negative_case": "cloudtrail-hardened-negative",
+      "boundary_case": "CLD-004-boundary",
+      "malformed_case": "cloudtrail-native-malformed"
+    },
+    {
+      "rule_id": "CLD-005",
+      "module": "cloudtrail",
+      "positive_case": "CLD-005-positive",
+      "negative_case": "cloudtrail-hardened-negative",
+      "boundary_case": "CLD-005-boundary",
+      "malformed_case": "cloudtrail-native-malformed"
+    },
+    {
+      "rule_id": "CLD-006",
+      "module": "cloudtrail",
+      "positive_case": "CLD-006-positive",
+      "negative_case": "cloudtrail-hardened-negative",
+      "boundary_case": "CLD-006-boundary",
+      "malformed_case": "cloudtrail-native-malformed"
+    },
+    {
+      "rule_id": "CLD-007",
+      "module": "cloudtrail",
+      "positive_case": "CLD-007-positive",
+      "negative_case": "cloudtrail-hardened-negative",
+      "boundary_case": "CLD-007-boundary",
+      "malformed_case": "cloudtrail-native-malformed"
+    },
+    {
+      "rule_id": "CLD-008",
+      "module": "cloudtrail",
+      "positive_case": "CLD-008-positive",
+      "negative_case": "cloudtrail-hardened-negative",
+      "boundary_case": "CLD-008-boundary",
+      "malformed_case": "cloudtrail-native-malformed"
+    },
+    {
+      "rule_id": "CLD-009",
+      "module": "cloudtrail",
+      "positive_case": "CLD-009-positive",
+      "negative_case": "cloudtrail-hardened-negative",
+      "boundary_case": "CLD-009-boundary",
+      "malformed_case": "cloudtrail-native-malformed"
+    },
+    {
+      "rule_id": "CLD-010",
+      "module": "cloudtrail",
+      "positive_case": "CLD-010-positive",
+      "negative_case": "cloudtrail-hardened-negative",
+      "boundary_case": "CLD-010-boundary",
+      "malformed_case": "cloudtrail-native-malformed"
+    },
+    {
+      "rule_id": "CLD-011",
+      "module": "cloudtrail",
+      "positive_case": "CLD-011-positive",
+      "negative_case": "cloudtrail-hardened-negative",
+      "boundary_case": "CLD-011-boundary",
+      "malformed_case": "cloudtrail-native-malformed"
+    }
+  ],
+  "scale_cases": [
+    {
+      "id": "iam-small",
+      "module": "iam",
+      "size": "small",
+      "input_count": 100,
+      "expected_finding_count": 10,
+      "expected_rule_counts": {
+        "IAM-006": 10
+      },
+      "max_findings_per_input": 0.1,
+      "max_peak_memory_bytes": 16777216
+    },
+    {
+      "id": "iam-large",
+      "module": "iam",
+      "size": "large",
+      "input_count": 5000,
+      "expected_finding_count": 500,
+      "expected_rule_counts": {
+        "IAM-006": 500
+      },
+      "max_findings_per_input": 0.1,
+      "max_peak_memory_bytes": 67108864
+    },
+    {
+      "id": "storage-small",
+      "module": "storage",
+      "size": "small",
+      "input_count": 100,
+      "expected_finding_count": 10,
+      "expected_rule_counts": {
+        "STO-005": 10
+      },
+      "max_findings_per_input": 0.1,
+      "max_peak_memory_bytes": 16777216
+    },
+    {
+      "id": "storage-large",
+      "module": "storage",
+      "size": "large",
+      "input_count": 5000,
+      "expected_finding_count": 500,
+      "expected_rule_counts": {
+        "STO-005": 500
+      },
+      "max_findings_per_input": 0.1,
+      "max_peak_memory_bytes": 67108864
+    },
+    {
+      "id": "network-small",
+      "module": "network",
+      "size": "small",
+      "input_count": 100,
+      "expected_finding_count": 10,
+      "expected_rule_counts": {
+        "NET-001": 10
+      },
+      "max_findings_per_input": 0.1,
+      "max_peak_memory_bytes": 16777216
+    },
+    {
+      "id": "network-large",
+      "module": "network",
+      "size": "large",
+      "input_count": 5000,
+      "expected_finding_count": 500,
+      "expected_rule_counts": {
+        "NET-001": 500
+      },
+      "max_findings_per_input": 0.1,
+      "max_peak_memory_bytes": 67108864
+    },
+    {
+      "id": "cloudtrail-small",
+      "module": "cloudtrail",
+      "size": "small",
+      "input_count": 200,
+      "expected_finding_count": 20,
+      "expected_rule_counts": {
+        "CLD-006": 20
+      },
+      "max_findings_per_input": 0.1,
+      "max_peak_memory_bytes": 16777216
+    },
+    {
+      "id": "cloudtrail-large",
+      "module": "cloudtrail",
+      "size": "large",
+      "input_count": 10000,
+      "expected_finding_count": 1000,
+      "expected_rule_counts": {
+        "CLD-006": 1000
+      },
+      "max_findings_per_input": 0.1,
+      "max_peak_memory_bytes": 67108864
+    }
+  ]
+}

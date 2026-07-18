@@ -39,13 +39,24 @@ jobs:
 
       - name: Type check
         run: >-
-          mypy cloud_analysis cloud_security_lab cloud_findings cloud_incidents
-          cloud_remediation cloud_rules cloud_timeline
+          mypy cloud_analysis cloud_benchmarks cloud_security_lab cloud_findings
+          cloud_incidents cloud_remediation cloud_rules cloud_timeline
           iam_analyzer storage_analyzer
           network_analyzer cloudtrail_detector report_generator
 
       - name: Test with branch coverage
-        run: coverage run -m unittest discover && coverage report
+        run: >-
+          mkdir -p reports/generated &&
+          coverage run -m unittest discover &&
+          coverage report &&
+          coverage json -o reports/generated/coverage.json &&
+          python -m cloud_benchmarks.coverage_gate
+          reports/generated/coverage.json
+
+      - name: Verify functional, fault-tolerance, and scale benchmarks
+        run: >-
+          python -m cloud_benchmarks.runner
+          --output reports/generated/benchmark_results.json
 
       - name: Verify deterministic end-to-end pipeline
         run: >-
@@ -110,6 +121,8 @@ jobs:
           python -c "import glob, zipfile;
           wheel = glob.glob('dist/*.whl')[0];
           names = zipfile.ZipFile(wheel).namelist();
+          assert 'cloud_benchmarks/benchmark-manifest-v1.0.json' in names;
+          assert 'cloud_benchmarks/runner.py' in names;
           assert 'cloud_rules/rules-v1.0.json' in names;
           assert 'cloud_remediation/plan.py' in names;
           assert 'cloud_timeline/timeline.py' in names;
@@ -119,5 +132,9 @@ jobs:
           '/schemas/attack-timeline-v1.0.schema.json') for name in names);
           assert any(name.endswith(
           '/schemas/findings-v2.0.schema.json') for name in names);
+          assert any(name.endswith(
+          '/schemas/benchmark-manifest-v1.0.schema.json') for name in names);
+          assert any(name.endswith(
+          '/schemas/benchmark-results-v1.0.schema.json') for name in names);
           assert any(name.endswith(
           '/sample_data/aws/fixture-manifest-v1.0.json') for name in names)"

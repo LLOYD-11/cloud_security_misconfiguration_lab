@@ -68,6 +68,10 @@ SCHEMA_SAMPLE_PAIRS = (
         "aws-fixture-manifest-v1.0.schema.json",
         "sample_data/aws/fixture-manifest-v1.0.json",
     ),
+    (
+        "benchmark-manifest-v1.0.schema.json",
+        "cloud_benchmarks/benchmark-manifest-v1.0.json",
+    ),
 )
 
 
