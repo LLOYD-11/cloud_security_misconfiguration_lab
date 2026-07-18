@@ -1,25 +1,40 @@
 # Cloud Security Misconfiguration Lab
 
-This project is an offline-first AWS security analysis lab for identifying risky identity, storage, network, and audit-event patterns from exported evidence.
+[![CI](https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/actions/workflows/ci.yml/badge.svg)](https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/actions/workflows/ci.yml)
+![Python 3.10-3.13](https://img.shields.io/badge/Python-3.10%20%7C%203.12%20%7C%203.13-3776AB)
+![Runtime dependencies: 0](https://img.shields.io/badge/runtime%20dependencies-0-198754)
+[![License: MIT](https://img.shields.io/badge/License-MIT-172033.svg)](LICENSE)
 
-The goal is to provide practical and explainable security findings without requiring cloud credentials or making changes to a live AWS account.
+An offline-first AWS security analysis lab that turns exported IAM, S3, EC2
+security-group, and CloudTrail evidence into explainable findings, correlated
+incidents, prioritized remediation, and a chronological attack timeline.
 
-The repository includes four analyzers, native AWS IAM, S3, EC2 security-group, and CloudTrail input normalization, versioned finding, incident, analysis-summary, detection-rule, remediation-plan, attack-timeline, and benchmark contracts, a unified CLI, a deterministic sample report, and automated engineering checks across Python 3.10, 3.12, and 3.13.
+The runtime never authenticates to AWS and never changes cloud resources. Native
+AWS-shaped exports are normalized into stable offline contracts so the same
+detection logic can be tested, explained, and reproduced without cloud
+credentials or charges.
 
-For a technical tour, start with the [system architecture](docs/architecture.md)
-and [version 2.0.0 release notes](docs/release-v2.0.0.md). Upgrade completion is
-tracked against the original M0-M9 plan in the [roadmap](ROADMAP.md) and
-[traceability matrix](docs/traceability.md).
+| At a Glance | Evidence |
+| --- | --- |
+| Security scope | IAM, S3, EC2 security groups, and CloudTrail |
+| Detection depth | 35 cataloged rules with qualified AWS Security Hub CSPM, CIS AWS Foundations, and MITRE ATT&CK mappings |
+| Deterministic sample | 39 findings, 2 incidents, 36 remediation actions, and 11 timeline entries |
+| Engineering assurance | 300 tests; 95.19% statement and 89.16% branch coverage; Python 3.10, 3.12, and 3.13 CI |
+| Safety boundary | Offline files only; zero runtime dependencies; no credentials and no cloud writes |
 
 ## Quick Start
 
-From the repository root, run the complete sample pipeline without installing runtime dependencies:
+Run the complete deterministic sample pipeline from the repository root:
 
 ```bash
 python3 -m cloud_security_lab demo --report-date 2026-06-30
 ```
 
-This writes four versioned finding files, four analysis summaries, one correlated incident file, one 36-action prioritized remediation plan, one 11-entry attack timeline, and a 39-finding consolidated report under `reports/generated/`. The result should exactly match [`reports/cloud_security_report_sample.md`](reports/cloud_security_report_sample.md).
+This writes versioned findings, coverage summaries, incidents, remediation,
+timeline, and report artifacts under `reports/generated/`. The final report must
+match the committed
+[`cloud_security_report_sample.md`](reports/cloud_security_report_sample.md)
+byte-for-byte.
 
 Install the project in a virtual environment to expose the `cloud-security-lab` command:
 
@@ -28,6 +43,58 @@ python3 -m venv .venv
 .venv/bin/python -m pip install -e .
 .venv/bin/cloud-security-lab --help
 ```
+
+## Sample Report
+
+[![Cloud Security Risk Report preview](docs/assets/report-preview.svg)](reports/cloud_security_report_sample.md)
+
+The preview shows real output from the bundled synthetic evidence: complete
+coverage across all four modules, a critical eight-event `alice-admin`
+correlation, and an explainable P0-P3 remediation queue. Open the
+[full sample report](reports/cloud_security_report_sample.md) for finding
+evidence, qualified control mappings, analyst context, and recommended actions.
+
+## Demo Walkthrough
+
+| Step | Pipeline Behavior | Primary Output |
+| ---: | --- | --- |
+| 1 | Normalize simplified or native AWS-shaped exports into stable offline environments. | Canonical evidence and analysis coverage |
+| 2 | Apply 35 cataloged rules while preserving provenance, confidence, and source references. | Four versioned findings files |
+| 3 | Correlate CloudTrail signals by account, actor, source, and bounded time window. | Incidents and chronological timeline |
+| 4 | Separate incident response from configuration hardening and render the reviewer-facing result. | P0-P3 plan and consolidated report |
+
+The [five-minute demo guide](docs/demo-walkthrough.md) provides a concise
+presentation path through the CLI, attack sequence, remediation decisions, and
+engineering evidence.
+
+## Tested Results
+
+| Quality Gate | Verified Result |
+| --- | --- |
+| Automated tests | 300 unit, regression, integration, CLI, schema, compatibility, and benchmark tests pass |
+| Coverage | 4,477/4,703 statements (95.19%) and 1,694/1,900 branches (89.16%) |
+| Rule benchmark | 78/78 exact functional cases and 4/4 malformed native inputs rejected |
+| Scale benchmark | 8/8 deterministic profiles pass across 100 to 10,000 inputs |
+| Supported Python | GitHub Actions passes on Python 3.10, 3.12, and 3.13 |
+| Distribution | Wheel and sdist build; installed-wheel demo and packaged benchmark pass |
+
+Timing is measured but deliberately not used as a CI threshold. Exact outputs,
+bounded finding amplification, repeated-run equality, structural operation
+bounds, and calibrated memory ceilings provide more stable regression evidence.
+See [Benchmarking and resilience](docs/benchmarking.md).
+
+## What I Learned
+
+- Evidence completeness must be reported independently from finding count.
+  Zero findings cannot be treated as proof that collection was complete.
+- Native AWS response parsing belongs at an adapter boundary. Keeping detector
+  inputs stable made deeper rules possible without coupling them to collection
+  formats.
+- Correlation and chronology are useful only when their claims stay narrow.
+  The project preserves actor, source, event, and resource evidence while
+  explicitly refusing to infer intent, causation, or attribution.
+- Deterministic IDs, versioned contracts, golden artifacts, and machine-readable
+  benchmarks turn a security script into a reviewable engineering system.
 
 ## Modules
 
@@ -331,6 +398,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [System architecture](docs/architecture.md)
 - [Design decisions](docs/design-decisions.md)
 - [Version 2.0.0 release notes](docs/release-v2.0.0.md)
+- [Five-minute demo walkthrough](docs/demo-walkthrough.md)
 - [Data contracts](docs/data-contracts.md)
 - [Detection rule catalog](docs/rule-catalog.md)
 - [Remediation prioritization](docs/remediation-prioritization.md)
@@ -481,6 +549,7 @@ cloud_security_misconfiguration_lab/
 │   ├── architecture.md
 │   ├── benchmarking.md
 │   ├── data-contracts.md
+│   ├── demo-walkthrough.md
 │   ├── design-decisions.md
 │   ├── engineering.md
 │   ├── incident-correlation.md
@@ -489,7 +558,9 @@ cloud_security_misconfiguration_lab/
 │   ├── remediation-prioritization.md
 │   ├── release-v2.0.0.md
 │   ├── rule-catalog.md
-│   └── traceability.md
+│   ├── traceability.md
+│   └── assets/
+│       └── report-preview.svg
 ├── tests/
 │   ├── test_benchmarks.py
 │   ├── test_contracts.py

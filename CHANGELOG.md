@@ -26,6 +26,11 @@ All notable changes to this project are documented in this file.
   measurements.
 - Independent 90% statement and 85% branch coverage gates backed by
   machine-readable coverage evidence.
+- A reviewer-focused README with CI and runtime badges, concise tested results,
+  a real report preview, a four-step pipeline walkthrough, and engineering
+  learning reflections.
+- A five-minute demonstration guide for presenting the evidence flow, attack
+  sequence, remediation model, assurance checks, and safety boundary.
 
 ### Changed
 

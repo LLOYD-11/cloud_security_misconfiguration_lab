@@ -127,9 +127,9 @@ The canonical plan is [ROADMAP.md](../ROADMAP.md). `v2.0.0` at commit
 | M9-R1 | Present an AWS-only summary, architecture, commands, results, and sample report. | Complete | [README](../README.md), [architecture](architecture.md), [design decisions](design-decisions.md), and sample report. |
 | M9-R2 | Publish rule-catalog and release documentation. | Complete | Rule-catalog documentation and [v2.0.0 release notes](release-v2.0.0.md). |
 | M9-R3 | Publish an immutable GitHub release. | Complete | Tag and release `v2.0.0`; release workflow from commit `7acfda6`. |
-| M9-R4 | Configure repository About metadata and focused topics. | Open | GitHub description, homepage, and topics were empty at the v2.0.0 review. |
-| M9-R5 | Show CI status and concise tested results in the README. | Open | Add a CI badge and a stable summary that does not overstate coverage. |
-| M9-R6 | Add a report preview, demo walkthrough, and learning reflection. | Open | Produce legible portfolio assets and concise reviewer-oriented copy. |
+| M9-R4 | Configure repository About metadata and focused topics. | Complete | The public [repository About panel](https://github.com/LLOYD-11/cloud_security_misconfiguration_lab) includes a concise description, sample-report homepage, and ten focused AWS, security, and engineering topics. |
+| M9-R5 | Show CI status and concise tested results in the README. | Complete | The [README](../README.md) shows the live CI badge, supported Python matrix, exact test and independent statement/branch coverage results, benchmark outcomes, and distribution checks. |
+| M9-R6 | Add a report preview, demo walkthrough, and learning reflection. | Complete | The [report preview](assets/report-preview.svg), [five-minute demo](demo-walkthrough.md), and [README learning reflections](../README.md#what-i-learned) present real project evidence without widening the documented claims. |
 | M9-R7 | Preserve milestone review history and publish the completion release. | Partial | Milestone commits and `v2.0.0` exist; remaining work will be completed on `upgrade/v2.1-completion` before `v2.1.0`. |
 
 ## Completion Rule

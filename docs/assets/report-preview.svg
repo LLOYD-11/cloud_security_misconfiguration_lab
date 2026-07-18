@@ -1,0 +1,213 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Cloud Security Risk Report preview</title>
+  <desc id="desc">Dashboard preview of 39 findings, complete coverage across four analyzers, a critical correlated incident, an eight-event attack timeline, and prioritized remediation work.</desc>
+  <style>
+    text {
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      fill: #172033;
+      letter-spacing: 0;
+    }
+    .muted { fill: #647086; }
+    .white { fill: #ffffff; }
+    .critical { fill: #c8323e; }
+    .high { fill: #d97706; }
+    .medium { fill: #2878c8; }
+    .success { fill: #198754; }
+    .label { font-size: 13px; font-weight: 700; }
+    .small { font-size: 12px; }
+    .tiny { font-size: 11px; }
+    .heading { font-size: 18px; font-weight: 750; }
+    .metric { font-size: 40px; font-weight: 800; }
+    .bold { font-weight: 750; }
+  </style>
+
+  <rect width="1600" height="1000" fill="#f3f5f8"/>
+
+  <rect x="42" y="30" width="52" height="52" rx="6" fill="#15283f"/>
+  <text x="68" y="63" text-anchor="middle" class="white" font-size="16" font-weight="800">CS</text>
+  <text x="112" y="55" font-size="30" font-weight="800">Cloud Security Risk Report</text>
+  <text x="112" y="78" class="muted" font-size="14">Offline AWS evidence analysis across identity, storage, network, and audit activity</text>
+  <text x="1558" y="50" text-anchor="end" font-size="14" font-weight="750">Sample assessment</text>
+  <text x="1558" y="73" text-anchor="end" class="muted" font-size="12">Account 111122223333 | Generated 2026-06-30</text>
+  <line x1="42" y1="108" x2="1558" y2="108" stroke="#dfe4ec"/>
+
+  <g>
+    <rect x="42" y="130" width="292" height="140" rx="6" fill="#ffffff" stroke="#dfe4ec"/>
+    <rect x="42" y="130" width="292" height="4" rx="2" fill="#15283f"/>
+    <text x="62" y="166" class="muted label">TOTAL FINDINGS</text>
+    <text x="62" y="215" class="metric">39</text>
+    <text x="62" y="246" class="muted small">35 cataloged rules | 4 analyzers</text>
+
+    <rect x="348" y="130" width="292" height="140" rx="6" fill="#ffffff" stroke="#dfe4ec"/>
+    <rect x="348" y="130" width="292" height="4" rx="2" fill="#c8323e"/>
+    <text x="368" y="166" class="muted label">CRITICAL</text>
+    <text x="368" y="215" class="metric">8</text>
+    <text x="368" y="246" class="muted small">Immediate response or hardening</text>
+
+    <rect x="654" y="130" width="292" height="140" rx="6" fill="#ffffff" stroke="#dfe4ec"/>
+    <rect x="654" y="130" width="292" height="4" rx="2" fill="#d97706"/>
+    <text x="674" y="166" class="muted label">HIGH</text>
+    <text x="674" y="215" class="metric">13</text>
+    <text x="674" y="246" class="muted small">Urgent investigation</text>
+
+    <rect x="960" y="130" width="292" height="140" rx="6" fill="#ffffff" stroke="#dfe4ec"/>
+    <rect x="960" y="130" width="292" height="4" rx="2" fill="#2878c8"/>
+    <text x="980" y="166" class="muted label">MEDIUM</text>
+    <text x="980" y="215" class="metric">16</text>
+    <text x="980" y="246" class="muted small">Near-term remediation</text>
+
+    <rect x="1266" y="130" width="292" height="140" rx="6" fill="#ffffff" stroke="#dfe4ec"/>
+    <rect x="1266" y="130" width="292" height="4" rx="2" fill="#647086"/>
+    <text x="1286" y="166" class="muted label">LOW</text>
+    <text x="1286" y="215" class="metric">2</text>
+    <text x="1286" y="246" class="muted small">Planned posture improvement</text>
+  </g>
+
+  <g>
+    <rect x="42" y="290" width="510" height="270" rx="6" fill="#ffffff" stroke="#dfe4ec"/>
+    <text x="64" y="326" class="heading">Analysis Coverage</text>
+    <text x="530" y="326" text-anchor="end" class="muted small">evaluated / discovered</text>
+
+    <rect x="64" y="348" width="222" height="82" rx="5" fill="#ffffff" stroke="#dfe4ec"/>
+    <text x="78" y="374" class="label">IAM</text>
+    <text x="78" y="399" class="success tiny bold">Complete | 6 / 6 resources</text>
+    <text x="268" y="397" text-anchor="end" font-size="26" font-weight="800">9</text>
+
+    <rect x="306" y="348" width="222" height="82" rx="5" fill="#ffffff" stroke="#dfe4ec"/>
+    <text x="320" y="374" class="label">STORAGE</text>
+    <text x="320" y="399" class="success tiny bold">Complete | 3 / 3 buckets</text>
+    <text x="510" y="397" text-anchor="end" font-size="26" font-weight="800">9</text>
+
+    <rect x="64" y="448" width="222" height="82" rx="5" fill="#ffffff" stroke="#dfe4ec"/>
+    <text x="78" y="474" class="label">NETWORK</text>
+    <text x="78" y="499" class="success tiny bold">Complete | 4 / 4 groups</text>
+    <text x="268" y="497" text-anchor="end" font-size="26" font-weight="800">10</text>
+
+    <rect x="306" y="448" width="222" height="82" rx="5" fill="#ffffff" stroke="#dfe4ec"/>
+    <text x="320" y="474" class="label">CLOUDTRAIL</text>
+    <text x="320" y="499" class="success tiny bold">Complete | 17 / 17 events</text>
+    <text x="510" y="497" text-anchor="end" font-size="26" font-weight="800">11</text>
+  </g>
+
+  <g>
+    <rect x="42" y="578" width="510" height="340" rx="6" fill="#ffffff" stroke="#dfe4ec"/>
+    <text x="64" y="614" class="heading">Prioritized Work Queue</text>
+    <text x="530" y="614" text-anchor="end" class="muted small">36 actions</text>
+
+    <rect x="64" y="640" width="46" height="28" rx="4" fill="#c8323e"/>
+    <text x="87" y="659" text-anchor="middle" class="white small bold">P0</text>
+    <text x="126" y="653" font-size="13" font-weight="750">Respond: monitoring defenses weakened</text>
+    <text x="126" y="673" class="muted tiny">Critical incident | High confidence | 8 linked events</text>
+    <line x1="64" y1="694" x2="530" y2="694" stroke="#dfe4ec"/>
+
+    <rect x="64" y="718" width="46" height="28" rx="4" fill="#d97706"/>
+    <text x="87" y="737" text-anchor="middle" class="white small bold">P1</text>
+    <text x="126" y="731" font-size="13" font-weight="750">Restore audit controls and protect KMS data</text>
+    <text x="126" y="751" class="muted tiny">Contain durable access paths and preserve evidence</text>
+    <line x1="64" y1="772" x2="530" y2="772" stroke="#dfe4ec"/>
+
+    <rect x="64" y="796" width="46" height="28" rx="4" fill="#2878c8"/>
+    <text x="87" y="815" text-anchor="middle" class="white small bold">P2</text>
+    <text x="126" y="809" font-size="13" font-weight="750">Remove public storage and network exposure</text>
+    <text x="126" y="829" class="muted tiny">Configuration hardening stays separate from response</text>
+
+    <rect x="64" y="858" width="466" height="38" rx="4" fill="#f3f5f8"/>
+    <text x="78" y="882" class="muted small">Explainable P0-P3 bands | no opaque numeric risk score</text>
+  </g>
+
+  <g>
+    <rect x="570" y="290" width="988" height="410" rx="6" fill="#ffffff" stroke="#dfe4ec"/>
+    <text x="592" y="326" class="heading">Correlated Attack Timeline</text>
+    <text x="1536" y="326" text-anchor="end" class="muted small">11 / 11 findings included | 0 omitted</text>
+
+    <rect x="592" y="348" width="944" height="100" rx="5" fill="#fff0f1"/>
+    <rect x="592" y="348" width="5" height="100" rx="2" fill="#c8323e"/>
+    <text x="615" y="375" class="critical tiny bold">P0 CORRELATED INCIDENT | CTI-B36042008211</text>
+    <text x="615" y="404" font-size="17" font-weight="800">Monitoring defenses weakened during persistence activity</text>
+    <text x="615" y="428" class="muted small">alice-admin | 198.51.100.20 | 19-minute observation window</text>
+    <text x="1514" y="384" text-anchor="end" class="critical" font-size="19" font-weight="800">Critical</text>
+    <text x="1514" y="408" text-anchor="end" class="muted tiny">High confidence</text>
+    <text x="1514" y="428" text-anchor="end" class="muted tiny">8 rules | 8 events</text>
+
+    <line x1="650" y1="514" x2="1480" y2="514" stroke="#cad2dd" stroke-width="2"/>
+
+    <g text-anchor="middle">
+      <circle cx="650" cy="514" r="21" fill="#c8323e" stroke="#ffffff" stroke-width="4"/>
+      <text x="650" y="518" class="white tiny bold">MFA</text>
+      <text x="650" y="550" class="muted tiny bold">01:04</text>
+      <text x="650" y="570" class="tiny bold">MFA removed</text>
+
+      <circle cx="768" cy="514" r="21" fill="#15283f" stroke="#ffffff" stroke-width="4"/>
+      <text x="768" y="518" class="white tiny bold">SG</text>
+      <text x="768" y="550" class="muted tiny bold">01:09</text>
+      <text x="768" y="570" class="tiny bold">Ingress changed</text>
+
+      <circle cx="886" cy="514" r="21" fill="#d97706" stroke="#ffffff" stroke-width="4"/>
+      <text x="886" y="518" class="white tiny bold">S3</text>
+      <text x="886" y="550" class="muted tiny bold">01:12</text>
+      <text x="886" y="570" class="tiny bold">Bucket policy</text>
+
+      <circle cx="1004" cy="514" r="21" fill="#d97706" stroke="#ffffff" stroke-width="4"/>
+      <text x="1004" y="518" class="white tiny bold">IAM</text>
+      <text x="1004" y="550" class="muted tiny bold">01:15</text>
+      <text x="1004" y="570" class="tiny bold">Policy version</text>
+
+      <circle cx="1122" cy="514" r="21" fill="#15283f" stroke="#ffffff" stroke-width="4"/>
+      <text x="1122" y="518" class="white tiny bold">KEY</text>
+      <text x="1122" y="550" class="muted tiny bold">01:17</text>
+      <text x="1122" y="570" class="tiny bold">Access key</text>
+
+      <circle cx="1240" cy="514" r="21" fill="#15283f" stroke="#ffffff" stroke-width="4"/>
+      <text x="1240" y="518" class="white tiny bold">STS</text>
+      <text x="1240" y="550" class="muted tiny bold">01:19</text>
+      <text x="1240" y="570" class="tiny bold">Trust changed</text>
+
+      <circle cx="1358" cy="514" r="21" fill="#c8323e" stroke="#ffffff" stroke-width="4"/>
+      <text x="1358" y="518" class="white tiny bold">DET</text>
+      <text x="1358" y="550" class="muted tiny bold">01:21</text>
+      <text x="1358" y="570" class="tiny bold">Detector deleted</text>
+
+      <circle cx="1476" cy="514" r="21" fill="#c8323e" stroke="#ffffff" stroke-width="4"/>
+      <text x="1476" y="518" class="white tiny bold">KMS</text>
+      <text x="1476" y="550" class="muted tiny bold">01:23</text>
+      <text x="1476" y="570" class="tiny bold">Key deletion</text>
+    </g>
+
+    <rect x="592" y="612" width="944" height="66" rx="5" fill="#f3f5f8"/>
+    <text x="612" y="638" class="label">Analyst context</text>
+    <text x="612" y="660" class="muted small">Observed chronology supports triage; it does not claim malicious intent, causation, or attribution.</text>
+  </g>
+
+  <g>
+    <rect x="570" y="718" width="988" height="200" rx="6" fill="#ffffff" stroke="#dfe4ec"/>
+    <text x="592" y="754" class="heading">Evidence and Assurance</text>
+    <text x="1536" y="754" text-anchor="end" class="muted small">deterministic sample pipeline</text>
+
+    <rect x="592" y="776" width="298" height="116" rx="5" fill="#ffffff" stroke="#dfe4ec"/>
+    <text x="608" y="801" class="muted tiny bold">PROVENANCE</text>
+    <text x="608" y="828" class="label">Stable IDs, account, Region,</text>
+    <text x="608" y="849" class="label">UTC time, source references</text>
+    <text x="608" y="875" class="success tiny bold">Finding contract v2.0</text>
+
+    <rect x="915" y="776" width="298" height="116" rx="5" fill="#ffffff" stroke="#dfe4ec"/>
+    <text x="931" y="801" class="muted tiny bold">CONTROL CONTEXT</text>
+    <text x="931" y="828" class="label">AWS Security Hub, CIS AWS,</text>
+    <text x="931" y="849" class="label">MITRE ATT&amp;CK mappings</text>
+    <text x="931" y="875" class="medium tiny bold">Direct vs related qualified</text>
+
+    <rect x="1238" y="776" width="298" height="116" rx="5" fill="#ffffff" stroke="#dfe4ec"/>
+    <text x="1254" y="801" class="muted tiny bold">SAFETY BOUNDARY</text>
+    <text x="1254" y="828" class="label">Offline exports only</text>
+    <text x="1254" y="849" class="label">No credentials or cloud changes</text>
+    <text x="1254" y="875" class="success tiny bold">Dependency-free runtime</text>
+  </g>
+
+  <line x1="42" y1="946" x2="1558" y2="946" stroke="#dfe4ec"/>
+  <circle cx="48" cy="970" r="4" fill="#198754"/>
+  <text x="60" y="974" class="muted small">Complete coverage</text>
+  <circle cx="196" cy="970" r="4" fill="#198754"/>
+  <text x="208" y="974" class="muted small">Deterministic output</text>
+  <circle cx="372" cy="970" r="4" fill="#198754"/>
+  <text x="384" y="974" class="muted small">Versioned contracts</text>
+  <text x="1558" y="974" text-anchor="end" class="muted small">Cloud Security Misconfiguration Lab | Synthetic documentation-only evidence</text>
+</svg>
