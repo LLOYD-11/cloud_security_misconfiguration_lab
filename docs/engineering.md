@@ -33,7 +33,11 @@ inventory and SHA-256 integrity. AST-based completeness tests compare every
 analyzer's literal rule IDs with the catalog, while timeline tests require a
 classification for every CloudTrail rule. Compatibility tests call every
 original module CLI so the unified package does not silently break earlier
-workflows.
+workflows. CloudTrail tests additionally compare the optimized API-failure
+window against a frozen quadratic oracle over a deterministic scaled corpus and
+enforce a structural timestamp-operation bound. This proves output equivalence
+and pointer monotonicity without an unstable wall-clock gate; see
+[CloudTrail failure-window performance](detection-performance.md).
 
 ## Continuous Integration
 

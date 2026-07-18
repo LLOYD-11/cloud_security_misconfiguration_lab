@@ -110,6 +110,9 @@ class CloudTrailAnalysisResult:
     incidents: tuple[Incident, ...]
 
 
+_TimedFailureEvent = tuple[datetime, int, dict[str, Any]]
+
+
 def _actor(event: dict[str, Any]) -> str:
     identity = event.get("userIdentity", {})
     if not isinstance(identity, dict):
@@ -525,6 +528,28 @@ def analyze_single_event(event: dict[str, Any], index: int) -> list[Finding]:
     return findings
 
 
+def _first_qualifying_failure_window(
+    ordered: list[_TimedFailureEvent],
+    *,
+    threshold: int = 5,
+    window: timedelta,
+) -> list[_TimedFailureEvent] | None:
+    """Return the first qualifying maximal window using a monotonic right edge."""
+
+    right = 0
+    for left, (start_time, _, _) in enumerate(ordered):
+        if right < left:
+            right = left
+        while (
+            right < len(ordered)
+            and ordered[right][0] - start_time <= window
+        ):
+            right += 1
+        if right - left >= threshold:
+            return ordered[left:right]
+    return None
+
+
 def detect_api_failure_spikes(
     events: list[dict[str, Any]],
     *,
@@ -533,7 +558,7 @@ def detect_api_failure_spikes(
 ) -> list[Finding]:
     groups: dict[
         tuple[str, str, str],
-        list[tuple[int, dict[str, Any]]],
+        list[_TimedFailureEvent],
     ] = defaultdict(list)
     for index, event in enumerate(events):
         if event.get("errorCode"):
@@ -543,70 +568,72 @@ def detect_api_failure_spikes(
                     _actor(event),
                     _source_ip(event),
                 )
-            ].append((index, event))
+            ].append((_event_time(event), index, event))
 
     findings: list[Finding] = []
     window = timedelta(minutes=window_minutes)
     for (account_id, actor, source_ip), group_events in groups.items():
-        ordered = sorted(group_events, key=lambda item: _event_time(item[1]))
-        for start_index, (_, start_event) in enumerate(ordered):
-            start_time = _event_time(start_event)
-            window_events = [
-                item
-                for item in ordered[start_index:]
-                if _event_time(item[1]) - start_time <= window
-            ]
-            if len(window_events) >= threshold:
-                event_names = sorted({_event_name(event) for _, event in window_events})
-                error_codes = sorted(
-                    {str(event.get("errorCode")) for _, event in window_events}
-                )
-                event_ids = [
-                    _event_id(event, original_index)
-                    for original_index, event in window_events
-                ]
-                last_event = window_events[-1][1]
-                _add_finding(
-                    findings,
-                    severity="medium",
-                    rule_id="CLD-006",
-                    resource_type="api_activity",
-                    resource_id=f"{actor}@{source_ip}",
-                    title="Repeated API failures from one actor and source",
-                    evidence=(
-                        f"{len(window_events)} failed API call(s) from {actor} at {source_ip} "
-                        f"within {window_minutes} minutes starting {start_event.get('eventTime')}."
-                    ),
-                    impact="Repeated failed API calls may indicate credential misuse, probing, or brute-force style activity.",
-                    remediation="Review the source IP, actor, failed API names, and related authentication activity.",
-                    references=[REF_AWS_CLOUDTRAIL, REF_MITRE_BRUTE_FORCE],
-                    metadata={
-                        "actor": actor,
-                        "source_ip": source_ip,
-                        "event_names": ", ".join(event_names),
-                        "error_codes": ", ".join(error_codes),
-                        "event_ids": ", ".join(event_ids),
-                        "first_seen": str(start_event.get("eventTime", "unknown-time")),
-                        "last_seen": str(last_event.get("eventTime", "unknown-time")),
-                        "event_time": str(start_event.get("eventTime", "unknown-time")),
-                        "window_minutes": str(window_minutes),
-                        "failure_count": str(len(window_events)),
-                        "account_id": account_id,
-                        "aws_region": (
-                            next(iter(regions))
-                            if len(
-                                regions := {
-                                    str(event.get("awsRegion"))
-                                    for _, event in window_events
-                                    if event.get("awsRegion")
-                                }
-                            )
-                            == 1
-                            else "multiple"
-                        ),
-                    },
-                )
-                break
+        ordered = sorted(group_events, key=lambda item: item[0])
+        window_events = _first_qualifying_failure_window(
+            ordered,
+            threshold=threshold,
+            window=window,
+        )
+        if window_events is None:
+            continue
+
+        start_event = window_events[0][2]
+        last_event = window_events[-1][2]
+        event_names = sorted(
+            {_event_name(event) for _, _, event in window_events}
+        )
+        error_codes = sorted(
+            {str(event.get("errorCode")) for _, _, event in window_events}
+        )
+        event_ids = [
+            _event_id(event, original_index)
+            for _, original_index, event in window_events
+        ]
+        _add_finding(
+            findings,
+            severity="medium",
+            rule_id="CLD-006",
+            resource_type="api_activity",
+            resource_id=f"{actor}@{source_ip}",
+            title="Repeated API failures from one actor and source",
+            evidence=(
+                f"{len(window_events)} failed API call(s) from {actor} at {source_ip} "
+                f"within {window_minutes} minutes starting {start_event.get('eventTime')}."
+            ),
+            impact="Repeated failed API calls may indicate credential misuse, probing, or brute-force style activity.",
+            remediation="Review the source IP, actor, failed API names, and related authentication activity.",
+            references=[REF_AWS_CLOUDTRAIL, REF_MITRE_BRUTE_FORCE],
+            metadata={
+                "actor": actor,
+                "source_ip": source_ip,
+                "event_names": ", ".join(event_names),
+                "error_codes": ", ".join(error_codes),
+                "event_ids": ", ".join(event_ids),
+                "first_seen": str(start_event.get("eventTime", "unknown-time")),
+                "last_seen": str(last_event.get("eventTime", "unknown-time")),
+                "event_time": str(start_event.get("eventTime", "unknown-time")),
+                "window_minutes": str(window_minutes),
+                "failure_count": str(len(window_events)),
+                "account_id": account_id,
+                "aws_region": (
+                    next(iter(regions))
+                    if len(
+                        regions := {
+                            str(event.get("awsRegion"))
+                            for _, _, event in window_events
+                            if event.get("awsRegion")
+                        }
+                    )
+                    == 1
+                    else "multiple"
+                ),
+            },
+        )
 
     return findings
 

@@ -20,7 +20,12 @@ It does not call AWS APIs or require cloud credentials. The simplified model can
 | `CLD-010` | High/Critical | Audit or threat-detection control disabled |
 | `CLD-011` | High/Critical | KMS key disabled or scheduled for deletion |
 
-The failed API detector uses a default threshold of 5 failed API calls within 10 minutes for the same actor and source IP.
+The failed API detector uses a default threshold of 5 failed API calls within
+10 minutes for the same account, actor, and source IP. Its bounded-window search
+uses a monotonic right edge after stable timestamp sorting while preserving the
+first qualifying inclusive window and one finding per group. Complexity,
+behavioral invariants, and regression evidence are documented in
+[CloudTrail failure-window performance](../docs/detection-performance.md).
 
 Failed API calls do not produce findings that claim a configuration changed. Risk-reducing actions such as revoking ingress, deleting a bucket policy, or detaching an IAM policy are also excluded from the risk-increasing change rules. Duplicate events with the same `eventID` are analyzed once.
 

@@ -1,10 +1,15 @@
 import json
+import random
 import tempfile
 import unittest
+from collections import defaultdict
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Any
 
 from cloud_findings import EvidenceReference, Finding, findings_to_dicts, write_findings
 from cloud_incidents import incidents_to_dicts, write_incidents
+from cloudtrail_detector import detector as detector_module
 from cloudtrail_detector.correlation import correlate_incidents
 from cloudtrail_detector.detector import (
     analyze_activity,
@@ -14,6 +19,175 @@ from cloudtrail_detector.detector import (
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SAMPLE_FILE = PROJECT_ROOT / "sample_data" / "cloudtrail" / "sample_cloudtrail_events.json"
+
+
+def _quadratic_failure_spike_reference(
+    events: list[dict[str, Any]],
+    *,
+    threshold: int,
+    window_minutes: int,
+) -> list[Finding]:
+    """Frozen C1 implementation used only as a behavioral oracle."""
+
+    groups = defaultdict(list)
+    for index, event in enumerate(events):
+        if event.get("errorCode"):
+            groups[
+                (
+                    detector_module._event_account_id(event),
+                    detector_module._actor(event),
+                    detector_module._source_ip(event),
+                )
+            ].append((index, event))
+
+    findings = []
+    window = timedelta(minutes=window_minutes)
+    for (account_id, actor, source_ip), group_events in groups.items():
+        ordered = sorted(
+            group_events,
+            key=lambda item: detector_module._event_time(item[1]),
+        )
+        for start_index, (_, start_event) in enumerate(ordered):
+            start_time = detector_module._event_time(start_event)
+            window_events = [
+                item
+                for item in ordered[start_index:]
+                if detector_module._event_time(item[1]) - start_time <= window
+            ]
+            if len(window_events) < threshold:
+                continue
+
+            event_names = sorted(
+                {
+                    detector_module._event_name(event)
+                    for _, event in window_events
+                }
+            )
+            error_codes = sorted(
+                {str(event.get("errorCode")) for _, event in window_events}
+            )
+            event_ids = [
+                detector_module._event_id(event, original_index)
+                for original_index, event in window_events
+            ]
+            last_event = window_events[-1][1]
+            detector_module._add_finding(
+                findings,
+                severity="medium",
+                rule_id="CLD-006",
+                resource_type="api_activity",
+                resource_id=f"{actor}@{source_ip}",
+                title="Repeated API failures from one actor and source",
+                evidence=(
+                    f"{len(window_events)} failed API call(s) from {actor} at "
+                    f"{source_ip} within {window_minutes} minutes starting "
+                    f"{start_event.get('eventTime')}."
+                ),
+                impact=(
+                    "Repeated failed API calls may indicate credential misuse, "
+                    "probing, or brute-force style activity."
+                ),
+                remediation=(
+                    "Review the source IP, actor, failed API names, and related "
+                    "authentication activity."
+                ),
+                references=[
+                    detector_module.REF_AWS_CLOUDTRAIL,
+                    detector_module.REF_MITRE_BRUTE_FORCE,
+                ],
+                metadata={
+                    "actor": actor,
+                    "source_ip": source_ip,
+                    "event_names": ", ".join(event_names),
+                    "error_codes": ", ".join(error_codes),
+                    "event_ids": ", ".join(event_ids),
+                    "first_seen": str(
+                        start_event.get("eventTime", "unknown-time")
+                    ),
+                    "last_seen": str(
+                        last_event.get("eventTime", "unknown-time")
+                    ),
+                    "event_time": str(
+                        start_event.get("eventTime", "unknown-time")
+                    ),
+                    "window_minutes": str(window_minutes),
+                    "failure_count": str(len(window_events)),
+                    "account_id": account_id,
+                    "aws_region": (
+                        next(iter(regions))
+                        if len(
+                            regions := {
+                                str(event.get("awsRegion"))
+                                for _, event in window_events
+                                if event.get("awsRegion")
+                            }
+                        )
+                        == 1
+                        else "multiple"
+                    ),
+                },
+            )
+            break
+    return findings
+
+
+def _scaled_failure_corpus() -> list[dict[str, Any]]:
+    rng = random.Random(20260718)
+    base = datetime(2026, 6, 30, tzinfo=timezone.utc)
+    events = []
+    event_names = (
+        "AssumeRole",
+        "ListBuckets",
+        "GetObject",
+        "DescribeInstances",
+    )
+    error_codes = (
+        "AccessDenied",
+        "UnauthorizedOperation",
+        "ThrottlingException",
+    )
+    regions = ("ap-southeast-2", "us-east-1")
+    accounts = ("111122223333", "999988887777")
+
+    for group_index in range(80):
+        actor = f"scale-user-{group_index:03d}"
+        source_ip = f"192.0.2.{group_index % 200 + 1}"
+        account_id = accounts[group_index % len(accounts)]
+        group_base = base + timedelta(hours=group_index)
+        for event_index in range(36):
+            observed_at = group_base + timedelta(
+                seconds=rng.randrange(0, 30 * 60)
+            )
+            event = {
+                "eventID": f"scale-{group_index:03d}-{event_index:03d}",
+                "eventTime": observed_at.isoformat().replace("+00:00", "Z"),
+                "eventName": event_names[event_index % len(event_names)],
+                "recipientAccountId": account_id,
+                "awsRegion": regions[event_index % len(regions)],
+                "sourceIPAddress": source_ip,
+                "userIdentity": {
+                    "type": "IAMUser",
+                    "userName": actor,
+                },
+            }
+            if event_index % 7 != 0:
+                event["errorCode"] = error_codes[
+                    event_index % len(error_codes)
+                ]
+            events.append(event)
+    rng.shuffle(events)
+    return events
+
+
+class _CountingTimestamp:
+    subtractions = 0
+
+    def __init__(self, value: datetime) -> None:
+        self.value = value
+
+    def __sub__(self, other: "_CountingTimestamp") -> timedelta:
+        type(self).subtractions += 1
+        return self.value - other.value
 
 
 class CloudTrailDetectorTests(unittest.TestCase):
@@ -156,6 +330,118 @@ class CloudTrailDetectorTests(unittest.TestCase):
         self.assertEqual(
             {"unknown-user@192.0.2.44", "unknown-user@198.51.100.22"},
             {finding.resource_id for finding in findings},
+        )
+
+    def test_failure_window_preserves_first_anchor_and_inclusive_boundary(self):
+        base_event = {
+            "eventName": "AssumeRole",
+            "sourceIPAddress": "192.0.2.44",
+            "userIdentity": {
+                "type": "IAMUser",
+                "userName": "boundary-user",
+            },
+            "errorCode": "AccessDenied",
+        }
+        for times, window_minutes, expected_ids in (
+            (
+                ("02:00:00", "02:05:00", "02:10:00", "02:10:01"),
+                10,
+                ("boundary-0", "boundary-1", "boundary-2"),
+            ),
+            (
+                ("02:00:00", "02:11:00", "02:12:00", "02:13:00"),
+                2,
+                ("boundary-1", "boundary-2", "boundary-3"),
+            ),
+        ):
+            with self.subTest(times=times, window_minutes=window_minutes):
+                events = [
+                    {
+                        **base_event,
+                        "eventID": f"boundary-{index}",
+                        "eventTime": f"2026-06-30T{event_time}Z",
+                    }
+                    for index, event_time in enumerate(times)
+                ]
+
+                finding = detector_module.detect_api_failure_spikes(
+                    events,
+                    threshold=3,
+                    window_minutes=window_minutes,
+                )[0]
+
+                self.assertEqual(
+                    ", ".join(expected_ids),
+                    finding.metadata["event_ids"],
+                )
+                self.assertEqual(
+                    sorted(expected_ids),
+                    [
+                        reference.id
+                        for reference in finding.evidence_references
+                    ],
+                )
+                first_index = int(expected_ids[0].rsplit("-", 1)[1])
+                self.assertEqual(
+                    f"2026-06-30T{times[first_index]}Z",
+                    finding.observed_at,
+                )
+
+    def test_failure_spike_optimization_matches_quadratic_reference_at_scale(self):
+        events = _scaled_failure_corpus()
+        self.assertEqual(2_880, len(events))
+        self.assertEqual(
+            2_400,
+            sum(bool(event.get("errorCode")) for event in events),
+        )
+
+        for threshold, window_minutes in (
+            (1, 10),
+            (3, 5),
+            (5, 10),
+            (12, 15),
+            (50, 10),
+        ):
+            with self.subTest(
+                threshold=threshold,
+                window_minutes=window_minutes,
+            ):
+                expected = _quadratic_failure_spike_reference(
+                    events,
+                    threshold=threshold,
+                    window_minutes=window_minutes,
+                )
+                actual = detector_module.detect_api_failure_spikes(
+                    events,
+                    threshold=threshold,
+                    window_minutes=window_minutes,
+                )
+
+                self.assertEqual(expected, actual)
+
+    def test_failure_window_two_pointer_uses_linear_timestamp_subtractions(self):
+        base = datetime(2026, 6, 30, tzinfo=timezone.utc)
+        event_count = 10_000
+        _CountingTimestamp.subtractions = 0
+        ordered = [
+            (
+                _CountingTimestamp(base + timedelta(seconds=index)),
+                index,
+                {},
+            )
+            for index in range(event_count)
+        ]
+
+        result = detector_module._first_qualifying_failure_window(
+            ordered,
+            threshold=event_count + 1,
+            window=timedelta(seconds=30),
+        )
+
+        self.assertIsNone(result)
+        self.assertLessEqual(
+            _CountingTimestamp.subtractions,
+            2 * event_count,
         )
 
     def test_failed_api_spikes_and_incidents_do_not_cross_account_boundaries(self):

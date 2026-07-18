@@ -188,6 +188,11 @@ Duplicate CloudTrail events with the same `eventID` are analyzed once. Failed AP
 
 CloudTrail input can use either the simplified event contract or one or more native `Records` log files in JSON or gzip format. Native normalization validates version 1.x records, UTC timestamps, identity and account context, and event GUIDs before merging files. Identical duplicate events are skipped with a warning; conflicting records sharing an ID stop analysis.
 
+The `CLD-006` failure-spike search uses a near-linear bounded-window scan after
+stable per-group sorting. Exact old/new finding equivalence, edge semantics, and
+a deterministic 10,000-point structural performance bound are documented in
+[CloudTrail failure-window performance](docs/detection-performance.md).
+
 Rule catalog:
 
 | Rule | Risk Pattern |
@@ -332,6 +337,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [Attack timeline](docs/attack-timeline.md)
 - [Analysis coverage](docs/analysis-coverage.md)
 - [Native AWS inputs](docs/native-aws-inputs.md)
+- [CloudTrail failure-window performance](docs/detection-performance.md)
 - [Engineering checks](docs/engineering.md)
 - [Known limitations](docs/known-limitations.md)
 - [Change log](CHANGELOG.md)

@@ -45,6 +45,11 @@ Repeated findings for the same rule do not create a multi-signal incident by the
 
 Event IDs are de-duplicated before counting. Native CloudTrail GUIDs are used when available; simplified events without IDs receive deterministic input-order fallback identifiers.
 
+The upstream `CLD-006` aggregate selects the first qualifying inclusive window
+for one account, actor, and source and emits at most one finding per group. Its
+algorithmic contract and scale regression evidence are documented in
+[CloudTrail failure-window performance](detection-performance.md).
+
 ## Severity, Confidence, and Identity
 
 Incident severity equals the highest severity among its constituent findings. Correlation never raises severity simply because more events were observed.

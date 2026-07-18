@@ -16,6 +16,8 @@ All notable changes to this project are documented in this file.
 - A versioned, SHA-256-verified provenance manifest for every synthetic
   AWS-shaped fixture.
 - Python 3.12 CI coverage between the supported 3.10 and 3.13 endpoints.
+- Exact old/new CloudTrail failure-window equivalence tests, explicit boundary
+  cases, and a deterministic 10,000-point structural operation bound.
 
 ### Changed
 
@@ -25,6 +27,8 @@ All notable changes to this project are documented in this file.
 - Native S3 normalization now preserves `BucketRegion`.
 - CloudTrail failure-spike detection and incident correlation now keep account
   boundaries separate when multi-account evidence is supplied.
+- CloudTrail failure-spike detection now uses a monotonic bounded-window scan
+  after per-group sorting instead of repeatedly rescanning ordered suffixes.
 
 ## 2.0.0 - 2026-07-17
 

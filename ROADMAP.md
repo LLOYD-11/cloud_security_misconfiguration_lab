@@ -84,14 +84,14 @@ Status: Complete in `v2.0.0` within the documented offline evidence boundary.
 
 ## M6: CloudTrail Detection and Attack-Chain Correlation
 
-Status: Substantially complete; performance hardening remains open for `v2.1.0`.
+Status: Complete for `v2.1.0`.
 
 - [x] Validate event identity, time, source, outcome, and duplicate `eventID` behavior.
 - [x] Detect root login, MFA removal, security-control changes, credential creation, policy and trust changes, monitoring disablement, KMS disruption, and API-failure spikes.
 - [x] Correlate eligible events into deterministic incidents by actor, source, and time window.
 - [x] Generate an evidence-based chronological attack timeline with explicit omissions.
-- [ ] Replace the quadratic API-failure spike window scan with a linear or near-linear bounded-window implementation.
-- [ ] Add performance regression tests proving identical findings at scale.
+- [x] Replace the quadratic API-failure spike window scan with a linear or near-linear bounded-window implementation.
+- [x] Add performance regression tests proving identical findings at scale.
 
 ## M7: Professional Report and Risk Model
 
@@ -133,7 +133,7 @@ Status: In progress; `v2.0.0` is the release checkpoint and `v2.1.0` is the comp
 
 1. **C0 - Governance:** restore M0-M9 and add requirement-to-evidence traceability.
 2. **C1 - Provenance (complete):** complete M2 and M3 finding provenance, contract migration, Python 3.12 CI, and fixture manifests.
-3. **C2 - Detection performance:** complete the M6 failure-window optimization and equivalence tests.
+3. **C2 - Detection performance (complete):** complete the M6 failure-window optimization and equivalence tests.
 4. **C3 - Benchmarking:** complete M8 benchmark, scale, resilience, and coverage evidence.
 5. **C4 - Portfolio presentation:** complete the remaining M9 README, visual, and repository-metadata work.
 6. **C5 - Release:** run the full release gate and publish `v2.1.0`.

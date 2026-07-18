@@ -97,7 +97,7 @@ The canonical plan is [ROADMAP.md](../ROADMAP.md). `v2.0.0` at commit
 | M6-R2 | Detect identity, network, storage, monitoring, IAM, credential, and KMS risk changes. | Complete | CloudTrail detector, tests, and [rule catalog](rule-catalog.md); commit `51af0b7`. |
 | M6-R3 | Correlate events into deterministic incidents. | Complete | [Correlation engine](../cloudtrail_detector/correlation.py), incident contract, tests, and [correlation documentation](incident-correlation.md). |
 | M6-R4 | Produce an evidence-based attack timeline. | Complete | Timeline package, tests, schema, and [timeline documentation](attack-timeline.md); commit `ea5b59e`. |
-| M6-R5 | Use a linear or near-linear bounded failure window. | Partial | `detect_api_failure_spikes` is correct but rescans the ordered suffix for each anchor. Replace it with a bounded two-pointer or deque implementation and prove output equivalence. |
+| M6-R5 | Use a linear or near-linear bounded failure window. | Complete | Monotonic two-pointer implementation in the [CloudTrail detector](../cloudtrail_detector/detector.py), exact old/new finding-equivalence and structural operation-bound tests in the [detector test suite](../cloudtrail_detector/test_detector.py), and published [performance evidence](detection-performance.md). |
 
 ## M7: Professional Report and Risk Model
 
