@@ -171,7 +171,8 @@ Status: Complete in `v2.1.1`.
 
 ## M11: Runtime and Supply-Chain Hardening
 
-Status: In progress for `v2.2.0`.
+Status: Substantially complete for `v2.2.0`; generated release evidence awaits
+the `v2.2.0` tag.
 
 - [x] Define evidence-based limits for JSON size, decompressed gzip size,
       resource count, node count, and nesting depth.
@@ -180,8 +181,12 @@ Status: In progress for `v2.2.0`.
       resolution reproducible.
 - [x] Exercise every documented Python minor version in CI.
 - [x] Add Markdown, internal-link, and external-link validation.
-- [ ] Publish a security policy, threat model, release checksums, an SBOM, and
-      build-provenance evidence.
+- [x] Publish a security policy and threat model.
+- [x] Implement and test exact release checksums, an installed-wheel SPDX SBOM,
+      signed build provenance, a signed SBOM predicate, and isolated
+      release-authority boundaries.
+- [ ] Publish the generated checksum, SBOM, and attestation assets with the
+      `v2.2.0` tag after M12 is complete.
 
 ## M12: Independent External Evaluation
 

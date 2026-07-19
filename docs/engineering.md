@@ -77,7 +77,7 @@ also runs the documentation gates and builds the wheel and source distribution.
 Workflow permissions are limited to read-only repository contents. Actions use
 full immutable commit SHAs, the runner is fixed to Ubuntu 24.04, and pip
 installs the reviewed hash lock before installing the local project without
-dependency or build isolation.
+dependency or build isolation. Checkout credentials are not persisted.
 
 The deterministic end-to-end check fixes the report date to the sample event
 date and compares the generated Markdown, including finding provenance, the
@@ -103,6 +103,28 @@ packaged benchmark manifest, runner, and both benchmark schemas.
 The tag starts `.github/workflows/release.yml`. That workflow verifies the tag
 against the installed package version, requires the matching release-notes
 file, repeats the full quality and deterministic gates, builds the wheel and
-source distribution, runs the installed-wheel demo, and then creates a GitHub
-Release with both distributions attached. Its write permission is scoped to
-repository contents.
+source distribution, and runs the installed-wheel demo.
+
+The workflow then installs the wheel into an isolated inventory root, generates
+an SPDX 2.3 SBOM with pinned Syft, and runs the tested release-evidence tool:
+
+```bash
+python -m tools.release_evidence prepare \
+  --dist dist \
+  --project-name cloud-security-misconfiguration-lab \
+  --version X.Y.Z \
+  --license-id MIT
+python -m tools.release_evidence verify \
+  --dist dist \
+  --project-name cloud-security-misconfiguration-lab \
+  --version X.Y.Z \
+  --license-id MIT
+```
+
+A low-privilege build job signs SLSA provenance for the two distributions,
+SBOM, and checksum manifest, and signs a separate SPDX predicate for the wheel.
+It verifies both bundles before staging the candidate. A second job has
+repository-content write permission but does not check out source or execute
+project Python; it rechecks hashes and signer identity before creating the
+GitHub Release. See [Release integrity](release-integrity.md) for asset names,
+consumer verification, and residual trust.

@@ -13,6 +13,10 @@ an action. Both workflows pin the following official releases:
 | --- | --- | --- |
 | `actions/checkout` | `v7.0.0` | `9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0` |
 | `actions/setup-python` | `v6.3.0` | `ece7cb06caefa5fff74198d8649806c4678c61a1` |
+| `anchore/sbom-action` | `v0.24.0` | `e22c389904149dbc22b58101806040fa8d37a610` |
+| `actions/attest` | `v4.2.0` | `f7c74d28b9d84cb8768d0b8ca14a4bac6ef463e6` |
+| `actions/upload-artifact` | `v7.0.1` | `043fb46d1a93c77aae656e7c1c64a875d1fc6a0a` |
+| `actions/download-artifact` | `v8.0.1` | `3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c` |
 
 The release tags and commits were verified through the official repositories on
 2026-07-19. Version comments remain beside each SHA so automated and human
@@ -23,6 +27,10 @@ References:
 - [GitHub secure-use guidance](https://docs.github.com/en/actions/reference/security/secure-use#using-third-party-actions)
 - [`actions/checkout` v7.0.0](https://github.com/actions/checkout/releases/tag/v7.0.0)
 - [`actions/setup-python` v6.3.0](https://github.com/actions/setup-python/releases/tag/v6.3.0)
+- [`anchore/sbom-action` v0.24.0](https://github.com/anchore/sbom-action/releases/tag/v0.24.0)
+- [`actions/attest` v4.2.0](https://github.com/actions/attest/releases/tag/v4.2.0)
+- [`actions/upload-artifact` v7.0.1](https://github.com/actions/upload-artifact/releases/tag/v7.0.1)
+- [`actions/download-artifact` v8.0.1](https://github.com/actions/download-artifact/releases/tag/v8.0.1)
 
 ## Development Lock
 
@@ -88,6 +96,26 @@ References:
   keys, or post-install `pip check` in either workflow;
 - a development requirement that is absent from the lock;
 - a lock entry without an exact version or a valid SHA-256 hash.
+- persisted checkout credentials or unreviewed release-evidence Actions;
+- release jobs that omit separate build, signing, transfer, and publish
+  verification controls; and
+- release workflows that omit the pinned Syft version, SPDX predicate,
+  checksums, or exact signer-workflow verification.
+
+## Release Authority Boundary
+
+The release build job can read repository contents and request short-lived OIDC
+and attestation credentials. It cannot create or modify a GitHub Release.
+Checkout does not persist credentials in the working tree.
+
+The publisher job can write repository release contents, but it receives only
+the staged candidate, does not check out source, and does not execute project
+Python. It rechecks the SHA-256 manifest and both Sigstore bundles after the
+workflow-artifact transfer. This separation limits the authority available to
+third-party build tooling and repository code.
+
+See [Release integrity](release-integrity.md) for the artifact trust chain and
+[Threat model](threat-model.md) for the remaining upstream dependencies.
 
 ## Residual Boundary
 
@@ -95,4 +123,6 @@ The lock constrains selected package versions and accepted distributions; it
 does not make builds bit-for-bit reproducible. GitHub-hosted Ubuntu 24.04 images,
 the latest patch release of each requested Python minor, pip itself, network
 availability, and PyPI metadata remain upstream inputs. Release checksums, an
-SBOM, and build provenance are separate M11 controls.
+SBOM, and build provenance establish integrity and origin but do not make the
+source vulnerability-free or the build environment hermetic. GitHub CLI and
+Sigstore trusted-root freshness are also release-verification dependencies.

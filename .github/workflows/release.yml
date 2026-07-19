@@ -5,21 +5,24 @@ on:
     tags:
       - "v*.*.*"
 
-permissions:
-  contents: write
-
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  release:
-    name: Verify and publish
+  build:
+    name: Verify, attest, and stage
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
 
     steps:
       - name: Check out repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
@@ -42,6 +45,9 @@ jobs:
           assert tag == expected, f'{tag} does not match {expected}';
           notes = pathlib.Path(f'docs/release-{tag}.md');
           assert notes.is_file(), f'{notes} is missing'"
+
+      - name: Export verified release version
+        run: echo "RELEASE_VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
 
       - name: Lint
         run: ruff check .
@@ -113,12 +119,144 @@ jobs:
           assert '## Attack Timeline' in
           (output / 'cloud_security_report.md').read_text()"
 
+      - name: Install wheel into isolated SBOM root
+        run: >-
+          python -m pip install --no-deps --no-index
+          --target build/sbom-root dist/*.whl
+
+      - name: Generate SPDX 2.3 SBOM from installed wheel
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+        env:
+          SYFT_CHECK_FOR_APP_UPDATE: "false"
+          SYFT_SOURCE_NAME: cloud-security-misconfiguration-lab-wheel
+          SYFT_SOURCE_VERSION: ${{ env.RELEASE_VERSION }}
+        with:
+          path: build/sbom-root
+          format: spdx-json
+          output-file: dist/cloud-security-misconfiguration-lab.spdx.json
+          artifact-name: cloud-security-misconfiguration-lab.spdx.json
+          upload-artifact: false
+          upload-release-assets: false
+          dependency-snapshot: false
+          syft-version: v1.48.0
+
+      - name: Prepare and verify release checksums and SBOM identity
+        run: |
+          python -m tools.release_evidence prepare \
+            --dist dist \
+            --project-name cloud-security-misconfiguration-lab \
+            --version "$RELEASE_VERSION" \
+            --license-id MIT
+          python -m tools.release_evidence verify \
+            --dist dist \
+            --project-name cloud-security-misconfiguration-lab \
+            --version "$RELEASE_VERSION" \
+            --license-id MIT
+
+      - name: Attest release build provenance
+        id: provenance
+        uses: actions/attest@f7c74d28b9d84cb8768d0b8ca14a4bac6ef463e6 # v4.2.0
+        with:
+          subject-path: |
+            dist/*.whl
+            dist/*.tar.gz
+            dist/*.spdx.json
+            dist/SHA256SUMS
+
+      - name: Attest wheel SBOM
+        id: sbom-attestation
+        uses: actions/attest@f7c74d28b9d84cb8768d0b8ca14a4bac6ef463e6 # v4.2.0
+        with:
+          subject-path: dist/*.whl
+          sbom-path: dist/cloud-security-misconfiguration-lab.spdx.json
+
+      - name: Export signed attestation bundles
+        env:
+          PROVENANCE_BUNDLE: ${{ steps.provenance.outputs.bundle-path }}
+          SBOM_BUNDLE: ${{ steps.sbom-attestation.outputs.bundle-path }}
+        run: |
+          cp "$PROVENANCE_BUNDLE" \
+            dist/cloud-security-misconfiguration-lab-build-provenance.sigstore.json
+          cp "$SBOM_BUNDLE" \
+            dist/cloud-security-misconfiguration-lab-sbom-attestation.sigstore.json
+
+      - name: Verify signed attestation bundles
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for artifact in dist/*.whl dist/*.tar.gz dist/*.spdx.json dist/SHA256SUMS; do
+            gh attestation verify "$artifact" \
+              --repo "$GITHUB_REPOSITORY" \
+              --bundle dist/cloud-security-misconfiguration-lab-build-provenance.sigstore.json \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release.yml"
+          done
+          gh attestation verify dist/*.whl \
+            --repo "$GITHUB_REPOSITORY" \
+            --bundle dist/cloud-security-misconfiguration-lab-sbom-attestation.sigstore.json \
+            --predicate-type https://spdx.dev/Document/v2.3 \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release.yml"
+
+      - name: Upload verified release candidate
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-candidate
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
+            dist/*.spdx.json
+            dist/SHA256SUMS
+            dist/*.sigstore.json
+            docs/release-${{ github.ref_name }}.md
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Reverify and publish
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      attestations: read
+
+    steps:
+      - name: Download verified release candidate
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-candidate
+          path: release-candidate
+
+      - name: Reverify release checksums after transfer
+        working-directory: release-candidate/dist
+        run: sha256sum --check SHA256SUMS
+
+      - name: Reverify signed attestations after transfer
+        working-directory: release-candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for artifact in dist/*.whl dist/*.tar.gz dist/*.spdx.json dist/SHA256SUMS; do
+            gh attestation verify "$artifact" \
+              --repo "$GITHUB_REPOSITORY" \
+              --bundle dist/cloud-security-misconfiguration-lab-build-provenance.sigstore.json \
+              --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release.yml"
+          done
+          gh attestation verify dist/*.whl \
+            --repo "$GITHUB_REPOSITORY" \
+            --bundle dist/cloud-security-misconfiguration-lab-sbom-attestation.sigstore.json \
+            --predicate-type https://spdx.dev/Document/v2.3 \
+            --signer-workflow "$GITHUB_REPOSITORY/.github/workflows/release.yml"
+
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: >-
           gh release create "$GITHUB_REF_NAME"
-          dist/*.whl dist/*.tar.gz
+          release-candidate/dist/*.whl
+          release-candidate/dist/*.tar.gz
+          release-candidate/dist/*.spdx.json
+          release-candidate/dist/SHA256SUMS
+          release-candidate/dist/*.sigstore.json
           --verify-tag
           --title "Cloud Security Misconfiguration Lab $GITHUB_REF_NAME"
-          --notes-file "docs/release-$GITHUB_REF_NAME.md"
+          --notes-file
+          "release-candidate/docs/release-$GITHUB_REF_NAME.md"

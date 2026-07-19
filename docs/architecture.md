@@ -164,6 +164,11 @@ The exact fail-closed byte, decompression, node, nesting, resource, and
 file-count ceilings are documented in
 [Input resource limits](input-resource-limits.md).
 
+The complete actor, asset, abuse-case, development-network, local-filesystem,
+and release-signing analysis is maintained in the
+[Threat model](threat-model.md). Security reports follow the repository
+[Security policy](../SECURITY.md).
+
 ## Determinism
 
 Determinism makes the repository reviewable and testable:
@@ -199,6 +204,13 @@ The wheel contains:
 The installed `cloud-security-lab` command and `python -m cloud_security_lab`
 entry point expose the same `analyze`, `report`, `catalog`, and `demo`
 subcommands. Original module scripts remain compatibility entry points.
+
+Tagged releases cross a separate delivery boundary. A read-only build job
+tests and packages the project, inventories an isolated wheel installation,
+validates checksums and SPDX identity, and signs provenance through GitHub
+OIDC. A second job receives only the verified candidate, repeats checksum and
+attestation verification, and holds the permission to create the GitHub
+Release. See [Release integrity](release-integrity.md).
 
 ## Extension Path
 

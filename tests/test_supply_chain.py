@@ -9,18 +9,40 @@ WORKFLOWS = (
     PROJECT_ROOT / ".github/workflows/ci.yml",
     PROJECT_ROOT / ".github/workflows/release.yml",
 )
-EXPECTED_ACTIONS = {
-    (
-        "actions/checkout",
-        "9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0",
-        "v7.0.0",
-    ),
-    (
-        "actions/setup-python",
-        "ece7cb06caefa5fff74198d8649806c4678c61a1",
-        "v6.3.0",
-    ),
-}
+EXPECTED_ACTION_COUNTS = Counter(
+    {
+        (
+            "actions/checkout",
+            "9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0",
+            "v7.0.0",
+        ): 2,
+        (
+            "actions/setup-python",
+            "ece7cb06caefa5fff74198d8649806c4678c61a1",
+            "v6.3.0",
+        ): 2,
+        (
+            "anchore/sbom-action",
+            "e22c389904149dbc22b58101806040fa8d37a610",
+            "v0.24.0",
+        ): 1,
+        (
+            "actions/attest",
+            "f7c74d28b9d84cb8768d0b8ca14a4bac6ef463e6",
+            "v4.2.0",
+        ): 2,
+        (
+            "actions/upload-artifact",
+            "043fb46d1a93c77aae656e7c1c64a875d1fc6a0a",
+            "v7.0.1",
+        ): 1,
+        (
+            "actions/download-artifact",
+            "3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c",
+            "v8.0.1",
+        ): 1,
+    }
+)
 ACTION_PATTERN = re.compile(
     r"^\s*uses:\s*([^@\s]+)@([0-9a-f]{40})\s+#\s+(\S+)\s*$",
     re.MULTILINE,
@@ -121,7 +143,7 @@ class SupplyChainTests(unittest.TestCase):
             observed.extend(matches)
 
         self.assertEqual(
-            Counter({action: len(WORKFLOWS) for action in EXPECTED_ACTIONS}),
+            EXPECTED_ACTION_COUNTS,
             Counter(observed),
         )
 
@@ -142,6 +164,58 @@ class SupplyChainTests(unittest.TestCase):
             for fragment in required_fragments:
                 with self.subTest(workflow=path.name, fragment=fragment):
                     self.assertIn(fragment, text)
+            self.assertEqual(
+                text.count("persist-credentials: false"),
+                1,
+                path,
+            )
+
+    def test_release_workflow_separates_build_and_publish_permissions(self):
+        release = (PROJECT_ROOT / ".github/workflows/release.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertNotRegex(release, r"(?m)^permissions:")
+        self.assertEqual(1, release.count("contents: read"))
+        self.assertEqual(1, release.count("contents: write"))
+        self.assertEqual(1, release.count("id-token: write"))
+        self.assertEqual(1, release.count("attestations: write"))
+        self.assertEqual(1, release.count("attestations: read"))
+        self.assertNotIn("artifact-metadata:", release)
+        publish = release.split("\n  publish:\n", 1)[1]
+        self.assertNotIn("actions/checkout", publish)
+        self.assertNotIn("python ", publish)
+
+    def test_release_workflow_builds_and_reverifies_integrity_evidence(self):
+        release = (PROJECT_ROOT / ".github/workflows/release.yml").read_text(
+            encoding="utf-8"
+        )
+        required_fragments = (
+            "--target build/sbom-root dist/*.whl",
+            "path: build/sbom-root",
+            "format: spdx-json",
+            "syft-version: v1.48.0",
+            "SYFT_SOURCE_NAME: cloud-security-misconfiguration-lab-wheel",
+            "SYFT_SOURCE_VERSION: ${{ env.RELEASE_VERSION }}",
+            "upload-artifact: false",
+            "upload-release-assets: false",
+            "python -m tools.release_evidence prepare",
+            "python -m tools.release_evidence verify",
+            "dist/cloud-security-misconfiguration-lab.spdx.json",
+            "dist/SHA256SUMS",
+            "sbom-path: dist/cloud-security-misconfiguration-lab.spdx.json",
+            "https://spdx.dev/Document/v2.3",
+            "cloud-security-misconfiguration-lab-build-provenance.sigstore.json",
+            "cloud-security-misconfiguration-lab-sbom-attestation.sigstore.json",
+            "--signer-workflow",
+            "sha256sum --check SHA256SUMS",
+            "if-no-files-found: error",
+        )
+        for fragment in required_fragments:
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, release)
+        self.assertEqual(2, release.count("gh attestation verify dist/*.whl"))
+        self.assertEqual(2, release.count("for artifact in dist/*.whl"))
 
     def test_lock_covers_declared_tools_and_hashes_every_package(self):
         declared = _declared_dev_dependencies()

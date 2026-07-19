@@ -114,13 +114,13 @@ different elapsed times.
 
 ## Coverage Evidence
 
-The 2026-07-19 release-gate run executed 328 tests and measured the production
-packages, including `cloud_benchmarks`:
+The 2026-07-19 M11 release-gate run executed 391 tests and measured the runtime
+packages plus the repository quality-gate tools:
 
 | Metric | Covered | Total | Result | Minimum |
 | --- | ---: | ---: | ---: | ---: |
-| Statements | 4,979 | 5,229 | 95.22% | 90.00% |
-| Branches | 1,903 | 2,146 | 88.68% | 85.00% |
+| Statements | 5,809 | 6,076 | 95.61% | 90.00% |
+| Branches | 2,174 | 2,436 | 89.24% | 85.00% |
 
 `coverage.py` also reports a combined display percentage, but the acceptance
 gate deliberately computes statements and branches independently from

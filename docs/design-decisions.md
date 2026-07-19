@@ -247,6 +247,34 @@ credentials, non-default ports, and hosts resolving to non-public addresses.
 does not prevent documentation regressions and is difficult to reproduce during
 admissions or engineering review.
 
+## DD-013: Separate Signed Build Evidence from Release Authority
+
+**Status:** Accepted
+
+**Decision:** A low-privilege release job builds and tests the distributions,
+inventories an isolated wheel installation as SPDX 2.3, writes an exact
+SHA-256 manifest, and signs both build provenance and an SBOM predicate. It
+verifies the signer workflow before transferring the candidate. A separate job
+with release-write permission rechecks the transferred hashes and attestations,
+does not check out repository source, and publishes only explicit asset types.
+
+**Why:** Checksums without authenticated origin can be replaced together with
+an artifact. An SBOM that scans only opaque archives can miss the Python
+package. Giving build scripts the same token that publishes releases also
+unnecessarily combines code execution and repository-write authority.
+
+**Consequences:** Starting with `v2.2.0`, releases include the wheel, source
+distribution, SPDX inventory, `SHA256SUMS`, SLSA provenance bundle, and SPDX
+attestation bundle. The verifier rejects stale or duplicate distributions,
+symlinks, unsafe manifest names, wrong package identity, incomplete SPDX
+inventory, and digest mismatches. The release depends on GitHub OIDC, Sigstore,
+Syft, and immutable workflow-artifact transfer and does not claim a hermetic
+build or a particular SLSA level.
+
+**Alternative not chosen:** A single write-enabled job is shorter, and a bare
+checksum file is familiar, but neither provides the same authority separation
+or independently verifiable builder identity.
+
 ## Revisit Triggers
 
 These decisions should be revisited if the project adds:

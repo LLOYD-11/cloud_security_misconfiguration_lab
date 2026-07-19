@@ -19,7 +19,7 @@ credentials or charges.
 | Security scope | IAM, S3, EC2 security groups, and CloudTrail |
 | Detection depth | 35 cataloged rules with qualified AWS Security Hub CSPM, CIS AWS Foundations, and MITRE ATT&CK mappings |
 | Deterministic sample | 39 findings, 2 incidents, 36 remediation actions, and 11 timeline entries |
-| Engineering assurance | 375 tests; 95.51% statement and 89.02% branch coverage; Python 3.10-3.13 CI |
+| Engineering assurance | 391 tests; 95.61% statement and 89.24% branch coverage; Python 3.10-3.13 CI |
 | Safety boundary | Offline files only; zero runtime dependencies; no credentials and no cloud writes |
 
 ## Quick Start
@@ -71,8 +71,8 @@ engineering evidence.
 
 | Quality Gate | Verified Result |
 | --- | --- |
-| Automated tests | 375 unit, regression, integration, CLI, schema, compatibility, and benchmark tests pass |
-| Coverage | 5,536/5,796 statements (95.51%) and 2,067/2,322 branches (89.02%) |
+| Automated tests | 391 unit, regression, integration, CLI, schema, compatibility, and benchmark tests pass |
+| Coverage | 5,809/6,076 statements (95.61%) and 2,174/2,436 branches (89.24%) |
 | Rule benchmark | 78/78 exact functional cases and 4/4 malformed native inputs rejected |
 | Scale benchmark | 8/8 deterministic profiles pass across 100 to 10,000 inputs |
 | Supported Python | GitHub Actions exercises every minor from Python 3.10 through 3.13 |
@@ -411,10 +411,13 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 
 ## Project Documentation
 
+- [Security policy](SECURITY.md)
 - [Upgrade roadmap](ROADMAP.md)
 - [Upgrade traceability](docs/traceability.md)
 - [System architecture](docs/architecture.md)
+- [Threat model](docs/threat-model.md)
 - [Design decisions](docs/design-decisions.md)
+- [Release integrity and verification](docs/release-integrity.md)
 - [Version 2.1.1 release notes](docs/release-v2.1.1.md)
 - [Version 2.1.0 release notes](docs/release-v2.1.0.md)
 - [Version 2.0.0 release notes](docs/release-v2.0.0.md)
@@ -471,7 +474,9 @@ The benchmark gate covers all 35 built-in rules through 78 exact functional
 cases plus eight deterministic scale profiles. Coverage is enforced separately
 at 90% for statements and 85% for branches. GitHub Actions runs the quality,
 benchmark, and deterministic pipeline on Python 3.10, 3.11, 3.12, and 3.13,
-and builds the distributions on Python 3.13.
+and builds the distributions on Python 3.13. Starting with `v2.2.0`, tagged
+releases add a verified SPDX inventory, SHA-256 manifest, and signed build and
+SBOM attestations; see [Release integrity](docs/release-integrity.md).
 
 ## Project Structure
 
@@ -481,12 +486,14 @@ cloud_security_misconfiguration_lab/
 │   ├── ci.yml
 │   └── release.yml
 ├── README.md
+├── SECURITY.md
 ├── ROADMAP.md
 ├── CHANGELOG.md
 ├── pyproject.toml
 ├── requirements-dev.lock
 ├── tools/
-│   └── check_markdown_links.py
+│   ├── check_markdown_links.py
+│   └── release_evidence.py
 ├── cloud_security_lab/
 │   ├── __main__.py
 │   ├── analysis.py
@@ -597,12 +604,14 @@ cloud_security_misconfiguration_lab/
 │   ├── input-resource-limits.md
 │   ├── known-limitations.md
 │   ├── native-aws-inputs.md
+│   ├── release-integrity.md
 │   ├── remediation-prioritization.md
 │   ├── release-v2.0.0.md
 │   ├── release-v2.1.0.md
 │   ├── release-v2.1.1.md
 │   ├── rule-catalog.md
 │   ├── simplified-input-validation.md
+│   ├── threat-model.md
 │   ├── traceability.md
 │   └── assets/
 │       └── report-preview.svg
@@ -611,6 +620,7 @@ cloud_security_misconfiguration_lab/
 │   ├── test_contracts.py
 │   ├── test_legacy_clis.py
 │   ├── test_markdown_links.py
+│   ├── test_release_evidence.py
 │   └── test_supply_chain.py
 ├── LICENSE
 └── .gitignore
