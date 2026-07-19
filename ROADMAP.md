@@ -4,9 +4,9 @@ This is the canonical upgrade route for the Cloud Security
 Misconfiguration Lab. It preserves the original M0-M9 identifiers; milestones
 must not be renumbered or collapsed when work is summarized.
 
-`v2.0.0` is an immutable, working release checkpoint. It delivered most of the
-planned upgrade, but it did not complete every original milestone. The remaining
-work targets `v2.1.0`.
+`v2.0.0` is an immutable, working release checkpoint. `v2.1.0` completes the
+remaining provenance, performance, benchmark, and portfolio-presentation work
+from the original upgrade plan.
 
 Detailed requirement, artifact, test, and commit evidence is maintained in
 [Upgrade traceability](docs/traceability.md).
@@ -39,7 +39,7 @@ Status: Complete in `v2.0.0`.
 
 ## M2: Engineering Foundation, CLI, Schema, and CI
 
-Status: Complete for `v2.1.0`.
+Status: Complete in `v2.1.0`.
 
 - [x] Add installable package metadata and optional development dependencies.
 - [x] Add the unified `analyze`, `report`, `demo`, and `catalog` CLI workflows.
@@ -52,7 +52,7 @@ Status: Complete for `v2.1.0`.
 
 ## M3: Native AWS Evidence Adapters
 
-Status: Complete for `v2.1.0`.
+Status: Complete in `v2.1.0`.
 
 - [x] Normalize IAM account-authorization details and credential-report evidence.
 - [x] Normalize S3 account and bucket security evidence.
@@ -84,7 +84,7 @@ Status: Complete in `v2.0.0` within the documented offline evidence boundary.
 
 ## M6: CloudTrail Detection and Attack-Chain Correlation
 
-Status: Complete for `v2.1.0`.
+Status: Complete in `v2.1.0`.
 
 - [x] Validate event identity, time, source, outcome, and duplicate `eventID` behavior.
 - [x] Detect root login, MFA removal, security-control changes, credential creation, policy and trust changes, monitoring disablement, KMS disruption, and API-failure spikes.
@@ -106,7 +106,7 @@ Status: Complete in `v2.0.0`.
 
 ## M8: Tests, Benchmark, Performance, and Fault Tolerance
 
-Status: Complete for `v2.1.0`.
+Status: Complete in `v2.1.0`.
 
 - [x] Build broad unit, contract, schema, CLI, native-adapter, integration, malformed-input, duplicate-input, and deterministic-output coverage.
 - [x] Run branch-enabled coverage and enforce the current CI quality gate.
@@ -118,8 +118,7 @@ Status: Complete for `v2.1.0`.
 
 ## M9: GitHub Application Presentation and Final v2 Release
 
-Status: Substantially complete; portfolio presentation is complete and
-`v2.1.0` remains the final release target.
+Status: Complete in `v2.1.0`.
 
 - [x] Publish an AWS-only first-screen summary, quick start, sample results, architecture, rule catalog, design decisions, and release notes.
 - [x] Publish an immutable `v2.0.0` tag and GitHub release.
@@ -128,16 +127,16 @@ Status: Substantially complete; portfolio presentation is complete and
 - [x] Add a CI status badge and a concise tested-results block to the README.
 - [x] Add a legible report preview and a short demo walkthrough.
 - [x] Add a concise "What I learned" section for application reviewers.
-- [ ] Complete every open M0-M9 acceptance item, then publish `v2.1.0`.
+- [x] Complete every open M0-M9 acceptance item, then publish `v2.1.0`.
 
 ## v2.1 Completion Sequence
 
-1. **C0 - Governance:** restore M0-M9 and add requirement-to-evidence traceability.
+1. **C0 - Governance (complete):** restore M0-M9 and add requirement-to-evidence traceability.
 2. **C1 - Provenance (complete):** complete M2 and M3 finding provenance, contract migration, Python 3.12 CI, and fixture manifests.
 3. **C2 - Detection performance (complete):** complete the M6 failure-window optimization and equivalence tests.
 4. **C3 - Benchmarking (complete):** complete M8 benchmark, scale, resilience, and coverage evidence.
 5. **C4 - Portfolio presentation (complete):** complete the remaining M9 README, visual, and repository-metadata work.
-6. **C5 - Release:** run the full release gate and publish `v2.1.0`.
+6. **C5 - Release (complete):** run the full release gate and publish `v2.1.0`.
 
 ## Definition of Done
 

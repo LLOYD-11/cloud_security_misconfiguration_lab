@@ -5,8 +5,8 @@ evidence. It exists to prevent milestone renumbering, scope drift, and
 unsupported completion claims.
 
 The canonical plan is [ROADMAP.md](../ROADMAP.md). `v2.0.0` at commit
-`7acfda6` is an immutable checkpoint. Open and partial requirements below target
-`v2.1.0`.
+`7acfda6` is an immutable checkpoint. `v2.1.0` closes the remaining requirements
+from the original M0-M9 plan.
 
 ## Status Legend
 
@@ -18,11 +18,11 @@ The canonical plan is [ROADMAP.md](../ROADMAP.md). `v2.0.0` at commit
 
 ## Release Checkpoints
 
-| Checkpoint | Commit | Purpose |
+| Checkpoint | Reference | Purpose |
 | --- | --- | --- |
 | `v1.0.0` | `8e8f86e` | Frozen original four-analyzer project and sample report. |
 | `v2.0.0` | `7acfda6` | Working reliability, native-input, detection-depth, and reporting release. |
-| `v2.1.0` | Planned | Completion release for every remaining M0-M9 acceptance item. |
+| `v2.1.0` | Tag `v2.1.0` | Completion release for every remaining M0-M9 acceptance item. |
 
 ## M0: Freeze v1 and Record the Baseline
 
@@ -46,7 +46,7 @@ The canonical plan is [ROADMAP.md](../ROADMAP.md). `v2.0.0` at commit
 
 ## M2: Engineering Foundation, CLI, Schema, and CI
 
-| ID | Requirement | Status | Evidence or Remaining Work |
+| ID | Requirement | Status | Evidence |
 | --- | --- | --- | --- |
 | M2-R1 | Add installable package metadata. | Complete | [pyproject.toml](../pyproject.toml); commit `0d981ba`. |
 | M2-R2 | Add unified analyze, report, demo, and catalog workflows. | Complete | [CLI](../cloud_security_lab/cli.py), CLI tests, and [README commands](../README.md); commits `0d981ba` and `5747c00`. |
@@ -58,7 +58,7 @@ The canonical plan is [ROADMAP.md](../ROADMAP.md). `v2.0.0` at commit
 
 ## M3: Native AWS Evidence Adapters
 
-| ID | Requirement | Status | Evidence or Remaining Work |
+| ID | Requirement | Status | Evidence |
 | --- | --- | --- | --- |
 | M3-R1 | Normalize IAM authorization details and credential reports. | Complete | IAM normalizer, native schema, AWS-shaped sample, and tests; commit `fb70b50`. |
 | M3-R2 | Normalize S3 account and bucket evidence. | Complete | S3 normalizer, native schema, AWS-shaped sample, and tests; commit `53d708d`. |
@@ -91,7 +91,7 @@ The canonical plan is [ROADMAP.md](../ROADMAP.md). `v2.0.0` at commit
 
 ## M6: CloudTrail Detection and Attack-Chain Correlation
 
-| ID | Requirement | Status | Evidence or Remaining Work |
+| ID | Requirement | Status | Evidence |
 | --- | --- | --- | --- |
 | M6-R1 | Validate event identity, timestamp, source, outcome, and duplicate IDs. | Complete | CloudTrail normalizer and detector tests; commits `d399dc6` and `51af0b7`. |
 | M6-R2 | Detect identity, network, storage, monitoring, IAM, credential, and KMS risk changes. | Complete | CloudTrail detector, tests, and [rule catalog](rule-catalog.md); commit `51af0b7`. |
@@ -111,7 +111,7 @@ The canonical plan is [ROADMAP.md](../ROADMAP.md). `v2.0.0` at commit
 
 ## M8: Tests, Benchmark, Performance, and Fault Tolerance
 
-| ID | Requirement | Status | Evidence or Remaining Work |
+| ID | Requirement | Status | Evidence |
 | --- | --- | --- | --- |
 | M8-R1 | Cover every rule with positive, negative, boundary, and malformed cases. | Complete | The [benchmark manifest](../cloud_benchmarks/benchmark-manifest-v1.0.json) maps all 35 rules to positive, boundary, hardened-negative, and native-malformed cases; contract tests verify the complete matrix. |
 | M8-R2 | Verify native fixtures, CLI, schemas, golden output, and integration. | Complete | Normalizer tests, CLI tests, contract tests, legacy CLI tests, and deterministic demo comparison in CI. |
@@ -122,15 +122,15 @@ The canonical plan is [ROADMAP.md](../ROADMAP.md). `v2.0.0` at commit
 
 ## M9: GitHub Application Presentation and Final v2 Release
 
-| ID | Requirement | Status | Evidence or Remaining Work |
+| ID | Requirement | Status | Evidence |
 | --- | --- | --- | --- |
 | M9-R1 | Present an AWS-only summary, architecture, commands, results, and sample report. | Complete | [README](../README.md), [architecture](architecture.md), [design decisions](design-decisions.md), and sample report. |
-| M9-R2 | Publish rule-catalog and release documentation. | Complete | Rule-catalog documentation and [v2.0.0 release notes](release-v2.0.0.md). |
+| M9-R2 | Publish rule-catalog and release documentation. | Complete | Rule-catalog documentation plus the [v2.0.0](release-v2.0.0.md) and [v2.1.0](release-v2.1.0.md) release notes. |
 | M9-R3 | Publish an immutable GitHub release. | Complete | Tag and release `v2.0.0`; release workflow from commit `7acfda6`. |
 | M9-R4 | Configure repository About metadata and focused topics. | Complete | The public [repository About panel](https://github.com/LLOYD-11/cloud_security_misconfiguration_lab) includes a concise description, sample-report homepage, and ten focused AWS, security, and engineering topics. |
 | M9-R5 | Show CI status and concise tested results in the README. | Complete | The [README](../README.md) shows the live CI badge, supported Python matrix, exact test and independent statement/branch coverage results, benchmark outcomes, and distribution checks. |
 | M9-R6 | Add a report preview, demo walkthrough, and learning reflection. | Complete | The [report preview](assets/report-preview.svg), [five-minute demo](demo-walkthrough.md), and [README learning reflections](../README.md#what-i-learned) present real project evidence without widening the documented claims. |
-| M9-R7 | Preserve milestone review history and publish the completion release. | Partial | Milestone commits and `v2.0.0` exist; remaining work will be completed on `upgrade/v2.1-completion` before `v2.1.0`. |
+| M9-R7 | Preserve milestone review history and publish the completion release. | Complete | The milestone-oriented `upgrade/v2.1-completion` history, annotated `v2.1.0` tag, matching release notes, and gated release workflow preserve and publish the completion evidence. |
 
 ## Completion Rule
 

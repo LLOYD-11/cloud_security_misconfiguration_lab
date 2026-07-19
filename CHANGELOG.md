@@ -4,6 +4,8 @@ All notable changes to this project are documented in this file.
 
 ## Unreleased
 
+## 2.1.0 - 2026-07-19
+
 ### Added
 
 - Requirement-to-evidence traceability for the original M0-M9 upgrade plan.
@@ -34,7 +36,8 @@ All notable changes to this project are documented in this file.
 
 ### Changed
 
-- Restored the original milestone numbering and recorded the remaining v2.1.0 completion scope without changing the immutable v2.0.0 release.
+- Restored the original milestone numbering and recorded the remaining v2.1.0
+  completion scope without changing the immutable v2.0.0 release.
 - Reports, remediation plans, and timelines now consume finding-level
   confidence and expose first-class provenance.
 - Native S3 normalization now preserves `BucketRegion`.

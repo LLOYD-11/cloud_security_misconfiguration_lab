@@ -397,6 +397,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [Upgrade traceability](docs/traceability.md)
 - [System architecture](docs/architecture.md)
 - [Design decisions](docs/design-decisions.md)
+- [Version 2.1.0 release notes](docs/release-v2.1.0.md)
 - [Version 2.0.0 release notes](docs/release-v2.0.0.md)
 - [Five-minute demo walkthrough](docs/demo-walkthrough.md)
 - [Data contracts](docs/data-contracts.md)
@@ -557,6 +558,7 @@ cloud_security_misconfiguration_lab/
 │   ├── native-aws-inputs.md
 │   ├── remediation-prioritization.md
 │   ├── release-v2.0.0.md
+│   ├── release-v2.1.0.md
 │   ├── rule-catalog.md
 │   ├── traceability.md
 │   └── assets/
