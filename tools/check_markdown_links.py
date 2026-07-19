@@ -183,18 +183,24 @@ def markdown_anchors(path: Path) -> frozenset[str]:
     return frozenset(anchors)
 
 
-def _path_case_matches(root: Path, target: Path) -> bool:
+PathCaseStatus = Literal["exact", "mismatch", "missing", "unreadable"]
+
+
+def _path_case_status(root: Path, target: Path) -> PathCaseStatus:
     relative = target.relative_to(root)
     current = root
     for part in relative.parts:
         try:
             names = {entry.name for entry in current.iterdir()}
         except OSError:
-            return False
-        if part not in names:
-            return False
-        current /= part
-    return True
+            return "unreadable"
+        if part in names:
+            current /= part
+            continue
+        if part.casefold() in {name.casefold() for name in names}:
+            return "mismatch"
+        return "missing"
+    return "exact"
 
 
 def validate_internal_links(
@@ -266,12 +272,8 @@ def validate_internal_links(
                 )
             )
             continue
-        if not candidate.is_file():
-            issues.append(
-                LinkIssue(reference.source, reference.line, target, "target file does not exist")
-            )
-            continue
-        if not _path_case_matches(root, candidate):
+        case_status = _path_case_status(root, candidate)
+        if case_status == "mismatch":
             issues.append(
                 LinkIssue(
                     reference.source,
@@ -279,6 +281,21 @@ def validate_internal_links(
                     target,
                     "target path has incorrect letter case",
                 )
+            )
+            continue
+        if case_status == "unreadable":
+            issues.append(
+                LinkIssue(
+                    reference.source,
+                    reference.line,
+                    target,
+                    "target path could not be inspected",
+                )
+            )
+            continue
+        if case_status == "missing" or not candidate.is_file():
+            issues.append(
+                LinkIssue(reference.source, reference.line, target, "target file does not exist")
             )
             continue
 

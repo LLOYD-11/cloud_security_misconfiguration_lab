@@ -19,7 +19,7 @@ credentials or charges.
 | Security scope | IAM, S3, EC2 security groups, and CloudTrail |
 | Detection depth | 35 cataloged rules with qualified AWS Security Hub CSPM, CIS AWS Foundations, and MITRE ATT&CK mappings |
 | Deterministic sample | 39 findings, 2 incidents, 36 remediation actions, and 11 timeline entries |
-| Engineering assurance | 375 tests; 95.51% statement and 89.00% branch coverage; Python 3.10-3.13 CI |
+| Engineering assurance | 375 tests; 95.51% statement and 89.02% branch coverage; Python 3.10-3.13 CI |
 | Safety boundary | Offline files only; zero runtime dependencies; no credentials and no cloud writes |
 
 ## Quick Start
@@ -72,7 +72,7 @@ engineering evidence.
 | Quality Gate | Verified Result |
 | --- | --- |
 | Automated tests | 375 unit, regression, integration, CLI, schema, compatibility, and benchmark tests pass |
-| Coverage | 5,528/5,788 statements (95.51%) and 2,063/2,318 branches (89.00%) |
+| Coverage | 5,536/5,796 statements (95.51%) and 2,067/2,322 branches (89.02%) |
 | Rule benchmark | 78/78 exact functional cases and 4/4 malformed native inputs rejected |
 | Scale benchmark | 8/8 deterministic profiles pass across 100 to 10,000 inputs |
 | Supported Python | GitHub Actions exercises every minor from Python 3.10 through 3.13 |

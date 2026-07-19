@@ -186,7 +186,7 @@ class MarkdownLinkTests(unittest.TestCase):
             with patch("tools.check_markdown_links.Path.iterdir", side_effect=OSError):
                 issues = validate_internal_links(root, (reference,))
 
-        self.assertEqual("target path has incorrect letter case", issues[0].message)
+        self.assertEqual("target path could not be inspected", issues[0].message)
 
     def test_rejects_unsafe_uri_schemes_and_invalid_mailto_links(self):
         root = Path("/tmp").resolve()

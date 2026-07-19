@@ -29,7 +29,7 @@ regular expression.
 
 The internal gate rejects:
 
-- missing files and directory targets;
+- missing files, directory targets, and unreadable path traversal;
 - paths that escape the repository or begin at an ambiguous filesystem root;
 - letter-case mismatches that may work on macOS but fail on Linux or GitHub;
 - unsupported URI schemes and malformed `mailto` targets;
