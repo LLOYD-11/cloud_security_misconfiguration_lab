@@ -152,7 +152,7 @@ and release evidence exist.
 | ID | Requirement | Status | Evidence |
 | --- | --- | --- | --- |
 | M11-R1 | Bound JSON, gzip, resource-count, node-count, and nesting inputs. | Complete | Shared [bounded input layer](../cloud_inputs/bounds.py), measured [input resource limits](input-resource-limits.md), analyzer and artifact-loader enforcement, in-memory API checks, and adversarial byte, gzip, depth, node, resource, aggregate-budget, and file-count tests. |
-| M11-R2 | Make CI actions and development dependency resolution reproducible. | Open | Planned immutable action revisions and locked development environment. |
+| M11-R2 | Make CI actions and development dependency resolution reproducible. | Complete | Full-SHA [CI](../.github/workflows/ci.yml) and [release](../.github/workflows/release.yml) actions, universal hash-locked [development dependencies](../requirements-dev.lock), no-isolation local builds, executable supply-chain regression tests, and documented [supply-chain controls](supply-chain.md). |
 | M11-R3 | Exercise every documented Python minor version and validate public links and Markdown. | Open | Planned CI matrix and documentation jobs. |
 | M11-R4 | Publish security, threat-model, checksum, SBOM, and build-provenance evidence. | Open | Planned security and release artifacts. |
 

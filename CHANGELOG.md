@@ -9,12 +9,17 @@ All notable changes to this project are documented in this file.
 - Evidence-based resource ceilings for external JSON, gzip, credential-report,
   and report-artifact inputs, with bounded reads, aggregate budgets, and
   adversarial regression tests.
+- A universal development lock containing exact direct and transitive package
+  versions with SHA-256 hashes, plus executable supply-chain regression tests.
 
 ### Changed
 
 - Simplified and native analyzers now fail closed on excessive encoded or
   decompressed bytes, JSON nodes or nesting, primary resources, artifact
   records, and related input files before unbounded analysis work begins.
+- CI and release workflows now pin external Actions to verified full commit
+  SHAs, install development tools in pip hash-checking mode, and build with the
+  locked setuptools backend instead of resolving an isolated backend at runtime.
 
 ## 2.1.1 - 2026-07-19
 

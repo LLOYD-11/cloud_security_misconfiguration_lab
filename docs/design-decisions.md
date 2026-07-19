@@ -201,6 +201,29 @@ would weaken report integrity.
 **Alternative not chosen:** Removing legacy entry points would simplify the
 tree but create unnecessary migration cost for existing users and examples.
 
+## DD-011: Lock Executable Development Inputs
+
+**Status:** Accepted
+
+**Decision:** CI and release workflows pin each external action to a verified
+full commit SHA. Direct and transitive development packages, including the
+setuptools build backend, are installed from one universal requirements file
+with exact versions and SHA-256 hashes.
+
+**Why:** Broad dependency ranges remain useful declarations for maintainers,
+but resolving them during every CI run permits behavior to change without a
+repository diff. Mutable action tags can move independently of this project.
+
+**Consequences:** Dependency upgrades are explicit review events. Editable
+installs use `--no-build-isolation --no-deps`, release builds use
+`--no-isolation`, and lock regeneration records the exact resolver version.
+Python patch releases and the Ubuntu 24.04 hosted image continue to receive
+upstream security updates and are not claimed to be bit-for-bit fixed machines.
+
+**Alternative not chosen:** Floating action tags and `pip install -e ".[dev]"`
+are easier to maintain but execute newly resolved third-party code without a
+corresponding project change.
+
 ## Revisit Triggers
 
 These decisions should be revisited if the project adds:

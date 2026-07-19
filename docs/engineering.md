@@ -6,8 +6,15 @@ The project keeps runtime analysis dependency-free while providing an optional d
 
 ```bash
 python3 -m venv .venv
-.venv/bin/python -m pip install -e ".[dev]"
+.venv/bin/python -m pip install --require-hashes -r requirements-dev.lock
+.venv/bin/python -m pip install --no-build-isolation --no-deps -e .
+.venv/bin/python -m pip check
 ```
+
+The lock contains every direct and transitive development package with exact
+versions and SHA-256 hashes. The editable project install disables dependency
+resolution and build isolation so it cannot fetch an unreviewed build backend.
+See [Supply-chain controls](supply-chain.md) for regeneration and review steps.
 
 ## Release Gate
 
@@ -26,7 +33,7 @@ mkdir -p reports/generated
 cmp reports/cloud_security_report_sample.md reports/generated/cloud_security_report.md
 .venv/bin/python -m cloud_security_lab catalog --output reports/generated/rule_catalog.md
 cmp docs/rule-catalog.md reports/generated/rule_catalog.md
-.venv/bin/python -m build
+.venv/bin/python -m build --no-isolation
 ```
 
 Coverage uses branch measurement and independently fails below 90% statement
@@ -57,7 +64,9 @@ reference measurements, and separate coverage evidence.
 GitHub Actions runs the same lint, type, test, independent coverage, benchmark,
 and end-to-end checks on Python 3.10, 3.12, and 3.13. The Python 3.13 job also
 builds the wheel and source distribution. Workflow permissions are limited to
-read-only repository contents.
+read-only repository contents. Actions use full immutable commit SHAs, the
+runner is fixed to Ubuntu 24.04, and pip installs the reviewed hash lock before
+installing the local project without dependency or build isolation.
 
 The deterministic end-to-end check fixes the report date to the sample event
 date and compares the generated Markdown, including finding provenance, the

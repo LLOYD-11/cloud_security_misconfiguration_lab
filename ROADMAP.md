@@ -176,7 +176,7 @@ Status: In progress for `v2.2.0`.
 - [x] Define evidence-based limits for JSON size, decompressed gzip size,
       resource count, node count, and nesting depth.
 - [x] Fail closed on oversized, deeply nested, truncated, or malformed inputs.
-- [ ] Pin GitHub Actions to immutable revisions and make development dependency
+- [x] Pin GitHub Actions to immutable revisions and make development dependency
       resolution reproducible.
 - [ ] Exercise every documented Python minor version in CI.
 - [ ] Add Markdown, internal-link, and external-link validation.

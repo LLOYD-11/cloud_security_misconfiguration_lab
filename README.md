@@ -40,7 +40,7 @@ Install the project in a virtual environment to expose the `cloud-security-lab` 
 
 ```bash
 python3 -m venv .venv
-.venv/bin/python -m pip install -e .
+.venv/bin/python -m pip install --no-deps -e .
 .venv/bin/cloud-security-lab --help
 ```
 
@@ -429,6 +429,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [Native AWS inputs](docs/native-aws-inputs.md)
 - [CloudTrail failure-window performance](docs/detection-performance.md)
 - [Benchmarking and resilience](docs/benchmarking.md)
+- [Supply-chain controls](docs/supply-chain.md)
 - [Engineering checks](docs/engineering.md)
 - [Known limitations](docs/known-limitations.md)
 - [Change log](CHANGELOG.md)
@@ -437,11 +438,17 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 
 Runtime: Python 3.10 or later. The analyzers and unified CLI have no third-party runtime dependencies.
 
-Development and contract checks use optional tools declared in `pyproject.toml`:
+Development and contract checks use the universal, SHA-256-locked transitive
+environment in `requirements-dev.lock`:
 
 ```bash
-.venv/bin/python -m pip install -e ".[dev]"
+.venv/bin/python -m pip install --require-hashes -r requirements-dev.lock
+.venv/bin/python -m pip install --no-build-isolation --no-deps -e .
+.venv/bin/python -m pip check
 ```
+
+See [Supply-chain controls](docs/supply-chain.md) for the lock update and
+immutable GitHub Actions verification process.
 
 ## Quality Checks
 
@@ -473,6 +480,7 @@ cloud_security_misconfiguration_lab/
 ├── ROADMAP.md
 ├── CHANGELOG.md
 ├── pyproject.toml
+├── requirements-dev.lock
 ├── cloud_security_lab/
 │   ├── __main__.py
 │   ├── analysis.py
