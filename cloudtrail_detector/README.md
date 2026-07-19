@@ -32,7 +32,8 @@ Risk-reducing actions such as revoking ingress, deleting a bucket policy, or
 detaching an IAM policy are also excluded from the risk-increasing change rules.
 Every change rule requires both the supported API name and its expected AWS
 `eventSource`; a same-named event from another service does not produce that
-finding. Duplicate events with the same `eventID` are analyzed once.
+finding. Identical events with the same `eventID` are analyzed once. Conflicting
+records sharing an ID stop analysis before findings or incidents are produced.
 
 Each finding uses the shared schema and includes AWS CloudTrail, AWS IAM, or MITRE ATT&CK references where applicable.
 

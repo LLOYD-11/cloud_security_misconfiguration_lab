@@ -41,7 +41,11 @@ No runtime timestamp or source path is stored, so identical evidence and options
 
 `empty` means no primary resource reached the analyzer. It takes precedence over partial because an empty run must not look like a successful zero-finding assessment.
 
-An identical duplicate CloudTrail record is counted as skipped evidence with `affects_coverage: false`: the event is analyzed once and no distinct evidence is lost. A conflicting duplicate in simplified input affects coverage because only the first record reaches the current detector path.
+An identical duplicate CloudTrail record is counted as skipped evidence with
+`affects_coverage: false`: the event is analyzed once and no distinct evidence
+is lost. Conflicting simplified or native records sharing an `eventID` are
+invalid evidence and stop analysis; they never produce a first-record-wins
+finding set or a misleading partial summary.
 
 ## Primary Resources
 

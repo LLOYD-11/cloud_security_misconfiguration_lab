@@ -2,7 +2,7 @@ import json
 import sys
 import tempfile
 import unittest
-from contextlib import redirect_stdout
+from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
@@ -40,6 +40,41 @@ class LegacyCliCompatibilityTests(unittest.TestCase):
 
                 self.assertEqual(0, result)
                 self.assertEqual(expected_count, payload["finding_count"])
+
+    def test_cloudtrail_script_rejects_conflicting_event_ids(self):
+        event = {
+            "eventID": "duplicate-event",
+            "eventTime": "2026-06-30T01:00:00Z",
+            "eventSource": "s3.amazonaws.com",
+            "eventName": "PutBucketPolicy",
+            "sourceIPAddress": "192.0.2.1",
+            "userIdentity": {"type": "IAMUser", "userName": "alice"},
+            "requestParameters": {"bucketName": "example"},
+        }
+        conflicting = {
+            **event,
+            "eventName": "GetBucketPolicy",
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            input_path = Path(tmpdir) / "conflicting-events.json"
+            input_path.write_text(
+                json.dumps({"events": [event, conflicting]}),
+                encoding="utf-8",
+            )
+            argv = ["cloudtrail_detector", str(input_path)]
+            stderr = StringIO()
+
+            with patch.object(sys, "argv", argv), redirect_stdout(
+                StringIO()
+            ), redirect_stderr(stderr), self.assertRaises(SystemExit) as context:
+                cloudtrail_main()
+
+        self.assertEqual(2, context.exception.code)
+        self.assertIn(
+            "Conflicting CloudTrail events share eventID 'duplicate-event'",
+            stderr.getvalue(),
+        )
 
     def test_report_script_entrypoint_still_writes_markdown(self):
         finding = Finding(

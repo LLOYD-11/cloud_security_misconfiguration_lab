@@ -29,6 +29,7 @@ from cloudtrail_detector.correlation import (
     DEFAULT_CORRELATION_WINDOW_MINUTES,
     correlate_incidents,
 )
+from cloudtrail_detector.events import deduplicate_cloudtrail_events
 
 REF_AWS_CLOUDTRAIL = "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html"
 REF_AWS_CLOUDTRAIL_RECORD = (
@@ -688,21 +689,6 @@ def detect_api_failure_spikes(
     return findings
 
 
-def _deduplicate_events(environment: dict[str, Any]) -> list[dict[str, Any]]:
-    raw_events = [event for event in environment.get("events", []) if isinstance(event, dict)]
-    events: list[dict[str, Any]] = []
-    seen_event_ids: set[str] = set()
-    for event in raw_events:
-        event_id = event.get("eventID")
-        if event_id:
-            normalized_event_id = str(event_id)
-            if normalized_event_id in seen_event_ids:
-                continue
-            seen_event_ids.add(normalized_event_id)
-        events.append(event)
-    return events
-
-
 def analyze_activity(
     environment: dict[str, Any],
     *,
@@ -718,7 +704,9 @@ def analyze_activity(
         if value <= 0:
             raise ValueError(f"{name} must be greater than zero.")
 
-    events = _deduplicate_events(environment)
+    events = list(
+        deduplicate_cloudtrail_events(environment.get("events", [])).events
+    )
     findings: list[Finding] = []
 
     for index, event in enumerate(events):

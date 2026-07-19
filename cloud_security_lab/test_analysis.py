@@ -228,10 +228,11 @@ class AnalysisCoverageBuilderTests(unittest.TestCase):
         self.assertEqual(1, coverage.skipped_count)
         self.assertFalse(summary.skipped_evidence[0].affects_coverage)
 
-    def test_conflicting_simplified_event_ids_make_coverage_partial(self):
+    def test_conflicting_simplified_event_ids_stop_summary_in_any_order(self):
         event = {
             "eventID": "event-1",
             "eventTime": "2026-06-30T01:00:00Z",
+            "eventSource": "ec2.amazonaws.com",
             "eventName": "DescribeInstances",
             "sourceIPAddress": "192.0.2.1",
             "userIdentity": {"type": "IAMUser", "userName": "alice"},
@@ -239,23 +240,24 @@ class AnalysisCoverageBuilderTests(unittest.TestCase):
         conflicting = copy.deepcopy(event)
         conflicting["eventName"] = "StopInstances"
 
-        summary = build_analysis_summary(
-            module="cloudtrail",
-            environment={
-                "account_id": "111122223333",
-                "events": [event, conflicting],
-            },
-            input_format="simplified",
-            input_file_count=1,
-            finding_count=0,
-        )
-
-        self.assertEqual("partial", summary.coverage_status)
-        self.assertEqual(
-            "CLD_CONFLICTING_DUPLICATE_EVENT",
-            summary.skipped_evidence[0].code,
-        )
-        self.assertEqual(1, summary.resource_coverage[0].evaluated_count)
+        for label, events in (
+            ("original-first", [event, conflicting]),
+            ("conflicting-first", [conflicting, event]),
+        ):
+            with self.subTest(order=label), self.assertRaisesRegex(
+                ValueError,
+                "Conflicting CloudTrail events share eventID 'event-1'",
+            ):
+                build_analysis_summary(
+                    module="cloudtrail",
+                    environment={
+                        "account_id": "111122223333",
+                        "events": events,
+                    },
+                    input_format="simplified",
+                    input_file_count=1,
+                    finding_count=0,
+                )
 
     def test_cloudtrail_summary_exposes_invalid_and_incomplete_events(self):
         summary = build_analysis_summary(

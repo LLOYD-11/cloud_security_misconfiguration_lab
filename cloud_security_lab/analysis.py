@@ -7,6 +7,7 @@ from typing import Any, Iterable
 
 from cloud_analysis import AnalysisSummary, ResourceCoverage, SkippedEvidence
 from cloud_security_lab import __version__
+from cloudtrail_detector.events import deduplicate_cloudtrail_events
 
 
 def _objects(environment: dict[str, Any], key: str) -> list[dict[str, Any]]:
@@ -246,45 +247,16 @@ def _cloudtrail_skipped_evidence(
             )
         )
 
-    events_by_id: dict[str, dict[str, Any]] = {}
-    duplicate_counts: dict[str, int] = defaultdict(int)
-    conflicting_ids: set[str] = set()
-    for event in raw_events:
-        if not isinstance(event, dict) or not event.get("eventID"):
-            continue
-        event_id = str(event["eventID"])
-        existing = events_by_id.get(event_id)
-        if existing is None:
-            events_by_id[event_id] = event
-            continue
-        duplicate_counts[event_id] += 1
-        if existing != event:
-            conflicting_ids.add(event_id)
-
-    identical_ids = set(duplicate_counts).difference(conflicting_ids)
-    identical_count = sum(duplicate_counts[event_id] for event_id in identical_ids)
-    if identical_count:
+    deduplication = deduplicate_cloudtrail_events(raw_events)
+    if deduplication.duplicate_count:
         skipped.append(
             _issue(
                 "CLD_DUPLICATE_EVENT",
                 "cloudtrail-event",
                 "Identical records sharing an event ID were analyzed once.",
-                identical_ids,
+                deduplication.duplicate_event_ids,
                 affects_coverage=False,
-                count=identical_count,
-            )
-        )
-    conflicting_count = sum(
-        duplicate_counts[event_id] for event_id in conflicting_ids
-    )
-    if conflicting_count:
-        skipped.append(
-            _issue(
-                "CLD_CONFLICTING_DUPLICATE_EVENT",
-                "cloudtrail-event",
-                "Conflicting simplified records shared an event ID; only the first record was analyzed.",
-                conflicting_ids,
-                count=conflicting_count,
+                count=deduplication.duplicate_count,
             )
         )
 
@@ -415,24 +387,12 @@ def _resource_coverage(
         raw_events = environment.get("events", [])
         if not isinstance(raw_events, list):
             raise ValueError("Analysis summary expected events to be a list.")
-        evaluated_count = 0
-        seen_event_ids: set[str] = set()
-        for event in raw_events:
-            if not isinstance(event, dict):
-                continue
-            event_id = event.get("eventID")
-            if event_id:
-                normalized_event_id = str(event_id)
-                if normalized_event_id in seen_event_ids:
-                    continue
-                seen_event_ids.add(normalized_event_id)
-            evaluated_count += 1
+        evaluated_count = len(deduplicate_cloudtrail_events(raw_events).events)
         skipped_count = sum(
             item.count
             for item in skipped_evidence
             if item.code
             in {
-                "CLD_CONFLICTING_DUPLICATE_EVENT",
                 "CLD_DUPLICATE_EVENT",
                 "CLD_EVENT_NOT_OBJECT",
             }

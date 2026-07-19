@@ -158,7 +158,7 @@ Planned release checkpoints:
 Status: In progress for `v2.1.1`.
 
 - [x] Match CloudTrail change rules on both AWS service source and event name.
-- [ ] Reject conflicting simplified CloudTrail records that share an `eventID`,
+- [x] Reject conflicting simplified CloudTrail records that share an `eventID`,
       while continuing to analyze identical duplicates once.
 - [ ] Preserve generated Markdown structure when finding, incident, summary, or
       source text contains Markdown control characters.

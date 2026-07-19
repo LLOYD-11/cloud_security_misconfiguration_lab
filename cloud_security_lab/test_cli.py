@@ -473,6 +473,50 @@ class UnifiedCliTests(unittest.TestCase):
             summary["parameters"],
         )
 
+    def test_simplified_cloudtrail_conflicts_fail_closed_in_any_input_order(self):
+        dangerous = {
+            "eventID": "duplicate-event",
+            "eventTime": "2026-06-30T01:00:00Z",
+            "eventSource": "s3.amazonaws.com",
+            "eventName": "PutBucketPolicy",
+            "sourceIPAddress": "192.0.2.1",
+            "userIdentity": {"type": "IAMUser", "userName": "alice"},
+            "requestParameters": {"bucketName": "example"},
+        }
+        benign = {
+            **dangerous,
+            "eventName": "GetBucketPolicy",
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            for label, events in (
+                ("dangerous-first", [dangerous, benign]),
+                ("benign-first", [benign, dangerous]),
+            ):
+                input_path = Path(tmpdir) / f"{label}.json"
+                input_path.write_text(
+                    json.dumps(
+                        {
+                            "account_id": "111122223333",
+                            "events": events,
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+                stderr = StringIO()
+
+                with self.subTest(order=label):
+                    with redirect_stdout(StringIO()), redirect_stderr(
+                        stderr
+                    ), self.assertRaises(SystemExit) as context:
+                        main(["analyze", "cloudtrail", str(input_path)])
+
+                    self.assertEqual(2, context.exception.code)
+                    self.assertIn(
+                        "Conflicting CloudTrail events share eventID 'duplicate-event'",
+                        stderr.getvalue(),
+                    )
+
     def test_cloudtrail_incident_options_are_rejected_for_other_modules(self):
         with redirect_stderr(StringIO()) as stderr, self.assertRaises(
             SystemExit

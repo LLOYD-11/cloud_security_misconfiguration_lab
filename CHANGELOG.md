@@ -15,6 +15,9 @@ All notable changes to this project are documented in this file.
 - CloudTrail change rules now require the expected AWS `eventSource` together
   with the supported API name, preventing cross-service name collisions from
   producing findings.
+- Simplified CloudTrail inputs now reject conflicting records that share an
+  `eventID` instead of silently analyzing whichever record appeared first;
+  identical duplicates continue to be analyzed once.
 
 ## 2.1.0 - 2026-07-19
 

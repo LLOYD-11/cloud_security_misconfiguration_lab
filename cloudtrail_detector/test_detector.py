@@ -726,6 +726,56 @@ class CloudTrailDetectorTests(unittest.TestCase):
 
         self.assertEqual(["CLD-004"], [finding.rule_id for finding in findings])
 
+    def test_conflicting_event_ids_are_rejected_in_any_input_order(self):
+        dangerous = {
+            "eventID": "duplicate-event",
+            "eventTime": "2026-06-30T01:00:00Z",
+            "eventSource": "s3.amazonaws.com",
+            "eventName": "PutBucketPolicy",
+            "sourceIPAddress": "192.0.2.1",
+            "userIdentity": {"type": "IAMUser", "userName": "alice"},
+            "requestParameters": {"bucketName": "example"},
+        }
+        benign = {
+            **dangerous,
+            "eventName": "GetBucketPolicy",
+        }
+
+        for label, events in (
+            ("dangerous-first", [dangerous, benign]),
+            ("benign-first", [benign, dangerous]),
+            (
+                "conflict-after-identical",
+                [dangerous, dict(dangerous), benign],
+            ),
+        ):
+            with self.subTest(order=label), self.assertRaisesRegex(
+                ValueError,
+                "Conflicting CloudTrail events share eventID 'duplicate-event'",
+            ):
+                analyze_environment({"events": events})
+
+    def test_conflicting_event_id_is_escaped_in_user_facing_error(self):
+        event = {
+            "eventID": "event-\n-injected",
+            "eventTime": "2026-06-30T01:00:00Z",
+            "eventSource": "s3.amazonaws.com",
+            "eventName": "PutBucketPolicy",
+            "sourceIPAddress": "192.0.2.1",
+            "userIdentity": {"type": "IAMUser", "userName": "alice"},
+        }
+        conflicting = {
+            **event,
+            "eventName": "GetBucketPolicy",
+        }
+
+        with self.assertRaises(ValueError) as context:
+            analyze_environment({"events": [event, conflicting]})
+
+        message = str(context.exception)
+        self.assertNotIn("\n", message)
+        self.assertIn(r"event-\n-injected", message)
+
     def test_iam_console_login_without_explicit_mfa_no_is_not_reported(self):
         base_event = {
             "eventTime": "2026-06-30T01:00:00Z",

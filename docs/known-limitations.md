@@ -57,7 +57,8 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 ## CloudTrail Detection
 
 - Native CloudTrail normalization accepts one recipient account per analysis. Organization-trail accounts must currently be analyzed separately.
-- Identical duplicate `eventID` records are removed with a warning, while conflicting records using the same ID stop analysis.
+- Identical duplicate `eventID` records are analyzed once, while conflicting
+  simplified or native records using the same ID stop analysis.
 - The lab does not verify CloudTrail digest signatures or prove log-file integrity.
 - Change rules require both a selected high-value API name and its expected AWS
   service source, but they do not inspect policy diffs or all request
