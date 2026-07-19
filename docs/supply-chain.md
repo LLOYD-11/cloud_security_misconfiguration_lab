@@ -36,6 +36,11 @@ tool ranges. `requirements-dev.lock` is the executable environment:
 - setuptools is included so editable installs and release builds do not resolve
   a separate build backend.
 
+In universal mode, uv treats the current or explicitly supplied Python version
+as the resolution's lower bound. The compile command therefore supplies
+`--python-version 3.10`, matching the project's minimum supported version,
+instead of depending on the maintainer's active interpreter.
+
 Install it with pip's all-or-nothing hash-checking mode:
 
 ```bash
@@ -52,6 +57,7 @@ References:
 
 - [pip secure installs and hash-checking mode](https://pip.pypa.io/en/stable/topics/secure-installs/)
 - [uv requirements locking](https://docs.astral.sh/uv/pip/compile/)
+- [uv universal-resolution semantics](https://docs.astral.sh/uv/reference/cli/#uv-pip-compile)
 
 ## Reviewed Update Procedure
 
@@ -61,6 +67,7 @@ References:
 
    ```bash
    uv pip compile pyproject.toml --extra dev --universal \
+     --python-version 3.10 \
      --generate-hashes --format requirements.txt \
      --output-file requirements-dev.lock
    ```

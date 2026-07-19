@@ -4,6 +4,7 @@ from collections import Counter
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+SUPPORTED_PYTHON_FLOOR = "3.10"
 WORKFLOWS = (
     PROJECT_ROOT / ".github/workflows/ci.yml",
     PROJECT_ROOT / ".github/workflows/release.yml",
@@ -74,6 +75,23 @@ def _locked_requirements() -> dict[str, tuple[str, ...]]:
 
 
 class SupplyChainTests(unittest.TestCase):
+    def test_lock_resolution_starts_at_supported_python_floor(self):
+        pyproject = (PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8")
+        lock_header = "\n".join(
+            (PROJECT_ROOT / "requirements-dev.lock")
+            .read_text(encoding="utf-8")
+            .splitlines()[:3]
+        )
+
+        self.assertIn(
+            f'requires-python = ">={SUPPORTED_PYTHON_FLOOR}"',
+            pyproject,
+        )
+        self.assertIn(
+            f"--universal --python-version {SUPPORTED_PYTHON_FLOOR}",
+            lock_header,
+        )
+
     def test_workflow_actions_use_reviewed_immutable_commits(self):
         observed: list[tuple[str, str, str]] = []
         for path in WORKFLOWS:
