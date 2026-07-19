@@ -4,6 +4,8 @@ All notable changes to this project are documented in this file.
 
 ## Unreleased
 
+## 2.1.1 - 2026-07-19
+
 ### Added
 
 - A post-v2.1 M10-M14 roadmap and requirement-to-evidence plan for verified

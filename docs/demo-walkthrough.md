@@ -97,16 +97,16 @@ mkdir -p reports/generated
 
 Current evidence:
 
-- 300 tests
-- 95.19% statement coverage
-- 89.16% branch coverage
+- 328 tests
+- 95.22% statement coverage
+- 88.68% branch coverage
 - 78 exact functional benchmark cases
 - 4 exact fail-closed malformed-input cases
 - 8 deterministic scale cases up to 10,000 inputs
 - Python 3.10, 3.12, and 3.13 GitHub Actions coverage
 
 Finish with [Benchmarking and resilience](benchmarking.md) and the
-[upgrade traceability matrix](traceability.md), which map the original M0-M9
+[upgrade traceability matrix](traceability.md), which map the upgrade
 requirements to implementation and verification artifacts.
 
 ## 4:45 - Close with the Boundary

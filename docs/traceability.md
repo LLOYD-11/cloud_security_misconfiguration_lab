@@ -6,7 +6,7 @@ unsupported completion claims.
 
 The canonical plan is [ROADMAP.md](../ROADMAP.md). `v2.0.0` at commit
 `7acfda6` is an immutable checkpoint. `v2.1.0` closes the remaining requirements
-from the original M0-M9 plan.
+from the original M0-M9 plan. `v2.1.1` closes the verified M10 boundary defects.
 
 ## Status Legend
 
@@ -23,10 +23,11 @@ from the original M0-M9 plan.
 | `v1.0.0` | `8e8f86e` | Frozen original four-analyzer project and sample report. |
 | `v2.0.0` | `7acfda6` | Working reliability, native-input, detection-depth, and reporting release. |
 | `v2.1.0` | Tag `v2.1.0` | Completion release for every remaining M0-M9 acceptance item. |
+| `v2.1.1` | Tag `v2.1.1` | Verified input, detection, duplicate-event, and report-integrity boundary fixes. |
 
-Planned post-v2.1 checkpoints are `v2.1.1` for M10, `v2.2.0` for
-M11-M12, and `v2.3.0` for M13-M14. They become release checkpoints in this
-table only after their tags and release evidence exist.
+Planned future checkpoints are `v2.2.0` for M11-M12 and `v2.3.0` for
+M13-M14. They become release checkpoints in this table only after their tags
+and release evidence exist.
 
 ## M0: Freeze v1 and Record the Baseline
 
@@ -144,7 +145,7 @@ table only after their tags and release evidence exist.
 | M10-R2 | Reject conflicting simplified duplicate event IDs while deduplicating identical records. | Complete | Shared [CloudTrail event boundary](../cloudtrail_detector/events.py), order-independent detector regressions, unified and legacy CLI error tests, coverage-summary regression, and duplicate-semantics documentation. |
 | M10-R3 | Preserve Markdown report structure for untrusted artifact text. | Complete | Context-aware [report renderer](../report_generator/generate_report.py), cross-artifact adversarial regression, format-neutral remediation rationale, deterministic sample report, and documented [report-integrity boundary](report-integrity.md). |
 | M10-R4 | Validate all consumed simplified-input structures at runtime. | Complete | Dependency-free [runtime validators](../cloud_inputs/validation.py), path-stable errors, four-module unified and compatibility CLI matrices, nested malformed-input regressions, native-normalizer round trips, and [boundary documentation](simplified-input-validation.md). |
-| M10-R5 | Re-run complete quality, benchmark, packaging, privacy, and deterministic-output gates. | Open | Planned `v2.1.1` release evidence. |
+| M10-R5 | Re-run complete quality, benchmark, packaging, privacy, and deterministic-output gates. | Complete | The [v2.1.1 release evidence](release-v2.1.1.md) records 328 passing tests, independent 95.22% statement and 88.68% branch coverage, all benchmark profiles, deterministic report and catalog checks, native pipelines, clean-wheel execution, and privacy/secret review. |
 
 ## M11: Runtime and Supply-Chain Hardening
 

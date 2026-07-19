@@ -6,7 +6,8 @@ must not be renumbered or collapsed when work is summarized.
 
 `v2.0.0` is an immutable, working release checkpoint. `v2.1.0` completes the
 remaining provenance, performance, benchmark, and portfolio-presentation work
-from the original upgrade plan.
+from the original upgrade plan. `v2.1.1` closes the verified M10 boundary
+defects without widening the analyzer scope.
 
 Detailed requirement, artifact, test, and commit evidence is maintained in
 [Upgrade traceability](docs/traceability.md).
@@ -155,7 +156,7 @@ Planned release checkpoints:
 
 ## M10: Verified Boundary Defects
 
-Status: In progress for `v2.1.1`.
+Status: Complete in `v2.1.1`.
 
 - [x] Match CloudTrail change rules on both AWS service source and event name.
 - [x] Reject conflicting simplified CloudTrail records that share an `eventID`,
@@ -166,7 +167,7 @@ Status: In progress for `v2.1.1`.
       runtime and return stable user-facing errors.
 - [x] Convert every verified defect into a regression test and search all
       equivalent entry points for the same failure mode.
-- [ ] Run the full release gate and publish `v2.1.1`.
+- [x] Run the full release gate and publish `v2.1.1`.
 
 ## M11: Runtime and Supply-Chain Hardening
 

@@ -19,7 +19,7 @@ credentials or charges.
 | Security scope | IAM, S3, EC2 security groups, and CloudTrail |
 | Detection depth | 35 cataloged rules with qualified AWS Security Hub CSPM, CIS AWS Foundations, and MITRE ATT&CK mappings |
 | Deterministic sample | 39 findings, 2 incidents, 36 remediation actions, and 11 timeline entries |
-| Engineering assurance | 300 tests; 95.19% statement and 89.16% branch coverage; Python 3.10, 3.12, and 3.13 CI |
+| Engineering assurance | 328 tests; 95.22% statement and 88.68% branch coverage; Python 3.10, 3.12, and 3.13 CI |
 | Safety boundary | Offline files only; zero runtime dependencies; no credentials and no cloud writes |
 
 ## Quick Start
@@ -71,8 +71,8 @@ engineering evidence.
 
 | Quality Gate | Verified Result |
 | --- | --- |
-| Automated tests | 300 unit, regression, integration, CLI, schema, compatibility, and benchmark tests pass |
-| Coverage | 4,477/4,703 statements (95.19%) and 1,694/1,900 branches (89.16%) |
+| Automated tests | 328 unit, regression, integration, CLI, schema, compatibility, and benchmark tests pass |
+| Coverage | 4,979/5,229 statements (95.22%) and 1,903/2,146 branches (88.68%) |
 | Rule benchmark | 78/78 exact functional cases and 4/4 malformed native inputs rejected |
 | Scale benchmark | 8/8 deterministic profiles pass across 100 to 10,000 inputs |
 | Supported Python | GitHub Actions passes on Python 3.10, 3.12, and 3.13 |
@@ -413,6 +413,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [Upgrade traceability](docs/traceability.md)
 - [System architecture](docs/architecture.md)
 - [Design decisions](docs/design-decisions.md)
+- [Version 2.1.1 release notes](docs/release-v2.1.1.md)
 - [Version 2.1.0 release notes](docs/release-v2.1.0.md)
 - [Version 2.0.0 release notes](docs/release-v2.0.0.md)
 - [Five-minute demo walkthrough](docs/demo-walkthrough.md)
@@ -579,6 +580,7 @@ cloud_security_misconfiguration_lab/
 │   ├── remediation-prioritization.md
 │   ├── release-v2.0.0.md
 │   ├── release-v2.1.0.md
+│   ├── release-v2.1.1.md
 │   ├── rule-catalog.md
 │   ├── simplified-input-validation.md
 │   ├── traceability.md
