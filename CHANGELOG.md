@@ -4,6 +4,12 @@ All notable changes to this project are documented in this file.
 
 ## Unreleased
 
+### Added
+
+- A post-v2.1 M10-M14 roadmap and requirement-to-evidence plan for verified
+  boundary fixes, runtime hardening, independent evaluation, application
+  presentation, and the final application release.
+
 ## 2.1.0 - 2026-07-19
 
 ### Added

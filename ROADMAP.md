@@ -138,6 +138,95 @@ Status: Complete in `v2.1.0`.
 5. **C4 - Portfolio presentation (complete):** complete the remaining M9 README, visual, and repository-metadata work.
 6. **C5 - Release (complete):** run the full release gate and publish `v2.1.0`.
 
+## Post-v2.1 Upgrade Route
+
+The original M0-M9 route remains immutable and complete. The milestones below
+extend the project from a deterministic synthetic lab into an independently
+evaluated application project without renumbering or reopening the original
+requirements.
+
+Planned release checkpoints:
+
+| Release | Milestones | Purpose |
+| --- | --- | --- |
+| `v2.1.1` | M10 | Close verified correctness and report-integrity defects. |
+| `v2.2.0` | M11-M12 | Harden runtime boundaries and publish independent evaluation evidence. |
+| `v2.3.0` | M13-M14 | Publish the research narrative and final application release. |
+
+## M10: Verified Boundary Defects
+
+Status: In progress for `v2.1.1`.
+
+- [ ] Match CloudTrail change rules on both AWS service source and event name.
+- [ ] Reject conflicting simplified CloudTrail records that share an `eventID`,
+      while continuing to analyze identical duplicates once.
+- [ ] Preserve generated Markdown structure when finding, incident, summary, or
+      source text contains Markdown control characters.
+- [ ] Validate the consumed structure of all simplified analyzer inputs at
+      runtime and return stable user-facing errors.
+- [ ] Convert every verified defect into a regression test and search all
+      equivalent entry points for the same failure mode.
+- [ ] Run the full release gate and publish `v2.1.1`.
+
+## M11: Runtime and Supply-Chain Hardening
+
+Status: Planned for `v2.2.0`.
+
+- [ ] Define evidence-based limits for JSON size, decompressed gzip size,
+      resource count, node count, and nesting depth.
+- [ ] Fail closed on oversized, deeply nested, truncated, or malformed inputs.
+- [ ] Pin GitHub Actions to immutable revisions and make development dependency
+      resolution reproducible.
+- [ ] Exercise every documented Python minor version in CI.
+- [ ] Add Markdown, internal-link, and external-link validation.
+- [ ] Publish a security policy, threat model, release checksums, an SBOM, and
+      build-provenance evidence.
+
+## M12: Independent External Evaluation
+
+Status: Planned for `v2.2.0`.
+
+- [ ] Publish a versioned evaluation protocol before running the analyzers.
+- [ ] Build a provenance-tracked corpus of independent positive, hardened,
+      boundary, and ambiguous IAM, S3, network, and CloudTrail cases.
+- [ ] Establish ground truth independently from analyzer output and preserve
+      sanitized native evidence with integrity hashes.
+- [ ] Compare overlapping controls with an established external baseline without
+      treating unsupported scope as a disagreement.
+- [ ] Publish per-module true positives, false positives, false negatives, true
+      negatives, precision, recall, F1, and complete disagreement analysis.
+- [ ] Measure native/simplified equivalence and the effects of reachability
+      context and incident correlation.
+- [ ] Publish machine-readable evaluation results and a reproducible runner.
+
+## M13: Research and Application Narrative
+
+Status: Planned for `v2.3.0`.
+
+- [ ] State one bounded research question and connect every public claim to
+      architecture or evaluation evidence.
+- [ ] Publish a concise technical case study with method, results, threats to
+      validity, limitations, and future work.
+- [ ] Identify personal contribution, important design changes, difficult
+      defects, and lessons learned without overstating authorship.
+- [ ] Reduce the main README to a reviewer-first project entry point and move
+      detailed reference material into focused documents.
+- [ ] Publish a short real-system demo and a one-page application summary.
+- [ ] Make public author, project, version, and support information consistent.
+
+## M14: Final Application Release
+
+Status: Planned for `v2.3.0`.
+
+- [ ] Reproduce installation, analysis, evaluation, and release from a clean
+      clone and installed wheel.
+- [ ] Complete final correctness, privacy, secret, license, link, documentation,
+      and unsupported-claim reviews.
+- [ ] Link every M10-M14 requirement to implementation, test, documentation, and
+      commit evidence.
+- [ ] Publish deterministic application artifacts and the final `v2.3.0`
+      release with checksums, SBOM, and evaluation results.
+
 ## Definition of Done
 
 The original upgrade route is complete only when:

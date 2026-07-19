@@ -24,6 +24,10 @@ from the original M0-M9 plan.
 | `v2.0.0` | `7acfda6` | Working reliability, native-input, detection-depth, and reporting release. |
 | `v2.1.0` | Tag `v2.1.0` | Completion release for every remaining M0-M9 acceptance item. |
 
+Planned post-v2.1 checkpoints are `v2.1.1` for M10, `v2.2.0` for
+M11-M12, and `v2.3.0` for M13-M14. They become release checkpoints in this
+table only after their tags and release evidence exist.
+
 ## M0: Freeze v1 and Record the Baseline
 
 | ID | Requirement | Status | Evidence |
@@ -131,6 +135,53 @@ from the original M0-M9 plan.
 | M9-R5 | Show CI status and concise tested results in the README. | Complete | The [README](../README.md) shows the live CI badge, supported Python matrix, exact test and independent statement/branch coverage results, benchmark outcomes, and distribution checks. |
 | M9-R6 | Add a report preview, demo walkthrough, and learning reflection. | Complete | The [report preview](assets/report-preview.svg), [five-minute demo](demo-walkthrough.md), and [README learning reflections](../README.md#what-i-learned) present real project evidence without widening the documented claims. |
 | M9-R7 | Preserve milestone review history and publish the completion release. | Complete | The milestone-oriented `upgrade/v2.1-completion` history, annotated `v2.1.0` tag, matching release notes, and gated release workflow preserve and publish the completion evidence. |
+
+## M10: Verified Boundary Defects
+
+| ID | Requirement | Status | Evidence |
+| --- | --- | --- | --- |
+| M10-R1 | Match CloudTrail change rules on service source and event name. | Open | Planned detector mapping, wrong-source regression matrix, catalog review, and compatibility documentation. |
+| M10-R2 | Reject conflicting simplified duplicate event IDs while deduplicating identical records. | Open | Planned shared duplicate validator, detector and CLI regression tests, and coverage-summary update. |
+| M10-R3 | Preserve Markdown report structure for untrusted artifact text. | Open | Planned context-aware renderer escaping and adversarial report tests. |
+| M10-R4 | Validate all consumed simplified-input structures at runtime. | Open | Planned dependency-free validators, stable CLI errors, and malformed-input tests for every module. |
+| M10-R5 | Re-run complete quality, benchmark, packaging, privacy, and deterministic-output gates. | Open | Planned `v2.1.1` release evidence. |
+
+## M11: Runtime and Supply-Chain Hardening
+
+| ID | Requirement | Status | Evidence |
+| --- | --- | --- | --- |
+| M11-R1 | Bound JSON, gzip, resource-count, node-count, and nesting inputs. | Open | Planned measured limits, loader enforcement, and adversarial resource tests. |
+| M11-R2 | Make CI actions and development dependency resolution reproducible. | Open | Planned immutable action revisions and locked development environment. |
+| M11-R3 | Exercise every documented Python minor version and validate public links and Markdown. | Open | Planned CI matrix and documentation jobs. |
+| M11-R4 | Publish security, threat-model, checksum, SBOM, and build-provenance evidence. | Open | Planned security and release artifacts. |
+
+## M12: Independent External Evaluation
+
+| ID | Requirement | Status | Evidence |
+| --- | --- | --- | --- |
+| M12-R1 | Publish an evaluation protocol and independent ground-truth process before measurement. | Open | Planned protocol, schemas, and provenance rules. |
+| M12-R2 | Build a sanitized, integrity-tracked independent corpus across all four modules. | Open | Planned evaluation fixtures and manifest. |
+| M12-R3 | Compare overlapping behavior with an established external baseline. | Open | Planned overlap matrix and disagreement record. |
+| M12-R4 | Publish classification metrics, disagreement analysis, and relevant ablations. | Open | Planned machine-readable results, runner, and evaluation report. |
+
+## M13: Research and Application Narrative
+
+| ID | Requirement | Status | Evidence |
+| --- | --- | --- | --- |
+| M13-R1 | State a bounded research question and evidence-backed contribution claims. | Open | Planned application case study and claim-to-evidence table. |
+| M13-R2 | Publish methods, results, threats to validity, limitations, and future work. | Open | Planned concise technical report. |
+| M13-R3 | Make personal contribution, design evolution, and difficult defects visible. | Open | Planned contribution and engineering-reflection material. |
+| M13-R4 | Produce a reviewer-first README, short real-system demo, and one-page summary. | Open | Planned application presentation artifacts. |
+| M13-R5 | Make public identity, version, and support information consistent. | Open | Planned metadata and documentation review. |
+
+## M14: Final Application Release
+
+| ID | Requirement | Status | Evidence |
+| --- | --- | --- | --- |
+| M14-R1 | Reproduce the complete project and evaluation from a clean clone and wheel. | Open | Planned clean-environment release gate. |
+| M14-R2 | Complete final correctness, privacy, secret, license, link, and claim reviews. | Open | Planned review records and release checklist. |
+| M14-R3 | Link every post-v2.1 requirement to implementation, verification, documentation, and commit evidence. | Open | Planned completed rows in this document. |
+| M14-R4 | Publish the final application release and all integrity and evaluation artifacts. | Open | Planned `v2.3.0` tag and GitHub Release. |
 
 ## Completion Rule
 
