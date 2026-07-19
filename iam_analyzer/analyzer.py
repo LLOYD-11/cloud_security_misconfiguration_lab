@@ -21,7 +21,7 @@ from cloud_findings import (
     with_findings_context,
     write_findings,
 )
-from cloud_inputs import load_simplified_environment
+from cloud_inputs import load_simplified_environment, validate_analysis_input_limits
 from cloud_rules import validate_rule_emission
 
 SENSITIVE_ACTIONS = (
@@ -843,6 +843,7 @@ def analyze_trust_policy(role: dict[str, Any], account_id: str) -> list[Finding]
 
 
 def analyze_environment(environment: dict[str, Any]) -> list[Finding]:
+    validate_analysis_input_limits("iam", environment)
     account_id = str(environment.get("account_id") or "unknown")
     findings: list[Finding] = []
 

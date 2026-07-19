@@ -74,9 +74,11 @@ flowchart TD
 ```
 
 1. The CLI selects a module, input format, and explicit analysis parameters.
-2. Native adapters validate AWS-shaped evidence and translate it into a
-   canonical module environment. Simplified files cross a dependency-free,
-   path-aware validator before entering the same canonical boundary.
+2. A bounded reader limits external bytes, gzip expansion, JSON nodes and
+   depth, resources, and related files. Native adapters then validate
+   AWS-shaped evidence and translate it into a canonical module environment.
+   Simplified files cross a dependency-free, path-aware validator before
+   entering the same canonical boundary.
 3. An analyzer applies module-specific rules and emits shared `Finding`
    objects with stable IDs, confidence, account, Region, time, and structured
    source references. CloudTrail analysis can also correlate eligible findings
@@ -96,7 +98,7 @@ flowchart TD
 | --- | --- | --- |
 | `cloud_security_lab.cli` | Command parsing and pipeline orchestration | Detection logic |
 | `cloud_security_lab.normalizers` | Strict native AWS parsing and canonical translation | Live AWS collection |
-| `cloud_inputs` | Simplified-input structure, type, and compatibility validation | Detection or full JSON Schema evaluation |
+| `cloud_inputs` | External-file resource bounds plus simplified-input structure, type, and compatibility validation | Detection or full JSON Schema evaluation |
 | `iam_analyzer` | Identity policy, trust, boundary, and credential checks | Full IAM authorization evaluation |
 | `storage_analyzer` | S3 public-access, ownership, encryption, and versioning checks | Object inventory or access-point analysis |
 | `network_analyzer` | Security-group exposure and supplied reachability context | Independent end-to-end path calculation |
@@ -157,6 +159,10 @@ The architecture treats absence of evidence differently from a secure value:
 Input files are trusted only as supplied evidence. The lab does not verify
 CloudTrail digest signatures, provenance, collection authorization, or whether
 files were altered before analysis.
+
+The exact fail-closed byte, decompression, node, nesting, resource, and
+file-count ceilings are documented in
+[Input resource limits](input-resource-limits.md).
 
 ## Determinism
 

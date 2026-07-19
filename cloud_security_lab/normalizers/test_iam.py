@@ -192,6 +192,37 @@ class NativeIamNormalizerTests(unittest.TestCase):
                 as_of=AS_OF,
             )
 
+    def test_identity_inventory_resource_limit_is_enforced_before_normalization(self):
+        authorization = {
+            "IsTruncated": False,
+            "UserDetailList": [{}] * 10_001,
+            "GroupDetailList": [],
+            "RoleDetailList": [],
+            "Policies": [],
+        }
+
+        with self.assertRaisesRegex(
+            ValueError,
+            r"identity inventory contains 10,001 items; limit is 10,000",
+        ):
+            normalize_aws_iam_environment(
+                authorization,
+                {},
+                as_of=AS_OF,
+            )
+
+        authorization["UserDetailList"] = []
+        authorization["Policies"] = [{}] * 10_001
+        with self.assertRaisesRegex(
+            ValueError,
+            r"managed policy inventory contains 10,001 items; limit is 10,000",
+        ):
+            normalize_aws_iam_environment(
+                authorization,
+                {},
+                as_of=AS_OF,
+            )
+
     def test_incomplete_authorization_details_are_rejected(self):
         for missing_field in ("IsTruncated", "RoleDetailList"):
             with self.subTest(missing_field=missing_field):

@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import argparse
-import json
 from pathlib import Path
 from typing import Any, Sequence, cast
 
 from cloud_benchmarks.models import load_benchmark_manifest
+from cloud_inputs import load_bounded_json
 
 
 def _percentage(numerator: int, denominator: int, label: str) -> float:
@@ -74,8 +74,10 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    with args.coverage_json.open("r", encoding="utf-8") as handle:
-        payload = json.load(handle)
+    payload = load_bounded_json(
+        args.coverage_json,
+        label=f"Coverage JSON {args.coverage_json}",
+    )
     if not isinstance(payload, dict):
         raise ValueError("Coverage JSON must contain an object.")
     manifest = load_benchmark_manifest(args.manifest)

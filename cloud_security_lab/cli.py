@@ -58,9 +58,7 @@ from network_analyzer.analyzer import (
     print_findings as print_network,
 )
 from report_generator.generate_report import (
-    load_all_analysis_summaries,
-    load_all_findings,
-    load_all_incidents,
+    load_report_inputs,
     render_report,
     write_report,
 )
@@ -356,9 +354,11 @@ def _run_analyze(args: argparse.Namespace) -> int:
 
 
 def _run_report(args: argparse.Namespace) -> int:
-    findings = load_all_findings(args.findings)
-    incidents = load_all_incidents(args.incidents)
-    analysis_summaries = load_all_analysis_summaries(args.analysis_summary)
+    findings, incidents, analysis_summaries = load_report_inputs(
+        args.findings,
+        args.incidents,
+        args.analysis_summary,
+    )
     report = render_report(
         findings,
         source_files=[*args.findings, *args.incidents, *args.analysis_summary],

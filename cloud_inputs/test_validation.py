@@ -81,6 +81,67 @@ class SimplifiedInputValidationTests(unittest.TestCase):
                 validate_simplified_environment(module, environment)
             self.assertEqual(message, str(context.exception))
 
+    def test_each_module_rejects_more_than_ten_thousand_resources(self):
+        cases = {
+            "iam": (
+                {
+                    "account_id": "111122223333",
+                    "users": [{}] * 10_001,
+                    "roles": [],
+                },
+                "IAM",
+            ),
+            "storage": (
+                {
+                    "account_id": "111122223333",
+                    "buckets": [{}] * 10_001,
+                },
+                "STORAGE",
+            ),
+            "network": (
+                {
+                    "account_id": "111122223333",
+                    "security_groups": [{}] * 10_001,
+                },
+                "NETWORK",
+            ),
+            "cloudtrail": (
+                {
+                    "account_id": "111122223333",
+                    "events": [{}] * 10_001,
+                },
+                "CLOUDTRAIL",
+            ),
+        }
+        for module, (environment, error_label) in cases.items():
+            with self.subTest(module=module), self.assertRaisesRegex(
+                SimplifiedInputError,
+                (
+                    rf"{error_label} environment contains 10,001 primary "
+                    r"resources; limit is 10,000"
+                ),
+            ):
+                validate_simplified_environment(module, environment)
+
+    def test_deep_simplified_input_fails_before_recursive_validation(self):
+        nested = {}
+        cursor = nested
+        for _ in range(65):
+            child = {}
+            cursor["nested"] = child
+            cursor = child
+        environment = {
+            "account_id": "111122223333",
+            "events": [],
+            "unexpected": nested,
+        }
+
+        with self.assertRaisesRegex(
+            SimplifiedInputError,
+            r"JSON nesting-depth limit of 64",
+        ):
+            validate_simplified_environment("cloudtrail", environment)
+
     def test_iam_rejects_nested_policy_container_with_stable_path(self):
         environment = {
             "account_id": "111122223333",

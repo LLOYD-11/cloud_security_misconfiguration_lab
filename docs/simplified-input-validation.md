@@ -56,6 +56,8 @@ schemas with the optional development dependency, validates committed samples
 and generated canonical environments, and then passes native-normalizer output
 through this runtime boundary as a round-trip check.
 
-Input byte, resource-count, decompression, and nesting-depth limits are separate
-hardening work tracked in M11. Structural validity does not establish evidence
-freshness, provenance, completeness, authorization, or security.
+Byte, resource-count, decompression, node-count, nesting-depth, and input-file
+ceilings are enforced by the separate shared
+[input resource boundary](input-resource-limits.md) before or alongside this
+contract validation. Structural validity does not establish evidence freshness,
+provenance, completeness, authorization, or security.

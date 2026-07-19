@@ -291,6 +291,15 @@ class NativeEc2NormalizerTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "must contain a JSON object"):
                 load_aws_ec2_environment(path)
 
+    def test_security_group_resource_limit_is_enforced_before_normalization(self):
+        response = {"SecurityGroups": [{}] * 10_001}
+
+        with self.assertRaisesRegex(
+            ValueError,
+            r"group inventory contains 10,001 items; limit is 10,000",
+        ):
+            normalize_aws_ec2_environment(response)
+
 
 if __name__ == "__main__":
     unittest.main()

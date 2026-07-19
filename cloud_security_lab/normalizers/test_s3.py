@@ -433,6 +433,16 @@ class NativeS3NormalizerTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "must contain a JSON object"):
                 load_aws_s3_environment(path)
 
+    def test_bucket_inventory_resource_limit_is_enforced_before_normalization(self):
+        bundle = _bundle()
+        bundle["ListBuckets"]["Buckets"] = [{}] * 10_001
+
+        with self.assertRaisesRegex(
+            ValueError,
+            r"bucket inventory contains 10,001 items; limit is 10,000",
+        ):
+            normalize_aws_s3_environment(bundle)
+
 
 if __name__ == "__main__":
     unittest.main()

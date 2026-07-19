@@ -8,7 +8,7 @@ import sys
 from collections import Counter, defaultdict
 from datetime import date
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Sequence
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
@@ -17,6 +17,11 @@ if str(PROJECT_ROOT) not in sys.path:
 from cloud_analysis import AnalysisSummary, load_analysis_summary_file
 from cloud_findings import Finding, load_findings_file, sort_findings
 from cloud_incidents import Incident, load_incidents_file, sort_incidents
+from cloud_inputs import (
+    JsonBudget,
+    enforce_collection_limit,
+    enforce_input_file_count,
+)
 from cloud_remediation import (
     RemediationPlan,
     build_remediation_plan,
@@ -85,24 +90,60 @@ def _parse_report_date(value: str) -> date:
         ) from exc
 
 
-def load_all_findings(paths: Iterable[Path]) -> list[Finding]:
+def load_all_findings(
+    paths: Iterable[Path],
+    *,
+    budget: JsonBudget | None = None,
+) -> list[Finding]:
+    path_list = list(paths)
+    enforce_input_file_count(path_list, label="Findings input set")
+    active_budget = budget or JsonBudget("Findings input set")
     findings: list[Finding] = []
-    for path in paths:
-        findings.extend(load_findings_file(path))
+    for path in path_list:
+        findings.extend(load_findings_file(path, budget=active_budget))
+        enforce_collection_limit(
+            len(findings),
+            label="Combined findings input",
+        )
     return sort_findings(findings)
 
 
-def load_all_incidents(paths: Iterable[Path]) -> list[Incident]:
+def load_all_incidents(
+    paths: Iterable[Path],
+    *,
+    budget: JsonBudget | None = None,
+) -> list[Incident]:
+    path_list = list(paths)
+    enforce_input_file_count(path_list, label="Incidents input set")
+    active_budget = budget or JsonBudget("Incidents input set")
     incidents: list[Incident] = []
-    for path in paths:
-        incidents.extend(load_incidents_file(path))
+    for path in path_list:
+        incidents.extend(load_incidents_file(path, budget=active_budget))
+        enforce_collection_limit(
+            len(incidents),
+            label="Combined incidents input",
+        )
     return sort_incidents(incidents)
 
 
-def load_all_analysis_summaries(paths: Iterable[Path]) -> list[AnalysisSummary]:
+def load_all_analysis_summaries(
+    paths: Iterable[Path],
+    *,
+    budget: JsonBudget | None = None,
+) -> list[AnalysisSummary]:
     """Load analysis summaries in deterministic module order."""
 
-    summaries = [load_analysis_summary_file(path) for path in paths]
+    path_list = list(paths)
+    enforce_input_file_count(path_list, label="Analysis-summary input set")
+    active_budget = budget or JsonBudget("Analysis-summary input set")
+    summaries = [
+        load_analysis_summary_file(path, budget=active_budget)
+        for path in path_list
+    ]
+    enforce_collection_limit(
+        len(summaries),
+        label="Combined analysis summaries",
+    )
     return sorted(
         summaries,
         key=lambda item: (
@@ -112,6 +153,26 @@ def load_all_analysis_summaries(paths: Iterable[Path]) -> list[AnalysisSummary]:
             item.input_file_count,
         ),
     )
+
+
+def load_report_inputs(
+    finding_paths: Sequence[Path],
+    incident_paths: Sequence[Path],
+    summary_paths: Sequence[Path],
+) -> tuple[list[Finding], list[Incident], list[AnalysisSummary]]:
+    """Load one report input set under shared file, byte, node, and item budgets."""
+
+    all_paths = [*finding_paths, *incident_paths, *summary_paths]
+    enforce_input_file_count(all_paths, label="Report input set")
+    budget = JsonBudget("Report input set")
+    findings = load_all_findings(finding_paths, budget=budget)
+    incidents = load_all_incidents(incident_paths, budget=budget)
+    summaries = load_all_analysis_summaries(summary_paths, budget=budget)
+    enforce_collection_limit(
+        len(findings) + len(incidents) + len(summaries),
+        label="Combined report artifacts",
+    )
+    return findings, incidents, summaries
 
 
 def _severity_counts(findings: Iterable[Finding]) -> Counter[str]:
@@ -445,13 +506,27 @@ def render_report(
     analysis_summaries: Iterable[AnalysisSummary] = (),
 ) -> str:
     report_date = report_date or date.today()
+    source_path_list = list(source_files)
+    incident_items = list(incidents)
+    summary_items = list(analysis_summaries)
+    enforce_input_file_count(source_path_list, label="Report source file set")
+    enforce_collection_limit(len(findings), label="Report findings")
+    enforce_collection_limit(len(incident_items), label="Report incidents")
+    enforce_collection_limit(
+        len(summary_items),
+        label="Report analysis summaries",
+    )
+    enforce_collection_limit(
+        len(findings) + len(incident_items) + len(summary_items),
+        label="Combined report artifacts",
+    )
     sorted_items = sort_findings(findings)
     severity_counts = _severity_counts(sorted_items)
     module_counts = _module_counts(sorted_items)
     grouped = _group_by_severity(sorted_items)
-    sorted_incidents = sort_incidents(incidents)
+    sorted_incidents = sort_incidents(incident_items)
     sorted_summaries = sorted(
-        analysis_summaries,
+        summary_items,
         key=lambda item: (
             item.module,
             item.input_format,
@@ -577,7 +652,7 @@ def render_report(
             "",
         ]
     )
-    for path in source_files:
+    for path in source_path_list:
         lines.append(f"- {_inline_code(str(path))}")
 
     if sorted_incidents:
@@ -783,9 +858,11 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        findings = load_all_findings(args.findings)
-        incidents = load_all_incidents(args.incidents)
-        analysis_summaries = load_all_analysis_summaries(args.analysis_summary)
+        findings, incidents, analysis_summaries = load_report_inputs(
+            args.findings,
+            args.incidents,
+            args.analysis_summary,
+        )
     except (OSError, ValueError, KeyError) as exc:
         parser.error(str(exc))
 

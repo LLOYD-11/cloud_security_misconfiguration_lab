@@ -17,6 +17,11 @@ from cloud_findings import (
     sort_findings,
 )
 from cloud_incidents import Incident, sort_incidents
+from cloud_inputs import (
+    JsonBudget,
+    enforce_collection_limit,
+    load_bounded_json,
+)
 from cloud_rules import get_rule
 
 SCHEMA_VERSION = "1.0"
@@ -712,8 +717,24 @@ def write_attack_timeline(path: Path, timeline: AttackTimeline) -> None:
         handle.write("\n")
 
 
-def load_attack_timeline_file(path: Path) -> AttackTimeline:
+def load_attack_timeline_file(
+    path: Path,
+    *,
+    budget: JsonBudget | None = None,
+) -> AttackTimeline:
     """Load and validate one attack timeline file."""
 
-    with path.open("r", encoding="utf-8") as handle:
-        return attack_timeline_from_dict(json.load(handle))
+    payload = load_bounded_json(
+        path,
+        label=f"Attack timeline file {path}",
+        budget=budget,
+    )
+    if isinstance(payload, dict):
+        entries = payload.get("entries")
+        omissions = payload.get("omissions")
+        if isinstance(entries, list) and isinstance(omissions, list):
+            enforce_collection_limit(
+                len(entries) + len(omissions),
+                label=f"Attack timeline file {path}",
+            )
+    return attack_timeline_from_dict(payload)

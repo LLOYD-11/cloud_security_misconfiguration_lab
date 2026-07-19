@@ -21,7 +21,7 @@ from cloud_findings import (
     with_findings_context,
     write_findings,
 )
-from cloud_inputs import load_simplified_environment
+from cloud_inputs import load_simplified_environment, validate_analysis_input_limits
 from cloud_rules import validate_rule_emission
 
 REF_AWS_S3_BLOCK_PUBLIC_ACCESS = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html"
@@ -517,6 +517,7 @@ def analyze_bucket(bucket: dict[str, Any]) -> list[Finding]:
 
 
 def analyze_environment(environment: dict[str, Any]) -> list[Finding]:
+    validate_analysis_input_limits("storage", environment)
     findings: list[Finding] = []
     for bucket in environment.get("buckets", []):
         findings.extend(analyze_bucket(bucket))

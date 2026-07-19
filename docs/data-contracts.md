@@ -38,6 +38,13 @@ JSON-style path. Full Draft 2020-12 evaluation remains an
 independent development and CI gate supplied by the optional `dev`
 dependencies. See [Simplified-input runtime validation](simplified-input-validation.md).
 
+External contract files are also subject to fixed
+[input resource limits](input-resource-limits.md). The bounded reader checks
+encoded and decompressed bytes, JSON node and container depth, aggregate
+multi-file budgets, primary-resource or artifact counts, and file counts before
+unbounded work can begin. These operational limits complement the versioned
+schemas; they do not change any published schema version.
+
 New finding exports use schema v2.0. Each finding carries a deterministic
 `FND-` ID, evidence-to-rule confidence, account, Region, optional UTC
 observation time, and one or more structured evidence references. The stable ID

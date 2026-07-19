@@ -713,6 +713,28 @@ class UnifiedCliTests(unittest.TestCase):
                 self.assertEqual(2, context.exception.code)
                 self.assertIn(message, stderr.getvalue())
 
+    def test_oversized_resource_set_returns_stable_cli_error(self):
+        payload = {
+            "account_id": "111122223333",
+            "events": [{}] * 10_001,
+        }
+        with tempfile.TemporaryDirectory() as tmpdir:
+            input_path = Path(tmpdir) / "too-many-events.json"
+            input_path.write_text(json.dumps(payload), encoding="utf-8")
+            stderr = StringIO()
+
+            with redirect_stdout(StringIO()), redirect_stderr(
+                stderr
+            ), self.assertRaises(SystemExit) as context:
+                main(["analyze", "cloudtrail", str(input_path)])
+
+        self.assertEqual(2, context.exception.code)
+        self.assertIn(
+            "CLOUDTRAIL environment contains 10,001 primary resources; "
+            "limit is 10,000",
+            stderr.getvalue(),
+        )
+
     def test_catalog_defaults_to_markdown_stdout(self):
         stdout = StringIO()
         with redirect_stdout(stdout):

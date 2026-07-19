@@ -10,6 +10,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Iterable
 
+from cloud_inputs import JsonBudget, enforce_collection_limit, load_bounded_json
+
 SCHEMA_VERSION = "2.0"
 LEGACY_SCHEMA_VERSION = "1.0"
 SUPPORTED_SCHEMA_VERSIONS = frozenset({LEGACY_SCHEMA_VERSION, SCHEMA_VERSION})
@@ -494,9 +496,16 @@ def write_findings(path: Path, findings: Iterable[Finding]) -> None:
         handle.write("\n")
 
 
-def load_findings_file(path: Path) -> list[Finding]:
-    with path.open("r", encoding="utf-8") as handle:
-        payload = json.load(handle)
+def load_findings_file(
+    path: Path,
+    *,
+    budget: JsonBudget | None = None,
+) -> list[Finding]:
+    payload = load_bounded_json(
+        path,
+        label=f"Findings file {path}",
+        budget=budget,
+    )
 
     if not isinstance(payload, dict):
         raise ValueError(f"{path} must contain a versioned findings JSON object.")
@@ -523,6 +532,10 @@ def load_findings_file(path: Path) -> list[Finding]:
     findings = payload["findings"]
     if not isinstance(findings, list):
         raise ValueError(f"{path} must contain a findings list.")
+    enforce_collection_limit(
+        len(findings),
+        label=f"Findings file {path}",
+    )
 
     finding_count = payload["finding_count"]
     if not isinstance(finding_count, int) or isinstance(finding_count, bool):

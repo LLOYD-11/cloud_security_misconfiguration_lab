@@ -9,6 +9,8 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Iterable
 
+from cloud_inputs import JsonBudget, enforce_collection_limit, load_bounded_json
+
 SCHEMA_VERSION = "1.0"
 VALID_SEVERITIES = frozenset({"critical", "high", "medium", "low", "info"})
 VALID_CONFIDENCE = frozenset({"low", "medium", "high"})
@@ -188,9 +190,16 @@ def write_incidents(path: Path, incidents: Iterable[Incident]) -> None:
         handle.write("\n")
 
 
-def load_incidents_file(path: Path) -> list[Incident]:
-    with path.open("r", encoding="utf-8") as handle:
-        payload = json.load(handle)
+def load_incidents_file(
+    path: Path,
+    *,
+    budget: JsonBudget | None = None,
+) -> list[Incident]:
+    payload = load_bounded_json(
+        path,
+        label=f"Incidents file {path}",
+        budget=budget,
+    )
 
     if not isinstance(payload, dict):
         raise ValueError(f"{path} must contain a versioned incidents JSON object.")
@@ -204,6 +213,10 @@ def load_incidents_file(path: Path) -> list[Incident]:
     incidents = payload.get("incidents")
     if not isinstance(incidents, list):
         raise ValueError(f"{path} must contain an incidents list.")
+    enforce_collection_limit(
+        len(incidents),
+        label=f"Incidents file {path}",
+    )
     incident_count = payload.get("incident_count")
     if not isinstance(incident_count, int) or isinstance(incident_count, bool):
         raise ValueError(f"{path} must contain an integer incident_count.")

@@ -11,6 +11,14 @@ from pathlib import Path
 from typing import Any, Sequence
 
 from cloud_analysis import SkippedEvidence
+from cloud_inputs import (
+    JsonBudget,
+    enforce_collection_limit,
+    enforce_input_file_count,
+    load_bounded_json,
+    validate_analysis_input_limits,
+    validate_json_value_limits,
+)
 
 ACCOUNT_ID_PATTERN = re.compile(r"^\d{12}$")
 EVENT_ID_PATTERN = re.compile(
@@ -30,29 +38,32 @@ class CloudTrailNormalizationResult:
     skipped_evidence: tuple[SkippedEvidence, ...] = ()
 
 
-def _load_json_object(path: Path) -> dict[str, Any]:
-    if path.suffix.lower() == ".gz":
-        try:
-            with gzip.open(path, "rt", encoding="utf-8") as handle:
-                payload = json.load(handle)
-        except json.JSONDecodeError as exc:
-            raise ValueError(
-                f"CloudTrail file {path} does not contain valid JSON: {exc.msg}."
-            ) from exc
-        except (gzip.BadGzipFile, EOFError, UnicodeDecodeError) as exc:
+def _load_json_object(
+    path: Path,
+    *,
+    budget: JsonBudget | None = None,
+) -> dict[str, Any]:
+    try:
+        payload = load_bounded_json(
+            path,
+            label=f"CloudTrail file {path}",
+            allow_gzip=True,
+            budget=budget,
+        )
+    except json.JSONDecodeError as exc:
+        raise ValueError(
+            f"CloudTrail file {path} does not contain valid JSON: {exc.msg}."
+        ) from exc
+    except UnicodeDecodeError as exc:
+        if path.suffix.lower() == ".gz":
             raise ValueError(
                 f"CloudTrail file {path} is not valid gzip-compressed JSON."
             ) from exc
-    else:
-        try:
-            with path.open("r", encoding="utf-8") as handle:
-                payload = json.load(handle)
-        except json.JSONDecodeError as exc:
-            raise ValueError(
-                f"CloudTrail file {path} does not contain valid JSON: {exc.msg}."
-            ) from exc
-        except UnicodeDecodeError as exc:
-            raise ValueError(f"CloudTrail file {path} is not valid UTF-8 JSON.") from exc
+        raise ValueError(f"CloudTrail file {path} is not valid UTF-8 JSON.") from exc
+    except (gzip.BadGzipFile, EOFError) as exc:
+        raise ValueError(
+            f"CloudTrail file {path} is not valid gzip-compressed JSON."
+        ) from exc
     if not isinstance(payload, dict):
         raise ValueError(f"CloudTrail file {path} must contain a JSON object.")
     return payload
@@ -199,6 +210,17 @@ def normalize_aws_cloudtrail_environment(
 
     if not log_files:
         raise ValueError("At least one native CloudTrail log file is required.")
+    enforce_input_file_count(
+        len(log_files),
+        label="CloudTrail input set",
+    )
+    node_budget = JsonBudget("CloudTrail input set")
+    for file_index, payload in enumerate(log_files):
+        validate_json_value_limits(
+            payload,
+            label=f"CloudTrail log file {file_index + 1}",
+            budget=node_budget,
+        )
 
     events: list[dict[str, Any]] = []
     events_by_id: dict[str, dict[str, Any]] = {}
@@ -206,9 +228,16 @@ def normalize_aws_cloudtrail_environment(
     duplicate_count = 0
     duplicate_event_ids: set[str] = set()
     account_fallback_count = 0
+    record_count = 0
     for file_index, payload in enumerate(log_files):
         file_context = f"CloudTrail log file {file_index + 1}"
-        for record_index, record in enumerate(_records(payload, file_context)):
+        records = _records(payload, file_context)
+        record_count += len(records)
+        enforce_collection_limit(
+            record_count,
+            label="CloudTrail event input",
+        )
+        for record_index, record in enumerate(records):
             context = f"{file_context} record {record_index + 1}"
             event, account_id, used_fallback = _normalized_event(record, context)
             event_id = str(event["eventID"])
@@ -255,11 +284,13 @@ def normalize_aws_cloudtrail_environment(
                 resource_ids=sorted(duplicate_event_ids),
             ),
         )
+    environment = {
+        "account_id": next(iter(account_ids)),
+        "events": events,
+    }
+    validate_analysis_input_limits("cloudtrail", environment)
     return CloudTrailNormalizationResult(
-        environment={
-            "account_id": next(iter(account_ids)),
-            "events": events,
-        },
+        environment=environment,
         warnings=tuple(warnings),
         skipped_evidence=skipped_evidence,
     )
@@ -272,12 +303,14 @@ def load_aws_cloudtrail_environment(
 
     if not paths:
         raise ValueError("At least one native CloudTrail log file path is required.")
+    enforce_input_file_count(paths, label="CloudTrail input set")
     seen_paths: set[Path] = set()
     payloads: list[dict[str, Any]] = []
+    budget = JsonBudget("CloudTrail input set")
     for path in paths:
         resolved = path.resolve()
         if resolved in seen_paths:
             raise ValueError(f"CloudTrail input path was provided more than once: {path}.")
         seen_paths.add(resolved)
-        payloads.append(_load_json_object(path))
+        payloads.append(_load_json_object(path, budget=budget))
     return normalize_aws_cloudtrail_environment(payloads)

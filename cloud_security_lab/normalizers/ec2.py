@@ -3,13 +3,18 @@
 from __future__ import annotations
 
 import ipaddress
-import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 from cloud_analysis import SkippedEvidence
+from cloud_inputs import (
+    enforce_collection_limit,
+    load_bounded_json,
+    validate_analysis_input_limits,
+    validate_json_value_limits,
+)
 
 ACCOUNT_ID_PATTERN = re.compile(r"^\d{12}$")
 SECURITY_GROUP_ID_PATTERN = re.compile(r"^sg-(?:[0-9a-f]{8}|[0-9a-f]{17})$")
@@ -35,8 +40,10 @@ class Ec2NormalizationResult:
 
 
 def _load_json_object(path: Path) -> dict[str, Any]:
-    with path.open("r", encoding="utf-8") as handle:
-        payload = json.load(handle)
+    payload = load_bounded_json(
+        path,
+        label=f"AWS EC2 security group export {path}",
+    )
     if not isinstance(payload, dict):
         raise ValueError("AWS EC2 security group export must contain a JSON object.")
     return payload
@@ -343,6 +350,10 @@ def _normalized_group(group: dict[str, Any]) -> tuple[dict[str, Any], set[str]]:
 def normalize_aws_ec2_environment(response: dict[str, Any]) -> Ec2NormalizationResult:
     """Convert a complete DescribeSecurityGroups response into network analyzer input."""
 
+    validate_json_value_limits(
+        response,
+        label="AWS EC2 security group export",
+    )
     if "NextToken" in response and response["NextToken"] is not None:
         next_token = response["NextToken"]
         if not isinstance(next_token, str) or not next_token:
@@ -353,6 +364,10 @@ def normalize_aws_ec2_environment(response: dict[str, Any]) -> Ec2NormalizationR
     groups = _object_list(response, "SecurityGroups", "DescribeSecurityGroups", required=True)
     if not groups:
         raise ValueError("DescribeSecurityGroups response must contain at least one security group.")
+    enforce_collection_limit(
+        len(groups),
+        label="AWS EC2 security group inventory",
+    )
 
     normalized_groups: list[dict[str, Any]] = []
     seen_group_ids: set[str] = set()
@@ -377,11 +392,13 @@ def normalize_aws_ec2_environment(response: dict[str, Any]) -> Ec2NormalizationR
             "DescribeSecurityGroups response contains multiple owner account IDs; "
             "analyze one account snapshot at a time."
         )
+    environment = {
+        "account_id": next(iter(account_ids)),
+        "security_groups": normalized_groups,
+    }
+    validate_analysis_input_limits("network", environment)
     return Ec2NormalizationResult(
-        environment={
-            "account_id": next(iter(account_ids)),
-            "security_groups": normalized_groups,
-        },
+        environment=environment,
         warnings=tuple(warnings),
     )
 

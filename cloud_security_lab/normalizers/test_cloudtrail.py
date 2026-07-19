@@ -226,6 +226,23 @@ class NativeCloudTrailNormalizerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "At least one"):
             load_aws_cloudtrail_environment(())
 
+    def test_file_and_event_resource_limits_are_enforced(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            r"contains 101 files; limit is 100",
+        ):
+            load_aws_cloudtrail_environment(
+                tuple(Path(f"event-{index}.json") for index in range(101))
+            )
+
+        with self.assertRaisesRegex(
+            ValueError,
+            r"event input contains 10,001 items; limit is 10,000",
+        ):
+            normalize_aws_cloudtrail_environment(
+                ({"Records": [{}] * 10_001},)
+            )
+
     def test_loader_rejects_non_object_and_corrupt_gzip(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             json_path = Path(tmpdir) / "events.json"
@@ -237,6 +254,13 @@ class NativeCloudTrailNormalizerTests(unittest.TestCase):
             gzip_path.write_bytes(b"not-gzip")
             with self.assertRaisesRegex(ValueError, "not valid gzip"):
                 load_aws_cloudtrail_environment((gzip_path,))
+
+            truncated_gzip_path = Path(tmpdir) / "truncated.json.gz"
+            truncated_gzip_path.write_bytes(
+                gzip.compress(json.dumps({"Records": [_event()]}).encode())[:-4]
+            )
+            with self.assertRaisesRegex(ValueError, "not valid gzip"):
+                load_aws_cloudtrail_environment((truncated_gzip_path,))
 
             invalid_utf8_path = Path(tmpdir) / "invalid.json"
             invalid_utf8_path.write_bytes(b"\xff")

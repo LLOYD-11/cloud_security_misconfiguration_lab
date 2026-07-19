@@ -9,6 +9,13 @@ from pathlib import Path
 from typing import Any
 
 from cloud_analysis import SkippedEvidence
+from cloud_inputs import (
+    enforce_collection_limit,
+    load_bounded_json,
+    parse_bounded_json_text,
+    validate_analysis_input_limits,
+    validate_json_value_limits,
+)
 
 ACCOUNT_ID_PATTERN = re.compile(r"^\d{12}$")
 SCHEMA_VERSION = "1.0"
@@ -38,8 +45,10 @@ class S3NormalizationResult:
 
 
 def _load_json_object(path: Path) -> dict[str, Any]:
-    with path.open("r", encoding="utf-8") as handle:
-        payload = json.load(handle)
+    payload = load_bounded_json(
+        path,
+        label=f"AWS S3 evidence bundle {path}",
+    )
     if not isinstance(payload, dict):
         raise ValueError("AWS S3 evidence bundle must contain a JSON object.")
     return payload
@@ -127,7 +136,10 @@ def _bucket_policy(payload: dict[str, Any], context: str) -> dict[str, Any]:
     policy_value = payload.get("Policy")
     if isinstance(policy_value, str):
         try:
-            policy_value = json.loads(policy_value)
+            policy_value = parse_bounded_json_text(
+                policy_value,
+                label=f"{context} Policy",
+            )
         except json.JSONDecodeError as exc:
             raise ValueError(f"{context} Policy is not valid JSON.") from exc
     if not isinstance(policy_value, dict):
@@ -300,6 +312,10 @@ def _bucket_inventory(list_buckets: dict[str, Any]) -> dict[str, str | None]:
             )
 
     buckets = _required_object_list(list_buckets, "Buckets", "ListBuckets")
+    enforce_collection_limit(
+        len(buckets),
+        label="AWS S3 bucket inventory",
+    )
     inventory: dict[str, str | None] = {}
     seen: set[str] = set()
     for bucket in buckets:
@@ -321,6 +337,10 @@ def _bucket_inventory(list_buckets: dict[str, Any]) -> dict[str, str | None]:
 def normalize_aws_s3_environment(evidence_bundle: dict[str, Any]) -> S3NormalizationResult:
     """Convert an AWS S3 evidence bundle into storage analyzer input."""
 
+    validate_json_value_limits(
+        evidence_bundle,
+        label="AWS S3 evidence bundle",
+    )
     if evidence_bundle.get("schema_version") != SCHEMA_VERSION:
         raise ValueError(
             "AWS S3 evidence bundle must use schema_version "
@@ -346,6 +366,10 @@ def normalize_aws_s3_environment(evidence_bundle: dict[str, Any]) -> S3Normaliza
         evidence_bundle,
         "BucketEvidence",
         "S3 evidence bundle",
+    )
+    enforce_collection_limit(
+        len(bucket_evidence),
+        label="AWS S3 bucket evidence",
     )
 
     evidence_by_name: dict[str, dict[str, Any]] = {}
@@ -411,8 +435,10 @@ def normalize_aws_s3_environment(evidence_bundle: dict[str, Any]) -> S3Normaliza
             normalized_bucket["region"] = bucket_region
         normalized_buckets.append(normalized_bucket)
 
+    environment = {"account_id": account_id, "buckets": normalized_buckets}
+    validate_analysis_input_limits("storage", environment)
     return S3NormalizationResult(
-        environment={"account_id": account_id, "buckets": normalized_buckets},
+        environment=environment,
         warnings=tuple(warnings),
     )
 

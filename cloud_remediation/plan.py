@@ -17,6 +17,11 @@ from cloud_findings import (
     sort_findings,
 )
 from cloud_incidents import Incident, sort_incidents
+from cloud_inputs import (
+    JsonBudget,
+    enforce_collection_limit,
+    load_bounded_json,
+)
 from cloud_rules import get_rule
 
 SCHEMA_VERSION = "1.0"
@@ -525,8 +530,21 @@ def write_remediation_plan(path: Path, plan: RemediationPlan) -> None:
         handle.write("\n")
 
 
-def load_remediation_plan_file(path: Path) -> RemediationPlan:
+def load_remediation_plan_file(
+    path: Path,
+    *,
+    budget: JsonBudget | None = None,
+) -> RemediationPlan:
     """Load and validate one remediation plan file."""
 
-    with path.open("r", encoding="utf-8") as handle:
-        return remediation_plan_from_dict(json.load(handle))
+    payload = load_bounded_json(
+        path,
+        label=f"Remediation plan file {path}",
+        budget=budget,
+    )
+    if isinstance(payload, dict) and isinstance(payload.get("actions"), list):
+        enforce_collection_limit(
+            len(payload["actions"]),
+            label=f"Remediation plan file {path}",
+        )
+    return remediation_plan_from_dict(payload)

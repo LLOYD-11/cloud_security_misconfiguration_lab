@@ -4,6 +4,18 @@ All notable changes to this project are documented in this file.
 
 ## Unreleased
 
+### Added
+
+- Evidence-based resource ceilings for external JSON, gzip, credential-report,
+  and report-artifact inputs, with bounded reads, aggregate budgets, and
+  adversarial regression tests.
+
+### Changed
+
+- Simplified and native analyzers now fail closed on excessive encoded or
+  decompressed bytes, JSON nodes or nesting, primary resources, artifact
+  records, and related input files before unbounded analysis work begins.
+
 ## 2.1.1 - 2026-07-19
 
 ### Added

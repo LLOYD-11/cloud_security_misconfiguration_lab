@@ -10,7 +10,11 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
   remain the complete canonical contracts and are evaluated separately in
   development and CI; documented runtime aliases are compatibility extensions.
 - Native CloudTrail input supports standard `Records` log files in JSON or gzip form, not CloudTrail Insight, aggregated-event, or digest payloads.
-- Evidence is loaded into memory and is intended for small lab datasets.
+- External inputs fail closed at the documented
+  [byte, decompression, node, depth, resource, and file-count limits](input-resource-limits.md).
+  Accepted evidence is still materialized in memory; these ceilings are safety
+  controls for lab datasets, not production capacity or operating-system RSS
+  guarantees.
 - Findings v2 preserve provenance only when the source evidence or explicit CLI
   options provide it. Versioned v1 findings migrate with `unknown` account,
   Region, and confidence plus a `null` observation time.

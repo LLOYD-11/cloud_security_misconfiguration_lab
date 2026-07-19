@@ -8,6 +8,8 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
+from cloud_inputs import JsonBudget, load_bounded_json
+
 SCHEMA_VERSION = "1.0"
 VALID_MODULES = frozenset({"iam", "storage", "network", "cloudtrail"})
 VALID_INPUT_FORMATS = frozenset({"simplified", "aws"})
@@ -327,11 +329,18 @@ def write_analysis_summary(path: Path, summary: AnalysisSummary) -> None:
         handle.write("\n")
 
 
-def load_analysis_summary_file(path: Path) -> AnalysisSummary:
+def load_analysis_summary_file(
+    path: Path,
+    *,
+    budget: JsonBudget | None = None,
+) -> AnalysisSummary:
     """Load one supported analysis-summary file."""
 
-    with path.open("r", encoding="utf-8") as handle:
-        payload = json.load(handle)
+    payload = load_bounded_json(
+        path,
+        label=f"Analysis summary file {path}",
+        budget=budget,
+    )
     if not isinstance(payload, dict):
         raise ValueError(f"{path} must contain a versioned analysis summary object.")
     schema_version = payload.pop("schema_version", None)

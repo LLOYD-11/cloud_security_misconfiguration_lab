@@ -10,6 +10,8 @@ from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
+from cloud_inputs import enforce_collection_limit, load_bounded_json
+
 SCHEMA_VERSION = "1.0"
 CATALOG_FILENAME = "rules-v1.0.json"
 MODULE_ORDER = ("iam", "storage", "network", "cloudtrail")
@@ -342,8 +344,16 @@ def rule_catalog_to_dict(catalog: RuleCatalog) -> dict[str, Any]:
 def load_rule_catalog_file(path: Path) -> RuleCatalog:
     """Load one rule catalog JSON file from disk."""
 
-    with path.open("r", encoding="utf-8") as handle:
-        return rule_catalog_from_dict(json.load(handle))
+    payload = load_bounded_json(
+        path,
+        label=f"Rule catalog file {path}",
+    )
+    if isinstance(payload, dict) and isinstance(payload.get("rules"), list):
+        enforce_collection_limit(
+            len(payload["rules"]),
+            label=f"Rule catalog file {path}",
+        )
+    return rule_catalog_from_dict(payload)
 
 
 @lru_cache(maxsize=1)

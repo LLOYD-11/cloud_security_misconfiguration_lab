@@ -15,6 +15,14 @@ from typing import Any
 from urllib.parse import unquote
 
 from cloud_analysis import SkippedEvidence
+from cloud_inputs import (
+    enforce_collection_limit,
+    load_bounded_json,
+    parse_bounded_json_text,
+    read_bounded_utf8,
+    validate_analysis_input_limits,
+    validate_json_value_limits,
+)
 from cloud_security_lab.normalizers.common import (
     write_normalized_environment as write_normalized_environment,
 )
@@ -48,8 +56,7 @@ class IamNormalizationResult:
 
 
 def _load_json_object(path: Path, label: str) -> dict[str, Any]:
-    with path.open("r", encoding="utf-8") as handle:
-        payload = json.load(handle)
+    payload = load_bounded_json(path, label=label)
     if not isinstance(payload, dict):
         raise ValueError(f"{label} must contain a JSON object.")
     return payload
@@ -80,14 +87,20 @@ def _decode_policy_document(value: Any, context: str) -> dict[str, Any]:
             break
 
         try:
-            current = json.loads(current)
+            current = parse_bounded_json_text(
+                current,
+                label=f"{context} IAM policy document",
+            )
             continue
         except json.JSONDecodeError:
             decoded = unquote(current)
             if decoded == current:
                 raise ValueError(f"{context} contains an invalid IAM policy document.")
             try:
-                current = json.loads(decoded)
+                current = parse_bounded_json_text(
+                    decoded,
+                    label=f"{context} IAM policy document",
+                )
             except json.JSONDecodeError as exc:
                 raise ValueError(f"{context} contains an invalid IAM policy document.") from exc
 
@@ -274,12 +287,18 @@ def _permissions_boundary(
 
 
 def _credential_csv_text(path: Path) -> str:
-    raw = path.read_text(encoding="utf-8-sig")
+    raw = read_bounded_utf8(
+        path,
+        label=f"AWS credential report {path}",
+    ).removeprefix("\ufeff")
     if not raw.lstrip().startswith(("{", "[")):
         return raw
 
     try:
-        payload = json.loads(raw)
+        payload = parse_bounded_json_text(
+            raw,
+            label=f"AWS credential report {path}",
+        )
     except json.JSONDecodeError as exc:
         raise ValueError("AWS credential report JSON is invalid.") from exc
     if not isinstance(payload, dict):
@@ -317,6 +336,10 @@ def _credential_rows(path: Path) -> dict[str, dict[str, str]]:
         if username in rows:
             raise ValueError(f"AWS credential report contains duplicate user {username}.")
         rows[username] = {key: str(value or "").strip() for key, value in row.items()}
+        enforce_collection_limit(
+            len(rows),
+            label="AWS credential report",
+        )
     return rows
 
 
@@ -463,6 +486,14 @@ def normalize_aws_iam_environment(
 ) -> IamNormalizationResult:
     """Convert AWS authorization details and credential rows to analyzer input."""
 
+    validate_json_value_limits(
+        authorization_details,
+        label="AWS IAM authorization details",
+    )
+    validate_json_value_limits(
+        credential_rows,
+        label="AWS IAM credential rows",
+    )
     if authorization_details.get("IsTruncated") is True:
         raise ValueError(
             "AWS IAM authorization details are truncated; collect all pages before analysis."
@@ -478,6 +509,18 @@ def normalize_aws_iam_environment(
     groups = _object_list(authorization_details, "GroupDetailList")
     roles = _object_list(authorization_details, "RoleDetailList")
     policies = _object_list(authorization_details, "Policies")
+    enforce_collection_limit(
+        len(users) + len(groups) + len(roles),
+        label="AWS IAM identity inventory",
+    )
+    enforce_collection_limit(
+        len(policies),
+        label="AWS IAM managed policy inventory",
+    )
+    enforce_collection_limit(
+        len(credential_rows),
+        label="AWS IAM credential rows",
+    )
     warnings: list[str] = []
     skipped_evidence: list[SkippedEvidence] = []
     managed = _managed_policy_documents(policies, warnings)
@@ -645,6 +688,7 @@ def normalize_aws_iam_environment(
     }
     if root_account is not None:
         environment["root_account"] = root_account
+    validate_analysis_input_limits("iam", environment)
 
     return IamNormalizationResult(
         environment=environment,

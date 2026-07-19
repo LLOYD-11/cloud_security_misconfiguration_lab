@@ -24,6 +24,7 @@ from report_generator.generate_report import (
     load_all_analysis_summaries,
     load_all_findings,
     load_all_incidents,
+    load_report_inputs,
     render_report,
     write_report,
 )
@@ -65,6 +66,77 @@ class ReportGeneratorTests(unittest.TestCase):
             findings = load_all_findings([path_a, path_b])
 
         self.assertEqual(["IAM-001", "STO-001"], [finding.rule_id for finding in findings])
+
+    def test_report_file_and_finding_limits_fail_before_item_parsing(self):
+        with self.assertRaisesRegex(
+            ValueError,
+            r"contains 101 files; limit is 100",
+        ):
+            load_report_inputs(
+                [Path(f"finding-{index}.json") for index in range(101)],
+                [],
+                [],
+            )
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "oversized-findings.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "schema_version": "2.0",
+                        "finding_count": 10_001,
+                        "findings": [{}] * 10_001,
+                    }
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(
+                ValueError,
+                r"contains 10,001 items; limit is 10,000",
+            ):
+                load_all_findings([path])
+
+        finding = Finding(
+            rule_id="CUSTOM-001",
+            severity="info",
+            module="custom",
+            category="test",
+            resource_type="fixture",
+            resource_id="example",
+            title="Custom extension rule",
+            evidence="Synthetic evidence.",
+            impact="Synthetic impact.",
+            remediation="Synthetic remediation.",
+        )
+        incident = Incident(
+            incident_id="CTI-123456789ABC",
+            severity="high",
+            confidence="high",
+            module="cloudtrail",
+            category="test",
+            title="Synthetic incident",
+            actor="test-user",
+            source_ip="192.0.2.1",
+            first_seen="2026-06-30T00:00:00Z",
+            last_seen="2026-06-30T00:00:00Z",
+            event_count=1,
+            finding_count=1,
+            rule_ids=["CUSTOM-001"],
+            event_ids=["event-1"],
+            resources=["fixture/example"],
+            summary="Synthetic incident for resource-limit testing.",
+            recommended_actions=["Review the synthetic event."],
+            references=["https://example.com/reference"],
+        )
+        with self.assertRaisesRegex(
+            ValueError,
+            r"Combined report artifacts contains 10,001 items; limit is 10,000",
+        ):
+            render_report(
+                [finding] * 10_000,
+                source_files=[],
+                incidents=[incident],
+            )
 
     def test_render_report_includes_summary_and_details(self):
         finding = Finding(

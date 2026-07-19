@@ -123,6 +123,7 @@ jobs:
           names = zipfile.ZipFile(wheel).namelist();
           assert 'cloud_benchmarks/benchmark-manifest-v1.0.json' in names;
           assert 'cloud_benchmarks/runner.py' in names;
+          assert 'cloud_inputs/bounds.py' in names;
           assert 'cloud_inputs/validation.py' in names;
           assert 'cloud_rules/rules-v1.0.json' in names;
           assert 'cloud_remediation/plan.py' in names;

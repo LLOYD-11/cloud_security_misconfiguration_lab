@@ -10,6 +10,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, NoReturn, cast
 
+from cloud_inputs.bounds import (
+    InputLimitError,
+    load_bounded_json,
+    validate_analysis_input_limits,
+)
+
 MODULE_LABELS = {
     "iam": "IAM",
     "storage": "storage",
@@ -1234,6 +1240,11 @@ def validate_simplified_environment(
     """Validate and return one simplified analyzer environment."""
 
     validator = _validator_for(module)
+    if isinstance(value, dict):
+        try:
+            validate_analysis_input_limits(module, value)
+        except InputLimitError as exc:
+            _fail(module, "$", str(exc).removesuffix("."))
     validator(value)
     return cast(dict[str, Any], value)
 
@@ -1243,8 +1254,10 @@ def load_simplified_environment(path: Path, module: str) -> dict[str, Any]:
 
     _validator_for(module)
     try:
-        with path.open("r", encoding="utf-8") as handle:
-            value = json.load(handle)
+        value = load_bounded_json(
+            path,
+            label=f"Simplified {MODULE_LABELS[module]} input {path}",
+        )
     except json.JSONDecodeError as exc:
         _fail(
             module,
@@ -1253,4 +1266,6 @@ def load_simplified_environment(path: Path, module: str) -> dict[str, Any]:
         )
     except UnicodeDecodeError:
         _fail(module, "$", "expected UTF-8 encoded JSON")
+    except InputLimitError as exc:
+        _fail(module, "$", str(exc).removesuffix("."))
     return validate_simplified_environment(module, value)

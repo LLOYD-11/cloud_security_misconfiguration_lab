@@ -22,7 +22,7 @@ from cloud_findings import (
     with_findings_context,
     write_findings,
 )
-from cloud_inputs import load_simplified_environment
+from cloud_inputs import load_simplified_environment, validate_analysis_input_limits
 from cloud_rules import validate_rule_emission
 
 REF_AWS_SECURITY_GROUPS = "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html"
@@ -787,6 +787,7 @@ def analyze_security_group(group: dict[str, Any]) -> list[Finding]:
 
 
 def analyze_environment(environment: dict[str, Any]) -> list[Finding]:
+    validate_analysis_input_limits("network", environment)
     findings: list[Finding] = []
     for group in environment.get("security_groups", []):
         findings.extend(analyze_security_group(group))

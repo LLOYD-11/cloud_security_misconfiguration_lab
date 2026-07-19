@@ -3,13 +3,18 @@
 from __future__ import annotations
 
 import copy
-import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 from cloud_analysis import SkippedEvidence
-from cloud_inputs import canonicalize_rfc3339_timestamp
+from cloud_inputs import (
+    canonicalize_rfc3339_timestamp,
+    enforce_collection_limit,
+    load_bounded_json,
+    validate_analysis_input_limits,
+    validate_json_value_limits,
+)
 
 SCHEMA_VERSION = "1.0"
 REACHABILITY_METHODS = frozenset(
@@ -33,8 +38,10 @@ class NetworkReachabilityResult:
 
 
 def _load_json_object(path: Path) -> dict[str, Any]:
-    with path.open("r", encoding="utf-8") as handle:
-        payload = json.load(handle)
+    payload = load_bounded_json(
+        path,
+        label=f"Network reachability context {path}",
+    )
     if not isinstance(payload, dict):
         raise ValueError("Network reachability context must contain a JSON object.")
     return payload
@@ -118,6 +125,10 @@ def normalize_network_reachability_context(
 ) -> dict[str, dict[str, Any]]:
     """Validate a reachability context payload and index it by security group."""
 
+    validate_json_value_limits(
+        payload,
+        label="Network reachability context",
+    )
     _only_keys(payload, {"schema_version", "security_groups"}, "Reachability context")
     if payload.get("schema_version") != SCHEMA_VERSION:
         raise ValueError(
@@ -131,6 +142,10 @@ def normalize_network_reachability_context(
         raise ValueError(
             "Network reachability context security_groups must be a non-empty list of objects."
         )
+    enforce_collection_limit(
+        len(groups),
+        label="Network reachability context",
+    )
 
     assessments: dict[str, dict[str, Any]] = {}
     for index, group in enumerate(groups):
@@ -164,9 +179,25 @@ def apply_network_reachability_context(
 ) -> NetworkReachabilityResult:
     """Attach validated assessments without mutating the source environment."""
 
+    validate_json_value_limits(
+        environment,
+        label="Network environment",
+    )
+    validate_json_value_limits(
+        assessments,
+        label="Network reachability assessments",
+    )
     groups = environment.get("security_groups")
     if not isinstance(groups, list) or not all(isinstance(group, dict) for group in groups):
         raise ValueError("Network environment security_groups must be a list of objects.")
+    enforce_collection_limit(
+        len(groups),
+        label="Network security group environment",
+    )
+    enforce_collection_limit(
+        len(assessments),
+        label="Network reachability assessments",
+    )
 
     group_ids: list[str] = []
     for group in groups:
@@ -199,6 +230,7 @@ def apply_network_reachability_context(
             f"{len(missing_ids)} security group(s): {', '.join(missing_ids)}. "
             "Their findings remain configuration-only."
         )
+    validate_analysis_input_limits("network", enriched)
     return NetworkReachabilityResult(
         environment=enriched,
         warnings=tuple(warnings),

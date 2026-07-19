@@ -24,7 +24,7 @@ from cloud_findings import (
     write_findings,
 )
 from cloud_incidents import Incident, write_incidents
-from cloud_inputs import load_simplified_environment
+from cloud_inputs import load_simplified_environment, validate_analysis_input_limits
 from cloud_rules import validate_rule_emission
 from cloudtrail_detector.correlation import (
     DEFAULT_CORRELATION_WINDOW_MINUTES,
@@ -697,6 +697,7 @@ def analyze_activity(
     failure_window_minutes: int = 10,
     correlation_window_minutes: int = DEFAULT_CORRELATION_WINDOW_MINUTES,
 ) -> CloudTrailAnalysisResult:
+    validate_analysis_input_limits("cloudtrail", environment)
     for name, value in (
         ("failure_threshold", failure_threshold),
         ("failure_window_minutes", failure_window_minutes),

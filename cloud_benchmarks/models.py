@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Iterable, cast
 
 from cloud_findings import Finding
+from cloud_inputs import load_bounded_json
 
 BENCHMARK_SCHEMA_VERSION = "1.0"
 BENCHMARK_MANIFEST_FILENAME = "benchmark-manifest-v1.0.json"
@@ -71,8 +72,10 @@ def load_benchmark_manifest(path: Path | None = None) -> dict[str, Any]:
         with resource.open("r", encoding="utf-8") as handle:
             payload = json.load(handle)
     else:
-        with path.open("r", encoding="utf-8") as handle:
-            payload = json.load(handle)
+        payload = load_bounded_json(
+            path,
+            label=f"Benchmark manifest {path}",
+        )
     if not isinstance(payload, dict):
         raise ValueError("Benchmark manifest must contain a JSON object.")
     if payload.get("schema_version") != BENCHMARK_SCHEMA_VERSION:

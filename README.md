@@ -294,7 +294,9 @@ Every simplified JSON file crosses the same dependency-free
 [runtime validation boundary](docs/simplified-input-validation.md) before
 analysis. Errors identify the first invalid field with a stable JSON-style path;
 the unified and compatibility CLIs therefore reject malformed nested evidence
-consistently.
+consistently. All external evidence and report artifacts also cross measured
+[input resource limits](docs/input-resource-limits.md) for bytes, gzip
+decompression, JSON nodes and depth, resource counts, and file counts.
 
 Run one analyzer:
 
@@ -419,6 +421,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [Five-minute demo walkthrough](docs/demo-walkthrough.md)
 - [Data contracts](docs/data-contracts.md)
 - [Simplified-input runtime validation](docs/simplified-input-validation.md)
+- [Input resource limits](docs/input-resource-limits.md)
 - [Detection rule catalog](docs/rule-catalog.md)
 - [Remediation prioritization](docs/remediation-prioritization.md)
 - [Attack timeline](docs/attack-timeline.md)
@@ -492,6 +495,8 @@ cloud_security_misconfiguration_lab/
 ├── cloud_findings/
 │   └── finding.py
 ├── cloud_inputs/
+│   ├── bounds.py
+│   ├── test_bounds.py
 │   ├── validation.py
 │   └── test_validation.py
 ├── cloud_incidents/
@@ -575,6 +580,7 @@ cloud_security_misconfiguration_lab/
 │   ├── design-decisions.md
 │   ├── engineering.md
 │   ├── incident-correlation.md
+│   ├── input-resource-limits.md
 │   ├── known-limitations.md
 │   ├── native-aws-inputs.md
 │   ├── remediation-prioritization.md
