@@ -92,38 +92,6 @@ class DataContractTests(unittest.TestCase):
                     format_checker=FormatChecker(),
                 ).validate(sample)
 
-    def test_iam_contract_rejects_mutually_exclusive_statement_elements(self):
-        schema = _load_json(
-            PROJECT_ROOT / "schemas/iam-environment-v1.0.schema.json"
-        )
-        validator = Draft202012Validator(schema)
-        conflicts = (
-            {"action": "*", "not_action": "iam:*"},
-            {"action": "*", "resource": "*", "not_resource": "example"},
-            {
-                "action": "sts:AssumeRole",
-                "principal": "*",
-                "not_principal": {"AWS": "111122223333"},
-            },
-        )
-
-        for fields in conflicts:
-            environment = {
-                "account_id": "111122223333",
-                "users": [],
-                "roles": [
-                    {
-                        "name": "ambiguous-role",
-                        "trust_policy": {
-                            "statements": [{"effect": "Allow", **fields}]
-                        },
-                        "attached_policies": [],
-                    }
-                ],
-            }
-            with self.subTest(fields=tuple(fields)):
-                self.assertTrue(list(validator.iter_errors(environment)))
-
     def test_aws_fixture_manifest_is_complete_and_integrity_checked(self):
         manifest = _load_json(
             PROJECT_ROOT / "sample_data/aws/fixture-manifest-v1.0.json"

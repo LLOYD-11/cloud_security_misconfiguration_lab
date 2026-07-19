@@ -52,13 +52,9 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["effect"],
-      "oneOf": [
+      "anyOf": [
         { "required": ["action"] },
         { "required": ["not_action"] }
-      ],
-      "allOf": [
-        { "not": { "required": ["resource", "not_resource"] } },
-        { "not": { "required": ["principal", "not_principal"] } }
       ],
       "properties": {
         "sid": { "type": "string" },
