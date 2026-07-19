@@ -131,6 +131,19 @@ class NetworkReachabilityContextTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "duplicate values"):
             normalize_network_reachability_context(payload)
 
+    def test_observed_at_offset_is_canonicalized_to_utc(self):
+        payload = _payload()
+        payload["security_groups"][0]["observed_at"] = (
+            "2026-06-30T11:00:00+10:00"
+        )
+
+        assessments = normalize_network_reachability_context(payload)
+
+        self.assertEqual(
+            "2026-06-30T01:00:00Z",
+            next(iter(assessments.values()))["observed_at"],
+        )
+
     def test_environment_group_shape_and_identity_are_validated(self):
         assessment = next(iter(load_network_reachability_context(CONTEXT_PATH).values()))
         cases = (

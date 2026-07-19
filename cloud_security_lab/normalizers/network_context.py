@@ -5,11 +5,11 @@ from __future__ import annotations
 import copy
 import json
 from dataclasses import dataclass
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 from cloud_analysis import SkippedEvidence
+from cloud_inputs import canonicalize_rfc3339_timestamp
 
 SCHEMA_VERSION = "1.0"
 REACHABILITY_METHODS = frozenset(
@@ -105,12 +105,12 @@ def _direction(payload: dict[str, Any], key: str, context: str) -> dict[str, Any
 def _observed_at(payload: dict[str, Any], context: str) -> str:
     value = _required_string(payload, "observed_at", context)
     try:
-        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        return canonicalize_rfc3339_timestamp(
+            value,
+            field_name=f"{context} observed_at",
+        )
     except ValueError as exc:
-        raise ValueError(f"{context} observed_at must be an RFC 3339 timestamp.") from exc
-    if parsed.tzinfo is None or parsed.utcoffset() is None:
-        raise ValueError(f"{context} observed_at must include a UTC offset.")
-    return value
+        raise ValueError(str(exc)) from exc
 
 
 def normalize_network_reachability_context(

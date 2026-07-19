@@ -24,6 +24,7 @@ from cloud_findings import (
     write_findings,
 )
 from cloud_incidents import Incident, write_incidents
+from cloud_inputs import load_simplified_environment
 from cloud_rules import validate_rule_emission
 from cloudtrail_detector.correlation import (
     DEFAULT_CORRELATION_WINDOW_MINUTES,
@@ -751,11 +752,7 @@ def analyze_environment(
 
 
 def load_environment(path: Path) -> dict[str, Any]:
-    with path.open("r", encoding="utf-8") as handle:
-        data = json.load(handle)
-    if not isinstance(data, dict):
-        raise ValueError("CloudTrail event file must contain a JSON object.")
-    return data
+    return load_simplified_environment(path, "cloudtrail")
 
 
 def print_findings(findings: list[Finding]) -> None:

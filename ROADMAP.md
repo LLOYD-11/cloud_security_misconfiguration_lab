@@ -162,9 +162,9 @@ Status: In progress for `v2.1.1`.
       while continuing to analyze identical duplicates once.
 - [x] Preserve generated Markdown structure when finding, incident, summary, or
       source text contains Markdown control characters.
-- [ ] Validate the consumed structure of all simplified analyzer inputs at
+- [x] Validate the consumed structure of all simplified analyzer inputs at
       runtime and return stable user-facing errors.
-- [ ] Convert every verified defect into a regression test and search all
+- [x] Convert every verified defect into a regression test and search all
       equivalent entry points for the same failure mode.
 - [ ] Run the full release gate and publish `v2.1.1`.
 

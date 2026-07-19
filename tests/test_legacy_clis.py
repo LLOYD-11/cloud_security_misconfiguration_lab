@@ -21,6 +21,28 @@ ANALYZER_CASES = (
     (network_main, "sample_data/network/sample_network_environment.json", 10),
     (cloudtrail_main, "sample_data/cloudtrail/sample_cloudtrail_events.json", 11),
 )
+MALFORMED_ANALYZER_CASES = (
+    (
+        iam_main,
+        {"account_id": "111122223333", "users": {}, "roles": []},
+        "Invalid simplified IAM input at $.users: expected an array.",
+    ),
+    (
+        storage_main,
+        {"account_id": "111122223333", "buckets": {}},
+        "Invalid simplified storage input at $.buckets: expected an array.",
+    ),
+    (
+        network_main,
+        {"account_id": "111122223333", "security_groups": {}},
+        "Invalid simplified network input at $.security_groups: expected an array.",
+    ),
+    (
+        cloudtrail_main,
+        {"account_id": "111122223333", "events": {}},
+        "Invalid simplified CloudTrail input at $.events: expected an array.",
+    ),
+)
 
 
 class LegacyCliCompatibilityTests(unittest.TestCase):
@@ -59,7 +81,12 @@ class LegacyCliCompatibilityTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmpdir:
             input_path = Path(tmpdir) / "conflicting-events.json"
             input_path.write_text(
-                json.dumps({"events": [event, conflicting]}),
+                json.dumps(
+                    {
+                        "account_id": "111122223333",
+                        "events": [event, conflicting],
+                    }
+                ),
                 encoding="utf-8",
             )
             argv = ["cloudtrail_detector", str(input_path)]
@@ -75,6 +102,28 @@ class LegacyCliCompatibilityTests(unittest.TestCase):
             "Conflicting CloudTrail events share eventID 'duplicate-event'",
             stderr.getvalue(),
         )
+
+    def test_module_scripts_share_stable_simplified_input_errors(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            for index, (entrypoint, payload, message) in enumerate(
+                MALFORMED_ANALYZER_CASES
+            ):
+                input_path = Path(tmpdir) / f"malformed-{index}.json"
+                input_path.write_text(json.dumps(payload), encoding="utf-8")
+                stderr = StringIO()
+                argv = ["analyzer", str(input_path)]
+
+                with self.subTest(message=message), patch.object(
+                    sys, "argv", argv
+                ), redirect_stdout(StringIO()), redirect_stderr(
+                    stderr
+                ), self.assertRaises(
+                    SystemExit
+                ) as context:
+                    entrypoint()
+
+                self.assertEqual(2, context.exception.code)
+                self.assertIn(message, stderr.getvalue())
 
     def test_report_script_entrypoint_still_writes_markdown(self):
         finding = Finding(

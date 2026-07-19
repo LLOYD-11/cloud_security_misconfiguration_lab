@@ -16,7 +16,7 @@ Run these commands from the repository root:
 ```bash
 mkdir -p reports/generated
 .venv/bin/ruff check .
-.venv/bin/mypy cloud_analysis cloud_benchmarks cloud_security_lab cloud_findings cloud_incidents cloud_remediation cloud_rules cloud_timeline iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
+.venv/bin/mypy cloud_analysis cloud_benchmarks cloud_security_lab cloud_findings cloud_inputs cloud_incidents cloud_remediation cloud_rules cloud_timeline iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
 .venv/bin/coverage json -o reports/generated/coverage.json
@@ -64,9 +64,9 @@ date and compares the generated Markdown, including finding provenance, the
 prioritized work queue, and attack timeline, byte-for-byte with the committed
 report. A second byte-for-byte check regenerates the human-readable rule catalog
 from its packaged JSON source. The build gate also confirms that the wheel
-contains the rule catalog, remediation and timeline modules, their schemas, and
-the AWS fixture manifest. It also verifies the packaged benchmark manifest,
-runner, and both benchmark schemas.
+contains the simplified-input validator, rule catalog, remediation and timeline
+modules, their schemas, and the AWS fixture manifest. It also verifies the
+packaged benchmark manifest, runner, and both benchmark schemas.
 
 ## Release Process
 

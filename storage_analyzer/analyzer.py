@@ -21,6 +21,7 @@ from cloud_findings import (
     with_findings_context,
     write_findings,
 )
+from cloud_inputs import load_simplified_environment
 from cloud_rules import validate_rule_emission
 
 REF_AWS_S3_BLOCK_PUBLIC_ACCESS = "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html"
@@ -529,11 +530,7 @@ def analyze_environment(environment: dict[str, Any]) -> list[Finding]:
 
 
 def load_environment(path: Path) -> dict[str, Any]:
-    with path.open("r", encoding="utf-8") as handle:
-        data = json.load(handle)
-    if not isinstance(data, dict):
-        raise ValueError("Storage environment file must contain a JSON object.")
-    return data
+    return load_simplified_environment(path, "storage")
 
 
 def print_findings(findings: list[Finding]) -> None:

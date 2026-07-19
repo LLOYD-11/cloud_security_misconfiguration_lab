@@ -172,10 +172,12 @@ Python standard library. Development tools remain optional dependencies.
 restricted teaching or review environments. It also reduces supply-chain and
 versioning surface for a small offline tool.
 
-**Consequences:** Full JSON Schema validation belongs to development and CI;
-runtime models implement focused validation in Python. A proven library should
-still be adopted if future scope makes a standard-library implementation less
-safe or maintainable.
+**Consequences:** Full JSON Schema validation belongs to development and CI.
+The shared `cloud_inputs` boundary performs focused, path-aware runtime
+validation for every simplified field consumed by an analyzer without
+reimplementing the complete JSON Schema standard. A proven library should still
+be adopted if future scope makes a standard-library implementation less safe or
+maintainable.
 
 **Alternative not chosen:** Making boto3, pydantic, or a policy engine mandatory
 would add capabilities but also substantial runtime weight not required by the

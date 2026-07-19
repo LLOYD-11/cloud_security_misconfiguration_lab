@@ -290,6 +290,12 @@ The detector also correlates eligible findings from the same actor and source in
 
 ## Unified CLI
 
+Every simplified JSON file crosses the same dependency-free
+[runtime validation boundary](docs/simplified-input-validation.md) before
+analysis. Errors identify the first invalid field with a stable JSON-style path;
+the unified and compatibility CLIs therefore reject malformed nested evidence
+consistently.
+
 Run one analyzer:
 
 ```bash
@@ -411,6 +417,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [Version 2.0.0 release notes](docs/release-v2.0.0.md)
 - [Five-minute demo walkthrough](docs/demo-walkthrough.md)
 - [Data contracts](docs/data-contracts.md)
+- [Simplified-input runtime validation](docs/simplified-input-validation.md)
 - [Detection rule catalog](docs/rule-catalog.md)
 - [Remediation prioritization](docs/remediation-prioritization.md)
 - [Attack timeline](docs/attack-timeline.md)
@@ -437,7 +444,7 @@ Development and contract checks use optional tools declared in `pyproject.toml`:
 ```bash
 mkdir -p reports/generated
 .venv/bin/ruff check .
-.venv/bin/mypy cloud_analysis cloud_benchmarks cloud_security_lab cloud_findings cloud_incidents cloud_remediation cloud_rules cloud_timeline iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
+.venv/bin/mypy cloud_analysis cloud_benchmarks cloud_security_lab cloud_findings cloud_inputs cloud_incidents cloud_remediation cloud_rules cloud_timeline iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
 .venv/bin/coverage json -o reports/generated/coverage.json
@@ -483,6 +490,9 @@ cloud_security_misconfiguration_lab/
 │   └── summary.py
 ├── cloud_findings/
 │   └── finding.py
+├── cloud_inputs/
+│   ├── validation.py
+│   └── test_validation.py
 ├── cloud_incidents/
 │   └── incident.py
 ├── cloud_remediation/
@@ -570,6 +580,7 @@ cloud_security_misconfiguration_lab/
 │   ├── release-v2.0.0.md
 │   ├── release-v2.1.0.md
 │   ├── rule-catalog.md
+│   ├── simplified-input-validation.md
 │   ├── traceability.md
 │   └── assets/
 │       └── report-preview.svg

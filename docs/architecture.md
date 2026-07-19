@@ -39,6 +39,7 @@ flowchart TD
     CLI["Unified CLI"]
     Normalize["Native-input normalizers"]
     Canonical["Canonical module environments"]
+    Validate["Simplified-input validators"]
     Analyze["IAM, storage, network, and CloudTrail analyzers"]
     Findings["Shared Finding objects"]
     Correlate["CloudTrail incident correlation"]
@@ -51,7 +52,8 @@ flowchart TD
 
     Input --> CLI
     CLI --> Normalize
-    CLI -->|"Simplified input"| Canonical
+    CLI -->|"Simplified input"| Validate
+    Validate --> Canonical
     Normalize --> Canonical
     Canonical --> Analyze
     Canonical --> Coverage
@@ -73,8 +75,8 @@ flowchart TD
 
 1. The CLI selects a module, input format, and explicit analysis parameters.
 2. Native adapters validate AWS-shaped evidence and translate it into a
-   canonical module environment. Simplified inputs enter at the same canonical
-   boundary.
+   canonical module environment. Simplified files cross a dependency-free,
+   path-aware validator before entering the same canonical boundary.
 3. An analyzer applies module-specific rules and emits shared `Finding`
    objects with stable IDs, confidence, account, Region, time, and structured
    source references. CloudTrail analysis can also correlate eligible findings
@@ -94,6 +96,7 @@ flowchart TD
 | --- | --- | --- |
 | `cloud_security_lab.cli` | Command parsing and pipeline orchestration | Detection logic |
 | `cloud_security_lab.normalizers` | Strict native AWS parsing and canonical translation | Live AWS collection |
+| `cloud_inputs` | Simplified-input structure, type, and compatibility validation | Detection or full JSON Schema evaluation |
 | `iam_analyzer` | Identity policy, trust, boundary, and credential checks | Full IAM authorization evaluation |
 | `storage_analyzer` | S3 public-access, ownership, encryption, and versioning checks | Object inventory or access-point analysis |
 | `network_analyzer` | Security-group exposure and supplied reachability context | Independent end-to-end path calculation |

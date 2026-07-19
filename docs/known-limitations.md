@@ -5,6 +5,10 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 ## Input Compatibility
 
 - All four analyzers accept documented simplified inputs or versioned native AWS evidence.
+- Runtime simplified-input validation checks consumed structure, types, selected
+  cross-field invariants, and compatibility aliases. The versioned schemas
+  remain the complete canonical contracts and are evaluated separately in
+  development and CI; documented runtime aliases are compatibility extensions.
 - Native CloudTrail input supports standard `Records` log files in JSON or gzip form, not CloudTrail Insight, aggregated-event, or digest payloads.
 - Evidence is loaded into memory and is intended for small lab datasets.
 - Findings v2 preserve provenance only when the source evidence or explicit CLI

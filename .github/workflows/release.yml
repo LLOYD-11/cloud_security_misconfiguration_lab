@@ -45,7 +45,7 @@ jobs:
       - name: Type check
         run: >-
           mypy cloud_analysis cloud_benchmarks cloud_security_lab cloud_findings
-          cloud_incidents cloud_remediation cloud_rules cloud_timeline
+          cloud_inputs cloud_incidents cloud_remediation cloud_rules cloud_timeline
           iam_analyzer storage_analyzer
           network_analyzer cloudtrail_detector report_generator
 

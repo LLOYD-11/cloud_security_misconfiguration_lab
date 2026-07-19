@@ -23,6 +23,12 @@ All notable changes to this project are documented in this file.
   model-valid text cannot alter the fixed report structure.
 - Remediation rationale is now format-neutral plain text; Markdown syntax is
   owned exclusively by the report renderer.
+- All simplified analyzer files now cross one dependency-free, path-aware
+  runtime validation boundary that rejects malformed nested structures,
+  primitive types, timestamps, CIDRs, port ranges, unsupported fields, and
+  ambiguous compatibility aliases consistently across unified and legacy CLIs.
+- Valid offset-aware evidence times are canonicalized to UTC `Z` before
+  analysis so timestamps and stable finding identities do not vary by notation.
 
 ## 2.1.0 - 2026-07-19
 

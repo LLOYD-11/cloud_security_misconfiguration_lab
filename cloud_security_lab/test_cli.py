@@ -517,6 +517,49 @@ class UnifiedCliTests(unittest.TestCase):
                         stderr.getvalue(),
                     )
 
+    def test_simplified_cloudtrail_offset_time_is_canonicalized_before_analysis(self):
+        environment = {
+            "account_id": "111122223333",
+            "events": [
+                {
+                    "eventID": "offset-event",
+                    "eventTime": "2026-06-30T11:00:00+10:00",
+                    "eventSource": "s3.amazonaws.com",
+                    "eventName": "PutBucketPolicy",
+                    "sourceIPAddress": "192.0.2.1",
+                    "userIdentity": {
+                        "type": "IAMUser",
+                        "userName": "alice",
+                    },
+                    "requestParameters": {"bucketName": "example-bucket"},
+                }
+            ],
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            input_path = Path(tmpdir) / "events.json"
+            output_path = Path(tmpdir) / "findings.json"
+            input_path.write_text(json.dumps(environment), encoding="utf-8")
+            with redirect_stdout(StringIO()), redirect_stderr(StringIO()):
+                result = main(
+                    [
+                        "analyze",
+                        "cloudtrail",
+                        str(input_path),
+                        "--output",
+                        str(output_path),
+                    ]
+                )
+            findings = json.loads(output_path.read_text(encoding="utf-8"))["findings"]
+
+        self.assertEqual(0, result)
+        self.assertEqual(1, len(findings))
+        self.assertEqual("2026-06-30T01:00:00Z", findings[0]["observed_at"])
+        self.assertEqual(
+            "2026-06-30T01:00:00Z",
+            findings[0]["metadata"]["event_time"],
+        )
+
     def test_cloudtrail_incident_options_are_rejected_for_other_modules(self):
         with redirect_stderr(StringIO()) as stderr, self.assertRaises(
             SystemExit
@@ -627,6 +670,48 @@ class UnifiedCliTests(unittest.TestCase):
 
         self.assertEqual(2, context.exception.code)
         self.assertIn("exactly one JSON file", stderr.getvalue())
+
+    def test_malformed_simplified_inputs_have_stable_module_errors(self):
+        cases = (
+            (
+                "iam",
+                {"account_id": "111122223333", "users": {}, "roles": []},
+                "Invalid simplified IAM input at $.users: expected an array.",
+            ),
+            (
+                "storage",
+                {"account_id": "111122223333", "buckets": {}},
+                "Invalid simplified storage input at $.buckets: expected an array.",
+            ),
+            (
+                "network",
+                {"account_id": "111122223333", "security_groups": {}},
+                (
+                    "Invalid simplified network input at $.security_groups: "
+                    "expected an array."
+                ),
+            ),
+            (
+                "cloudtrail",
+                {"account_id": "111122223333", "events": {}},
+                "Invalid simplified CloudTrail input at $.events: expected an array.",
+            ),
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            for module, payload, message in cases:
+                input_path = Path(tmpdir) / f"{module}.json"
+                input_path.write_text(json.dumps(payload), encoding="utf-8")
+                stderr = StringIO()
+
+                with self.subTest(module=module), redirect_stdout(
+                    StringIO()
+                ), redirect_stderr(stderr), self.assertRaises(
+                    SystemExit
+                ) as context:
+                    main(["analyze", module, str(input_path)])
+
+                self.assertEqual(2, context.exception.code)
+                self.assertIn(message, stderr.getvalue())
 
     def test_catalog_defaults_to_markdown_stdout(self):
         stdout = StringIO()

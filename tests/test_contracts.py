@@ -12,6 +12,7 @@ from jsonschema import Draft202012Validator, FormatChecker
 from cloud_analysis import write_analysis_summary
 from cloud_findings import write_findings
 from cloud_incidents import write_incidents
+from cloud_inputs import validate_simplified_environment
 from cloud_remediation import build_remediation_plan, write_remediation_plan
 from cloud_security_lab.analysis import build_analysis_summary
 from cloud_security_lab.normalizers.cloudtrail import load_aws_cloudtrail_environment
@@ -91,6 +92,38 @@ class DataContractTests(unittest.TestCase):
                     format_checker=FormatChecker(),
                 ).validate(sample)
 
+    def test_iam_contract_rejects_mutually_exclusive_statement_elements(self):
+        schema = _load_json(
+            PROJECT_ROOT / "schemas/iam-environment-v1.0.schema.json"
+        )
+        validator = Draft202012Validator(schema)
+        conflicts = (
+            {"action": "*", "not_action": "iam:*"},
+            {"action": "*", "resource": "*", "not_resource": "example"},
+            {
+                "action": "sts:AssumeRole",
+                "principal": "*",
+                "not_principal": {"AWS": "111122223333"},
+            },
+        )
+
+        for fields in conflicts:
+            environment = {
+                "account_id": "111122223333",
+                "users": [],
+                "roles": [
+                    {
+                        "name": "ambiguous-role",
+                        "trust_policy": {
+                            "statements": [{"effect": "Allow", **fields}]
+                        },
+                        "attached_policies": [],
+                    }
+                ],
+            }
+            with self.subTest(fields=tuple(fields)):
+                self.assertTrue(list(validator.iter_errors(environment)))
+
     def test_aws_fixture_manifest_is_complete_and_integrity_checked(self):
         manifest = _load_json(
             PROJECT_ROOT / "sample_data/aws/fixture-manifest-v1.0.json"
@@ -155,6 +188,7 @@ class DataContractTests(unittest.TestCase):
 
         Draft202012Validator.check_schema(schema)
         Draft202012Validator(schema).validate(result.environment)
+        validate_simplified_environment("storage", result.environment)
 
     def test_normalized_native_ec2_environment_matches_network_contract(self):
         schema = _load_json(PROJECT_ROOT / "schemas/network-environment-v1.0.schema.json")
@@ -175,6 +209,8 @@ class DataContractTests(unittest.TestCase):
             schema,
             format_checker=FormatChecker(),
         ).validate(enriched)
+        validate_simplified_environment("network", result.environment)
+        validate_simplified_environment("network", enriched)
 
     def test_normalized_native_iam_environment_matches_iam_contract(self):
         schema = _load_json(PROJECT_ROOT / "schemas/iam-environment-v1.0.schema.json")
@@ -186,6 +222,7 @@ class DataContractTests(unittest.TestCase):
 
         Draft202012Validator.check_schema(schema)
         Draft202012Validator(schema).validate(result.environment)
+        validate_simplified_environment("iam", result.environment)
 
     def test_gzip_cloudtrail_sample_and_normalized_environment_match_contracts(self):
         native_schema = _load_json(
@@ -220,6 +257,7 @@ class DataContractTests(unittest.TestCase):
             normalized_schema,
             format_checker=FormatChecker(),
         ).validate(result.environment)
+        validate_simplified_environment("cloudtrail", result.environment)
 
     def test_generated_findings_match_shared_contract(self):
         schema = _load_json(PROJECT_ROOT / "schemas/findings-v2.0.schema.json")
