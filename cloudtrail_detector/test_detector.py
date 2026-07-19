@@ -273,6 +273,172 @@ class CloudTrailDetectorTests(unittest.TestCase):
 
         self.assertEqual([], findings)
 
+    def test_change_rules_require_the_expected_aws_service_source(self):
+        cases = (
+            (
+                "CLD-001",
+                "signin.amazonaws.com",
+                {
+                    "eventName": "ConsoleLogin",
+                    "responseElements": {"ConsoleLogin": "Success"},
+                    "userIdentity": {"type": "Root"},
+                },
+            ),
+            (
+                "CLD-002",
+                "iam.amazonaws.com",
+                {
+                    "eventName": "DeactivateMFADevice",
+                    "requestParameters": {"userName": "alice"},
+                },
+            ),
+            (
+                "CLD-003",
+                "ec2.amazonaws.com",
+                {
+                    "eventName": "AuthorizeSecurityGroupIngress",
+                    "requestParameters": {"groupId": "sg-123"},
+                },
+            ),
+            (
+                "CLD-004",
+                "s3.amazonaws.com",
+                {
+                    "eventName": "PutBucketPolicy",
+                    "requestParameters": {"bucketName": "example"},
+                },
+            ),
+            (
+                "CLD-005",
+                "iam.amazonaws.com",
+                {
+                    "eventName": "CreatePolicyVersion",
+                    "requestParameters": {"policyName": "Example"},
+                },
+            ),
+            (
+                "CLD-007",
+                "signin.amazonaws.com",
+                {
+                    "eventName": "ConsoleLogin",
+                    "responseElements": {"ConsoleLogin": "Success"},
+                    "additionalEventData": {"MFAUsed": "No"},
+                },
+            ),
+            (
+                "CLD-008",
+                "iam.amazonaws.com",
+                {
+                    "eventName": "CreateAccessKey",
+                    "requestParameters": {"userName": "alice"},
+                },
+            ),
+            (
+                "CLD-009",
+                "iam.amazonaws.com",
+                {
+                    "eventName": "UpdateAssumeRolePolicy",
+                    "requestParameters": {"roleName": "Example"},
+                },
+            ),
+            (
+                "CLD-010",
+                "guardduty.amazonaws.com",
+                {
+                    "eventName": "DeleteDetector",
+                    "requestParameters": {"detectorId": "detector-1"},
+                },
+            ),
+            (
+                "CLD-011",
+                "kms.amazonaws.com",
+                {
+                    "eventName": "ScheduleKeyDeletion",
+                    "requestParameters": {"keyId": "key-1"},
+                },
+            ),
+        )
+        for rule_id, event_source, overrides in cases:
+            with self.subTest(rule_id=rule_id):
+                event = {
+                    "eventID": f"event-{rule_id.lower()}",
+                    "eventTime": "2026-06-30T01:00:00Z",
+                    "eventSource": event_source,
+                    "sourceIPAddress": "192.0.2.1",
+                    "userIdentity": {
+                        "type": "IAMUser",
+                        "userName": "alice",
+                    },
+                    **overrides,
+                }
+
+                matching = analyze_environment({"events": [event]})
+                wrong_source = analyze_environment(
+                    {
+                        "events": [
+                            {
+                                **event,
+                                "eventSource": "unrelated.amazonaws.com",
+                            }
+                        ]
+                    }
+                )
+
+                self.assertEqual([rule_id], [finding.rule_id for finding in matching])
+                self.assertEqual([], wrong_source)
+
+    def test_event_source_map_covers_every_supported_change_event(self):
+        expected_by_source = {
+            "cloudtrail.amazonaws.com": {
+                "DeleteTrail",
+                "StopLogging",
+            },
+            "config.amazonaws.com": {
+                "DeleteConfigurationRecorder",
+                "DeleteDeliveryChannel",
+                "StopConfigurationRecorder",
+            },
+            "ec2.amazonaws.com": {
+                "AuthorizeSecurityGroupEgress",
+                "AuthorizeSecurityGroupIngress",
+                "DeleteFlowLogs",
+            },
+            "guardduty.amazonaws.com": {
+                "DeleteDetector",
+                "UpdateDetector",
+            },
+            "iam.amazonaws.com": {
+                "AttachRolePolicy",
+                "AttachUserPolicy",
+                "CreateAccessKey",
+                "CreateLoginProfile",
+                "CreatePolicy",
+                "CreatePolicyVersion",
+                "CreateServiceSpecificCredential",
+                "DeactivateMFADevice",
+                "DeleteVirtualMFADevice",
+                "PutRolePolicy",
+                "PutUserPolicy",
+                "SetDefaultPolicyVersion",
+                "UpdateAssumeRolePolicy",
+                "UploadSSHPublicKey",
+                "UploadSigningCertificate",
+            },
+            "kms.amazonaws.com": {
+                "DisableKey",
+                "ScheduleKeyDeletion",
+            },
+            "s3.amazonaws.com": {
+                "DeletePublicAccessBlock",
+                "PutBucketAcl",
+                "PutBucketPolicy",
+            },
+            "securityhub.amazonaws.com": {"DisableSecurityHub"},
+            "signin.amazonaws.com": {"ConsoleLogin"},
+        }
+
+        self.assertEqual(expected_by_source, detector_module.EVENT_SOURCES)
+
     def test_failed_api_spike_requires_threshold_within_window(self):
         events = []
         for index in range(4):
@@ -549,6 +715,7 @@ class CloudTrailDetectorTests(unittest.TestCase):
         event = {
             "eventID": "duplicate-event",
             "eventTime": "2026-06-30T01:00:00Z",
+            "eventSource": "s3.amazonaws.com",
             "eventName": "PutBucketPolicy",
             "sourceIPAddress": "192.0.2.1",
             "userIdentity": {"type": "IAMUser", "userName": "alice"},
@@ -562,6 +729,7 @@ class CloudTrailDetectorTests(unittest.TestCase):
     def test_iam_console_login_without_explicit_mfa_no_is_not_reported(self):
         base_event = {
             "eventTime": "2026-06-30T01:00:00Z",
+            "eventSource": "signin.amazonaws.com",
             "eventName": "ConsoleLogin",
             "sourceIPAddress": "192.0.2.1",
             "userIdentity": {"type": "IAMUser", "userName": "alice"},
@@ -579,34 +747,39 @@ class CloudTrailDetectorTests(unittest.TestCase):
         cases = (
             (
                 "CreateAccessKey",
+                "iam.amazonaws.com",
                 {"userName": "backup-user"},
                 "CLD-008",
                 "backup-user",
             ),
             (
                 "UpdateAssumeRolePolicy",
+                "iam.amazonaws.com",
                 {"roleName": "admin-role"},
                 "CLD-009",
                 "admin-role",
             ),
             (
                 "DeleteDetector",
+                "guardduty.amazonaws.com",
                 {"detectorId": "detector-1"},
                 "CLD-010",
                 "detector-1",
             ),
             (
                 "ScheduleKeyDeletion",
+                "kms.amazonaws.com",
                 {"keyId": "key-1"},
                 "CLD-011",
                 "key-1",
             ),
         )
-        for event_name, request_parameters, rule_id, resource_id in cases:
+        for event_name, event_source, request_parameters, rule_id, resource_id in cases:
             with self.subTest(event_name=event_name):
                 event = {
                     "eventID": f"event-{event_name}",
                     "eventTime": "2026-06-30T01:00:00Z",
+                    "eventSource": event_source,
                     "eventName": event_name,
                     "sourceIPAddress": "192.0.2.1",
                     "userIdentity": {"type": "IAMUser", "userName": "alice"},
@@ -628,6 +801,7 @@ class CloudTrailDetectorTests(unittest.TestCase):
     def test_update_detector_only_fires_when_explicitly_disabled(self):
         base_event = {
             "eventTime": "2026-06-30T01:00:00Z",
+            "eventSource": "guardduty.amazonaws.com",
             "eventName": "UpdateDetector",
             "sourceIPAddress": "192.0.2.1",
             "userIdentity": {"type": "IAMUser", "userName": "alice"},
@@ -648,6 +822,7 @@ class CloudTrailDetectorTests(unittest.TestCase):
     def test_lower_scope_monitoring_change_is_high_not_critical(self):
         event = {
             "eventTime": "2026-06-30T01:00:00Z",
+            "eventSource": "ec2.amazonaws.com",
             "eventName": "DeleteFlowLogs",
             "sourceIPAddress": "192.0.2.1",
             "userIdentity": {"type": "IAMUser", "userName": "alice"},
@@ -664,6 +839,7 @@ class CloudTrailDetectorTests(unittest.TestCase):
             "events": [
                 {
                     "eventTime": "2026-06-30T01:00:00Z",
+                    "eventSource": "s3.amazonaws.com",
                     "eventName": "PutBucketPolicy",
                     "sourceIPAddress": "192.0.2.1",
                     "userIdentity": {
@@ -690,6 +866,7 @@ class CloudTrailDetectorTests(unittest.TestCase):
             {
                 "eventID": "event-1",
                 "eventTime": "2026-06-30T01:00:00Z",
+                "eventSource": "s3.amazonaws.com",
                 "eventName": "PutBucketPolicy",
                 "sourceIPAddress": "192.0.2.1",
                 "userIdentity": {"type": "IAMUser", "userName": "alice"},
@@ -698,6 +875,7 @@ class CloudTrailDetectorTests(unittest.TestCase):
             {
                 "eventID": "event-2",
                 "eventTime": "2026-06-30T01:01:00Z",
+                "eventSource": "s3.amazonaws.com",
                 "eventName": "PutBucketPolicy",
                 "sourceIPAddress": "192.0.2.1",
                 "userIdentity": {"type": "IAMUser", "userName": "alice"},
@@ -706,6 +884,7 @@ class CloudTrailDetectorTests(unittest.TestCase):
             {
                 "eventID": "event-3",
                 "eventTime": "2026-06-30T01:02:00Z",
+                "eventSource": "iam.amazonaws.com",
                 "eventName": "CreateAccessKey",
                 "sourceIPAddress": "198.51.100.1",
                 "userIdentity": {"type": "IAMUser", "userName": "alice"},
@@ -714,6 +893,7 @@ class CloudTrailDetectorTests(unittest.TestCase):
             {
                 "eventID": "event-4",
                 "eventTime": "2026-06-30T01:03:00Z",
+                "eventSource": "iam.amazonaws.com",
                 "eventName": "UpdateAssumeRolePolicy",
                 "sourceIPAddress": "198.51.100.1",
                 "userIdentity": {"type": "IAMUser", "userName": "bob"},
@@ -731,6 +911,7 @@ class CloudTrailDetectorTests(unittest.TestCase):
             {
                 "eventID": "event-1",
                 "eventTime": "2026-06-30T01:00:00Z",
+                "eventSource": "s3.amazonaws.com",
                 "eventName": "PutBucketPolicy",
                 "userIdentity": [],
                 "requestParameters": {"bucketName": "one"},
@@ -738,6 +919,7 @@ class CloudTrailDetectorTests(unittest.TestCase):
             {
                 "eventID": "event-2",
                 "eventTime": "2026-06-30T01:01:00Z",
+                "eventSource": "iam.amazonaws.com",
                 "eventName": "CreateAccessKey",
                 "userIdentity": [],
                 "requestParameters": {"userName": "alice"},
@@ -754,6 +936,7 @@ class CloudTrailDetectorTests(unittest.TestCase):
             {
                 "eventID": "event-1",
                 "eventTime": "2026-06-30T01:00:00Z",
+                "eventSource": "iam.amazonaws.com",
                 "eventName": "DeactivateMFADevice",
                 "sourceIPAddress": "192.0.2.1",
                 "userIdentity": {"type": "IAMUser", "userName": "alice"},
@@ -762,6 +945,7 @@ class CloudTrailDetectorTests(unittest.TestCase):
             {
                 "eventID": "event-2",
                 "eventTime": "2026-06-30T01:11:00Z",
+                "eventSource": "iam.amazonaws.com",
                 "eventName": "CreateAccessKey",
                 "sourceIPAddress": "192.0.2.1",
                 "userIdentity": {"type": "IAMUser", "userName": "alice"},

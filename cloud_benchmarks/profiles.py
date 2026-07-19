@@ -492,6 +492,7 @@ def _cloud_event(
     additional_event_data: dict[str, Any] | None = None,
     observed_at: str = "2026-06-30T01:00:00Z",
     source_ip: str = "192.0.2.10",
+    event_source: str = "benchmark.amazonaws.com",
 ) -> dict[str, Any]:
     identity: dict[str, Any] = {"type": identity_type}
     if identity_type.lower() != "root":
@@ -499,7 +500,7 @@ def _cloud_event(
     event: dict[str, Any] = {
         "eventID": event_id,
         "eventTime": observed_at,
-        "eventSource": "benchmark.amazonaws.com",
+        "eventSource": event_source,
         "eventName": event_name,
         "awsRegion": "ap-southeast-2",
         "sourceIPAddress": source_ip,
@@ -525,6 +526,7 @@ def _cloudtrail_rule_environment(rule_id: str, mode: str) -> dict[str, Any]:
                 "AssumeRole",
                 actor="failure-benchmark",
                 error_code="AccessDenied",
+                event_source="sts.amazonaws.com",
                 observed_at=f"2026-06-30T01:0{index}:00Z",
                 source_ip="192.0.2.44",
             )
@@ -535,93 +537,113 @@ def _cloudtrail_rule_environment(rule_id: str, mode: str) -> dict[str, Any]:
     positive_specs: dict[str, dict[str, Any]] = {
         "CLD-001": {
             "event_name": "ConsoleLogin",
+            "event_source": "signin.amazonaws.com",
             "identity_type": "Root",
             "response_elements": {"ConsoleLogin": "Success"},
         },
         "CLD-002": {
             "event_name": "DeactivateMFADevice",
+            "event_source": "iam.amazonaws.com",
             "request_parameters": {"userName": "benchmark-user"},
         },
         "CLD-003": {
             "event_name": "AuthorizeSecurityGroupIngress",
+            "event_source": "ec2.amazonaws.com",
             "request_parameters": {"groupId": "sg-benchmark"},
         },
         "CLD-004": {
             "event_name": "PutBucketPolicy",
+            "event_source": "s3.amazonaws.com",
             "request_parameters": {"bucketName": "benchmark-bucket"},
         },
         "CLD-005": {
             "event_name": "CreatePolicyVersion",
+            "event_source": "iam.amazonaws.com",
             "request_parameters": {
                 "policyArn": f"arn:aws:iam::{ACCOUNT_ID}:policy/BenchmarkPolicy"
             },
         },
         "CLD-007": {
             "event_name": "ConsoleLogin",
+            "event_source": "signin.amazonaws.com",
             "response_elements": {"ConsoleLogin": "Success"},
             "additional_event_data": {"MFAUsed": "No"},
         },
         "CLD-008": {
             "event_name": "CreateAccessKey",
+            "event_source": "iam.amazonaws.com",
             "request_parameters": {"userName": "benchmark-target"},
         },
         "CLD-009": {
             "event_name": "UpdateAssumeRolePolicy",
+            "event_source": "iam.amazonaws.com",
             "request_parameters": {"roleName": "benchmark-role"},
         },
         "CLD-010": {
             "event_name": "StopLogging",
+            "event_source": "cloudtrail.amazonaws.com",
             "request_parameters": {"name": "benchmark-trail"},
         },
         "CLD-011": {
             "event_name": "ScheduleKeyDeletion",
+            "event_source": "kms.amazonaws.com",
             "request_parameters": {"keyId": "benchmark-key"},
         },
     }
     boundary_specs: dict[str, dict[str, Any]] = {
         "CLD-001": {
             "event_name": "ConsoleLogin",
+            "event_source": "signin.amazonaws.com",
             "identity_type": "Root",
             "response_elements": {"ConsoleLogin": "Failure"},
         },
         "CLD-002": {
             "event_name": "DeactivateMFADevice",
+            "event_source": "iam.amazonaws.com",
             "request_parameters": {"userName": "benchmark-user"},
             "error_code": "AccessDenied",
         },
         "CLD-003": {
             "event_name": "RevokeSecurityGroupIngress",
+            "event_source": "ec2.amazonaws.com",
             "request_parameters": {"groupId": "sg-benchmark"},
         },
         "CLD-004": {
             "event_name": "DeleteBucketPolicy",
+            "event_source": "s3.amazonaws.com",
             "request_parameters": {"bucketName": "benchmark-bucket"},
         },
         "CLD-005": {
             "event_name": "DetachUserPolicy",
+            "event_source": "iam.amazonaws.com",
             "request_parameters": {"userName": "benchmark-user"},
         },
         "CLD-007": {
             "event_name": "ConsoleLogin",
+            "event_source": "signin.amazonaws.com",
             "response_elements": {"ConsoleLogin": "Success"},
             "additional_event_data": {"MFAUsed": "Yes"},
         },
         "CLD-008": {
             "event_name": "CreateAccessKey",
+            "event_source": "iam.amazonaws.com",
             "request_parameters": {"userName": "benchmark-target"},
             "error_code": "AccessDenied",
         },
         "CLD-009": {
             "event_name": "UpdateAssumeRolePolicy",
+            "event_source": "iam.amazonaws.com",
             "request_parameters": {"roleName": "benchmark-role"},
             "error_code": "AccessDenied",
         },
         "CLD-010": {
             "event_name": "StartLogging",
+            "event_source": "cloudtrail.amazonaws.com",
             "request_parameters": {"name": "benchmark-trail"},
         },
         "CLD-011": {
             "event_name": "EnableKey",
+            "event_source": "kms.amazonaws.com",
             "request_parameters": {"keyId": "benchmark-key"},
         },
     }
@@ -705,6 +727,7 @@ def build_negative_environment(module: str) -> dict[str, Any]:
                     "hardened-readonly-event",
                     "DescribeInstances",
                     actor="readonly-auditor",
+                    event_source="ec2.amazonaws.com",
                     source_ip="10.0.1.25",
                 )
             ],
@@ -822,6 +845,11 @@ def build_scale_environment(module: str, input_count: int) -> dict[str, Any]:
                         f"scale-{group_index:05d}-{event_index:02d}",
                         "AssumeRole" if failed else "DescribeInstances",
                         actor=actor,
+                        event_source=(
+                            "sts.amazonaws.com"
+                            if failed
+                            else "ec2.amazonaws.com"
+                        ),
                         source_ip=source_ip,
                         error_code="AccessDenied" if failed else None,
                         observed_at=(

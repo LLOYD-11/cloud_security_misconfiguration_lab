@@ -140,7 +140,7 @@ table only after their tags and release evidence exist.
 
 | ID | Requirement | Status | Evidence |
 | --- | --- | --- | --- |
-| M10-R1 | Match CloudTrail change rules on service source and event name. | Open | Planned detector mapping, wrong-source regression matrix, catalog review, and compatibility documentation. |
+| M10-R1 | Match CloudTrail change rules on service source and event name. | Complete | [CloudTrail detector](../cloudtrail_detector/detector.py), complete source-map and wrong-source regression tests, source-aware benchmark profiles, simplified-input schema, and detector documentation. |
 | M10-R2 | Reject conflicting simplified duplicate event IDs while deduplicating identical records. | Open | Planned shared duplicate validator, detector and CLI regression tests, and coverage-summary update. |
 | M10-R3 | Preserve Markdown report structure for untrusted artifact text. | Open | Planned context-aware renderer escaping and adversarial report tests. |
 | M10-R4 | Validate all consumed simplified-input structures at runtime. | Open | Planned dependency-free validators, stable CLI errors, and malformed-input tests for every module. |

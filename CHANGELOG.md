@@ -10,6 +10,12 @@ All notable changes to this project are documented in this file.
   boundary fixes, runtime hardening, independent evaluation, application
   presentation, and the final application release.
 
+### Changed
+
+- CloudTrail change rules now require the expected AWS `eventSource` together
+  with the supported API name, preventing cross-service name collisions from
+  producing findings.
+
 ## 2.1.0 - 2026-07-19
 
 ### Added

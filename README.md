@@ -251,7 +251,10 @@ The CloudTrail detector checks sample audit events for suspicious cloud API acti
 - Audit or threat-detection controls being disabled
 - KMS keys being disabled or scheduled for deletion
 
-Duplicate CloudTrail events with the same `eventID` are analyzed once. Failed API calls remain available to the failure-spike detector but are not reported as successful configuration changes.
+Change findings require both a supported API name and its expected AWS
+`eventSource`. Duplicate CloudTrail events with the same `eventID` are analyzed
+once. Failed API calls remain available to the failure-spike detector but are
+not reported as successful configuration changes.
 
 CloudTrail input can use either the simplified event contract or one or more native `Records` log files in JSON or gzip format. Native normalization validates version 1.x records, UTC timestamps, identity and account context, and event GUIDs before merging files. Identical duplicate events are skipped with a warning; conflicting records sharing an ID stop analysis.
 

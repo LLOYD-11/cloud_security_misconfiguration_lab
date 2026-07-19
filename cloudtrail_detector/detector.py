@@ -66,6 +66,7 @@ REF_MITRE_DATA_DESTRUCTION = "https://attack.mitre.org/techniques/T1485/"
 ARN_ACCOUNT_PATTERN = re.compile(r"^arn:[^:]+:[^:]*:[^:]*:(\d{12}):")
 
 MFA_DISABLE_EVENTS = {"DeactivateMFADevice", "DeleteVirtualMFADevice"}
+CONSOLE_LOGIN_EVENTS = {"ConsoleLogin"}
 SECURITY_GROUP_CHANGE_EVENTS = {
     "AuthorizeSecurityGroupIngress",
     "AuthorizeSecurityGroupEgress",
@@ -102,6 +103,42 @@ MONITORING_DISABLE_EVENTS = {
     "StopLogging",
 }
 KMS_DISRUPTION_EVENTS = {"DisableKey", "ScheduleKeyDeletion"}
+ROLE_TRUST_CHANGE_EVENTS = {"UpdateAssumeRolePolicy"}
+UPDATE_DETECTOR_EVENTS = {"UpdateDetector"}
+EVENT_SOURCES = {
+    "cloudtrail.amazonaws.com": {
+        "DeleteTrail",
+        "StopLogging",
+    },
+    "config.amazonaws.com": {
+        "DeleteConfigurationRecorder",
+        "DeleteDeliveryChannel",
+        "StopConfigurationRecorder",
+    },
+    "ec2.amazonaws.com": {
+        *SECURITY_GROUP_CHANGE_EVENTS,
+        "DeleteFlowLogs",
+    },
+    "guardduty.amazonaws.com": {
+        "DeleteDetector",
+        *UPDATE_DETECTOR_EVENTS,
+    },
+    "iam.amazonaws.com": {
+        *CREDENTIAL_CREATION_EVENTS,
+        *IAM_POLICY_CHANGE_EVENTS,
+        *MFA_DISABLE_EVENTS,
+        *ROLE_TRUST_CHANGE_EVENTS,
+    },
+    "kms.amazonaws.com": KMS_DISRUPTION_EVENTS,
+    "s3.amazonaws.com": BUCKET_POLICY_CHANGE_EVENTS,
+    "securityhub.amazonaws.com": {"DisableSecurityHub"},
+    "signin.amazonaws.com": CONSOLE_LOGIN_EVENTS,
+}
+EVENT_SOURCE_BY_EVENT_NAME = {
+    event_name: event_source
+    for event_source, event_names in EVENT_SOURCES.items()
+    for event_name in event_names
+}
 
 
 @dataclass(frozen=True)
@@ -145,6 +182,17 @@ def _event_name(event: dict[str, Any]) -> str:
     return str(event.get("eventName", "unknown-event"))
 
 
+def _event_matches(
+    event: dict[str, Any],
+    event_names: set[str],
+) -> bool:
+    event_name = _event_name(event)
+    if event_name not in event_names:
+        return False
+    expected_source = EVENT_SOURCE_BY_EVENT_NAME[event_name]
+    return event.get("eventSource") == expected_source
+
+
 def _source_ip(event: dict[str, Any]) -> str:
     return str(event.get("sourceIPAddress", "unknown-source"))
 
@@ -186,7 +234,10 @@ def _event_identity_type(event: dict[str, Any]) -> str:
 
 
 def _console_login_without_mfa(event: dict[str, Any]) -> bool:
-    if _event_name(event) != "ConsoleLogin" or _event_identity_type(event).lower() != "iamuser":
+    if (
+        not _event_matches(event, CONSOLE_LOGIN_EVENTS)
+        or _event_identity_type(event).lower() != "iamuser"
+    ):
         return False
     additional_data = event.get("additionalEventData", {})
     if not isinstance(additional_data, dict):
@@ -195,10 +246,9 @@ def _console_login_without_mfa(event: dict[str, Any]) -> bool:
 
 
 def _monitoring_was_disabled(event: dict[str, Any]) -> bool:
-    event_name = _event_name(event)
-    if event_name in MONITORING_DISABLE_EVENTS:
+    if _event_matches(event, MONITORING_DISABLE_EVENTS):
         return True
-    if event_name == "UpdateDetector":
+    if _event_matches(event, UPDATE_DETECTOR_EVENTS):
         return _request_parameters(event).get("enable") is False
     return False
 
@@ -322,7 +372,7 @@ def analyze_single_event(event: dict[str, Any], index: int) -> list[Finding]:
         "account_id": _event_account_id(event),
     }
 
-    if event_name == "ConsoleLogin" and identity_type.lower() == "root":
+    if _event_matches(event, CONSOLE_LOGIN_EVENTS) and identity_type.lower() == "root":
         _add_finding(
             findings,
             severity="critical",
@@ -337,7 +387,7 @@ def analyze_single_event(event: dict[str, Any], index: int) -> list[Finding]:
             metadata=base_metadata,
         )
 
-    if event_name in MFA_DISABLE_EVENTS:
+    if _event_matches(event, MFA_DISABLE_EVENTS):
         target_user = _resource_from_params(event, ["userName", "serialNumber"])
         _add_finding(
             findings,
@@ -353,7 +403,7 @@ def analyze_single_event(event: dict[str, Any], index: int) -> list[Finding]:
             metadata=base_metadata,
         )
 
-    if event_name in SECURITY_GROUP_CHANGE_EVENTS:
+    if _event_matches(event, SECURITY_GROUP_CHANGE_EVENTS):
         group_id = _resource_from_params(event, ["groupId", "groupName"])
         _add_finding(
             findings,
@@ -369,7 +419,7 @@ def analyze_single_event(event: dict[str, Any], index: int) -> list[Finding]:
             metadata=base_metadata,
         )
 
-    if event_name in BUCKET_POLICY_CHANGE_EVENTS:
+    if _event_matches(event, BUCKET_POLICY_CHANGE_EVENTS):
         bucket_name = _resource_from_params(event, ["bucketName", "bucket"])
         _add_finding(
             findings,
@@ -385,7 +435,7 @@ def analyze_single_event(event: dict[str, Any], index: int) -> list[Finding]:
             metadata=base_metadata,
         )
 
-    if event_name in IAM_POLICY_CHANGE_EVENTS:
+    if _event_matches(event, IAM_POLICY_CHANGE_EVENTS):
         policy_id = _resource_from_params(event, ["policyArn", "policyName", "roleName", "userName"])
         _add_finding(
             findings,
@@ -420,7 +470,7 @@ def analyze_single_event(event: dict[str, Any], index: int) -> list[Finding]:
             metadata=base_metadata,
         )
 
-    if event_name in CREDENTIAL_CREATION_EVENTS:
+    if _event_matches(event, CREDENTIAL_CREATION_EVENTS):
         target_user = _resource_from_params(event, ["userName"])
         if target_user == "unknown-resource":
             target_user = actor
@@ -441,7 +491,7 @@ def analyze_single_event(event: dict[str, Any], index: int) -> list[Finding]:
             metadata=base_metadata,
         )
 
-    if event_name == "UpdateAssumeRolePolicy":
+    if _event_matches(event, ROLE_TRUST_CHANGE_EVENTS):
         role_name = _resource_from_params(event, ["roleName"])
         _add_finding(
             findings,
@@ -497,7 +547,7 @@ def analyze_single_event(event: dict[str, Any], index: int) -> list[Finding]:
             metadata=base_metadata,
         )
 
-    if event_name in KMS_DISRUPTION_EVENTS:
+    if _event_matches(event, KMS_DISRUPTION_EVENTS):
         key_id = _resource_from_params(event, ["keyId"])
         scheduled_deletion = event_name == "ScheduleKeyDeletion"
         _add_finding(

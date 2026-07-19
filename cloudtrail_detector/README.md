@@ -27,7 +27,12 @@ first qualifying inclusive window and one finding per group. Complexity,
 behavioral invariants, and regression evidence are documented in
 [CloudTrail failure-window performance](../docs/detection-performance.md).
 
-Failed API calls do not produce findings that claim a configuration changed. Risk-reducing actions such as revoking ingress, deleting a bucket policy, or detaching an IAM policy are also excluded from the risk-increasing change rules. Duplicate events with the same `eventID` are analyzed once.
+Failed API calls do not produce findings that claim a configuration changed.
+Risk-reducing actions such as revoking ingress, deleting a bucket policy, or
+detaching an IAM policy are also excluded from the risk-increasing change rules.
+Every change rule requires both the supported API name and its expected AWS
+`eventSource`; a same-named event from another service does not produce that
+finding. Duplicate events with the same `eventID` are analyzed once.
 
 Each finding uses the shared schema and includes AWS CloudTrail, AWS IAM, or MITRE ATT&CK references where applicable.
 
