@@ -110,6 +110,11 @@ Dependencies point from orchestration and derived views toward shared models.
 The shared finding model does not import analyzers or the CLI, which prevents
 reporting concerns from becoming detector dependencies.
 
+The report renderer is also a trust boundary. Finding, incident, analysis
+summary, remediation, timeline, and source-path text is treated as artifact
+data rather than Markdown. Context-aware rendering preserves the fixed report
+structure; see [Markdown report integrity](report-integrity.md).
+
 ## Artifact Contracts
 
 The pipeline uses explicit, versioned JSON boundaries:

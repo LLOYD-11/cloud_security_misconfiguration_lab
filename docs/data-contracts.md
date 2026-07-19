@@ -57,6 +57,8 @@ gaps.
 The remediation-plan model verifies deterministic priority ordering, stable and
 unique action IDs, complete one-time accounting of source findings in
 configuration work, and one response action for every source incident.
+Artifact text, including remediation rationale, remains format-neutral; only
+the Markdown report renderer introduces presentation syntax.
 
 The attack-timeline model verifies UTC chronological ordering, stable and unique
 entry IDs, valid activity classifications, exact source accounting across

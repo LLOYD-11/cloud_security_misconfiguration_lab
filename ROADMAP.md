@@ -160,7 +160,7 @@ Status: In progress for `v2.1.1`.
 - [x] Match CloudTrail change rules on both AWS service source and event name.
 - [x] Reject conflicting simplified CloudTrail records that share an `eventID`,
       while continuing to analyze identical duplicates once.
-- [ ] Preserve generated Markdown structure when finding, incident, summary, or
+- [x] Preserve generated Markdown structure when finding, incident, summary, or
       source text contains Markdown control characters.
 - [ ] Validate the consumed structure of all simplified analyzer inputs at
       runtime and return stable user-facing errors.

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from collections import Counter, defaultdict
 from datetime import date
@@ -31,6 +32,48 @@ from cloud_timeline import (
 )
 
 SEVERITY_ORDER = ("critical", "high", "medium", "low", "info")
+SAFE_HTTPS_REFERENCE_PATTERN = re.compile(
+    r"^https://[A-Za-z0-9._~:/?#@!$&'()+,;=%-]+$"
+)
+
+
+def _single_line_text(value: str) -> str:
+    normalized = " ".join(value.splitlines())
+    return "".join(
+        " " if ord(character) < 32 or ord(character) == 127 else character
+        for character in normalized
+    )
+
+
+def _escape_markdown_text(value: str) -> str:
+    escaped = _single_line_text(value).replace("\\", "\\\\")
+    for character in ("`", "*", "_", "[", "]", "~"):
+        escaped = escaped.replace(character, f"\\{character}")
+    return (
+        escaped.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+    )
+
+
+def _inline_code(value: str) -> str:
+    normalized = _single_line_text(value)
+    backtick_runs = re.findall(r"`+", normalized)
+    if not backtick_runs:
+        return f"`{normalized}`"
+    delimiter = "`" * (max(len(run) for run in backtick_runs) + 1)
+    return f"{delimiter} {normalized} {delimiter}"
+
+
+def _table_inline_code(value: str) -> str:
+    return _inline_code(value).replace("|", "&#124;")
+
+
+def _format_reference(value: str) -> str:
+    normalized = _single_line_text(value)
+    if SAFE_HTTPS_REFERENCE_PATTERN.fullmatch(normalized):
+        return normalized
+    return _escape_markdown_text(normalized)
 
 
 def _parse_report_date(value: str) -> date:
@@ -142,10 +185,10 @@ def _triggered_rule_context(findings: Iterable[Finding]) -> list[str]:
             value.capitalize() for value in finding_confidences
         )
         if rule is None:
-            title = rule_findings[0].title.replace("|", "\\|")
+            title = _escape_table_text(rule_findings[0].title)
             mappings = "Not cataloged"
         else:
-            title = rule.title.replace("|", "\\|")
+            title = _escape_table_text(rule.title)
             mappings = "<br>".join(
                 (
                     f"{frameworks[mapping.framework].name} "
@@ -154,7 +197,7 @@ def _triggered_rule_context(findings: Iterable[Finding]) -> list[str]:
                 for mapping in rule.mappings
             )
         lines.append(
-            f"| `{rule_id}` | {title} | {confidence} | {severities} | "
+            f"| {_table_inline_code(rule_id)} | {title} | {confidence} | {severities} | "
             f"{len(rule_findings)} | {mappings} |"
         )
     return lines
@@ -167,12 +210,15 @@ def _severity_label(severity: str) -> str:
 def _format_metadata(finding: Finding) -> str:
     if not finding.metadata:
         return "None"
-    return ", ".join(f"{key}: {value}" for key, value in sorted(finding.metadata.items()))
+    return ", ".join(
+        _escape_markdown_text(f"{key}: {value}")
+        for key, value in sorted(finding.metadata.items())
+    )
 
 
 def _format_evidence_references(finding: Finding) -> str:
     return ", ".join(
-        f"`{reference.type}/{reference.id}`"
+        _inline_code(f"{reference.type}/{reference.id}")
         for reference in finding.evidence_references
     )
 
@@ -231,7 +277,7 @@ def _resource_coverage_label(summary: AnalysisSummary) -> str:
 
 
 def _escape_table_text(value: str) -> str:
-    return value.replace("|", "\\|").replace("\n", " ")
+    return _escape_markdown_text(value).replace("|", "&#124;")
 
 
 def _render_remediation_plan(plan: RemediationPlan) -> list[str]:
@@ -281,7 +327,7 @@ def _render_remediation_plan(plan: RemediationPlan) -> list[str]:
             _escape_table_text(item) for item in action.actions
         )
         lines.append(
-            f"| **{action.priority}** | `{action.action_id}` "
+            f"| **{action.priority}** | {_table_inline_code(action.action_id)} "
             f"{_escape_table_text(action.title)} | {work_type} | "
             f"{action.severity.capitalize()} / {action.confidence.capitalize()} | "
             f"{_escape_table_text(action.rationale)} | {required_actions} |"
@@ -332,28 +378,35 @@ def _render_attack_timeline(timeline: AttackTimeline) -> list[str]:
         )
         for entry in timeline.entries:
             event_names = (
-                ", ".join(entry.event_names)
+                ", ".join(_escape_table_text(name) for name in entry.event_names)
                 if entry.event_names
                 else "Event name not recorded"
             )
             incident_context = (
-                ", ".join(f"`{incident_id}`" for incident_id in entry.incident_ids)
+                ", ".join(
+                    _table_inline_code(incident_id)
+                    for incident_id in entry.incident_ids
+                )
                 if entry.incident_ids
                 else "No correlated incident"
             )
             observation = (
-                f"{entry.observation} Actor `{entry.actor}` from `{entry.source_ip}`; "
-                f"event(s): {event_names}; resource: `{entry.resource}`."
+                f"{_escape_table_text(entry.observation)} "
+                f"Actor {_table_inline_code(entry.actor)} from "
+                f"{_table_inline_code(entry.source_ip)}; "
+                f"event(s): {event_names}; resource: "
+                f"{_table_inline_code(entry.resource)}."
             )
             signal_context = (
-                f"`{entry.rule_id}`; {entry.severity.capitalize()} severity; "
+                f"{_table_inline_code(entry.rule_id)}; "
+                f"{entry.severity.capitalize()} severity; "
                 f"{entry.confidence.capitalize()} confidence; {incident_context}"
             )
             lines.append(
                 f"| {_escape_table_text(_timeline_time_label(entry.first_seen, entry.last_seen))} "
                 f"| {_escape_table_text(activity_label(entry.activity_type))} "
-                f"| {_escape_table_text(observation)} "
-                f"| {_escape_table_text(signal_context)} "
+                f"| {observation} "
+                f"| {signal_context} "
                 f"| {_escape_table_text(entry.significance)} |"
             )
     else:
@@ -376,9 +429,9 @@ def _render_attack_timeline(timeline: AttackTimeline) -> list[str]:
         )
         for omission in timeline.omissions:
             lines.append(
-                f"| `{_escape_table_text(omission.rule_id)}` | "
-                f"`{_escape_table_text(omission.resource)}` | "
-                f"`{_escape_table_text(omission.reason)}` |"
+                f"| {_table_inline_code(omission.rule_id)} | "
+                f"{_table_inline_code(omission.resource)} | "
+                f"{_table_inline_code(omission.reason)} |"
             )
     return lines
 
@@ -454,9 +507,12 @@ def render_report(
         for summary in sorted_summaries:
             skipped_count = sum(item.count for item in summary.skipped_evidence)
             lines.append(
-                f"| {summary.module} | {summary.input_format} "
-                f"({summary.input_file_count} file(s)) | {summary.coverage_status} | "
-                f"{_resource_coverage_label(summary)} | {skipped_count} | "
+                f"| {_escape_table_text(summary.module)} | "
+                f"{_escape_table_text(summary.input_format)} "
+                f"({summary.input_file_count} file(s)) | "
+                f"{_escape_table_text(summary.coverage_status)} | "
+                f"{_escape_table_text(_resource_coverage_label(summary))} | "
+                f"{skipped_count} | "
                 f"{len(summary.warnings)} | {summary.finding_count} |"
             )
 
@@ -478,8 +534,9 @@ def render_report(
             for module, item in evidence_gaps:
                 impact = "yes" if item.affects_coverage else "no"
                 lines.append(
-                    f"| {module} | `{item.code}` | {item.count} | {impact} | "
-                    f"{item.reason} |"
+                    f"| {_escape_table_text(module)} | "
+                    f"{_table_inline_code(item.code)} | {item.count} | {impact} | "
+                    f"{_escape_table_text(item.reason)} |"
                 )
 
         analysis_warnings = [
@@ -490,7 +547,9 @@ def render_report(
         if analysis_warnings:
             lines.extend(["", "### Analysis Warnings", ""])
             for module, warning in analysis_warnings:
-                lines.append(f"- `{module}`: {warning}")
+                lines.append(
+                    f"- {_inline_code(module)}: {_escape_markdown_text(warning)}"
+                )
     else:
         lines.extend(
             [
@@ -503,7 +562,7 @@ def render_report(
         )
 
         for module, count in sorted(module_counts.items()):
-            lines.append(f"| {module} | {count} |")
+            lines.append(f"| {_escape_table_text(module)} | {count} |")
 
     lines.extend(_render_attack_timeline(timeline))
     lines.extend(_render_remediation_plan(remediation_plan))
@@ -519,7 +578,7 @@ def render_report(
         ]
     )
     for path in source_files:
-        lines.append(f"- `{path}`")
+        lines.append(f"- {_inline_code(str(path))}")
 
     if sorted_incidents:
         lines.extend(
@@ -538,9 +597,12 @@ def render_report(
         )
         for incident in sorted_incidents:
             lines.append(
-                f"| `{incident.incident_id}` | {_severity_label(incident.severity)} | "
-                f"{incident.confidence.capitalize()} | `{incident.actor}` | "
-                f"{incident.first_seen} to {incident.last_seen} | "
+                f"| {_table_inline_code(incident.incident_id)} | "
+                f"{_severity_label(incident.severity)} | "
+                f"{incident.confidence.capitalize()} | "
+                f"{_table_inline_code(incident.actor)} | "
+                f"{_escape_table_text(incident.first_seen)} to "
+                f"{_escape_table_text(incident.last_seen)} | "
                 f"{incident.finding_count} / {incident.event_count} |"
             )
 
@@ -551,22 +613,61 @@ def render_report(
             lines.extend(
                 [
                     "",
-                    f"### {incident.incident_id}: {incident.title}",
+                    (
+                        f"### {_escape_markdown_text(incident.incident_id)}: "
+                        f"{_escape_markdown_text(incident.title)}"
+                    ),
                     "",
-                    f"- Actor and source: `{incident.actor}` from `{incident.source_ip}`",
-                    f"- Window: {incident.first_seen} to {incident.last_seen}",
+                    (
+                        f"- Actor and source: {_inline_code(incident.actor)} "
+                        f"from {_inline_code(incident.source_ip)}"
+                    ),
+                    (
+                        f"- Window: {_escape_markdown_text(incident.first_seen)} "
+                        f"to {_escape_markdown_text(incident.last_seen)}"
+                    ),
                     f"- Severity and confidence: {incident.severity.capitalize()} / {incident.confidence.capitalize()}",
-                    f"- Correlated rules: {', '.join(incident.rule_ids)}",
+                    (
+                        "- Correlated rules: "
+                        + ", ".join(
+                            _escape_markdown_text(rule_id)
+                            for rule_id in incident.rule_ids
+                        )
+                    ),
                     (
                         f"- Events and findings: {incident.event_count} {event_label}, "
                         f"{incident.finding_count} {finding_label}"
                     ),
-                    f"- Resources: {', '.join(incident.resources)}",
-                    f"- Summary: {incident.summary}",
-                    f"- Observed sequence: {narrative.observed_sequence}",
-                    f"- Analyst context: {narrative.analyst_context}",
-                    f"- Recommended actions: {' '.join(incident.recommended_actions)}",
-                    f"- References: {', '.join(incident.references)}",
+                    (
+                        "- Resources: "
+                        + ", ".join(
+                            _escape_markdown_text(resource)
+                            for resource in incident.resources
+                        )
+                    ),
+                    f"- Summary: {_escape_markdown_text(incident.summary)}",
+                    (
+                        "- Observed sequence: "
+                        f"{_escape_markdown_text(narrative.observed_sequence)}"
+                    ),
+                    (
+                        "- Analyst context: "
+                        f"{_escape_markdown_text(narrative.analyst_context)}"
+                    ),
+                    (
+                        "- Recommended actions: "
+                        + " ".join(
+                            _escape_markdown_text(action)
+                            for action in incident.recommended_actions
+                        )
+                    ),
+                    (
+                        "- References: "
+                        + ", ".join(
+                            _format_reference(reference)
+                            for reference in incident.references
+                        )
+                    ),
                 ]
             )
 
@@ -586,31 +687,43 @@ def render_report(
         for finding in severity_findings:
             lines.extend(
                 [
-                    f"#### {finding.rule_id}: {finding.title}",
+                    (
+                        f"#### {_escape_markdown_text(finding.rule_id)}: "
+                        f"{_escape_markdown_text(finding.title)}"
+                    ),
                     "",
-                    f"- Module: `{finding.module}`",
-                    f"- Category: `{finding.category}`",
-                    f"- Resource: `{finding.resource_type}/{finding.resource_id}`",
-                    f"- Finding ID: `{finding.finding_id}`",
+                    f"- Module: {_inline_code(finding.module)}",
+                    f"- Category: {_inline_code(finding.category)}",
+                    (
+                        "- Resource: "
+                        f"{_inline_code(f'{finding.resource_type}/{finding.resource_id}')}"
+                    ),
+                    f"- Finding ID: {_inline_code(finding.finding_id)}",
                     f"- Confidence: {finding.confidence.capitalize()}",
                     (
                         "- Provenance: "
-                        f"account `{finding.account_id}`, "
-                        f"region `{finding.region}`, "
-                        f"observed `{finding.observed_at or 'not provided'}`"
+                        f"account {_inline_code(finding.account_id)}, "
+                        f"region {_inline_code(finding.region)}, "
+                        f"observed {_inline_code(finding.observed_at or 'not provided')}"
                     ),
                     (
                         "- Evidence references: "
                         f"{_format_evidence_references(finding)}"
                     ),
-                    f"- Evidence: {finding.evidence}",
-                    f"- Impact: {finding.impact}",
-                    f"- Remediation: {finding.remediation}",
+                    f"- Evidence: {_escape_markdown_text(finding.evidence)}",
+                    f"- Impact: {_escape_markdown_text(finding.impact)}",
+                    f"- Remediation: {_escape_markdown_text(finding.remediation)}",
                     f"- Metadata: {_format_metadata(finding)}",
                 ]
             )
             if finding.references:
-                lines.append(f"- References: {', '.join(finding.references)}")
+                lines.append(
+                    "- References: "
+                    + ", ".join(
+                        _format_reference(reference)
+                        for reference in finding.references
+                    )
+                )
             lines.append("")
 
     return "\n".join(lines)

@@ -120,6 +120,9 @@ class RemediationPlanTests(unittest.TestCase):
             ["P1", "P2"],
             [action.priority for action in plan.actions],
         )
+        self.assertTrue(
+            all("`" not in action.rationale for action in plan.actions)
+        )
 
     def test_same_rule_and_resource_without_shared_event_is_not_linked(self):
         unrelated = _finding(

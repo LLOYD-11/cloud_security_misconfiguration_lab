@@ -139,6 +139,11 @@ Rule catalog:
 
 The report generator reads one or more finding JSON files and creates a consolidated Markdown risk report. Optional analysis summaries replace finding-only module counts with evaluated and discovered resource counts, coverage status, skipped evidence, and normalization warnings. Findings and correlated incidents also produce an explainable P0-P3 work queue that separates immediate response from permanent configuration hardening. Timestamped CloudTrail findings form an evidence-preserving timeline, while incident sections explain observed sequence and triage context without presenting chronology as proof of intent or causation.
 
+Artifact-derived text crosses a documented
+[Markdown report-integrity boundary](docs/report-integrity.md). Context-specific
+renderers preserve headings, lists, tables, code spans, and links even when
+model-valid input contains Markdown control characters or embedded line breaks.
+
 Each analyzer can write a versioned analysis summary through `--summary-output`. A summary records `complete`, `partial`, or `empty` coverage independently from the finding count, so zero findings no longer imply that evidence was complete. See [Analysis coverage](docs/analysis-coverage.md) for the status and counting rules.
 
 All analyzers should emit the same finding schema:

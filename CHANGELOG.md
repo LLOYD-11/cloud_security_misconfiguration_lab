@@ -18,6 +18,11 @@ All notable changes to this project are documented in this file.
 - Simplified CloudTrail inputs now reject conflicting records that share an
   `eventID` instead of silently analyzing whichever record appeared first;
   identical duplicates continue to be analyzed once.
+- Markdown reports now render artifact-derived prose, headings, code spans,
+  table cells, references, and source paths through context-aware boundaries so
+  model-valid text cannot alter the fixed report structure.
+- Remediation rationale is now format-neutral plain text; Markdown syntax is
+  owned exclusively by the report renderer.
 
 ## 2.1.0 - 2026-07-19
 

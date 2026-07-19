@@ -118,7 +118,7 @@ class ReportGeneratorTests(unittest.TestCase):
             "`iam-trust-policy-statement/third-party-audit-role:ExternalTrust`",
             report,
         )
-        self.assertIn("policy_name: trust-policy", report)
+        self.assertIn(r"policy\_name: trust-policy", report)
         self.assertIn("https://attack.mitre.org/techniques/T1199/", report)
 
     def test_known_rule_context_rejects_wrong_module_or_severity(self):
@@ -397,6 +397,137 @@ class ReportGeneratorTests(unittest.TestCase):
             "not malicious intent or proof that one action caused the next",
             report,
         )
+
+    def test_untrusted_artifact_text_cannot_change_markdown_structure(self):
+        payload = (
+            "visible \\| cell `tick` ```fence``` <details> *emphasis* "
+            "[link](https://example.com)\r\n"
+            "## INJECTED_HEADING\n"
+            "- INJECTED_LIST\u2028"
+            "> INJECTED_QUOTE"
+        )
+        resource_id = f"resource-{payload}"
+        finding = Finding(
+            rule_id="CUSTOM-001",
+            severity="high",
+            module="cloudtrail",
+            category=payload,
+            resource_type="resource",
+            resource_id=resource_id,
+            title=payload,
+            evidence=payload,
+            impact=payload,
+            remediation=payload,
+            references=[f"https://example.com/reference?label={payload}"],
+            metadata={
+                "actor": payload,
+                "event_id": "event-1",
+                "event_time": "2026-06-30T01:00:00Z",
+                "source_ip": payload,
+                payload: payload,
+            },
+            confidence="medium",
+            account_id="111122223333",
+            region="global",
+            observed_at="2026-06-30T01:00:00Z",
+            evidence_references=[
+                EvidenceReference(type="cloudtrail-event", id="event-1"),
+                EvidenceReference(type="custom-evidence", id=payload),
+            ],
+        )
+        incident = Incident(
+            incident_id="CTI-ABCDEF123456",
+            severity="high",
+            confidence="high",
+            module="cloudtrail",
+            category=payload,
+            title=payload,
+            actor=payload,
+            source_ip=payload,
+            first_seen="2026-06-30T01:00:00Z",
+            last_seen="2026-06-30T01:05:00Z",
+            event_count=1,
+            finding_count=1,
+            rule_ids=["CUSTOM-001"],
+            event_ids=["event-1"],
+            resources=[f"resource/{resource_id}"],
+            summary=payload,
+            recommended_actions=[payload],
+            references=[f"https://example.com/incident?label={payload}"],
+        )
+        summary = AnalysisSummary(
+            module="cloudtrail",
+            analyzer_version="2.1.0",
+            input_format="simplified",
+            input_file_count=1,
+            coverage_status="partial",
+            finding_count=1,
+            incident_count=1,
+            resource_coverage=[ResourceCoverage(payload, 1, 1, 0)],
+            skipped_evidence=[
+                SkippedEvidence(
+                    code="CLD_TEST_EVIDENCE",
+                    evidence_type=payload,
+                    reason=payload,
+                    count=1,
+                    affects_coverage=True,
+                    resource_ids=[payload],
+                )
+            ],
+            warnings=[payload],
+        )
+
+        report = render_report(
+            [finding],
+            source_files=[Path(f"reports/generated/{payload}.json")],
+            report_date=date(2026, 6, 30),
+            incidents=[incident],
+            analysis_summaries=[summary],
+        )
+        second_level_headings = [
+            line for line in report.splitlines() if line.startswith("## ")
+        ]
+
+        self.assertEqual(
+            [
+                "## Executive Summary",
+                "## Severity Summary",
+                "## Analysis Coverage",
+                "## Attack Timeline",
+                "## Prioritized Remediation Plan",
+                "## Triggered Rule Context",
+                "## Source Files",
+                "## Correlated Incidents",
+                "## Findings",
+            ],
+            second_level_headings,
+        )
+        self.assertEqual(
+            1,
+            sum(line.startswith("#### ") for line in report.splitlines()),
+        )
+        self.assertNotIn("\n- INJECTED_LIST", report)
+        self.assertNotIn("\n> INJECTED_QUOTE", report)
+        self.assertIn("INJECTED_HEADING", report)
+        adversarial_table_lines = [
+            line
+            for line in report.splitlines()
+            if line.startswith("|") and "INJECTED_HEADING" in line
+        ]
+        self.assertTrue(adversarial_table_lines)
+        self.assertTrue(
+            all(
+                "visible \\\\| cell" not in line and "&#124;" in line
+                for line in adversarial_table_lines
+            )
+        )
+        evidence_line = next(
+            line for line in report.splitlines() if line.startswith("- Evidence:")
+        )
+        self.assertNotIn("<details>", evidence_line)
+        self.assertNotIn("[link](https://example.com)", evidence_line)
+        self.assertIn("&lt;details&gt;", evidence_line)
+        self.assertIn(r"\[link\](https://example.com)", evidence_line)
 
     def test_parser_accepts_explicit_report_date(self):
         args = build_parser().parse_args(

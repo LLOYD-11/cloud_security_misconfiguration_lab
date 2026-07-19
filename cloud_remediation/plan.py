@@ -283,7 +283,7 @@ def _incident_action(incident: Incident) -> RemediationAction:
     rule_label = "rule" if rule_count == 1 else "rules"
     rationale = (
         f"{incident.severity.capitalize()}-severity correlated incident "
-        f"`{incident.incident_id}` has {incident.confidence} confidence across "
+        f"{incident.incident_id} has {incident.confidence} confidence across "
         f"{rule_count} {rule_label} and {incident.event_count} {event_label}."
     )
     return RemediationAction(
@@ -370,13 +370,13 @@ def _configuration_actions(
         resource_label = "resource" if len(resources) == 1 else "resources"
         affect_verb = "affects" if len(group) == 1 else "affect"
         rationale = (
-            f"{len(group)} {severity} {finding_label} for `{rule_id}` {affect_verb} "
+            f"{len(group)} {severity} {finding_label} for {rule_id} {affect_verb} "
             f"{len(resources)} {resource_label}."
         )
         if incident_ids:
             rationale += (
                 " Related incident context: "
-                + ", ".join(f"`{incident_id}`" for incident_id in incident_ids)
+                + ", ".join(incident_ids)
                 + "."
             )
         actions.append(
