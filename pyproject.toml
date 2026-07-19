@@ -29,7 +29,9 @@ dev = [
   "build>=1.2,<2",
   "coverage[toml]>=7.6,<8",
   "jsonschema>=4.23,<5",
+  "markdown-it-py>=4.0,<5",
   "mypy>=1.11,<2",
+  "pymarkdownlnt>=0.9.39,<1",
   "ruff>=0.12,<1",
   "setuptools>=77,<84",
 ]
@@ -97,6 +99,11 @@ ignore = ["E402"]
 [tool.ruff.lint.isort]
 combine-as-imports = true
 
+[tool.pymarkdown]
+extensions.markdown-tables.enabled = true
+plugins.MD013.enabled = false
+plugins.MD024.siblings_only = true
+
 [tool.mypy]
 python_version = "3.10"
 exclude = "(^|/)test_[^/]*\\.py$"
@@ -124,6 +131,7 @@ source = [
   "network_analyzer",
   "report_generator",
   "storage_analyzer",
+  "tools",
 ]
 omit = ["*/__main__.py", "*/test_*.py"]
 

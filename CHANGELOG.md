@@ -11,6 +11,9 @@ All notable changes to this project are documented in this file.
   adversarial regression tests.
 - A universal development lock containing exact direct and transitive package
   versions with SHA-256 hashes, plus executable supply-chain regression tests.
+- Markdown linting plus parser-based internal and external link gates, including
+  exact-case path and heading-anchor checks, bounded retries, and public-address
+  restrictions for network probes.
 
 ### Changed
 
@@ -20,6 +23,8 @@ All notable changes to this project are documented in this file.
 - CI and release workflows now pin external Actions to verified full commit
   SHAs, install development tools in pip hash-checking mode, and build with the
   locked setuptools backend instead of resolving an isolated backend at runtime.
+- CI now exercises every declared Python minor from 3.10 through 3.13, while
+  documentation quality checks run once on 3.13 and again before a release.
 
 ## 2.1.1 - 2026-07-19
 

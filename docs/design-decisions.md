@@ -224,6 +224,29 @@ upstream security updates and are not claimed to be bit-for-bit fixed machines.
 are easier to maintain but execute newly resolved third-party code without a
 corresponding project change.
 
+## DD-012: Gate Public Documentation as Executable Evidence
+
+**Status:** Accepted
+
+**Decision:** CI exercises every declared Python minor and, once per run,
+validates all tracked Markdown with a locked linter, parser-based internal link
+checks, and bounded external HTTP probes. The release workflow repeats all
+three documentation gates.
+
+**Why:** Documentation is part of the review surface for this project. A stale
+compatibility claim, missing local artifact, malformed Markdown file, or dead
+framework reference can invalidate otherwise correct implementation evidence.
+
+**Consequences:** Internal checks are deterministic and enforce repository
+containment, exact path case, and GitHub-style heading anchors. External checks
+depend on upstream availability, so they deduplicate targets, limit per-host
+concurrency, and retry only transient failures. Network probes reject
+credentials, non-default ports, and hosts resolving to non-public addresses.
+
+**Alternative not chosen:** Manual link review avoids network-sensitive CI but
+does not prevent documentation regressions and is difficult to reproduce during
+admissions or engineering review.
+
 ## Revisit Triggers
 
 These decisions should be revisited if the project adds:

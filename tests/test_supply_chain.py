@@ -75,6 +75,25 @@ def _locked_requirements() -> dict[str, tuple[str, ...]]:
 
 
 class SupplyChainTests(unittest.TestCase):
+    def test_ci_matrix_covers_every_declared_python_minor(self):
+        pyproject = (PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8")
+        workflow = (PROJECT_ROOT / ".github/workflows/ci.yml").read_text(
+            encoding="utf-8"
+        )
+        declared = set(
+            re.findall(
+                r'"Programming Language :: Python :: (3\.\d+)"',
+                pyproject,
+            )
+        )
+        matrix_match = re.search(r"python-version:\s*\[([^\]]+)\]", workflow)
+        if matrix_match is None:
+            raise AssertionError("CI must declare an inline Python version matrix.")
+        exercised = set(re.findall(r'"(3\.\d+)"', matrix_match.group(1)))
+
+        self.assertEqual({"3.10", "3.11", "3.12", "3.13"}, declared)
+        self.assertEqual(declared, exercised)
+
     def test_lock_resolution_starts_at_supported_python_floor(self):
         pyproject = (PROJECT_ROOT / "pyproject.toml").read_text(encoding="utf-8")
         lock_header = "\n".join(
@@ -114,6 +133,9 @@ class SupplyChainTests(unittest.TestCase):
             "python -m pip install --no-build-isolation --no-deps -e .",
             "python -m pip check",
             "python -m build --no-isolation",
+            "pymarkdown --strict-config scan --respect-gitignore .",
+            "python -m tools.check_markdown_links internal",
+            "python -m tools.check_markdown_links external",
         )
         for path in WORKFLOWS:
             text = path.read_text(encoding="utf-8")

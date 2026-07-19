@@ -1,7 +1,7 @@
 # Cloud Security Misconfiguration Lab
 
 [![CI](https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/actions/workflows/ci.yml/badge.svg)](https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/actions/workflows/ci.yml)
-![Python 3.10-3.13](https://img.shields.io/badge/Python-3.10%20%7C%203.12%20%7C%203.13-3776AB)
+![Python 3.10-3.13](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-3776AB)
 ![Runtime dependencies: 0](https://img.shields.io/badge/runtime%20dependencies-0-198754)
 [![License: MIT](https://img.shields.io/badge/License-MIT-172033.svg)](LICENSE)
 
@@ -19,7 +19,7 @@ credentials or charges.
 | Security scope | IAM, S3, EC2 security groups, and CloudTrail |
 | Detection depth | 35 cataloged rules with qualified AWS Security Hub CSPM, CIS AWS Foundations, and MITRE ATT&CK mappings |
 | Deterministic sample | 39 findings, 2 incidents, 36 remediation actions, and 11 timeline entries |
-| Engineering assurance | 328 tests; 95.22% statement and 88.68% branch coverage; Python 3.10, 3.12, and 3.13 CI |
+| Engineering assurance | 375 tests; 95.51% statement and 89.00% branch coverage; Python 3.10-3.13 CI |
 | Safety boundary | Offline files only; zero runtime dependencies; no credentials and no cloud writes |
 
 ## Quick Start
@@ -71,11 +71,11 @@ engineering evidence.
 
 | Quality Gate | Verified Result |
 | --- | --- |
-| Automated tests | 328 unit, regression, integration, CLI, schema, compatibility, and benchmark tests pass |
-| Coverage | 4,979/5,229 statements (95.22%) and 1,903/2,146 branches (88.68%) |
+| Automated tests | 375 unit, regression, integration, CLI, schema, compatibility, and benchmark tests pass |
+| Coverage | 5,528/5,788 statements (95.51%) and 2,063/2,318 branches (89.00%) |
 | Rule benchmark | 78/78 exact functional cases and 4/4 malformed native inputs rejected |
 | Scale benchmark | 8/8 deterministic profiles pass across 100 to 10,000 inputs |
-| Supported Python | GitHub Actions passes on Python 3.10, 3.12, and 3.13 |
+| Supported Python | GitHub Actions exercises every minor from Python 3.10 through 3.13 |
 | Distribution | Wheel and sdist build; installed-wheel demo and packaged benchmark pass |
 
 Timing is measured but deliberately not used as a CI threshold. Exact outputs,
@@ -430,6 +430,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [CloudTrail failure-window performance](docs/detection-performance.md)
 - [Benchmarking and resilience](docs/benchmarking.md)
 - [Supply-chain controls](docs/supply-chain.md)
+- [Documentation quality gates](docs/documentation-quality.md)
 - [Engineering checks](docs/engineering.md)
 - [Known limitations](docs/known-limitations.md)
 - [Change log](CHANGELOG.md)
@@ -455,7 +456,10 @@ immutable GitHub Actions verification process.
 ```bash
 mkdir -p reports/generated
 .venv/bin/ruff check .
-.venv/bin/mypy cloud_analysis cloud_benchmarks cloud_security_lab cloud_findings cloud_inputs cloud_incidents cloud_remediation cloud_rules cloud_timeline iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
+.venv/bin/mypy cloud_analysis cloud_benchmarks cloud_security_lab cloud_findings cloud_inputs cloud_incidents cloud_remediation cloud_rules cloud_timeline iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator tools
+.venv/bin/pymarkdown --strict-config scan --respect-gitignore .
+.venv/bin/python -m tools.check_markdown_links internal
+.venv/bin/python -m tools.check_markdown_links external
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
 .venv/bin/coverage json -o reports/generated/coverage.json
@@ -466,8 +470,8 @@ mkdir -p reports/generated
 The benchmark gate covers all 35 built-in rules through 78 exact functional
 cases plus eight deterministic scale profiles. Coverage is enforced separately
 at 90% for statements and 85% for branches. GitHub Actions runs the quality,
-benchmark, and deterministic pipeline on Python 3.10, 3.12, and 3.13, and
-builds the distributions on Python 3.13.
+benchmark, and deterministic pipeline on Python 3.10, 3.11, 3.12, and 3.13,
+and builds the distributions on Python 3.13.
 
 ## Project Structure
 
@@ -481,6 +485,8 @@ cloud_security_misconfiguration_lab/
 ├── CHANGELOG.md
 ├── pyproject.toml
 ├── requirements-dev.lock
+├── tools/
+│   └── check_markdown_links.py
 ├── cloud_security_lab/
 │   ├── __main__.py
 │   ├── analysis.py
@@ -603,7 +609,9 @@ cloud_security_misconfiguration_lab/
 ├── tests/
 │   ├── test_benchmarks.py
 │   ├── test_contracts.py
-│   └── test_legacy_clis.py
+│   ├── test_legacy_clis.py
+│   ├── test_markdown_links.py
+│   └── test_supply_chain.py
 ├── LICENSE
 └── .gitignore
 ```

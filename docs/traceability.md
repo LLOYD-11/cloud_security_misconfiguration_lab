@@ -58,7 +58,7 @@ and release evidence exist.
 | M2-R3 | Publish versioned data contracts and validation warnings. | Complete | [Data contracts](data-contracts.md), `schemas/`, Python model validation, and normalizer tests. |
 | M2-R4 | Add stable finding identity and first-class account, region, time, confidence, and source provenance. | Complete | [Finding model](../cloud_findings/finding.py), [findings v2 schema](../schemas/findings-v2.0.schema.json), analyzer propagation, report rendering, and v1 migration tests. |
 | M2-R5 | Run lint, strict typing, tests, coverage, build, and end-to-end checks in CI. | Complete | [CI workflow](../.github/workflows/ci.yml) and [engineering checks](engineering.md); commit `0d981ba`. |
-| M2-R6 | Exercise Python 3.10, 3.12, and 3.13. | Complete | The [CI matrix](../.github/workflows/ci.yml) runs quality and end-to-end checks on all three documented versions. |
+| M2-R6 | Exercise Python 3.10 through 3.13. | Complete | The [CI matrix](../.github/workflows/ci.yml) runs quality and end-to-end checks on every declared minor version. |
 | M2-R7 | Preserve original module entry points. | Complete | Legacy CLI tests in [tests/test_legacy_clis.py](../tests/test_legacy_clis.py). |
 
 ## M3: Native AWS Evidence Adapters
@@ -153,7 +153,7 @@ and release evidence exist.
 | --- | --- | --- | --- |
 | M11-R1 | Bound JSON, gzip, resource-count, node-count, and nesting inputs. | Complete | Shared [bounded input layer](../cloud_inputs/bounds.py), measured [input resource limits](input-resource-limits.md), analyzer and artifact-loader enforcement, in-memory API checks, and adversarial byte, gzip, depth, node, resource, aggregate-budget, and file-count tests. |
 | M11-R2 | Make CI actions and development dependency resolution reproducible. | Complete | Full-SHA [CI](../.github/workflows/ci.yml) and [release](../.github/workflows/release.yml) actions, universal hash-locked [development dependencies](../requirements-dev.lock), no-isolation local builds, executable supply-chain regression tests, and documented [supply-chain controls](supply-chain.md). |
-| M11-R3 | Exercise every documented Python minor version and validate public links and Markdown. | Open | Planned CI matrix and documentation jobs. |
+| M11-R3 | Exercise every documented Python minor version and validate public links and Markdown. | Complete | Python-classifier/matrix regression tests, four-version [CI](../.github/workflows/ci.yml), strict Markdown lint, tested [internal and external link checker](../tools/check_markdown_links.py), repeated release gates, and documented [quality and safety controls](documentation-quality.md). |
 | M11-R4 | Publish security, threat-model, checksum, SBOM, and build-provenance evidence. | Open | Planned security and release artifacts. |
 
 ## M12: Independent External Evaluation

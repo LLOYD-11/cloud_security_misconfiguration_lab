@@ -178,8 +178,8 @@ Status: In progress for `v2.2.0`.
 - [x] Fail closed on oversized, deeply nested, truncated, or malformed inputs.
 - [x] Pin GitHub Actions to immutable revisions and make development dependency
       resolution reproducible.
-- [ ] Exercise every documented Python minor version in CI.
-- [ ] Add Markdown, internal-link, and external-link validation.
+- [x] Exercise every documented Python minor version in CI.
+- [x] Add Markdown, internal-link, and external-link validation.
 - [ ] Publish a security policy, threat model, release checksums, an SBOM, and
       build-provenance evidence.
 

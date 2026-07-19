@@ -51,7 +51,16 @@ jobs:
           mypy cloud_analysis cloud_benchmarks cloud_security_lab cloud_findings
           cloud_inputs cloud_incidents cloud_remediation cloud_rules cloud_timeline
           iam_analyzer storage_analyzer
-          network_analyzer cloudtrail_detector report_generator
+          network_analyzer cloudtrail_detector report_generator tools
+
+      - name: Lint Markdown
+        run: pymarkdown --strict-config scan --respect-gitignore .
+
+      - name: Verify internal Markdown links
+        run: python -m tools.check_markdown_links internal
+
+      - name: Verify external Markdown links
+        run: python -m tools.check_markdown_links external
 
       - name: Test with branch coverage
         run: >-

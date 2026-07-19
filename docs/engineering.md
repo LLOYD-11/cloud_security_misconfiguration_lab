@@ -23,7 +23,10 @@ Run these commands from the repository root:
 ```bash
 mkdir -p reports/generated
 .venv/bin/ruff check .
-.venv/bin/mypy cloud_analysis cloud_benchmarks cloud_security_lab cloud_findings cloud_inputs cloud_incidents cloud_remediation cloud_rules cloud_timeline iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator
+.venv/bin/mypy cloud_analysis cloud_benchmarks cloud_security_lab cloud_findings cloud_inputs cloud_incidents cloud_remediation cloud_rules cloud_timeline iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator tools
+.venv/bin/pymarkdown --strict-config scan --respect-gitignore .
+.venv/bin/python -m tools.check_markdown_links internal
+.venv/bin/python -m tools.check_markdown_links external
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
 .venv/bin/coverage json -o reports/generated/coverage.json
@@ -59,14 +62,22 @@ Elapsed time is measured and reported but is deliberately not gated. See
 [Benchmarking and resilience](benchmarking.md) for the manifest, methodology,
 reference measurements, and separate coverage evidence.
 
+The documentation gate scans every tracked Markdown file with strict linter
+configuration, resolves local paths with exact case, validates GitHub-style
+heading anchors, and probes each unique external HTTP target with bounded
+retries and per-host concurrency. See
+[Documentation quality gates](documentation-quality.md) for the safety
+controls, intentional lint configuration, and residual limits.
+
 ## Continuous Integration
 
 GitHub Actions runs the same lint, type, test, independent coverage, benchmark,
-and end-to-end checks on Python 3.10, 3.12, and 3.13. The Python 3.13 job also
-builds the wheel and source distribution. Workflow permissions are limited to
-read-only repository contents. Actions use full immutable commit SHAs, the
-runner is fixed to Ubuntu 24.04, and pip installs the reviewed hash lock before
-installing the local project without dependency or build isolation.
+and end-to-end checks on Python 3.10, 3.11, 3.12, and 3.13. The Python 3.13 job
+also runs the documentation gates and builds the wheel and source distribution.
+Workflow permissions are limited to read-only repository contents. Actions use
+full immutable commit SHAs, the runner is fixed to Ubuntu 24.04, and pip
+installs the reviewed hash lock before installing the local project without
+dependency or build isolation.
 
 The deterministic end-to-end check fixes the report date to the sample event
 date and compares the generated Markdown, including finding provenance, the
@@ -83,7 +94,7 @@ packaged benchmark manifest, runner, and both benchmark schemas.
    the roadmap milestone, and add `docs/release-vX.Y.Z.md`.
 2. Run the complete local release gate and install the wheel into a clean
    environment for one deterministic demo.
-3. Commit and push the release candidate branch, then require all three Python
+3. Commit and push the release candidate branch, then require all four Python
    matrix jobs to pass.
 4. Fast-forward `main` to the verified commit and require the main-branch CI run
    to pass.
