@@ -1,0 +1,393 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/schemas/evaluation-protocol-v1.0.schema.json",
+  "title": "Independent Evaluation Protocol v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "protocol_id",
+    "protocol_version",
+    "status",
+    "frozen_on",
+    "release_target",
+    "candidate",
+    "research_questions",
+    "independence_controls",
+    "corpus_design",
+    "ground_truth",
+    "external_baselines",
+    "scoring",
+    "experiments",
+    "artifact_contracts",
+    "change_control"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "protocol_id": { "const": "cloud-security-independent-evaluation" },
+    "protocol_version": { "type": "string", "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$" },
+    "status": { "const": "frozen" },
+    "frozen_on": { "type": "string", "format": "date" },
+    "release_target": { "type": "string", "pattern": "^v[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "candidate": { "$ref": "#/$defs/candidate" },
+    "research_questions": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/researchQuestion" }
+    },
+    "independence_controls": { "$ref": "#/$defs/independenceControls" },
+    "corpus_design": { "$ref": "#/$defs/corpusDesign" },
+    "ground_truth": { "$ref": "#/$defs/groundTruth" },
+    "external_baselines": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "$ref": "#/$defs/baseline" }
+    },
+    "scoring": { "$ref": "#/$defs/scoring" },
+    "experiments": {
+      "type": "array",
+      "minItems": 3,
+      "items": { "$ref": "#/$defs/experiment" }
+    },
+    "artifact_contracts": { "$ref": "#/$defs/artifactContracts" },
+    "change_control": { "$ref": "#/$defs/changeControl" }
+  },
+  "$defs": {
+    "nonEmptyText": { "type": "string", "minLength": 1 },
+    "httpsUrl": { "type": "string", "format": "uri", "pattern": "^https://" },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "commitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "moduleId": { "enum": ["iam", "storage", "network", "cloudtrail"] },
+    "ruleId": { "type": "string", "pattern": "^(?:IAM|STO|NET|CLD)-[0-9]{3}$" },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository", "analyzer_revision", "package_version", "rule_catalog", "modules"],
+      "properties": {
+        "repository": { "$ref": "#/$defs/httpsUrl" },
+        "analyzer_revision": { "$ref": "#/$defs/commitSha" },
+        "package_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "rule_catalog": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "schema_version", "sha256", "rule_count"],
+          "properties": {
+            "path": { "const": "cloud_rules/rules-v1.0.json" },
+            "schema_version": { "const": "1.0" },
+            "sha256": { "$ref": "#/$defs/sha256" },
+            "rule_count": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "modules": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "rule_prefix", "rule_count", "rule_ids", "input_forms"],
+            "properties": {
+              "id": { "$ref": "#/$defs/moduleId" },
+              "rule_prefix": { "enum": ["IAM", "STO", "NET", "CLD"] },
+              "rule_count": { "type": "integer", "minimum": 1 },
+              "rule_ids": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": { "$ref": "#/$defs/ruleId" }
+              },
+              "input_forms": {
+                "type": "array",
+                "minItems": 2,
+                "uniqueItems": true,
+                "items": { "enum": ["native", "simplified"] }
+              }
+            }
+          }
+        }
+      }
+    },
+    "researchQuestion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "primary", "question"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^RQ[1-9][0-9]*$" },
+        "primary": { "type": "boolean" },
+        "question": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    },
+    "independenceControls": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "model",
+        "candidate_output_access_before_label_freeze",
+        "candidate_source_may_be_known",
+        "third_party_review_claimed",
+        "holdout_separation",
+        "label_freeze_condition",
+        "disclosure"
+      ],
+      "properties": {
+        "model": { "const": "procedural-not-institutional" },
+        "candidate_output_access_before_label_freeze": { "const": false },
+        "candidate_source_may_be_known": { "const": true },
+        "third_party_review_claimed": { "const": false },
+        "holdout_separation": { "$ref": "#/$defs/nonEmptyText" },
+        "label_freeze_condition": { "$ref": "#/$defs/nonEmptyText" },
+        "disclosure": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    },
+    "corpusDesign": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_classes",
+        "allowed_origins",
+        "excluded_project_sources",
+        "minimum_case_counts_per_module",
+        "minimum_scored_assertions_per_rule",
+        "minimum_native_simplified_pairs_per_module",
+        "single_occurrence_per_decision_key",
+        "decision_key_fields",
+        "sanitization_requirements"
+      ],
+      "properties": {
+        "case_classes": {
+          "const": ["positive", "hardened-negative", "boundary", "ambiguous"]
+        },
+        "allowed_origins": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "independently-authored-synthetic",
+              "official-documentation-derived",
+              "public-open-source-derived"
+            ]
+          }
+        },
+        "excluded_project_sources": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyText" }
+        },
+        "minimum_case_counts_per_module": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["positive", "hardened-negative", "boundary", "ambiguous"],
+          "properties": {
+            "positive": { "type": "integer", "minimum": 1 },
+            "hardened-negative": { "type": "integer", "minimum": 1 },
+            "boundary": { "type": "integer", "minimum": 1 },
+            "ambiguous": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "minimum_scored_assertions_per_rule": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["positive", "negative"],
+          "properties": {
+            "positive": { "type": "integer", "minimum": 1 },
+            "negative": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "minimum_native_simplified_pairs_per_module": { "type": "integer", "minimum": 1 },
+        "single_occurrence_per_decision_key": { "const": true },
+        "decision_key_fields": {
+          "const": ["case_id", "rule_id", "resource_type", "resource_id"]
+        },
+        "sanitization_requirements": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyText" }
+        }
+      }
+    },
+    "groundTruth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "labels",
+        "positive_definition",
+        "negative_definition",
+        "ambiguous_definition",
+        "unsupported_definition",
+        "authoritative_source_requirement",
+        "baseline_role",
+        "review_stages",
+        "universe_rule",
+        "post_run_change_rule"
+      ],
+      "properties": {
+        "labels": { "const": ["positive", "negative", "ambiguous", "unsupported"] },
+        "positive_definition": { "$ref": "#/$defs/nonEmptyText" },
+        "negative_definition": { "$ref": "#/$defs/nonEmptyText" },
+        "ambiguous_definition": { "$ref": "#/$defs/nonEmptyText" },
+        "unsupported_definition": { "$ref": "#/$defs/nonEmptyText" },
+        "authoritative_source_requirement": { "$ref": "#/$defs/nonEmptyText" },
+        "baseline_role": { "$ref": "#/$defs/nonEmptyText" },
+        "review_stages": {
+          "type": "array",
+          "minItems": 3,
+          "items": { "$ref": "#/$defs/nonEmptyText" }
+        },
+        "universe_rule": { "$ref": "#/$defs/nonEmptyText" },
+        "post_run_change_rule": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    },
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "name",
+        "version",
+        "commit_sha",
+        "release_url",
+        "source_url",
+        "modules",
+        "comparison_scope",
+        "ground_truth_role"
+      ],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "name": { "$ref": "#/$defs/nonEmptyText" },
+        "version": { "$ref": "#/$defs/nonEmptyText" },
+        "commit_sha": { "$ref": "#/$defs/commitSha" },
+        "release_url": { "$ref": "#/$defs/httpsUrl" },
+        "source_url": { "$ref": "#/$defs/httpsUrl" },
+        "release_asset": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name", "sha256"],
+          "properties": {
+            "name": { "$ref": "#/$defs/nonEmptyText" },
+            "sha256": { "$ref": "#/$defs/sha256" }
+          }
+        },
+        "modules": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/moduleId" }
+        },
+        "comparison_scope": { "$ref": "#/$defs/nonEmptyText" },
+        "ground_truth_role": { "const": "corroborating-only" }
+      }
+    },
+    "scoring": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "primary_unit",
+        "included_labels",
+        "excluded_labels",
+        "true_positive",
+        "false_negative",
+        "true_negative",
+        "false_positive",
+        "duplicate_rule",
+        "metrics",
+        "aggregations",
+        "confidence_intervals",
+        "zero_denominator_policy",
+        "severity_measure",
+        "baseline_measure",
+        "acceptance_thresholds",
+        "acceptance_rationale"
+      ],
+      "properties": {
+        "primary_unit": { "$ref": "#/$defs/nonEmptyText" },
+        "included_labels": { "const": ["positive", "negative"] },
+        "excluded_labels": { "const": ["ambiguous", "unsupported"] },
+        "true_positive": { "$ref": "#/$defs/nonEmptyText" },
+        "false_negative": { "$ref": "#/$defs/nonEmptyText" },
+        "true_negative": { "$ref": "#/$defs/nonEmptyText" },
+        "false_positive": { "$ref": "#/$defs/nonEmptyText" },
+        "duplicate_rule": { "$ref": "#/$defs/nonEmptyText" },
+        "metrics": { "const": ["precision", "recall", "f1", "specificity"] },
+        "aggregations": { "const": ["overall-micro", "per-module", "per-rule"] },
+        "confidence_intervals": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["method", "confidence_level", "applies_to"],
+          "properties": {
+            "method": { "const": "wilson-score" },
+            "confidence_level": { "const": 0.95 },
+            "applies_to": { "const": ["precision", "recall", "specificity"] }
+          }
+        },
+        "zero_denominator_policy": { "$ref": "#/$defs/nonEmptyText" },
+        "severity_measure": { "$ref": "#/$defs/nonEmptyText" },
+        "baseline_measure": { "$ref": "#/$defs/nonEmptyText" },
+        "acceptance_thresholds": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "minimum_overall_micro_f1",
+            "minimum_per_module_precision",
+            "minimum_per_module_recall",
+            "maximum_critical_high_false_negatives",
+            "minimum_native_simplified_decision_agreement",
+            "maximum_unlabelled_predictions"
+          ],
+          "properties": {
+            "minimum_overall_micro_f1": { "type": "number", "minimum": 0, "maximum": 1 },
+            "minimum_per_module_precision": { "type": "number", "minimum": 0, "maximum": 1 },
+            "minimum_per_module_recall": { "type": "number", "minimum": 0, "maximum": 1 },
+            "maximum_critical_high_false_negatives": { "type": "integer", "minimum": 0 },
+            "minimum_native_simplified_decision_agreement": { "type": "number", "minimum": 0, "maximum": 1 },
+            "maximum_unlabelled_predictions": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "acceptance_rationale": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["classification", "high_impact", "representation", "completeness"],
+          "properties": {
+            "classification": { "$ref": "#/$defs/nonEmptyText" },
+            "high_impact": { "$ref": "#/$defs/nonEmptyText" },
+            "representation": { "$ref": "#/$defs/nonEmptyText" },
+            "completeness": { "$ref": "#/$defs/nonEmptyText" }
+          }
+        }
+      }
+    },
+    "experiment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "comparison", "invariant"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "comparison": { "$ref": "#/$defs/nonEmptyText" },
+        "invariant": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    },
+    "artifactContracts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol_schema", "corpus_manifest_schema", "baseline_overlap_schema", "results_schema"],
+      "properties": {
+        "protocol_schema": { "const": "schemas/evaluation-protocol-v1.0.schema.json" },
+        "corpus_manifest_schema": { "const": "schemas/evaluation-corpus-manifest-v1.0.schema.json" },
+        "baseline_overlap_schema": { "const": "schemas/evaluation-baseline-overlap-v1.0.schema.json" },
+        "results_schema": { "const": "schemas/evaluation-results-v1.0.schema.json" }
+      }
+    },
+    "changeControl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pre_execution", "post_execution", "analyzer_fix_after_evaluation"],
+      "properties": {
+        "pre_execution": { "$ref": "#/$defs/nonEmptyText" },
+        "post_execution": { "$ref": "#/$defs/nonEmptyText" },
+        "analyzer_fix_after_evaluation": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    }
+  }
+}

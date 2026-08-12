@@ -43,7 +43,10 @@ Coverage uses branch measurement and independently fails below 90% statement
 coverage or 85% branch coverage. Contract tests validate
 all committed sample files, findings v2 output, generated remediation plans,
 attack timelines, the canonical rule catalog, and the AWS fixture manifest
-against Draft 2020-12 schemas. The manifest test also enforces exact fixture
+against Draft 2020-12 schemas. Evaluation tests additionally compile all four
+predeclared M12 contracts and verify the frozen candidate, catalog digest,
+module inventory, holdout separation, baseline identities, label semantics,
+and scoring boundaries. The fixture manifest test also enforces exact fixture
 inventory and SHA-256 integrity. AST-based completeness tests compare every
 analyzer's literal rule IDs with the catalog, while timeline tests require a
 classification for every CloudTrail rule. Compatibility tests call every
@@ -77,7 +80,9 @@ also runs the documentation gates and builds the wheel and source distribution.
 Workflow permissions are limited to read-only repository contents. Actions use
 full immutable commit SHAs, the runner is fixed to Ubuntu 24.04, and pip
 installs the reviewed hash lock before installing the local project without
-dependency or build isolation. Checkout credentials are not persisted.
+dependency or build isolation. Checkout fetches full history so evaluation
+tests can prove the frozen candidate is an ancestor of the current revision;
+credentials are not persisted.
 
 The deterministic end-to-end check fixes the report date to the sample event
 date and compares the generated Markdown, including finding provenance, the
@@ -86,7 +91,8 @@ report. A second byte-for-byte check regenerates the human-readable rule catalog
 from its packaged JSON source. The build gate also confirms that the wheel
 contains the simplified-input validator, rule catalog, remediation and timeline
 modules, their schemas, and the AWS fixture manifest. It also verifies the
-packaged benchmark manifest, runner, and both benchmark schemas.
+packaged benchmark manifest, runner, both benchmark schemas, the frozen
+evaluation protocol, and all independent-evaluation schemas.
 
 ## Release Process
 

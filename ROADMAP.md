@@ -190,9 +190,10 @@ the `v2.2.0` tag.
 
 ## M12: Independent External Evaluation
 
-Status: Planned for `v2.2.0`.
+Status: In progress for `v2.2.0`; the protocol is frozen before corpus
+construction or candidate execution.
 
-- [ ] Publish a versioned evaluation protocol before running the analyzers.
+- [x] Publish a versioned evaluation protocol before running the analyzers.
 - [ ] Build a provenance-tracked corpus of independent positive, hardened,
       boundary, and ambiguous IAM, S3, network, and CloudTrail cases.
 - [ ] Establish ground truth independently from analyzer output and preserve

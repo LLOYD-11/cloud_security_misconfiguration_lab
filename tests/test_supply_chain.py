@@ -169,6 +169,7 @@ class SupplyChainTests(unittest.TestCase):
                 1,
                 path,
             )
+            self.assertEqual(text.count("fetch-depth: 0"), 1, path)
 
     def test_release_workflow_separates_build_and_publish_permissions(self):
         release = (PROJECT_ROOT / ".github/workflows/release.yml").read_text(

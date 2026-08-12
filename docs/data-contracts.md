@@ -23,8 +23,21 @@ The repository publishes versioned JSON Schema contracts for its simplified offl
 | Attack timeline | [`attack-timeline-v1.0.schema.json`](../schemas/attack-timeline-v1.0.schema.json) |
 | Benchmark manifest | [`benchmark-manifest-v1.0.schema.json`](../schemas/benchmark-manifest-v1.0.schema.json) |
 | Benchmark results | [`benchmark-results-v1.0.schema.json`](../schemas/benchmark-results-v1.0.schema.json) |
+| Independent evaluation protocol | [`evaluation-protocol-v1.0.schema.json`](../schemas/evaluation-protocol-v1.0.schema.json) |
+| Independent evaluation corpus manifest | [`evaluation-corpus-manifest-v1.0.schema.json`](../schemas/evaluation-corpus-manifest-v1.0.schema.json) |
+| External baseline overlap matrix | [`evaluation-baseline-overlap-v1.0.schema.json`](../schemas/evaluation-baseline-overlap-v1.0.schema.json) |
+| Independent evaluation results | [`evaluation-results-v1.0.schema.json`](../schemas/evaluation-results-v1.0.schema.json) |
 
-The schemas use JSON Schema Draft 2020-12. Contract tests validate every committed sample, the built-in rule catalog, the benchmark manifest, and analyzer-generated findings, incident, analysis-summary, remediation-plan, attack-timeline, and benchmark-result files against these schemas.
+The schemas use JSON Schema Draft 2020-12. Contract tests validate every committed sample, the built-in rule catalog, the benchmark manifest, the frozen evaluation protocol, and analyzer-generated findings, incident, analysis-summary, remediation-plan, attack-timeline, and benchmark-result files against these schemas.
+
+The independent-evaluation contracts are predeclared before measurement. The
+protocol fixes the candidate, ground-truth process, external baselines, metrics,
+thresholds, and change control. The corpus contract requires hashed evidence,
+authoritative citations, sanitization records, and output-blind review passes.
+The overlap contract separates exact comparisons from partial or unsupported
+scope, and the result contract preserves raw decisions, exclusions,
+disagreements, ablations, confidence intervals, and failed acceptance checks.
+See the [independent evaluation protocol](evaluation-protocol.md).
 
 The environment contracts describe the lab's simplified analyzer models. The native IAM contract describes the fields consumed from a non-truncated AWS `GetAccountAuthorizationDetails` snapshot; the accompanying credential report follows AWS's CSV contract and is validated by required headers and values in Python. Its normalized contract preserves root credentials, console-password usage, group membership, direct policy origin, and permissions-boundary context without treating a boundary as a grant. The S3 bundle contract groups multiple native account and per-bucket responses, including Object Ownership, without flattening collection errors into configuration values. Its normalized contract preserves positive and negative policy elements plus condition context so public-access evaluation does not reduce a policy to its principal alone. The EC2 contract represents a complete direct `DescribeSecurityGroups` response; its adapter flattens permission targets while retaining CIDR, prefix-list, and security-group peer context in the network environment. The optional reachability contract carries separately obtained, direction-specific path conclusions with scope, method, timestamp, evidence, and related resource IDs; it is an assessor attestation rather than a raw AWS API response. The CloudTrail contracts describe the simplified environment and supported native `Records` entries. Both paths analyze identical duplicate IDs once and reject conflicting records before detection; native JSON or gzip files are merged only after record validation. All normalizers convert native evidence into versioned analyzer environments, keeping the detection interface stable.
 

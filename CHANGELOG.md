@@ -21,6 +21,10 @@ All notable changes to this project are documented in this file.
   tamper detection.
 - Pinned Syft SBOM generation plus signed SLSA build provenance and SPDX
   attestations with downloadable Sigstore bundles.
+- A pre-registered independent-evaluation protocol that freezes the analyzer
+  candidate, holdout rules, ground-truth process, Prowler and Sigma baselines,
+  metrics, thresholds, ablations, provenance requirements, and future artifact
+  schemas before evaluation evidence is created or executed.
 
 ### Changed
 
@@ -32,10 +36,11 @@ All notable changes to this project are documented in this file.
   locked setuptools backend instead of resolving an isolated backend at runtime.
 - CI now exercises every declared Python minor from 3.10 through 3.13, while
   documentation quality checks run once on 3.13 and again before a release.
-- Checkout no longer persists workflow credentials. Tagged releases separate
-  low-privilege build and signing from an isolated release writer, with
-  checksum and signer-workflow verification on both sides of the artifact
-  transfer.
+- Checkout now fetches the history required to verify frozen evaluation
+  ancestry while continuing not to persist workflow credentials. Tagged
+  releases separate low-privilege build and signing from an isolated release
+  writer, with checksum and signer-workflow verification on both sides of the
+  artifact transfer.
 
 ## 2.1.1 - 2026-07-19
 

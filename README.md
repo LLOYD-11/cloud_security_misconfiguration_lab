@@ -19,7 +19,8 @@ credentials or charges.
 | Security scope | IAM, S3, EC2 security groups, and CloudTrail |
 | Detection depth | 35 cataloged rules with qualified AWS Security Hub CSPM, CIS AWS Foundations, and MITRE ATT&CK mappings |
 | Deterministic sample | 39 findings, 2 incidents, 36 remediation actions, and 11 timeline entries |
-| Engineering assurance | 391 tests; 95.61% statement and 89.24% branch coverage; Python 3.10-3.13 CI |
+| Engineering assurance | 401 tests; 95.61% statement and 89.24% branch coverage; Python 3.10-3.13 CI |
+| Evaluation status | Protocol v1.0.0 frozen before holdout construction or candidate execution; results pending |
 | Safety boundary | Offline files only; zero runtime dependencies; no credentials and no cloud writes |
 
 ## Quick Start
@@ -71,17 +72,25 @@ engineering evidence.
 
 | Quality Gate | Verified Result |
 | --- | --- |
-| Automated tests | 391 unit, regression, integration, CLI, schema, compatibility, and benchmark tests pass |
+| Automated tests | 401 unit, regression, integration, CLI, schema, compatibility, and benchmark tests pass |
 | Coverage | 5,809/6,076 statements (95.61%) and 2,174/2,436 branches (89.24%) |
 | Rule benchmark | 78/78 exact functional cases and 4/4 malformed native inputs rejected |
 | Scale benchmark | 8/8 deterministic profiles pass across 100 to 10,000 inputs |
 | Supported Python | GitHub Actions exercises every minor from Python 3.10 through 3.13 |
 | Distribution | Wheel and sdist build; installed-wheel demo and packaged benchmark pass |
+| Independent evaluation | Candidate, labels, Prowler/Sigma baselines, metrics, thresholds, and future artifact contracts pre-registered; no holdout result claimed yet |
 
 Timing is measured but deliberately not used as a CI threshold. Exact outputs,
 bounded finding amplification, repeated-run equality, structural operation
 bounds, and calibrated memory ceilings provide more stable regression evidence.
 See [Benchmarking and resilience](docs/benchmarking.md).
+
+M12 evaluation is intentionally separate from that development benchmark. Its
+[pre-registered protocol](docs/evaluation-protocol.md) freezes the candidate,
+holdout rules, ground-truth process, Prowler and Sigma baselines, metrics, and
+acceptance thresholds before corpus construction or execution. No independent
+accuracy result is claimed until the hashed holdout corpus and raw decisions
+are published.
 
 ## What I Learned
 
@@ -432,6 +441,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [Native AWS inputs](docs/native-aws-inputs.md)
 - [CloudTrail failure-window performance](docs/detection-performance.md)
 - [Benchmarking and resilience](docs/benchmarking.md)
+- [Independent evaluation protocol](docs/evaluation-protocol.md)
 - [Supply-chain controls](docs/supply-chain.md)
 - [Documentation quality gates](docs/documentation-quality.md)
 - [Engineering checks](docs/engineering.md)
@@ -491,6 +501,8 @@ cloud_security_misconfiguration_lab/
 ├── CHANGELOG.md
 ├── pyproject.toml
 ├── requirements-dev.lock
+├── evaluation/
+│   └── protocol-v1.0.json
 ├── tools/
 │   ├── check_markdown_links.py
 │   └── release_evidence.py
@@ -555,6 +567,10 @@ cloud_security_misconfiguration_lab/
 │   ├── aws-fixture-manifest-v1.0.schema.json
 │   ├── benchmark-manifest-v1.0.schema.json
 │   ├── benchmark-results-v1.0.schema.json
+│   ├── evaluation-baseline-overlap-v1.0.schema.json
+│   ├── evaluation-corpus-manifest-v1.0.schema.json
+│   ├── evaluation-protocol-v1.0.schema.json
+│   ├── evaluation-results-v1.0.schema.json
 │   ├── findings-v1.0.schema.json
 │   ├── findings-v2.0.schema.json
 │   ├── incidents-v1.0.schema.json

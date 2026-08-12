@@ -73,6 +73,10 @@ SCHEMA_SAMPLE_PAIRS = (
         "benchmark-manifest-v1.0.schema.json",
         "cloud_benchmarks/benchmark-manifest-v1.0.json",
     ),
+    (
+        "evaluation-protocol-v1.0.schema.json",
+        "evaluation/protocol-v1.0.json",
+    ),
 )
 
 

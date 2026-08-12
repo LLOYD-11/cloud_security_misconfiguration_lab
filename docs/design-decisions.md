@@ -275,6 +275,35 @@ build or a particular SLSA level.
 checksum file is familiar, but neither provides the same authority separation
 or independently verifiable builder identity.
 
+## DD-014: Pre-Register Holdout Evaluation Before Measurement
+
+**Status:** Accepted
+
+**Decision:** Freeze the analyzer revision, catalog digest, corpus construction
+rules, ground-truth labels, external baselines, metrics, thresholds, ablations,
+and change policy before authoring or executing the M12 corpus. Keep the corpus
+separate from development benchmarks and treat external scanner output as
+corroboration rather than ground truth.
+
+**Why:** A regression suite built alongside an analyzer can prove deterministic
+behavior but cannot estimate performance on unseen evidence. Choosing labels,
+overlap rules, or thresholds after observing candidate output would allow
+outcome-driven evaluation. Treating agreement between scanners as truth would
+also make baseline comparison circular.
+
+**Consequences:** The primary holdout candidate remains commit `6d71c99` even
+while evaluation infrastructure is added. Every case and applicable
+rule-resource decision is labelled and hashed before execution. Ambiguous and
+unsupported assertions are reported but excluded from primary metrics;
+undeclared predictions are false positives and completeness defects. The
+project claims procedural separation, not third-party certification. A fixed
+analyzer tested again on an exposed corpus produces regression evidence, not a
+new holdout result.
+
+**Alternative not chosen:** Reusing the 78-case development benchmark would be
+faster and likely produce excellent numbers, but those expectations are already
+known and therefore unsuitable as independent evidence.
+
 ## Revisit Triggers
 
 These decisions should be revisited if the project adds:

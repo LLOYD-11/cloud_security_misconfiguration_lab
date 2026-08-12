@@ -97,7 +97,7 @@ mkdir -p reports/generated
 
 Current evidence:
 
-- 391 tests
+- 401 tests
 - 95.61% statement coverage
 - 89.24% branch coverage
 - 78 exact functional benchmark cases

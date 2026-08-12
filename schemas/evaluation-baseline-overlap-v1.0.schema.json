@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/schemas/evaluation-baseline-overlap-v1.0.schema.json",
+  "title": "Independent Evaluation Baseline Overlap Matrix v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "matrix_id",
+    "matrix_version",
+    "created_on",
+    "protocol",
+    "corpus",
+    "rule_count",
+    "baseline_snapshots",
+    "comparison_policy",
+    "rows"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "matrix_id": { "const": "cloud-security-baseline-overlap" },
+    "matrix_version": { "type": "string", "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$" },
+    "created_on": { "type": "string", "format": "date" },
+    "protocol": { "$ref": "#/$defs/artifact" },
+    "corpus": { "$ref": "#/$defs/artifact" },
+    "rule_count": { "type": "integer", "minimum": 1 },
+    "baseline_snapshots": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "$ref": "#/$defs/baselineSnapshot" }
+    },
+    "comparison_policy": { "$ref": "#/$defs/nonEmptyText" },
+    "rows": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/overlapRow" }
+    }
+  },
+  "$defs": {
+    "nonEmptyText": { "type": "string", "minLength": 1 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "commitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "httpsUrl": { "type": "string", "format": "uri", "pattern": "^https://" },
+    "moduleId": { "enum": ["iam", "storage", "network", "cloudtrail"] },
+    "ruleId": { "type": "string", "pattern": "^(?:IAM|STO|NET|CLD)-[0-9]{3}$" },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "version", "sha256"],
+      "properties": {
+        "path": { "$ref": "#/$defs/nonEmptyText" },
+        "version": { "type": "string", "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "baselineSnapshot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "version", "commit_sha", "source_url"],
+      "properties": {
+        "id": { "enum": ["prowler-aws", "sigma-core"] },
+        "version": { "$ref": "#/$defs/nonEmptyText" },
+        "commit_sha": { "$ref": "#/$defs/commitSha" },
+        "source_url": { "$ref": "#/$defs/httpsUrl" },
+        "release_asset_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "overlapRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lab_rule_id",
+        "module",
+        "baseline_id",
+        "baseline_check_ids",
+        "relationship",
+        "predicate_direction",
+        "comparison_eligible",
+        "source_urls",
+        "rationale",
+        "semantic_differences"
+      ],
+      "properties": {
+        "lab_rule_id": { "$ref": "#/$defs/ruleId" },
+        "module": { "$ref": "#/$defs/moduleId" },
+        "baseline_id": { "enum": ["prowler-aws", "sigma-core"] },
+        "baseline_check_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyText" }
+        },
+        "relationship": { "enum": ["exact", "partial", "none"] },
+        "predicate_direction": {
+          "enum": ["equivalent", "lab-broader", "lab-narrower", "incomparable", "no-counterpart"]
+        },
+        "comparison_eligible": { "type": "boolean" },
+        "source_urls": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/httpsUrl" }
+        },
+        "rationale": { "$ref": "#/$defs/nonEmptyText" },
+        "semantic_differences": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "relationship": { "const": "exact" } }, "required": ["relationship"] },
+          "then": {
+            "properties": {
+              "baseline_check_ids": { "minItems": 1 },
+              "predicate_direction": { "const": "equivalent" },
+              "comparison_eligible": { "const": true },
+              "semantic_differences": { "maxItems": 0 }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "relationship": { "const": "partial" } }, "required": ["relationship"] },
+          "then": {
+            "properties": {
+              "baseline_check_ids": { "minItems": 1 },
+              "predicate_direction": { "enum": ["lab-broader", "lab-narrower", "incomparable"] },
+              "comparison_eligible": { "const": false },
+              "semantic_differences": { "minItems": 1 }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "relationship": { "const": "none" } }, "required": ["relationship"] },
+          "then": {
+            "properties": {
+              "baseline_check_ids": { "maxItems": 0 },
+              "predicate_direction": { "const": "no-counterpart" },
+              "comparison_eligible": { "const": false },
+              "semantic_differences": { "minItems": 1 }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

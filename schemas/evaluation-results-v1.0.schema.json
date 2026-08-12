@@ -1,0 +1,379 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/schemas/evaluation-results-v1.0.schema.json",
+  "title": "Independent Evaluation Results v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "evaluation_id",
+    "evaluated_at",
+    "protocol",
+    "corpus",
+    "overlap_matrix",
+    "candidate",
+    "environment",
+    "validity",
+    "counts",
+    "overall",
+    "per_module",
+    "per_rule",
+    "assertion_results",
+    "unexpected_predictions",
+    "baseline_comparisons",
+    "ablations",
+    "acceptance"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "evaluation_id": { "type": "string", "pattern": "^EVAL-RUN-[0-9]{4}-[0-9]{2}-[0-9]{2}-[A-Z0-9]+$" },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "(?:Z|\\+00:00)$"
+    },
+    "protocol": { "$ref": "#/$defs/artifact" },
+    "corpus": { "$ref": "#/$defs/artifact" },
+    "overlap_matrix": { "$ref": "#/$defs/artifact" },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["analyzer_revision", "package_version", "rule_catalog_sha256"],
+      "properties": {
+        "analyzer_revision": { "$ref": "#/$defs/commitSha" },
+        "package_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "rule_catalog_sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["python_version", "platform", "command", "clean_worktree"],
+      "properties": {
+        "python_version": { "type": "string", "pattern": "^3\\.(?:10|11|12|13)(?:\\.[0-9]+)?$" },
+        "platform": { "$ref": "#/$defs/nonEmptyText" },
+        "command": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/nonEmptyText" }
+        },
+        "clean_worktree": { "type": "boolean" }
+      }
+    },
+    "validity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["valid", "issues"],
+      "properties": {
+        "valid": { "type": "boolean" },
+        "issues": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/nonEmptyText" }
+        }
+      }
+    },
+    "counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_count",
+        "scored_assertion_count",
+        "excluded_assertion_count",
+        "unlabelled_prediction_count",
+        "duplicate_prediction_count",
+        "matched_positive_count",
+        "severity_match_count"
+      ],
+      "properties": {
+        "case_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "scored_assertion_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "excluded_assertion_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "unlabelled_prediction_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "duplicate_prediction_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "matched_positive_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "severity_match_count": { "$ref": "#/$defs/nonNegativeInteger" }
+      }
+    },
+    "overall": {
+      "allOf": [
+        { "$ref": "#/$defs/metricBlock" },
+        { "not": { "anyOf": [{ "required": ["module"] }, { "required": ["rule_id"] }] } }
+      ]
+    },
+    "per_module": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "allOf": [
+          { "$ref": "#/$defs/metricBlock" },
+          {
+            "type": "object",
+            "required": ["module"],
+            "properties": { "module": { "$ref": "#/$defs/moduleId" } },
+            "not": { "required": ["rule_id"] }
+          }
+        ]
+      }
+    },
+    "per_rule": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "allOf": [
+          { "$ref": "#/$defs/metricBlock" },
+          {
+            "type": "object",
+            "required": ["module", "rule_id"],
+            "properties": {
+              "module": { "$ref": "#/$defs/moduleId" },
+              "rule_id": { "$ref": "#/$defs/ruleId" }
+            }
+          }
+        ]
+      }
+    },
+    "assertion_results": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/assertionResult" }
+    },
+    "unexpected_predictions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/unexpectedPrediction" }
+    },
+    "baseline_comparisons": {
+      "type": "array",
+      "minItems": 2,
+      "items": { "$ref": "#/$defs/baselineComparison" }
+    },
+    "ablations": {
+      "type": "array",
+      "minItems": 3,
+      "items": { "$ref": "#/$defs/ablation" }
+    },
+    "acceptance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["passed", "checks"],
+      "properties": {
+        "passed": { "type": "boolean" },
+        "checks": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/acceptanceCheck" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyText": { "type": "string", "minLength": 1 },
+    "nonNegativeInteger": { "type": "integer", "minimum": 0 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "commitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "moduleId": { "enum": ["iam", "storage", "network", "cloudtrail"] },
+    "ruleId": { "type": "string", "pattern": "^(?:IAM|STO|NET|CLD)-[0-9]{3}$" },
+    "severity": { "enum": ["critical", "high", "medium", "low", "info"] },
+    "ratio": {
+      "oneOf": [
+        { "type": "number", "minimum": 0, "maximum": 1 },
+        { "type": "null" }
+      ]
+    },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "version", "sha256"],
+      "properties": {
+        "path": { "$ref": "#/$defs/nonEmptyText" },
+        "version": { "type": "string", "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "interval": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["lower", "upper"],
+          "properties": {
+            "lower": { "type": "number", "minimum": 0, "maximum": 1 },
+            "upper": { "type": "number", "minimum": 0, "maximum": 1 }
+          }
+        },
+        { "type": "null" }
+      ]
+    },
+    "metricBlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["confusion", "scores", "confidence_intervals"],
+      "properties": {
+        "module": { "$ref": "#/$defs/moduleId" },
+        "rule_id": { "$ref": "#/$defs/ruleId" },
+        "confusion": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["true_positive", "false_positive", "false_negative", "true_negative"],
+          "properties": {
+            "true_positive": { "$ref": "#/$defs/nonNegativeInteger" },
+            "false_positive": { "$ref": "#/$defs/nonNegativeInteger" },
+            "false_negative": { "$ref": "#/$defs/nonNegativeInteger" },
+            "true_negative": { "$ref": "#/$defs/nonNegativeInteger" }
+          }
+        },
+        "scores": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["precision", "recall", "f1", "specificity"],
+          "properties": {
+            "precision": { "$ref": "#/$defs/ratio" },
+            "recall": { "$ref": "#/$defs/ratio" },
+            "f1": { "$ref": "#/$defs/ratio" },
+            "specificity": { "$ref": "#/$defs/ratio" }
+          }
+        },
+        "confidence_intervals": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["precision", "recall", "specificity"],
+          "properties": {
+            "precision": { "$ref": "#/$defs/interval" },
+            "recall": { "$ref": "#/$defs/interval" },
+            "specificity": { "$ref": "#/$defs/interval" }
+          }
+        }
+      }
+    },
+    "assertionResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_id",
+        "assertion_id",
+        "module",
+        "rule_id",
+        "resource_type",
+        "resource_id",
+        "truth_label",
+        "prediction_count",
+        "duplicate_prediction_count",
+        "outcome",
+        "expected_severity",
+        "observed_severity",
+        "severity_match",
+        "message"
+      ],
+      "properties": {
+        "case_id": { "type": "string", "pattern": "^EVAL-(?:IAM|STO|NET|CLD)-[0-9]{3}$" },
+        "assertion_id": { "type": "string", "pattern": "^AST-(?:IAM|STO|NET|CLD)-[0-9]{3}-[0-9]{2}$" },
+        "module": { "$ref": "#/$defs/moduleId" },
+        "rule_id": { "$ref": "#/$defs/ruleId" },
+        "resource_type": { "$ref": "#/$defs/nonEmptyText" },
+        "resource_id": { "$ref": "#/$defs/nonEmptyText" },
+        "truth_label": { "enum": ["positive", "negative", "ambiguous", "unsupported"] },
+        "prediction_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "duplicate_prediction_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "outcome": { "enum": ["true-positive", "false-positive", "false-negative", "true-negative", "excluded"] },
+        "expected_severity": {
+          "oneOf": [
+            { "$ref": "#/$defs/severity" },
+            { "type": "null" }
+          ]
+        },
+        "observed_severity": {
+          "oneOf": [
+            { "$ref": "#/$defs/severity" },
+            { "type": "null" }
+          ]
+        },
+        "severity_match": {
+          "oneOf": [
+            { "type": "boolean" },
+            { "type": "null" }
+          ]
+        },
+        "message": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    },
+    "unexpectedPrediction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["case_id", "finding_id", "rule_id", "resource_type", "resource_id", "reason", "counted_as_false_positive"],
+      "properties": {
+        "case_id": { "type": "string", "pattern": "^EVAL-(?:IAM|STO|NET|CLD)-[0-9]{3}$" },
+        "finding_id": { "type": "string", "pattern": "^FND-[0-9A-F]{32}$" },
+        "rule_id": { "$ref": "#/$defs/ruleId" },
+        "resource_type": { "$ref": "#/$defs/nonEmptyText" },
+        "resource_id": { "$ref": "#/$defs/nonEmptyText" },
+        "reason": { "enum": ["undeclared-decision-key", "duplicate-decision-key"] },
+        "counted_as_false_positive": { "const": true }
+      }
+    },
+    "baselineComparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseline_id", "eligible_decisions", "agreements", "disagreements", "agreement_rate", "disagreement_records"],
+      "properties": {
+        "baseline_id": { "enum": ["prowler-aws", "sigma-core"] },
+        "eligible_decisions": { "$ref": "#/$defs/nonNegativeInteger" },
+        "agreements": { "$ref": "#/$defs/nonNegativeInteger" },
+        "disagreements": { "$ref": "#/$defs/nonNegativeInteger" },
+        "agreement_rate": { "$ref": "#/$defs/ratio" },
+        "disagreement_records": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["case_id", "lab_rule_id", "baseline_check_id", "lab_prediction", "baseline_prediction", "category", "explanation"],
+            "properties": {
+              "case_id": { "type": "string", "pattern": "^EVAL-(?:IAM|STO|NET|CLD)-[0-9]{3}$" },
+              "lab_rule_id": { "$ref": "#/$defs/ruleId" },
+              "baseline_check_id": { "$ref": "#/$defs/nonEmptyText" },
+              "lab_prediction": { "type": "boolean" },
+              "baseline_prediction": { "type": "boolean" },
+              "category": { "enum": ["predicate", "threshold", "evidence", "scope", "implementation"] },
+              "explanation": { "$ref": "#/$defs/nonEmptyText" }
+            }
+          }
+        }
+      }
+    },
+    "ablation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "eligible_cases",
+        "invariant_passed",
+        "primary_decision_agreement",
+        "changed_severity_count",
+        "changed_incident_count",
+        "unexpected_change_count",
+        "notes"
+      ],
+      "properties": {
+        "id": { "enum": ["native-simplified-equivalence", "network-reachability-context", "cloudtrail-incident-correlation"] },
+        "eligible_cases": { "$ref": "#/$defs/nonNegativeInteger" },
+        "invariant_passed": { "type": "boolean" },
+        "primary_decision_agreement": { "$ref": "#/$defs/ratio" },
+        "changed_severity_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "changed_incident_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "unexpected_change_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "notes": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    },
+    "acceptanceCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "observed", "operator", "threshold", "passed"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "observed": { "type": "number" },
+        "operator": { "enum": [">=", "<=", "=="] },
+        "threshold": { "type": "number" },
+        "passed": { "type": "boolean" }
+      }
+    }
+  }
+}

@@ -106,7 +106,8 @@ References:
 
 The release build job can read repository contents and request short-lived OIDC
 and attestation credentials. It cannot create or modify a GitHub Release.
-Checkout does not persist credentials in the working tree.
+Checkout fetches full history so the evaluation contract can verify the frozen
+candidate's ancestry, but it does not persist credentials in the working tree.
 
 The publisher job can write repository release contents, but it receives only
 the staged candidate, does not check out source, and does not execute project

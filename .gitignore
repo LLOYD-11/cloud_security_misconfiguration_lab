@@ -8,4 +8,5 @@ build/
 dist/
 htmlcov/
 reports/generated/
+evaluation/generated/
 .local/
