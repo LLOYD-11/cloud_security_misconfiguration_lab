@@ -25,6 +25,9 @@ All notable changes to this project are documented in this file.
   candidate, holdout rules, ground-truth process, Prowler and Sigma baselines,
   metrics, thresholds, ablations, provenance requirements, and future artifact
   schemas before evaluation evidence is created or executed.
+- A frozen 32-case, 42-file independent-evaluation corpus with 176 reviewed
+  assertions, authoritative citations, native/simplified pairs, exact hashes,
+  and a candidate-independent fail-closed verifier.
 
 ### Changed
 
@@ -41,6 +44,8 @@ All notable changes to this project are documented in this file.
   releases separate low-privilege build and signing from an isolated release
   writer, with checksum and signer-workflow verification on both sides of the
   artifact transfer.
+- CI, release, and distribution gates now verify the frozen corpus and require
+  all 42 evidence files plus its manifest in the built wheel.
 
 ## 2.1.1 - 2026-07-19
 

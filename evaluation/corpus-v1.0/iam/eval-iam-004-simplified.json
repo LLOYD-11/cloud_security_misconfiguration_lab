@@ -1,0 +1,97 @@
+{
+  "account_id": "246801357924",
+  "groups": [],
+  "roles": [
+    {
+      "attached_policies": [
+        {
+          "policy_name": "ScopedReadB",
+          "policy_source": "inline",
+          "statements": [
+            {
+              "action": "s3:GetObject",
+              "effect": "Allow",
+              "resource": "arn:aws:s3:::helios-readonly/report.txt"
+            }
+          ]
+        }
+      ],
+      "name": "role-readonly-b",
+      "permissions_boundary": {
+        "document_available": true,
+        "policy_arn": "arn:aws:iam::246801357924:policy/EvaluationScopedBoundaryB",
+        "policy_name": "EvaluationScopedBoundaryB",
+        "statements": [
+          {
+            "action": "s3:GetObject",
+            "effect": "Allow",
+            "resource": "arn:aws:s3:::helios-readonly/report.txt",
+            "sid": "BoundaryMaximum"
+          }
+        ]
+      },
+      "trust_policy": {
+        "statements": [
+          {
+            "action": "sts:AssumeRole",
+            "effect": "Allow",
+            "principal": {
+              "AWS": "arn:aws:iam::246801357924:role/release-deployer"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "root_account": {
+    "access_keys": [],
+    "mfa_enabled": true,
+    "password_age_days": 30,
+    "password_enabled": true,
+    "password_last_used_days": 5
+  },
+  "users": [
+    {
+      "access_keys": [],
+      "attached_policies": [
+        {
+          "policy_name": "SensitiveWithMfaB",
+          "policy_source": "inline",
+          "statements": [
+            {
+              "action": "iam:CreateAccessKey",
+              "condition": {
+                "Bool": {
+                  "aws:MultiFactorAuthPresent": "true"
+                }
+              },
+              "effect": "Allow",
+              "resource": "arn:aws:iam::246801357924:user/service-b"
+            }
+          ]
+        }
+      ],
+      "mfa_enabled": true,
+      "name": "user-sensitive-mfa-b",
+      "password_age_days": null,
+      "password_enabled": false,
+      "password_last_used_days": null
+    },
+    {
+      "access_keys": [
+        {
+          "age_days": 30,
+          "id": "key-current-b",
+          "last_used_days": 10,
+          "status": "Active"
+        }
+      ],
+      "attached_policies": [],
+      "mfa_enabled": true,
+      "name": "user-current-b",
+      "password_age_days": 30,
+      "password_enabled": true,
+      "password_last_used_days": 10
+    }
+  ]
+}

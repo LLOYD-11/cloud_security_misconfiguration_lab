@@ -1,0 +1,235 @@
+{
+  "account_id": "579246801357",
+  "events": [
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "FailedAuthentication",
+      "eventCategory": "Management",
+      "eventID": "00006001-0000-4000-8000-000000006001",
+      "eventName": "ConsoleLogin",
+      "eventSource": "signin.amazonaws.com",
+      "eventTime": "2026-08-10T04:00:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": null,
+      "responseElements": {
+        "ConsoleLogin": "Success"
+      },
+      "sourceIPAddress": "192.0.2.40",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:root",
+        "principalId": "EVAL6001",
+        "type": "Root"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "LimitExceeded",
+      "eventCategory": "Management",
+      "eventID": "00006002-0000-4000-8000-000000006002",
+      "eventName": "CreateAccessKey",
+      "eventSource": "iam.amazonaws.com",
+      "eventTime": "2026-08-10T04:01:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": {
+        "userName": "credential-error-edge"
+      },
+      "responseElements": null,
+      "sourceIPAddress": "192.0.2.40",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/credential-edge",
+        "principalId": "EVAL6002",
+        "type": "IAMUser",
+        "userName": "credential-edge"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "AccessDeniedException",
+      "eventCategory": "Management",
+      "eventID": "00006003-0000-4000-8000-000000006003",
+      "eventName": "StopLogging",
+      "eventSource": "cloudtrail.amazonaws.com",
+      "eventTime": "2026-08-10T04:02:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": {
+        "name": "trail-error-edge"
+      },
+      "responseElements": null,
+      "sourceIPAddress": "192.0.2.40",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/trail-edge",
+        "principalId": "EVAL6003",
+        "type": "IAMUser",
+        "userName": "trail-edge"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "AccessDenied",
+      "eventCategory": "Management",
+      "eventID": "00006011-0000-4000-8000-000000006011",
+      "eventName": "GetObject",
+      "eventSource": "s3.amazonaws.com",
+      "eventTime": "2026-08-10T04:10:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": null,
+      "responseElements": null,
+      "sourceIPAddress": "198.51.100.92",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/shared-name",
+        "principalId": "EVAL6011",
+        "type": "IAMUser",
+        "userName": "shared-name"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "AccessDenied",
+      "eventCategory": "Management",
+      "eventID": "00006012-0000-4000-8000-000000006012",
+      "eventName": "GetObject",
+      "eventSource": "s3.amazonaws.com",
+      "eventTime": "2026-08-10T04:12:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": null,
+      "responseElements": null,
+      "sourceIPAddress": "198.51.100.92",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/shared-name",
+        "principalId": "EVAL6012",
+        "type": "IAMUser",
+        "userName": "shared-name"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "AccessDenied",
+      "eventCategory": "Management",
+      "eventID": "00006013-0000-4000-8000-000000006013",
+      "eventName": "GetObject",
+      "eventSource": "s3.amazonaws.com",
+      "eventTime": "2026-08-10T04:14:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": null,
+      "responseElements": null,
+      "sourceIPAddress": "198.51.100.92",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/shared-name",
+        "principalId": "EVAL6013",
+        "type": "IAMUser",
+        "userName": "shared-name"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "AccessDenied",
+      "eventCategory": "Management",
+      "eventID": "00006021-0000-4000-8000-000000006021",
+      "eventName": "GetObject",
+      "eventSource": "s3.amazonaws.com",
+      "eventTime": "2026-08-10T04:10:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "680135792468",
+      "requestParameters": null,
+      "responseElements": null,
+      "sourceIPAddress": "198.51.100.92",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "680135792468",
+        "arn": "arn:aws:iam::680135792468:user/shared-name",
+        "principalId": "EVAL6021",
+        "type": "IAMUser",
+        "userName": "shared-name"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "AccessDenied",
+      "eventCategory": "Management",
+      "eventID": "00006022-0000-4000-8000-000000006022",
+      "eventName": "GetObject",
+      "eventSource": "s3.amazonaws.com",
+      "eventTime": "2026-08-10T04:12:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "680135792468",
+      "requestParameters": null,
+      "responseElements": null,
+      "sourceIPAddress": "198.51.100.92",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "680135792468",
+        "arn": "arn:aws:iam::680135792468:user/shared-name",
+        "principalId": "EVAL6022",
+        "type": "IAMUser",
+        "userName": "shared-name"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "AccessDenied",
+      "eventCategory": "Management",
+      "eventID": "00006023-0000-4000-8000-000000006023",
+      "eventName": "GetObject",
+      "eventSource": "s3.amazonaws.com",
+      "eventTime": "2026-08-10T04:14:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "680135792468",
+      "requestParameters": null,
+      "responseElements": null,
+      "sourceIPAddress": "198.51.100.92",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "680135792468",
+        "arn": "arn:aws:iam::680135792468:user/shared-name",
+        "principalId": "EVAL6023",
+        "type": "IAMUser",
+        "userName": "shared-name"
+      }
+    }
+  ]
+}

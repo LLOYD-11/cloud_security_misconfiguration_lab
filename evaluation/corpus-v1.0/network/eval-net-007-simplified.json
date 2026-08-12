@@ -1,0 +1,23 @@
+{
+  "account_id": "468013579246",
+  "region": "ap-southeast-2",
+  "security_groups": [
+    {
+      "description": "Synthetic evaluation security group",
+      "id": "sg-2b88ce08",
+      "inbound_rules": [
+        {
+          "from_port": 22,
+          "peer_id": "sg-3c99ce09",
+          "peer_type": "security_group",
+          "protocol": "tcp",
+          "to_port": 22
+        }
+      ],
+      "name": "evaluation-sg-2b88ce08",
+      "outbound_rules": [],
+      "owner_id": "468013579246",
+      "vpc_id": "vpc-0a11ce01"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "account_id": "246801357924",
+  "groups": [],
+  "roles": [],
+  "users": [
+    {
+      "access_keys": [],
+      "attached_policies": [
+        {
+          "policy_name": "DynamicMfaValue",
+          "policy_source": "inline",
+          "statements": [
+            {
+              "action": "kms:DisableKey",
+              "condition": {
+                "Bool": {
+                  "aws:MultiFactorAuthPresent": "${aws:PrincipalTag/require-mfa}"
+                }
+              },
+              "effect": "Allow",
+              "resource": "arn:aws:kms:ap-southeast-2:246801357924:key/dynamic-key"
+            }
+          ]
+        }
+      ],
+      "mfa_enabled": true,
+      "name": "user-dynamic-mfa",
+      "password_age_days": null,
+      "password_enabled": false,
+      "password_last_used_days": null
+    }
+  ]
+}

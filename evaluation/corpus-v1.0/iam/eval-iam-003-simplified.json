@@ -1,0 +1,47 @@
+{
+  "account_id": "246801357924",
+  "groups": [],
+  "roles": [
+    {
+      "attached_policies": [
+        {
+          "policy_name": "ScopedReadA",
+          "policy_source": "inline",
+          "statements": [
+            {
+              "action": "s3:GetObject",
+              "effect": "Allow",
+              "resource": "arn:aws:s3:::quartz-readonly/report.txt"
+            }
+          ]
+        }
+      ],
+      "name": "role-readonly-a",
+      "permissions_boundary": {
+        "document_available": true,
+        "policy_arn": "arn:aws:iam::246801357924:policy/EvaluationScopedBoundaryA",
+        "policy_name": "EvaluationScopedBoundaryA",
+        "statements": [
+          {
+            "action": "s3:GetObject",
+            "effect": "Allow",
+            "resource": "arn:aws:s3:::quartz-readonly/report.txt",
+            "sid": "BoundaryMaximum"
+          }
+        ]
+      },
+      "trust_policy": {
+        "statements": [
+          {
+            "action": "sts:AssumeRole",
+            "effect": "Allow",
+            "principal": {
+              "AWS": "arn:aws:iam::246801357924:role/platform-deployer"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "users": []
+}

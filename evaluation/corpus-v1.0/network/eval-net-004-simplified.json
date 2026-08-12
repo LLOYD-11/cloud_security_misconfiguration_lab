@@ -1,0 +1,29 @@
+{
+  "account_id": "468013579246",
+  "region": "ap-southeast-2",
+  "security_groups": [
+    {
+      "description": "Synthetic evaluation security group",
+      "id": "sg-0e55ce05",
+      "inbound_rules": [
+        {
+          "cidr": "0.0.0.0/0",
+          "from_port": 443,
+          "protocol": "tcp",
+          "to_port": 443
+        }
+      ],
+      "name": "evaluation-sg-0e55ce05",
+      "outbound_rules": [
+        {
+          "cidr": "10.30.0.0/16",
+          "from_port": 443,
+          "protocol": "tcp",
+          "to_port": 443
+        }
+      ],
+      "owner_id": "468013579246",
+      "vpc_id": "vpc-0a11ce01"
+    }
+  ]
+}

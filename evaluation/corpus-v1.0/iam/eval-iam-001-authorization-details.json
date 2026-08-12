@@ -1,0 +1,238 @@
+{
+  "GroupDetailList": [],
+  "IsTruncated": false,
+  "Policies": [
+    {
+      "Arn": "arn:aws:iam::246801357924:policy/EvaluationOpenBoundaryA",
+      "DefaultVersionId": "v1",
+      "PolicyName": "EvaluationOpenBoundaryA",
+      "PolicyVersionList": [
+        {
+          "Document": {
+            "Statement": [
+              {
+                "Action": "*",
+                "Effect": "Allow",
+                "Resource": "*",
+                "Sid": "BoundaryMaximum"
+              }
+            ],
+            "Version": "2012-10-17"
+          },
+          "IsDefaultVersion": true,
+          "VersionId": "v1"
+        }
+      ]
+    }
+  ],
+  "RoleDetailList": [
+    {
+      "Arn": "arn:aws:iam::246801357924:role/role-admin-a",
+      "AssumeRolePolicyDocument": {
+        "Statement": [
+          {
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "Sid": "ServiceTrust"
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "AttachedManagedPolicies": [],
+      "RoleName": "role-admin-a",
+      "RolePolicyList": [
+        {
+          "PolicyDocument": {
+            "Statement": [
+              {
+                "Action": "*",
+                "Effect": "Allow",
+                "Resource": "*"
+              }
+            ],
+            "Version": "2012-10-17"
+          },
+          "PolicyName": "AdminPatternA"
+        }
+      ]
+    },
+    {
+      "Arn": "arn:aws:iam::246801357924:role/role-partial-wildcard-a",
+      "AssumeRolePolicyDocument": {
+        "Statement": [
+          {
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "Sid": "ServiceTrust"
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "AttachedManagedPolicies": [],
+      "RoleName": "role-partial-wildcard-a",
+      "RolePolicyList": [
+        {
+          "PolicyDocument": {
+            "Statement": [
+              {
+                "Action": "s3:GetObject*",
+                "Effect": "Allow",
+                "Resource": "arn:aws:s3:::quartz-records/private/item-a"
+              }
+            ],
+            "Version": "2012-10-17"
+          },
+          "PolicyName": "ObjectReadPatternA"
+        }
+      ]
+    },
+    {
+      "Arn": "arn:aws:iam::246801357924:role/role-broad-write-a",
+      "AssumeRolePolicyDocument": {
+        "Statement": [
+          {
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "Sid": "ServiceTrust"
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "AttachedManagedPolicies": [],
+      "RoleName": "role-broad-write-a",
+      "RolePolicyList": [
+        {
+          "PolicyDocument": {
+            "Statement": [
+              {
+                "Action": "s3:DeleteObject",
+                "Effect": "Allow",
+                "Resource": "arn:aws:s3:::quartz-archive-*/*"
+              }
+            ],
+            "Version": "2012-10-17"
+          },
+          "PolicyName": "ArchiveWriteA"
+        }
+      ]
+    },
+    {
+      "Arn": "arn:aws:iam::246801357924:role/role-vendor-a",
+      "AssumeRolePolicyDocument": {
+        "Statement": [
+          {
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow",
+            "Principal": {
+              "AWS": "arn:aws:iam::975310864209:root"
+            },
+            "Sid": "VendorTrustA"
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "AttachedManagedPolicies": [],
+      "RoleName": "role-vendor-a",
+      "RolePolicyList": []
+    },
+    {
+      "Arn": "arn:aws:iam::246801357924:role/role-complement-a",
+      "AssumeRolePolicyDocument": {
+        "Statement": [
+          {
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "Sid": "ServiceTrust"
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "AttachedManagedPolicies": [],
+      "RoleName": "role-complement-a",
+      "RolePolicyList": [
+        {
+          "PolicyDocument": {
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "NotAction": "s3:DeleteObject",
+                "Resource": "arn:aws:s3:::quartz-logs"
+              }
+            ],
+            "Version": "2012-10-17"
+          },
+          "PolicyName": "ComplementA"
+        }
+      ]
+    },
+    {
+      "Arn": "arn:aws:iam::246801357924:role/role-exclusion-a",
+      "AssumeRolePolicyDocument": {
+        "Statement": [
+          {
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "Sid": "ServiceTrust"
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "AttachedManagedPolicies": [],
+      "RoleName": "role-exclusion-a",
+      "RolePolicyList": [
+        {
+          "PolicyDocument": {
+            "Statement": [
+              {
+                "Action": "s3:GetObject",
+                "Effect": "Allow",
+                "NotResource": "arn:aws:s3:::quartz-private/do-not-read.txt"
+              }
+            ],
+            "Version": "2012-10-17"
+          },
+          "PolicyName": "ExclusionA"
+        }
+      ]
+    },
+    {
+      "Arn": "arn:aws:iam::246801357924:role/role-boundary-a",
+      "AssumeRolePolicyDocument": {
+        "Statement": [
+          {
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "Sid": "ServiceTrust"
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "AttachedManagedPolicies": [],
+      "PermissionsBoundary": {
+        "PermissionsBoundaryArn": "arn:aws:iam::246801357924:policy/EvaluationOpenBoundaryA",
+        "PermissionsBoundaryType": "PermissionsBoundaryPolicy"
+      },
+      "RoleName": "role-boundary-a",
+      "RolePolicyList": []
+    }
+  ],
+  "UserDetailList": []
+}

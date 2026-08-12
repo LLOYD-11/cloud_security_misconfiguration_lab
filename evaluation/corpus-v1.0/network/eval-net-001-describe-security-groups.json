@@ -1,0 +1,61 @@
+{
+  "NextToken": null,
+  "SecurityGroups": [
+    {
+      "Description": "Synthetic evaluation security group",
+      "GroupId": "sg-0a11ce01",
+      "GroupName": "evaluation-sg-0a11ce01",
+      "IpPermissions": [
+        {
+          "FromPort": 22,
+          "IpProtocol": "tcp",
+          "IpRanges": [
+            {
+              "CidrIp": "0.0.0.0/0",
+              "Description": "Synthetic evaluation range"
+            }
+          ],
+          "Ipv6Ranges": [],
+          "PrefixListIds": [],
+          "ToPort": 22,
+          "UserIdGroupPairs": []
+        },
+        {
+          "IpProtocol": "-1",
+          "IpRanges": [],
+          "Ipv6Ranges": [
+            {
+              "CidrIpv6": "::/0",
+              "Description": "Synthetic evaluation range"
+            }
+          ],
+          "PrefixListIds": [],
+          "UserIdGroupPairs": []
+        }
+      ],
+      "IpPermissionsEgress": [
+        {
+          "IpProtocol": "-1",
+          "IpRanges": [
+            {
+              "CidrIp": "0.0.0.0/0",
+              "Description": "Synthetic evaluation range"
+            }
+          ],
+          "Ipv6Ranges": [],
+          "PrefixListIds": [],
+          "UserIdGroupPairs": []
+        }
+      ],
+      "OwnerId": "468013579246",
+      "SecurityGroupArn": "arn:aws:ec2:ap-southeast-2:468013579246:security-group/sg-0a11ce01",
+      "Tags": [
+        {
+          "Key": "Purpose",
+          "Value": "evaluation"
+        }
+      ],
+      "VpcId": "vpc-0a11ce01"
+    }
+  ]
+}

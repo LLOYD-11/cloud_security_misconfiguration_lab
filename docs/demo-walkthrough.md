@@ -93,21 +93,24 @@ mkdir -p reports/generated
 .venv/bin/python -m cloud_benchmarks.coverage_gate \
   reports/generated/coverage.json
 .venv/bin/python -m cloud_benchmarks.runner
+.venv/bin/python -m tools.evaluation_corpus
 ```
 
 Current evidence:
 
-- 401 tests
-- 95.61% statement coverage
-- 89.24% branch coverage
+- 415 tests
+- 94.75% statement coverage
+- 88.04% branch coverage
 - 78 exact functional benchmark cases
 - 4 exact fail-closed malformed-input cases
 - 8 deterministic scale cases up to 10,000 inputs
+- 32 frozen output-blind evaluation cases with 176 predeclared assertions
 - Python 3.10, 3.11, 3.12, and 3.13 GitHub Actions coverage
 
 Finish with [Benchmarking and resilience](benchmarking.md) and the
-[upgrade traceability matrix](traceability.md), which map the upgrade
-requirements to implementation and verification artifacts.
+[independent evaluation corpus](evaluation-corpus.md), then use the
+[upgrade traceability matrix](traceability.md) to map requirements to
+implementation and verification artifacts.
 
 ## 4:45 - Close with the Boundary
 

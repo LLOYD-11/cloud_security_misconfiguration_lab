@@ -1,0 +1,78 @@
+{
+  "AccountPublicAccessBlock": {
+    "PublicAccessBlockConfiguration": {
+      "BlockPublicAcls": false,
+      "BlockPublicPolicy": false,
+      "IgnorePublicAcls": false,
+      "RestrictPublicBuckets": false
+    }
+  },
+  "BucketEvidence": [
+    {
+      "BucketName": "fjord-audit-a",
+      "GetBucketAcl": {
+        "Grants": [
+          {
+            "Grantee": {
+              "ID": "canonical-owner-fjord-a",
+              "Type": "CanonicalUser"
+            },
+            "Permission": "FULL_CONTROL"
+          }
+        ],
+        "Owner": {
+          "ID": "canonical-owner-fjord-audit-a"
+        }
+      },
+      "GetBucketEncryption": {
+        "ServerSideEncryptionConfiguration": {
+          "Rules": [
+            {
+              "ApplyServerSideEncryptionByDefault": {
+                "KMSMasterKeyID": "alias/evaluation-storage-key",
+                "SSEAlgorithm": "aws:kms"
+              }
+            }
+          ]
+        }
+      },
+      "GetBucketOwnershipControls": {
+        "OwnershipControls": {
+          "Rules": [
+            {
+              "ObjectOwnership": "BucketOwnerEnforced"
+            }
+          ]
+        }
+      },
+      "GetBucketPolicy": {
+        "Error": {
+          "Code": "NoSuchBucketPolicy"
+        }
+      },
+      "GetBucketVersioning": {
+        "Status": "Enabled"
+      },
+      "GetPublicAccessBlock": {
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "BlockPublicPolicy": true,
+          "IgnorePublicAcls": true,
+          "RestrictPublicBuckets": true
+        }
+      }
+    }
+  ],
+  "ListBuckets": {
+    "Buckets": [
+      {
+        "BucketArn": "arn:aws:s3:::fjord-audit-a",
+        "BucketRegion": "ap-southeast-2",
+        "CreationDate": "2026-08-01T00:00:00Z",
+        "Name": "fjord-audit-a"
+      }
+    ]
+  },
+  "account_id": "357924680135",
+  "schema_version": "1.0"
+}

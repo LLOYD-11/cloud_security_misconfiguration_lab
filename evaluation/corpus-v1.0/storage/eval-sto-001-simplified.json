@@ -1,0 +1,43 @@
+{
+  "account_id": "357924680135",
+  "buckets": [
+    {
+      "acl": {
+        "grants": [
+          {
+            "grantee": "AllUsers",
+            "permission": "READ"
+          }
+        ]
+      },
+      "bucket_policy": {
+        "statements": [
+          {
+            "action": "s3:GetObject",
+            "effect": "Allow",
+            "principal": "*",
+            "resource": "arn:aws:s3:::cobalt-export-a/*",
+            "sid": "PublicRead"
+          }
+        ]
+      },
+      "encryption": {
+        "algorithm": "aws:kms",
+        "enabled": true,
+        "key_id": "alias/evaluation-storage-key"
+      },
+      "name": "cobalt-export-a",
+      "object_ownership": "BucketOwnerPreferred",
+      "public_access_block": {
+        "block_public_acls": false,
+        "block_public_policy": false,
+        "ignore_public_acls": false,
+        "restrict_public_buckets": false
+      },
+      "region": "ap-southeast-2",
+      "versioning": {
+        "status": "Suspended"
+      }
+    }
+  ]
+}

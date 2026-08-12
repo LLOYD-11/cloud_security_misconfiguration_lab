@@ -1,0 +1,34 @@
+{
+  "account_id": "357924680135",
+  "buckets": [
+    {
+      "acl": {
+        "grants": [
+          {
+            "grantee": "AllUsers",
+            "permission": "READ"
+          }
+        ]
+      },
+      "bucket_policy": {
+        "statements": []
+      },
+      "encryption": {
+        "algorithm": "aws:kms",
+        "enabled": true,
+        "key_id": "alias/evaluation-storage-key"
+      },
+      "name": "juno-ownership-unknown",
+      "public_access_block": {
+        "block_public_acls": true,
+        "block_public_policy": true,
+        "ignore_public_acls": false,
+        "restrict_public_buckets": true
+      },
+      "region": "ap-southeast-2",
+      "versioning": {
+        "status": "Enabled"
+      }
+    }
+  ]
+}

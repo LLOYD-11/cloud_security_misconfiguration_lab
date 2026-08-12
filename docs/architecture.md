@@ -141,9 +141,10 @@ source accounting, UTC ordering, and work-item linkage. Draft 2020-12 schema
 validation remains a development and CI gate.
 
 Evaluation is a repository-level assurance boundary rather than analyzer
-runtime logic. Its frozen protocol and future corpus are kept separate from the
-development benchmark so candidate output cannot generate its own ground
-truth. See [Independent evaluation protocol](evaluation-protocol.md).
+runtime logic. Its frozen protocol and [holdout corpus](evaluation-corpus.md)
+are kept separate from the development benchmark so candidate output cannot
+generate its own ground truth. See the
+[independent evaluation protocol](evaluation-protocol.md).
 
 See [Data contracts](data-contracts.md) for the complete contract index.
 

@@ -1,0 +1,47 @@
+{
+  "account_id": "357924680135",
+  "buckets": [
+    {
+      "acl": {
+        "grants": [
+          {
+            "grantee": "AllUsers",
+            "permission": "READ"
+          }
+        ]
+      },
+      "bucket_policy": {
+        "statements": [
+          {
+            "action": "s3:GetObject",
+            "condition": {
+              "StringEquals": {
+                "aws:SourceVpc": "vpc-0a11ce01"
+              }
+            },
+            "effect": "Allow",
+            "principal": "*",
+            "resource": "arn:aws:s3:::indigo-policy-edge/*"
+          }
+        ]
+      },
+      "encryption": {
+        "algorithm": "aws:kms",
+        "enabled": true,
+        "key_id": "alias/evaluation-storage-key"
+      },
+      "name": "indigo-policy-edge",
+      "object_ownership": "ObjectWriter",
+      "public_access_block": {
+        "block_public_acls": true,
+        "block_public_policy": false,
+        "ignore_public_acls": true,
+        "restrict_public_buckets": false
+      },
+      "region": "ap-southeast-2",
+      "versioning": {
+        "status": "Suspended"
+      }
+    }
+  ]
+}

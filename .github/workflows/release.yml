@@ -69,6 +69,9 @@ jobs:
       - name: Verify external Markdown links
         run: python -m tools.check_markdown_links external
 
+      - name: Verify frozen evaluation corpus
+        run: python -m tools.evaluation_corpus
+
       - name: Test with branch coverage
         run: >-
           mkdir -p reports/generated &&
@@ -94,6 +97,16 @@ jobs:
 
       - name: Build wheel and source distribution
         run: python -m build --no-isolation
+
+      - name: Verify wheel contains frozen evaluation corpus
+        run: >-
+          python -c "import glob, zipfile;
+          wheel = glob.glob('dist/*.whl')[0];
+          names = zipfile.ZipFile(wheel).namelist();
+          assert any(name.endswith(
+          '/evaluation/corpus-manifest-v1.0.json') for name in names);
+          assert len([name for name in names
+          if '/evaluation/corpus-v1.0/' in name]) == 42"
 
       - name: Verify installed wheel
         run: >-

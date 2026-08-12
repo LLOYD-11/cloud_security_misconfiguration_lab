@@ -71,6 +71,18 @@ cloud_rules = ["rules-v1.0.json"]
 [tool.setuptools.data-files]
 "share/cloud-security-misconfiguration-lab/schemas" = ["schemas/*.json"]
 "share/cloud-security-misconfiguration-lab/evaluation" = ["evaluation/*.json"]
+"share/cloud-security-misconfiguration-lab/evaluation/corpus-v1.0/iam" = [
+  "evaluation/corpus-v1.0/iam/*",
+]
+"share/cloud-security-misconfiguration-lab/evaluation/corpus-v1.0/storage" = [
+  "evaluation/corpus-v1.0/storage/*",
+]
+"share/cloud-security-misconfiguration-lab/evaluation/corpus-v1.0/network" = [
+  "evaluation/corpus-v1.0/network/*",
+]
+"share/cloud-security-misconfiguration-lab/evaluation/corpus-v1.0/cloudtrail" = [
+  "evaluation/corpus-v1.0/cloudtrail/*",
+]
 "share/cloud-security-misconfiguration-lab/sample_data/iam" = ["sample_data/iam/*.json"]
 "share/cloud-security-misconfiguration-lab/sample_data/aws" = [
   "sample_data/aws/*.json",

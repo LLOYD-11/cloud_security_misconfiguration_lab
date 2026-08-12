@@ -1,0 +1,44 @@
+{
+  "account_id": "357924680135",
+  "buckets": [
+    {
+      "acl": {
+        "grants": [
+          {
+            "grantee": "canonical-owner-glacier-b",
+            "permission": "FULL_CONTROL"
+          }
+        ]
+      },
+      "bucket_policy": {
+        "statements": [
+          {
+            "action": "s3:GetObject",
+            "effect": "Allow",
+            "principal": {
+              "AWS": "arn:aws:iam::357924680135:role/ledger-reader"
+            },
+            "resource": "arn:aws:s3:::glacier-ledger-b/*"
+          }
+        ]
+      },
+      "encryption": {
+        "algorithm": "aws:kms",
+        "enabled": true,
+        "key_id": "alias/evaluation-storage-key"
+      },
+      "name": "glacier-ledger-b",
+      "object_ownership": "BucketOwnerEnforced",
+      "public_access_block": {
+        "block_public_acls": true,
+        "block_public_policy": true,
+        "ignore_public_acls": true,
+        "restrict_public_buckets": true
+      },
+      "region": "ap-southeast-2",
+      "versioning": {
+        "status": "Enabled"
+      }
+    }
+  ]
+}

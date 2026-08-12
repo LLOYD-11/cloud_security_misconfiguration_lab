@@ -1,0 +1,67 @@
+{
+  "GroupDetailList": [],
+  "IsTruncated": false,
+  "Policies": [
+    {
+      "Arn": "arn:aws:iam::246801357924:policy/EvaluationScopedBoundaryA",
+      "DefaultVersionId": "v1",
+      "PolicyName": "EvaluationScopedBoundaryA",
+      "PolicyVersionList": [
+        {
+          "Document": {
+            "Statement": [
+              {
+                "Action": "s3:GetObject",
+                "Effect": "Allow",
+                "Resource": "arn:aws:s3:::quartz-readonly/report.txt",
+                "Sid": "BoundaryMaximum"
+              }
+            ],
+            "Version": "2012-10-17"
+          },
+          "IsDefaultVersion": true,
+          "VersionId": "v1"
+        }
+      ]
+    }
+  ],
+  "RoleDetailList": [
+    {
+      "Arn": "arn:aws:iam::246801357924:role/role-readonly-a",
+      "AssumeRolePolicyDocument": {
+        "Statement": [
+          {
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow",
+            "Principal": {
+              "AWS": "arn:aws:iam::246801357924:role/platform-deployer"
+            }
+          }
+        ],
+        "Version": "2012-10-17"
+      },
+      "AttachedManagedPolicies": [],
+      "PermissionsBoundary": {
+        "PermissionsBoundaryArn": "arn:aws:iam::246801357924:policy/EvaluationScopedBoundaryA",
+        "PermissionsBoundaryType": "PermissionsBoundaryPolicy"
+      },
+      "RoleName": "role-readonly-a",
+      "RolePolicyList": [
+        {
+          "PolicyDocument": {
+            "Statement": [
+              {
+                "Action": "s3:GetObject",
+                "Effect": "Allow",
+                "Resource": "arn:aws:s3:::quartz-readonly/report.txt"
+              }
+            ],
+            "Version": "2012-10-17"
+          },
+          "PolicyName": "ScopedReadA"
+        }
+      ]
+    }
+  ],
+  "UserDetailList": []
+}

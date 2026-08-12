@@ -1,0 +1,87 @@
+{
+  "AccountPublicAccessBlock": {
+    "PublicAccessBlockConfiguration": {
+      "BlockPublicAcls": false,
+      "BlockPublicPolicy": false,
+      "IgnorePublicAcls": false,
+      "RestrictPublicBuckets": false
+    }
+  },
+  "BucketEvidence": [
+    {
+      "BucketName": "cobalt-export-a",
+      "GetBucketAcl": {
+        "Grants": [
+          {
+            "Grantee": {
+              "Type": "Group",
+              "URI": "http://acs.amazonaws.com/groups/global/AllUsers"
+            },
+            "Permission": "READ"
+          }
+        ],
+        "Owner": {
+          "ID": "canonical-owner-cobalt-export-a"
+        }
+      },
+      "GetBucketEncryption": {
+        "ServerSideEncryptionConfiguration": {
+          "Rules": [
+            {
+              "ApplyServerSideEncryptionByDefault": {
+                "KMSMasterKeyID": "alias/evaluation-storage-key",
+                "SSEAlgorithm": "aws:kms"
+              }
+            }
+          ]
+        }
+      },
+      "GetBucketOwnershipControls": {
+        "OwnershipControls": {
+          "Rules": [
+            {
+              "ObjectOwnership": "BucketOwnerPreferred"
+            }
+          ]
+        }
+      },
+      "GetBucketPolicy": {
+        "Policy": {
+          "Statement": [
+            {
+              "Action": "s3:GetObject",
+              "Effect": "Allow",
+              "Principal": "*",
+              "Resource": "arn:aws:s3:::cobalt-export-a/*",
+              "Sid": "PublicRead"
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "GetBucketVersioning": {
+        "Status": "Suspended"
+      },
+      "GetPublicAccessBlock": {
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": false,
+          "BlockPublicPolicy": false,
+          "IgnorePublicAcls": false,
+          "RestrictPublicBuckets": false
+        }
+      }
+    }
+  ],
+  "ListBuckets": {
+    "Buckets": [
+      {
+        "BucketArn": "arn:aws:s3:::cobalt-export-a",
+        "BucketRegion": "ap-southeast-2",
+        "CreationDate": "2026-08-01T00:00:00Z",
+        "Name": "cobalt-export-a"
+      }
+    ]
+  },
+  "account_id": "357924680135",
+  "schema_version": "1.0"
+}

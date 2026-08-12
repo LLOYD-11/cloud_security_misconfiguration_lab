@@ -1,0 +1,130 @@
+{
+  "account_id": "579246801357",
+  "events": [
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "NoSuchEntity",
+      "eventCategory": "Management",
+      "eventID": "00007101-0000-4000-8000-000000007101",
+      "eventName": "GetUser",
+      "eventSource": "iam.amazonaws.com",
+      "eventTime": "2026-08-10T04:00:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": null,
+      "responseElements": null,
+      "sourceIPAddress": "203.0.113.95",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/HIDDEN_DUE_TO_SECURITY_REASONS",
+        "principalId": "EVAL7101",
+        "type": "IAMUser",
+        "userName": "HIDDEN_DUE_TO_SECURITY_REASONS"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "NoSuchEntity",
+      "eventCategory": "Management",
+      "eventID": "00007102-0000-4000-8000-000000007102",
+      "eventName": "GetUser",
+      "eventSource": "iam.amazonaws.com",
+      "eventTime": "2026-08-10T04:01:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": null,
+      "responseElements": null,
+      "sourceIPAddress": "203.0.113.95",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/HIDDEN_DUE_TO_SECURITY_REASONS",
+        "principalId": "EVAL7102",
+        "type": "IAMUser",
+        "userName": "HIDDEN_DUE_TO_SECURITY_REASONS"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "NoSuchEntity",
+      "eventCategory": "Management",
+      "eventID": "00007103-0000-4000-8000-000000007103",
+      "eventName": "GetUser",
+      "eventSource": "iam.amazonaws.com",
+      "eventTime": "2026-08-10T04:02:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": null,
+      "responseElements": null,
+      "sourceIPAddress": "203.0.113.95",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/HIDDEN_DUE_TO_SECURITY_REASONS",
+        "principalId": "EVAL7103",
+        "type": "IAMUser",
+        "userName": "HIDDEN_DUE_TO_SECURITY_REASONS"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "NoSuchEntity",
+      "eventCategory": "Management",
+      "eventID": "00007104-0000-4000-8000-000000007104",
+      "eventName": "GetUser",
+      "eventSource": "iam.amazonaws.com",
+      "eventTime": "2026-08-10T04:03:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": null,
+      "responseElements": null,
+      "sourceIPAddress": "203.0.113.95",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/HIDDEN_DUE_TO_SECURITY_REASONS",
+        "principalId": "EVAL7104",
+        "type": "IAMUser",
+        "userName": "HIDDEN_DUE_TO_SECURITY_REASONS"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "NoSuchEntity",
+      "eventCategory": "Management",
+      "eventID": "00007105-0000-4000-8000-000000007105",
+      "eventName": "GetUser",
+      "eventSource": "iam.amazonaws.com",
+      "eventTime": "2026-08-10T04:04:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": null,
+      "responseElements": null,
+      "sourceIPAddress": "203.0.113.95",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/HIDDEN_DUE_TO_SECURITY_REASONS",
+        "principalId": "EVAL7105",
+        "type": "IAMUser",
+        "userName": "HIDDEN_DUE_TO_SECURITY_REASONS"
+      }
+    }
+  ]
+}

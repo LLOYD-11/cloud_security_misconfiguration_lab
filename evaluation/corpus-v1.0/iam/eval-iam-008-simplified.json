@@ -1,0 +1,27 @@
+{
+  "account_id": "246801357924",
+  "groups": [],
+  "roles": [
+    {
+      "attached_policies": [],
+      "name": "role-dynamic-external-id",
+      "trust_policy": {
+        "statements": [
+          {
+            "action": "sts:AssumeRole",
+            "condition": {
+              "StringEquals": {
+                "sts:ExternalId": "${aws:PrincipalTag/vendor-id}"
+              }
+            },
+            "effect": "Allow",
+            "principal": {
+              "AWS": "arn:aws:iam::975310864209:root"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "users": []
+}

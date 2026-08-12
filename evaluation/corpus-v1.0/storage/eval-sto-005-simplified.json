@@ -1,0 +1,33 @@
+{
+  "account_id": "357924680135",
+  "buckets": [
+    {
+      "acl": {
+        "grants": [
+          {
+            "grantee": "canonical-owner-harbor",
+            "permission": "FULL_CONTROL"
+          }
+        ]
+      },
+      "bucket_policy": {
+        "statements": []
+      },
+      "encryption": {
+        "enabled": false
+      },
+      "name": "harbor-encryption-edge",
+      "object_ownership": "BucketOwnerEnforced",
+      "public_access_block": {
+        "block_public_acls": true,
+        "block_public_policy": true,
+        "ignore_public_acls": true,
+        "restrict_public_buckets": true
+      },
+      "region": "ap-southeast-2",
+      "versioning": {
+        "status": "Enabled"
+      }
+    }
+  ]
+}

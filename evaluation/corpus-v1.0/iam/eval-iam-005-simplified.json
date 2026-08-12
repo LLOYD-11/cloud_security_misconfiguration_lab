@@ -1,0 +1,133 @@
+{
+  "account_id": "246801357924",
+  "groups": [],
+  "roles": [],
+  "root_account": {
+    "access_keys": [
+      {
+        "age_days": 1,
+        "id": "root-boundary-key",
+        "last_used_days": 0,
+        "status": "Active"
+      }
+    ],
+    "mfa_enabled": false,
+    "password_age_days": 5,
+    "password_enabled": true,
+    "password_last_used_days": 1
+  },
+  "users": [
+    {
+      "access_keys": [],
+      "attached_policies": [
+        {
+          "policy_name": "SensitiveEdge",
+          "policy_source": "inline",
+          "statements": [
+            {
+              "action": "kms:DisableKey",
+              "effect": "Allow",
+              "resource": "arn:aws:kms:ap-southeast-2:246801357924:key/edge-key"
+            }
+          ]
+        }
+      ],
+      "mfa_enabled": true,
+      "name": "user-sensitive-edge",
+      "password_age_days": null,
+      "password_enabled": false,
+      "password_last_used_days": null
+    },
+    {
+      "access_keys": [],
+      "attached_policies": [],
+      "mfa_enabled": false,
+      "name": "user-console-edge",
+      "password_age_days": 2,
+      "password_enabled": true,
+      "password_last_used_days": 1
+    },
+    {
+      "access_keys": [
+        {
+          "age_days": 91,
+          "id": "key-age-91",
+          "last_used_days": 1,
+          "status": "Active"
+        }
+      ],
+      "attached_policies": [],
+      "mfa_enabled": true,
+      "name": "user-key-age-91",
+      "password_age_days": null,
+      "password_enabled": false,
+      "password_last_used_days": null
+    },
+    {
+      "access_keys": [
+        {
+          "age_days": 90,
+          "id": "key-age-90",
+          "last_used_days": 1,
+          "status": "Active"
+        }
+      ],
+      "attached_policies": [],
+      "mfa_enabled": true,
+      "name": "user-key-age-90",
+      "password_age_days": null,
+      "password_enabled": false,
+      "password_last_used_days": null
+    },
+    {
+      "access_keys": [
+        {
+          "age_days": 30,
+          "id": "key-unused-91",
+          "last_used_days": 91,
+          "status": "Active"
+        }
+      ],
+      "attached_policies": [],
+      "mfa_enabled": true,
+      "name": "user-key-unused-91",
+      "password_age_days": null,
+      "password_enabled": false,
+      "password_last_used_days": null
+    },
+    {
+      "access_keys": [
+        {
+          "age_days": 30,
+          "id": "key-unused-90",
+          "last_used_days": 90,
+          "status": "Active"
+        }
+      ],
+      "attached_policies": [],
+      "mfa_enabled": true,
+      "name": "user-key-unused-90",
+      "password_age_days": null,
+      "password_enabled": false,
+      "password_last_used_days": null
+    },
+    {
+      "access_keys": [],
+      "attached_policies": [],
+      "mfa_enabled": true,
+      "name": "user-password-unused-91",
+      "password_age_days": 120,
+      "password_enabled": true,
+      "password_last_used_days": 91
+    },
+    {
+      "access_keys": [],
+      "attached_policies": [],
+      "mfa_enabled": true,
+      "name": "user-password-unused-90",
+      "password_age_days": 120,
+      "password_enabled": true,
+      "password_last_used_days": 90
+    }
+  ]
+}

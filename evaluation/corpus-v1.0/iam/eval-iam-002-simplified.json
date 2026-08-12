@@ -1,0 +1,278 @@
+{
+  "account_id": "246801357924",
+  "groups": [],
+  "roles": [
+    {
+      "attached_policies": [
+        {
+          "policy_name": "AdminPatternB",
+          "policy_source": "inline",
+          "statements": [
+            {
+              "action": "*",
+              "effect": "Allow",
+              "resource": "*"
+            }
+          ]
+        }
+      ],
+      "name": "role-admin-b",
+      "trust_policy": {
+        "statements": [
+          {
+            "action": "sts:AssumeRole",
+            "effect": "Allow",
+            "principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "sid": "ServiceTrust"
+          }
+        ]
+      }
+    },
+    {
+      "attached_policies": [
+        {
+          "policy_name": "ObjectReadPatternB",
+          "policy_source": "inline",
+          "statements": [
+            {
+              "action": "s3:GetObject*",
+              "effect": "Allow",
+              "resource": "arn:aws:s3:::helios-records/private/item-b"
+            }
+          ]
+        }
+      ],
+      "name": "role-partial-wildcard-b",
+      "trust_policy": {
+        "statements": [
+          {
+            "action": "sts:AssumeRole",
+            "effect": "Allow",
+            "principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "sid": "ServiceTrust"
+          }
+        ]
+      }
+    },
+    {
+      "attached_policies": [
+        {
+          "policy_name": "ArchiveWriteB",
+          "policy_source": "inline",
+          "statements": [
+            {
+              "action": "s3:PutObject",
+              "effect": "Allow",
+              "resource": "arn:aws:s3:::helios-archive-*/*"
+            }
+          ]
+        }
+      ],
+      "name": "role-broad-write-b",
+      "trust_policy": {
+        "statements": [
+          {
+            "action": "sts:AssumeRole",
+            "effect": "Allow",
+            "principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "sid": "ServiceTrust"
+          }
+        ]
+      }
+    },
+    {
+      "attached_policies": [],
+      "name": "role-vendor-b",
+      "trust_policy": {
+        "statements": [
+          {
+            "action": "sts:AssumeRole",
+            "effect": "Allow",
+            "principal": {
+              "AWS": "975310864209"
+            },
+            "sid": "VendorTrustB"
+          }
+        ]
+      }
+    },
+    {
+      "attached_policies": [
+        {
+          "policy_name": "ComplementB",
+          "policy_source": "inline",
+          "statements": [
+            {
+              "effect": "Allow",
+              "not_action": "ec2:TerminateInstances",
+              "resource": "arn:aws:ec2:ap-southeast-2:246801357924:instance/i-0abc1234def567890"
+            }
+          ]
+        }
+      ],
+      "name": "role-complement-b",
+      "trust_policy": {
+        "statements": [
+          {
+            "action": "sts:AssumeRole",
+            "effect": "Allow",
+            "principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "sid": "ServiceTrust"
+          }
+        ]
+      }
+    },
+    {
+      "attached_policies": [
+        {
+          "policy_name": "ExclusionB",
+          "policy_source": "inline",
+          "statements": [
+            {
+              "action": "s3:GetObject",
+              "effect": "Allow",
+              "not_resource": "arn:aws:s3:::helios-private/blocked.txt"
+            }
+          ]
+        }
+      ],
+      "name": "role-exclusion-b",
+      "trust_policy": {
+        "statements": [
+          {
+            "action": "sts:AssumeRole",
+            "effect": "Allow",
+            "principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "sid": "ServiceTrust"
+          }
+        ]
+      }
+    },
+    {
+      "attached_policies": [],
+      "name": "role-boundary-b",
+      "permissions_boundary": {
+        "document_available": true,
+        "policy_arn": "arn:aws:iam::246801357924:policy/EvaluationOpenBoundaryB",
+        "policy_name": "EvaluationOpenBoundaryB",
+        "statements": [
+          {
+            "action": "*",
+            "effect": "Allow",
+            "resource": "*",
+            "sid": "BoundaryMaximum"
+          }
+        ]
+      },
+      "trust_policy": {
+        "statements": [
+          {
+            "action": "sts:AssumeRole",
+            "effect": "Allow",
+            "principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "sid": "ServiceTrust"
+          }
+        ]
+      }
+    }
+  ],
+  "root_account": {
+    "access_keys": [
+      {
+        "age_days": 7,
+        "id": "root-key-b",
+        "last_used_days": 1,
+        "status": "Active"
+      }
+    ],
+    "mfa_enabled": false,
+    "password_age_days": 14,
+    "password_enabled": true,
+    "password_last_used_days": 1
+  },
+  "users": [
+    {
+      "access_keys": [],
+      "attached_policies": [
+        {
+          "policy_name": "SensitiveWithoutMfaB",
+          "policy_source": "inline",
+          "statements": [
+            {
+              "action": "iam:CreateAccessKey",
+              "effect": "Allow",
+              "resource": "arn:aws:iam::246801357924:user/service-b"
+            }
+          ]
+        }
+      ],
+      "mfa_enabled": true,
+      "name": "user-sensitive-b",
+      "password_age_days": null,
+      "password_enabled": false,
+      "password_last_used_days": null
+    },
+    {
+      "access_keys": [],
+      "attached_policies": [],
+      "mfa_enabled": false,
+      "name": "user-console-b",
+      "password_age_days": 12,
+      "password_enabled": true,
+      "password_last_used_days": 1
+    },
+    {
+      "access_keys": [
+        {
+          "age_days": 91,
+          "id": "key-old-b",
+          "last_used_days": 2,
+          "status": "Active"
+        }
+      ],
+      "attached_policies": [],
+      "mfa_enabled": true,
+      "name": "user-old-key-b",
+      "password_age_days": null,
+      "password_enabled": false,
+      "password_last_used_days": null
+    },
+    {
+      "access_keys": [
+        {
+          "age_days": 30,
+          "id": "key-stale-b",
+          "last_used_days": 91,
+          "status": "Active"
+        }
+      ],
+      "attached_policies": [],
+      "mfa_enabled": true,
+      "name": "user-stale-key-b",
+      "password_age_days": null,
+      "password_enabled": false,
+      "password_last_used_days": null
+    },
+    {
+      "access_keys": [],
+      "attached_policies": [],
+      "mfa_enabled": true,
+      "name": "user-stale-password-b",
+      "password_age_days": 180,
+      "password_enabled": true,
+      "password_last_used_days": 91
+    }
+  ]
+}

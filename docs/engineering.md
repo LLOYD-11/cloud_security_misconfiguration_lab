@@ -27,6 +27,7 @@ mkdir -p reports/generated
 .venv/bin/pymarkdown --strict-config scan --respect-gitignore .
 .venv/bin/python -m tools.check_markdown_links internal
 .venv/bin/python -m tools.check_markdown_links external
+.venv/bin/python -m tools.evaluation_corpus
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
 .venv/bin/coverage json -o reports/generated/coverage.json
@@ -46,8 +47,11 @@ attack timelines, the canonical rule catalog, and the AWS fixture manifest
 against Draft 2020-12 schemas. Evaluation tests additionally compile all four
 predeclared M12 contracts and verify the frozen candidate, catalog digest,
 module inventory, holdout separation, baseline identities, label semantics,
-and scoring boundaries. The fixture manifest test also enforces exact fixture
-inventory and SHA-256 integrity. AST-based completeness tests compare every
+and scoring boundaries. The candidate-independent corpus verifier additionally
+checks all 32 cases, 176 assertions, 42 evidence hashes, review dates,
+citations, equivalence pairs, and exact file inventory without importing an
+analyzer. The fixture manifest test also enforces exact fixture inventory and
+SHA-256 integrity. AST-based completeness tests compare every
 analyzer's literal rule IDs with the catalog, while timeline tests require a
 classification for every CloudTrail rule. Compatibility tests call every
 original module CLI so the unified package does not silently break earlier
@@ -92,7 +96,8 @@ from its packaged JSON source. The build gate also confirms that the wheel
 contains the simplified-input validator, rule catalog, remediation and timeline
 modules, their schemas, and the AWS fixture manifest. It also verifies the
 packaged benchmark manifest, runner, both benchmark schemas, the frozen
-evaluation protocol, and all independent-evaluation schemas.
+evaluation protocol, corpus manifest, all 42 corpus files, and all
+independent-evaluation schemas.
 
 ## Release Process
 

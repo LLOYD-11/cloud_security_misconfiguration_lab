@@ -1,0 +1,33 @@
+{
+  "account_id": "579246801357",
+  "events": [
+    {
+      "additionalEventData": {
+        "MFAUsed": "Unknown"
+      },
+      "awsRegion": "ap-southeast-2",
+      "eventCategory": "Management",
+      "eventID": "00007001-0000-4000-8000-000000007001",
+      "eventName": "ConsoleLogin",
+      "eventSource": "signin.amazonaws.com",
+      "eventTime": "2026-08-10T04:00:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": null,
+      "responseElements": {
+        "ConsoleLogin": "Success"
+      },
+      "sourceIPAddress": "192.0.2.40",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/mfa-state-unknown",
+        "principalId": "EVAL7001",
+        "type": "IAMUser",
+        "userName": "mfa-state-unknown"
+      }
+    }
+  ]
+}

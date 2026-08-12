@@ -161,7 +161,7 @@ and release evidence exist.
 | ID | Requirement | Status | Evidence |
 | --- | --- | --- | --- |
 | M12-R1 | Publish an evaluation protocol and independent ground-truth process before measurement. | Complete | Frozen [machine-readable protocol](../evaluation/protocol-v1.0.json), readable [evaluation method](evaluation-protocol.md), fixed analyzer and catalog identity, pinned Prowler and Sigma baselines, predeclared labels, metrics, thresholds and ablations, four Draft 2020-12 artifact contracts, and executable schema and semantic regression tests. |
-| M12-R2 | Build a sanitized, integrity-tracked independent corpus across all four modules. | Open | Planned evaluation fixtures and manifest. |
+| M12-R2 | Build a sanitized, integrity-tracked independent corpus across all four modules. | Complete | Frozen [corpus and ground truth](evaluation-corpus.md), 32 cases across all four case classes, 176 reviewed assertions covering all 35 rules, 42 hashed files, eight native/simplified pairs, exact manifest inventory, candidate-independent verification, adversarial tests, and CI/release/package gates. |
 | M12-R3 | Compare overlapping behavior with an established external baseline. | Open | Planned overlap matrix and disagreement record. |
 | M12-R4 | Publish classification metrics, disagreement analysis, and relevant ablations. | Open | Planned machine-readable results, runner, and evaluation report. |
 

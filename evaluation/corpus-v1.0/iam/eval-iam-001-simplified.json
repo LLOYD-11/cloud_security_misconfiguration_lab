@@ -1,0 +1,192 @@
+{
+  "account_id": "246801357924",
+  "groups": [],
+  "roles": [
+    {
+      "attached_policies": [
+        {
+          "policy_name": "AdminPatternA",
+          "policy_source": "inline",
+          "statements": [
+            {
+              "action": "*",
+              "effect": "Allow",
+              "resource": "*"
+            }
+          ]
+        }
+      ],
+      "name": "role-admin-a",
+      "trust_policy": {
+        "statements": [
+          {
+            "action": "sts:AssumeRole",
+            "effect": "Allow",
+            "principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "sid": "ServiceTrust"
+          }
+        ]
+      }
+    },
+    {
+      "attached_policies": [
+        {
+          "policy_name": "ObjectReadPatternA",
+          "policy_source": "inline",
+          "statements": [
+            {
+              "action": "s3:GetObject*",
+              "effect": "Allow",
+              "resource": "arn:aws:s3:::quartz-records/private/item-a"
+            }
+          ]
+        }
+      ],
+      "name": "role-partial-wildcard-a",
+      "trust_policy": {
+        "statements": [
+          {
+            "action": "sts:AssumeRole",
+            "effect": "Allow",
+            "principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "sid": "ServiceTrust"
+          }
+        ]
+      }
+    },
+    {
+      "attached_policies": [
+        {
+          "policy_name": "ArchiveWriteA",
+          "policy_source": "inline",
+          "statements": [
+            {
+              "action": "s3:DeleteObject",
+              "effect": "Allow",
+              "resource": "arn:aws:s3:::quartz-archive-*/*"
+            }
+          ]
+        }
+      ],
+      "name": "role-broad-write-a",
+      "trust_policy": {
+        "statements": [
+          {
+            "action": "sts:AssumeRole",
+            "effect": "Allow",
+            "principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "sid": "ServiceTrust"
+          }
+        ]
+      }
+    },
+    {
+      "attached_policies": [],
+      "name": "role-vendor-a",
+      "trust_policy": {
+        "statements": [
+          {
+            "action": "sts:AssumeRole",
+            "effect": "Allow",
+            "principal": {
+              "AWS": "arn:aws:iam::975310864209:root"
+            },
+            "sid": "VendorTrustA"
+          }
+        ]
+      }
+    },
+    {
+      "attached_policies": [
+        {
+          "policy_name": "ComplementA",
+          "policy_source": "inline",
+          "statements": [
+            {
+              "effect": "Allow",
+              "not_action": "s3:DeleteObject",
+              "resource": "arn:aws:s3:::quartz-logs"
+            }
+          ]
+        }
+      ],
+      "name": "role-complement-a",
+      "trust_policy": {
+        "statements": [
+          {
+            "action": "sts:AssumeRole",
+            "effect": "Allow",
+            "principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "sid": "ServiceTrust"
+          }
+        ]
+      }
+    },
+    {
+      "attached_policies": [
+        {
+          "policy_name": "ExclusionA",
+          "policy_source": "inline",
+          "statements": [
+            {
+              "action": "s3:GetObject",
+              "effect": "Allow",
+              "not_resource": "arn:aws:s3:::quartz-private/do-not-read.txt"
+            }
+          ]
+        }
+      ],
+      "name": "role-exclusion-a",
+      "trust_policy": {
+        "statements": [
+          {
+            "action": "sts:AssumeRole",
+            "effect": "Allow",
+            "principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "sid": "ServiceTrust"
+          }
+        ]
+      }
+    },
+    {
+      "attached_policies": [],
+      "name": "role-boundary-a",
+      "permissions_boundary": {
+        "document_available": true,
+        "policy_arn": "arn:aws:iam::246801357924:policy/EvaluationOpenBoundaryA",
+        "policy_name": "EvaluationOpenBoundaryA",
+        "statements": [
+          {
+            "action": "*",
+            "effect": "Allow",
+            "resource": "*",
+            "sid": "BoundaryMaximum"
+          }
+        ]
+      },
+      "trust_policy": {
+        "statements": [
+          {
+            "action": "sts:AssumeRole",
+            "effect": "Allow",
+            "principal": {
+              "Service": "lambda.amazonaws.com"
+            },
+            "sid": "ServiceTrust"
+          }
+        ]
+      }
+    }
+  ],
+  "users": []
+}

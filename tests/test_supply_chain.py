@@ -158,6 +158,9 @@ class SupplyChainTests(unittest.TestCase):
             "pymarkdown --strict-config scan --respect-gitignore .",
             "python -m tools.check_markdown_links internal",
             "python -m tools.check_markdown_links external",
+            "python -m tools.evaluation_corpus",
+            "'/evaluation/corpus-manifest-v1.0.json'",
+            "'/evaluation/corpus-v1.0/'",
         )
         for path in WORKFLOWS:
             text = path.read_text(encoding="utf-8")

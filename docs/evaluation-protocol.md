@@ -11,7 +11,8 @@ contract.
 
 This registration fixes the candidate, corpus rules, labels, external
 baselines, metrics, thresholds, ablations, and change policy before results
-exist. It does not claim that the corpus or evaluation results are complete.
+exist. The separately documented [corpus](evaluation-corpus.md) was frozen next;
+no evaluation result is claimed yet.
 
 | Frozen Item | Value |
 | --- | --- |
@@ -321,9 +322,9 @@ new holdout claim requires a second independently frozen corpus.
 
 ## M12 Sequence
 
-1. **R1, protocol:** frozen here before evaluation evidence exists.
-2. **R2, corpus:** independently author, review, sanitize, hash, and freeze the
-   corpus and ground truth.
+1. **R1, protocol:** frozen here before evaluation evidence existed.
+2. **R2, corpus:** complete; 32 independently authored cases, 176 reviewed
+   assertions, and 42 sanitized evidence files are frozen with exact hashes.
 3. **R3, baseline:** publish the complete overlap matrix and baseline outcomes.
 4. **R4, measurement:** run the candidate once, publish machine-readable
    results, disagreement analysis, ablations, and the evaluation report.

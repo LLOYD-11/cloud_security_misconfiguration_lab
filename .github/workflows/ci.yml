@@ -63,6 +63,9 @@ jobs:
         if: matrix.python-version == '3.13'
         run: python -m tools.check_markdown_links external
 
+      - name: Verify frozen evaluation corpus
+        run: python -m tools.evaluation_corpus
+
       - name: Test with branch coverage
         run: >-
           mkdir -p reports/generated &&
@@ -167,5 +170,9 @@ jobs:
           '/schemas/evaluation-results-v1.0.schema.json') for name in names);
           assert any(name.endswith(
           '/evaluation/protocol-v1.0.json') for name in names);
+          assert any(name.endswith(
+          '/evaluation/corpus-manifest-v1.0.json') for name in names);
+          assert len([name for name in names
+          if '/evaluation/corpus-v1.0/' in name]) == 42;
           assert any(name.endswith(
           '/sample_data/aws/fixture-manifest-v1.0.json') for name in names)"

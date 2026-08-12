@@ -114,13 +114,13 @@ different elapsed times.
 
 ## Coverage Evidence
 
-The 2026-07-19 M11 release-gate run executed 391 tests and measured the runtime
-packages plus the repository quality-gate tools:
+The 2026-08-13 M12-R2 quality-gate run executed 415 tests and measured the
+runtime packages plus the repository quality-gate tools:
 
 | Metric | Covered | Total | Result | Minimum |
 | --- | ---: | ---: | ---: | ---: |
-| Statements | 5,809 | 6,076 | 95.61% | 90.00% |
-| Branches | 2,174 | 2,436 | 89.24% | 85.00% |
+| Statements | 6,082 | 6,419 | 94.75% | 90.00% |
+| Branches | 2,289 | 2,600 | 88.04% | 85.00% |
 
 `coverage.py` also reports a combined display percentage, but the acceptance
 gate deliberately computes statements and branches independently from

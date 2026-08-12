@@ -19,8 +19,8 @@ credentials or charges.
 | Security scope | IAM, S3, EC2 security groups, and CloudTrail |
 | Detection depth | 35 cataloged rules with qualified AWS Security Hub CSPM, CIS AWS Foundations, and MITRE ATT&CK mappings |
 | Deterministic sample | 39 findings, 2 incidents, 36 remediation actions, and 11 timeline entries |
-| Engineering assurance | 401 tests; 95.61% statement and 89.24% branch coverage; Python 3.10-3.13 CI |
-| Evaluation status | Protocol v1.0.0 frozen before holdout construction or candidate execution; results pending |
+| Engineering assurance | 415 tests; 94.75% statement and 88.04% branch coverage; Python 3.10-3.13 CI |
+| Evaluation status | Protocol and 32-case, 176-assertion holdout frozen before candidate execution; results pending |
 | Safety boundary | Offline files only; zero runtime dependencies; no credentials and no cloud writes |
 
 ## Quick Start
@@ -72,13 +72,13 @@ engineering evidence.
 
 | Quality Gate | Verified Result |
 | --- | --- |
-| Automated tests | 401 unit, regression, integration, CLI, schema, compatibility, and benchmark tests pass |
-| Coverage | 5,809/6,076 statements (95.61%) and 2,174/2,436 branches (89.24%) |
+| Automated tests | 415 unit, regression, integration, CLI, schema, compatibility, and benchmark tests pass |
+| Coverage | 6,082/6,419 statements (94.75%) and 2,289/2,600 branches (88.04%) |
 | Rule benchmark | 78/78 exact functional cases and 4/4 malformed native inputs rejected |
 | Scale benchmark | 8/8 deterministic profiles pass across 100 to 10,000 inputs |
 | Supported Python | GitHub Actions exercises every minor from Python 3.10 through 3.13 |
 | Distribution | Wheel and sdist build; installed-wheel demo and packaged benchmark pass |
-| Independent evaluation | Candidate, labels, Prowler/Sigma baselines, metrics, thresholds, and future artifact contracts pre-registered; no holdout result claimed yet |
+| Independent evaluation | Frozen protocol plus a hashed 32-case, 42-file, 176-assertion corpus; no holdout result claimed yet |
 
 Timing is measured but deliberately not used as a CI threshold. Exact outputs,
 bounded finding amplification, repeated-run equality, structural operation
@@ -88,9 +88,10 @@ See [Benchmarking and resilience](docs/benchmarking.md).
 M12 evaluation is intentionally separate from that development benchmark. Its
 [pre-registered protocol](docs/evaluation-protocol.md) freezes the candidate,
 holdout rules, ground-truth process, Prowler and Sigma baselines, metrics, and
-acceptance thresholds before corpus construction or execution. No independent
-accuracy result is claimed until the hashed holdout corpus and raw decisions
-are published.
+acceptance thresholds before corpus construction or execution. The
+[frozen corpus](docs/evaluation-corpus.md) now publishes output-blind labels,
+citations, hashes, and exact inventory. No independent accuracy result is
+claimed until raw decisions are published.
 
 ## What I Learned
 
@@ -442,6 +443,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [CloudTrail failure-window performance](docs/detection-performance.md)
 - [Benchmarking and resilience](docs/benchmarking.md)
 - [Independent evaluation protocol](docs/evaluation-protocol.md)
+- [Independent evaluation corpus](docs/evaluation-corpus.md)
 - [Supply-chain controls](docs/supply-chain.md)
 - [Documentation quality gates](docs/documentation-quality.md)
 - [Engineering checks](docs/engineering.md)
@@ -473,6 +475,7 @@ mkdir -p reports/generated
 .venv/bin/pymarkdown --strict-config scan --respect-gitignore .
 .venv/bin/python -m tools.check_markdown_links internal
 .venv/bin/python -m tools.check_markdown_links external
+.venv/bin/python -m tools.evaluation_corpus
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
 .venv/bin/coverage json -o reports/generated/coverage.json
@@ -502,9 +505,16 @@ cloud_security_misconfiguration_lab/
 ├── pyproject.toml
 ├── requirements-dev.lock
 ├── evaluation/
-│   └── protocol-v1.0.json
+│   ├── protocol-v1.0.json
+│   ├── corpus-manifest-v1.0.json
+│   └── corpus-v1.0/
+│       ├── iam/
+│       ├── storage/
+│       ├── network/
+│       └── cloudtrail/
 ├── tools/
 │   ├── check_markdown_links.py
+│   ├── evaluation_corpus.py
 │   └── release_evidence.py
 ├── cloud_security_lab/
 │   ├── __main__.py

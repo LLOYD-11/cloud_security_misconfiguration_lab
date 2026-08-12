@@ -1,0 +1,43 @@
+{
+  "account_id": "357924680135",
+  "buckets": [
+    {
+      "acl": {
+        "grants": [
+          {
+            "grantee": "AuthenticatedUsers",
+            "permission": "WRITE"
+          }
+        ]
+      },
+      "bucket_policy": {
+        "statements": [
+          {
+            "action": "s3:PutObject",
+            "effect": "Allow",
+            "principal": {
+              "AWS": "*"
+            },
+            "resource": "arn:aws:s3:::ember-dataset-b/*",
+            "sid": "BroadWrite"
+          }
+        ]
+      },
+      "encryption": {
+        "enabled": false
+      },
+      "name": "ember-dataset-b",
+      "object_ownership": "ObjectWriter",
+      "public_access_block": {
+        "block_public_acls": false,
+        "block_public_policy": false,
+        "ignore_public_acls": false,
+        "restrict_public_buckets": false
+      },
+      "region": "ap-southeast-2",
+      "versioning": {
+        "status": "Disabled"
+      }
+    }
+  ]
+}

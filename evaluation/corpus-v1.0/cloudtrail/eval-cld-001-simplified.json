@@ -1,0 +1,400 @@
+{
+  "account_id": "579246801357",
+  "events": [
+    {
+      "additionalEventData": {
+        "MFAUsed": "Yes"
+      },
+      "awsRegion": "ap-southeast-2",
+      "eventCategory": "Management",
+      "eventID": "00001001-0000-4000-8000-000000001001",
+      "eventName": "ConsoleLogin",
+      "eventSource": "signin.amazonaws.com",
+      "eventTime": "2026-08-10T04:00:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": null,
+      "responseElements": {
+        "ConsoleLogin": "Success"
+      },
+      "sourceIPAddress": "192.0.2.40",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:root",
+        "principalId": "EVAL1001",
+        "type": "Root"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "eventCategory": "Management",
+      "eventID": "00001002-0000-4000-8000-000000001002",
+      "eventName": "DeactivateMFADevice",
+      "eventSource": "iam.amazonaws.com",
+      "eventTime": "2026-08-10T04:01:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": {
+        "serialNumber": "arn:aws:iam::579246801357:mfa/evaluation",
+        "userName": "target-user-a"
+      },
+      "responseElements": null,
+      "sourceIPAddress": "192.0.2.40",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/identity-admin",
+        "principalId": "EVAL1002",
+        "type": "IAMUser",
+        "userName": "identity-admin"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "eventCategory": "Management",
+      "eventID": "00001003-0000-4000-8000-000000001003",
+      "eventName": "AuthorizeSecurityGroupIngress",
+      "eventSource": "ec2.amazonaws.com",
+      "eventTime": "2026-08-10T04:02:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": {
+        "groupId": "sg-6fcc2e12"
+      },
+      "responseElements": null,
+      "sourceIPAddress": "192.0.2.40",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/network-admin",
+        "principalId": "EVAL1003",
+        "type": "IAMUser",
+        "userName": "network-admin"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "eventCategory": "Management",
+      "eventID": "00001004-0000-4000-8000-000000001004",
+      "eventName": "PutBucketPolicy",
+      "eventSource": "s3.amazonaws.com",
+      "eventTime": "2026-08-10T04:03:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": {
+        "bucketName": "lumen-archive-a"
+      },
+      "responseElements": null,
+      "sourceIPAddress": "192.0.2.40",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/storage-admin",
+        "principalId": "EVAL1004",
+        "type": "IAMUser",
+        "userName": "storage-admin"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "eventCategory": "Management",
+      "eventID": "00001005-0000-4000-8000-000000001005",
+      "eventName": "AttachRolePolicy",
+      "eventSource": "iam.amazonaws.com",
+      "eventTime": "2026-08-10T04:04:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": {
+        "policyArn": "arn:aws:iam::579246801357:policy/evaluation-a",
+        "roleName": "workload-role"
+      },
+      "responseElements": null,
+      "sourceIPAddress": "192.0.2.40",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/iam-admin",
+        "principalId": "EVAL1005",
+        "type": "IAMUser",
+        "userName": "iam-admin"
+      }
+    },
+    {
+      "additionalEventData": {
+        "MFAUsed": "No"
+      },
+      "awsRegion": "ap-southeast-2",
+      "eventCategory": "Management",
+      "eventID": "00001006-0000-4000-8000-000000001006",
+      "eventName": "ConsoleLogin",
+      "eventSource": "signin.amazonaws.com",
+      "eventTime": "2026-08-10T04:05:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": null,
+      "responseElements": {
+        "ConsoleLogin": "Success"
+      },
+      "sourceIPAddress": "192.0.2.40",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/console-user-a",
+        "principalId": "EVAL1006",
+        "type": "IAMUser",
+        "userName": "console-user-a"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "eventCategory": "Management",
+      "eventID": "00001007-0000-4000-8000-000000001007",
+      "eventName": "CreateAccessKey",
+      "eventSource": "iam.amazonaws.com",
+      "eventTime": "2026-08-10T04:06:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": {
+        "userName": "credential-target-a"
+      },
+      "responseElements": null,
+      "sourceIPAddress": "192.0.2.40",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/credential-admin",
+        "principalId": "EVAL1007",
+        "type": "IAMUser",
+        "userName": "credential-admin"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "eventCategory": "Management",
+      "eventID": "00001008-0000-4000-8000-000000001008",
+      "eventName": "UpdateAssumeRolePolicy",
+      "eventSource": "iam.amazonaws.com",
+      "eventTime": "2026-08-10T04:07:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": {
+        "roleName": "federation-role-a"
+      },
+      "responseElements": null,
+      "sourceIPAddress": "192.0.2.40",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/trust-admin",
+        "principalId": "EVAL1008",
+        "type": "IAMUser",
+        "userName": "trust-admin"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "eventCategory": "Management",
+      "eventID": "00001009-0000-4000-8000-000000001009",
+      "eventName": "StopLogging",
+      "eventSource": "cloudtrail.amazonaws.com",
+      "eventTime": "2026-08-10T04:08:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": {
+        "name": "evaluation-trail-a"
+      },
+      "responseElements": null,
+      "sourceIPAddress": "192.0.2.40",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/security-admin",
+        "principalId": "EVAL1009",
+        "type": "IAMUser",
+        "userName": "security-admin"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "eventCategory": "Management",
+      "eventID": "00001010-0000-4000-8000-000000001010",
+      "eventName": "ScheduleKeyDeletion",
+      "eventSource": "kms.amazonaws.com",
+      "eventTime": "2026-08-10T04:09:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": {
+        "keyId": "arn:aws:kms:ap-southeast-2:579246801357:key/evaluation-a"
+      },
+      "responseElements": null,
+      "sourceIPAddress": "192.0.2.40",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/key-admin",
+        "principalId": "EVAL1010",
+        "type": "IAMUser",
+        "userName": "key-admin"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "AccessDenied",
+      "errorMessage": "Synthetic authorization failure",
+      "eventCategory": "Management",
+      "eventID": "00001011-0000-4000-8000-000000001011",
+      "eventName": "ListBuckets",
+      "eventSource": "s3.amazonaws.com",
+      "eventTime": "2026-08-10T04:20:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": null,
+      "responseElements": null,
+      "sourceIPAddress": "192.0.2.44",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/probe-a",
+        "principalId": "EVAL1011",
+        "type": "IAMUser",
+        "userName": "probe-a"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "AccessDenied",
+      "errorMessage": "Synthetic authorization failure",
+      "eventCategory": "Management",
+      "eventID": "00001012-0000-4000-8000-000000001012",
+      "eventName": "ListBuckets",
+      "eventSource": "s3.amazonaws.com",
+      "eventTime": "2026-08-10T04:21:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": null,
+      "responseElements": null,
+      "sourceIPAddress": "192.0.2.44",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/probe-a",
+        "principalId": "EVAL1012",
+        "type": "IAMUser",
+        "userName": "probe-a"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "AccessDenied",
+      "errorMessage": "Synthetic authorization failure",
+      "eventCategory": "Management",
+      "eventID": "00001013-0000-4000-8000-000000001013",
+      "eventName": "ListBuckets",
+      "eventSource": "s3.amazonaws.com",
+      "eventTime": "2026-08-10T04:23:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": null,
+      "responseElements": null,
+      "sourceIPAddress": "192.0.2.44",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/probe-a",
+        "principalId": "EVAL1013",
+        "type": "IAMUser",
+        "userName": "probe-a"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "AccessDenied",
+      "errorMessage": "Synthetic authorization failure",
+      "eventCategory": "Management",
+      "eventID": "00001014-0000-4000-8000-000000001014",
+      "eventName": "ListBuckets",
+      "eventSource": "s3.amazonaws.com",
+      "eventTime": "2026-08-10T04:25:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": null,
+      "responseElements": null,
+      "sourceIPAddress": "192.0.2.44",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/probe-a",
+        "principalId": "EVAL1014",
+        "type": "IAMUser",
+        "userName": "probe-a"
+      }
+    },
+    {
+      "additionalEventData": null,
+      "awsRegion": "ap-southeast-2",
+      "errorCode": "AccessDenied",
+      "errorMessage": "Synthetic authorization failure",
+      "eventCategory": "Management",
+      "eventID": "00001015-0000-4000-8000-000000001015",
+      "eventName": "ListBuckets",
+      "eventSource": "s3.amazonaws.com",
+      "eventTime": "2026-08-10T04:28:00Z",
+      "eventType": "AwsApiCall",
+      "eventVersion": "1.11",
+      "managementEvent": true,
+      "recipientAccountId": "579246801357",
+      "requestParameters": null,
+      "responseElements": null,
+      "sourceIPAddress": "192.0.2.44",
+      "userAgent": "aws-cli/2.synthetic-evaluation",
+      "userIdentity": {
+        "accountId": "579246801357",
+        "arn": "arn:aws:iam::579246801357:user/probe-a",
+        "principalId": "EVAL1015",
+        "type": "IAMUser",
+        "userName": "probe-a"
+      }
+    }
+  ]
+}
