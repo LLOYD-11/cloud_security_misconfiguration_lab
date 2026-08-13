@@ -11,8 +11,10 @@ contract.
 
 This registration fixes the candidate, corpus rules, labels, external
 baselines, metrics, thresholds, ablations, and change policy before results
-exist. The separately documented [corpus](evaluation-corpus.md) was frozen next;
-no evaluation result is claimed yet.
+exist. The separately documented [corpus](evaluation-corpus.md) and
+[external-baseline outcomes](evaluation-baselines.md) were frozen next. The
+candidate has not been executed and no candidate-performance result is claimed
+yet.
 
 | Frozen Item | Value |
 | --- | --- |
@@ -325,7 +327,10 @@ new holdout claim requires a second independently frozen corpus.
 1. **R1, protocol:** frozen here before evaluation evidence existed.
 2. **R2, corpus:** complete; 32 independently authored cases, 176 reviewed
    assertions, and 42 sanitized evidence files are frozen with exact hashes.
-3. **R3, baseline:** publish the complete overlap matrix and baseline outcomes.
+3. **R3, baseline:** complete; all 35 rules are classified as 5 exact, 18
+   partial, or 12 without a released counterpart, and 24 exact-overlap
+   baseline decisions are frozen without candidate execution. See the
+   [baseline audit](evaluation-baselines.md).
 4. **R4, measurement:** run the candidate once, publish machine-readable
    results, disagreement analysis, ablations, and the evaluation report.
 

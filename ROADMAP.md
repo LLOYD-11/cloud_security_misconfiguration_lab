@@ -190,15 +190,16 @@ the `v2.2.0` tag.
 
 ## M12: Independent External Evaluation
 
-Status: In progress for `v2.2.0`; the protocol and independently authored
-corpus are frozen before candidate execution.
+Status: In progress for `v2.2.0`; the protocol, independently authored corpus,
+complete overlap matrix, and baseline outcomes are frozen before candidate
+execution.
 
 - [x] Publish a versioned evaluation protocol before running the analyzers.
 - [x] Build a provenance-tracked corpus of independent positive, hardened,
       boundary, and ambiguous IAM, S3, network, and CloudTrail cases.
 - [x] Establish ground truth independently from analyzer output and preserve
       sanitized native evidence with integrity hashes.
-- [ ] Compare overlapping controls with an established external baseline without
+- [x] Compare overlapping controls with an established external baseline without
       treating unsupported scope as a disagreement.
 - [ ] Publish per-module true positives, false positives, false negatives, true
       negatives, precision, recall, F1, and complete disagreement analysis.

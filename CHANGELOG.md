@@ -28,6 +28,9 @@ All notable changes to this project are documented in this file.
 - A frozen 32-case, 42-file independent-evaluation corpus with 176 reviewed
   assertions, authoritative citations, native/simplified pairs, exact hashes,
   and a candidate-independent fail-closed verifier.
+- A complete 35-rule Prowler/Sigma overlap matrix plus 24 frozen exact-overlap
+  baseline decisions, upstream source and Sigma release inventories, a
+  machine-readable outcome contract, and deterministic tamper verification.
 
 ### Changed
 
@@ -44,8 +47,9 @@ All notable changes to this project are documented in this file.
   releases separate low-privilege build and signing from an isolated release
   writer, with checksum and signer-workflow verification on both sides of the
   artifact transfer.
-- CI, release, and distribution gates now verify the frozen corpus and require
-  all 42 evidence files plus its manifest in the built wheel.
+- CI, release, and distribution gates now verify the frozen corpus and baseline
+  artifacts and require all 42 evidence files, both manifests, both baseline
+  artifacts, and every evaluation schema in the built wheel.
 
 ## 2.1.1 - 2026-07-19
 

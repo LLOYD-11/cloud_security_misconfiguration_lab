@@ -14,6 +14,7 @@ EVALUATION_SCHEMAS = (
     "evaluation-protocol-v1.0.schema.json",
     "evaluation-corpus-manifest-v1.0.schema.json",
     "evaluation-baseline-overlap-v1.0.schema.json",
+    "evaluation-baseline-outcomes-v1.0.schema.json",
     "evaluation-results-v1.0.schema.json",
 )
 MODULE_PREFIXES = {

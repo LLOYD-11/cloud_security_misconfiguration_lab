@@ -1,0 +1,2503 @@
+{
+  "schema_version": "1.0",
+  "outcomes_id": "cloud-security-baseline-outcomes",
+  "outcomes_version": "1.0.0",
+  "status": "frozen",
+  "created_on": "2026-08-13",
+  "protocol": {
+    "path": "evaluation/protocol-v1.0.json",
+    "version": "1.0.0",
+    "sha256": "23523b0d79f16cd06604c1db5966ba2b4100c53005e4cb45639870698053977d"
+  },
+  "corpus": {
+    "path": "evaluation/corpus-manifest-v1.0.json",
+    "version": "1.0.0",
+    "sha256": "9e9eb0f1d5fa84f4926b7665cc5b3738c481a0caa0c11ad55ed4ae4df1142f59"
+  },
+  "overlap_matrix": {
+    "path": "evaluation/baseline-overlap-v1.0.json",
+    "version": "1.0.0",
+    "sha256": "2e7652643f9df31b421567ac11138707ebc373522ad0cc1ce03b1bb74f6aad49"
+  },
+  "method": {
+    "type": "source-audited-predicate-replay",
+    "candidate_executed": false,
+    "candidate_imported": false,
+    "truth_labels_consumed": false,
+    "input_variant_policy": "one-declared-simplified-variant-per-case",
+    "statement": "Only rule-level exact mappings are replayed. The runner reads decision-key identity and retained evidence but never reads assertion labels, expected severity, or candidate output."
+  },
+  "baseline_runs": [
+    {
+      "baseline_id": "prowler-aws",
+      "version": "5.38.0",
+      "commit_sha": "b21ddad32c6d9a98eb819f0ccadac8a6792c2837",
+      "execution_mode": "source-audited-predicate-replay",
+      "upstream_tool_executed": false,
+      "exact_rule_count": 5,
+      "decision_count": 24,
+      "positive_prediction_count": 11,
+      "negative_prediction_count": 13,
+      "exclusion_count": 97,
+      "source_predicates": [
+        {
+          "lab_rule_id": "IAM-006",
+          "baseline_check_id": "iam_user_mfa_enabled_console_access",
+          "source_path": "prowler/providers/aws/services/iam/iam_user_mfa_enabled_console_access/iam_user_mfa_enabled_console_access.py",
+          "source_url": "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_user_mfa_enabled_console_access/iam_user_mfa_enabled_console_access.py",
+          "sha256": "4d0e89d92560c8e81a167524866d6f84eb23b7163736b7b22df59ac7ed653aff"
+        },
+        {
+          "lab_rule_id": "IAM-007",
+          "baseline_check_id": "iam_rotate_access_key_90_days",
+          "source_path": "prowler/providers/aws/services/iam/iam_rotate_access_key_90_days/iam_rotate_access_key_90_days.py",
+          "source_url": "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_rotate_access_key_90_days/iam_rotate_access_key_90_days.py",
+          "sha256": "353e7e4bd0837f2e376dcaddfbce664a1cb70c5977db683a770cd1621be7fa6b"
+        },
+        {
+          "lab_rule_id": "IAM-013",
+          "baseline_check_id": "iam_no_root_access_key",
+          "source_path": "prowler/providers/aws/services/iam/iam_no_root_access_key/iam_no_root_access_key.py",
+          "source_url": "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_no_root_access_key/iam_no_root_access_key.py",
+          "sha256": "354dc5b14bb85eaa62f98af69a8bcbd109246240d61c4d0eb03524b8ae94d2c5"
+        },
+        {
+          "lab_rule_id": "STO-004",
+          "baseline_check_id": "s3_bucket_default_encryption",
+          "source_path": "prowler/providers/aws/services/s3/s3_bucket_default_encryption/s3_bucket_default_encryption.py",
+          "source_url": "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/s3/s3_bucket_default_encryption/s3_bucket_default_encryption.py",
+          "sha256": "56099ab4219c92c9c41c13e047bba758071373f0dbd6ead75d3de13abe436130"
+        },
+        {
+          "lab_rule_id": "STO-005",
+          "baseline_check_id": "s3_bucket_object_versioning",
+          "source_path": "prowler/providers/aws/services/s3/s3_bucket_object_versioning/s3_bucket_object_versioning.py",
+          "source_url": "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/s3/s3_bucket_object_versioning/s3_bucket_object_versioning.py",
+          "sha256": "4af640e1f646823133d13c6c06a95c4f352dd9f8f62497eacf1b3b7f1dd752f3"
+        }
+      ],
+      "release_inventory": [],
+      "notes": "The full Prowler CLI was not run against a live account. Exact 5.38.0 check predicates were independently replayed over equivalent retained fields, with source paths and file digests preserved."
+    },
+    {
+      "baseline_id": "sigma-core",
+      "version": "r2026-07-01",
+      "commit_sha": "552f3fee420ef232a8e5790c4fae591847e32347",
+      "execution_mode": "no-exact-overlap",
+      "upstream_tool_executed": false,
+      "exact_rule_count": 0,
+      "decision_count": 0,
+      "positive_prediction_count": 0,
+      "negative_prediction_count": 0,
+      "exclusion_count": 55,
+      "source_predicates": [],
+      "release_inventory": [
+        {
+          "source_path": "rules/cloud/aws/cloudtrail/aws_cloudtrail_imds_malicious_usage.yml",
+          "source_url": "https://github.com/SigmaHQ/sigma/blob/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail/aws_cloudtrail_imds_malicious_usage.yml",
+          "sha256": "b070399db57d212727d7f7873c642a0c1da0930c2b45a5fe8945c3e2474caf37"
+        },
+        {
+          "source_path": "rules/cloud/aws/cloudtrail/aws_cloudtrail_ssm_malicious_usage.yml",
+          "source_url": "https://github.com/SigmaHQ/sigma/blob/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail/aws_cloudtrail_ssm_malicious_usage.yml",
+          "sha256": "3d394a4a27a2af7c93034177c376f0358e13b29999074dda031334b7c92b2cc9"
+        },
+        {
+          "source_path": "rules/cloud/aws/cloudtrail/aws_config_disable_recording.yml",
+          "source_url": "https://github.com/SigmaHQ/sigma/blob/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail/aws_config_disable_recording.yml",
+          "sha256": "d53eb7e1c2b87a31bd7ca7558f3eda1d15ceb4646451e8e0405d78618480aea6"
+        },
+        {
+          "source_path": "rules/cloud/aws/cloudtrail/aws_ec2_startup_script_change.yml",
+          "source_url": "https://github.com/SigmaHQ/sigma/blob/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail/aws_ec2_startup_script_change.yml",
+          "sha256": "8b58ce7431b1b3964cf0239c95164d92c9ce51c941101f70d901f7ff3b71b727"
+        },
+        {
+          "source_path": "rules/cloud/aws/cloudtrail/aws_guardduty_disruption.yml",
+          "source_url": "https://github.com/SigmaHQ/sigma/blob/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail/aws_guardduty_disruption.yml",
+          "sha256": "b82f5f5ef3080814b9bbf019a07f7ddf0313afd1e08b8eca3e5331b6bbf3a01c"
+        },
+        {
+          "source_path": "rules/cloud/aws/cloudtrail/aws_iam_s3browser_loginprofile_creation.yml",
+          "source_url": "https://github.com/SigmaHQ/sigma/blob/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail/aws_iam_s3browser_loginprofile_creation.yml",
+          "sha256": "981a9406ac25d4b00b2dfd446c87a14b3f22cc03f54f03c7b6229a3ac507c371"
+        },
+        {
+          "source_path": "rules/cloud/aws/cloudtrail/aws_iam_s3browser_templated_s3_bucket_policy_creation.yml",
+          "source_url": "https://github.com/SigmaHQ/sigma/blob/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail/aws_iam_s3browser_templated_s3_bucket_policy_creation.yml",
+          "sha256": "f2a68159a3037c9511c3c74d3d027fc367dc9c4662df6c6f03723554aa92d245"
+        },
+        {
+          "source_path": "rules/cloud/aws/cloudtrail/aws_iam_s3browser_user_or_accesskey_creation.yml",
+          "source_url": "https://github.com/SigmaHQ/sigma/blob/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail/aws_iam_s3browser_user_or_accesskey_creation.yml",
+          "sha256": "c566f779298d219eb9733ec7db1e554ff269f748f71b3fffd4eb9ff09adf53fe"
+        },
+        {
+          "source_path": "rules/cloud/aws/cloudtrail/aws_rds_public_db_restore.yml",
+          "source_url": "https://github.com/SigmaHQ/sigma/blob/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail/aws_rds_public_db_restore.yml",
+          "sha256": "b15f0a86150e455237cd494602cd4305a500afbf1ebd61a4164129d665cafcbe"
+        },
+        {
+          "source_path": "rules/cloud/aws/cloudtrail/aws_securityhub_finding_evasion.yml",
+          "source_url": "https://github.com/SigmaHQ/sigma/blob/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail/aws_securityhub_finding_evasion.yml",
+          "sha256": "865044229606ad4a1bc676f90a7c5edb0de04a5b9f518b69888648aee3480e91"
+        },
+        {
+          "source_path": "rules/cloud/aws/cloudtrail/aws_sso_idp_change.yml",
+          "source_url": "https://github.com/SigmaHQ/sigma/blob/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail/aws_sso_idp_change.yml",
+          "sha256": "7ea2c37b143dacc7c240f87d69212a325155090b3535baa33ba38e8a7f58f145"
+        },
+        {
+          "source_path": "rules/cloud/aws/cloudtrail/aws_update_login_profile.yml",
+          "source_url": "https://github.com/SigmaHQ/sigma/blob/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail/aws_update_login_profile.yml",
+          "sha256": "d29c571268666e01c24c0f3492b7fc04ccb66b165294c79c3b9afac57db80af6"
+        }
+      ],
+      "notes": "The verified r2026-07-01 sigma_core.zip asset contains no released rule whose complete predicate is equivalent to a lab CloudTrail rule, so no Sigma decision is eligible for agreement scoring."
+    }
+  ],
+  "summary": {
+    "corpus_case_count": 32,
+    "corpus_assertion_count": 176,
+    "baseline_eligible_case_count": 24,
+    "exact_rule_count": 5,
+    "partial_rule_count": 18,
+    "no_counterpart_rule_count": 12,
+    "decision_count": 24,
+    "positive_prediction_count": 11,
+    "negative_prediction_count": 13,
+    "exclusion_count": 152
+  },
+  "decisions": [
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-06",
+      "module": "iam",
+      "lab_rule_id": "IAM-006",
+      "resource_type": "user",
+      "resource_id": "user-console-b",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_user_mfa_enabled_console_access"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/iam/eval-iam-002-simplified.json",
+          "sha256": "a381612ce30ef06a1eb0aa37d7b4dbbed3923970b2ab29ffc6e1911863c919c8"
+        }
+      ],
+      "prediction": true,
+      "basis": "Console password is enabled and MFA is explicitly inactive."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-07",
+      "module": "iam",
+      "lab_rule_id": "IAM-007",
+      "resource_type": "user",
+      "resource_id": "user-old-key-b",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_rotate_access_key_90_days"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/iam/eval-iam-002-simplified.json",
+          "sha256": "a381612ce30ef06a1eb0aa37d7b4dbbed3923970b2ab29ffc6e1911863c919c8"
+        }
+      ],
+      "prediction": true,
+      "basis": "At least one active access key has age_days greater than 90."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-13",
+      "module": "iam",
+      "lab_rule_id": "IAM-013",
+      "resource_type": "root-account",
+      "resource_id": "root",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_no_root_access_key"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/iam/eval-iam-002-simplified.json",
+          "sha256": "a381612ce30ef06a1eb0aa37d7b4dbbed3923970b2ab29ffc6e1911863c919c8"
+        }
+      ],
+      "prediction": true,
+      "basis": "At least one root-account access key is active."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-10",
+      "module": "iam",
+      "lab_rule_id": "IAM-006",
+      "resource_type": "user",
+      "resource_id": "user-current-b",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_user_mfa_enabled_console_access"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/iam/eval-iam-004-simplified.json",
+          "sha256": "e0154d060bee701c884fc1444c8a79874e64317dbe7db0ff37520a1d4d9283f3"
+        }
+      ],
+      "prediction": false,
+      "basis": "Console password is enabled and MFA is explicitly inactive."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-11",
+      "module": "iam",
+      "lab_rule_id": "IAM-007",
+      "resource_type": "user",
+      "resource_id": "user-current-b",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_rotate_access_key_90_days"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/iam/eval-iam-004-simplified.json",
+          "sha256": "e0154d060bee701c884fc1444c8a79874e64317dbe7db0ff37520a1d4d9283f3"
+        }
+      ],
+      "prediction": false,
+      "basis": "At least one active access key has age_days greater than 90."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-14",
+      "module": "iam",
+      "lab_rule_id": "IAM-013",
+      "resource_type": "root-account",
+      "resource_id": "root",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_no_root_access_key"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/iam/eval-iam-004-simplified.json",
+          "sha256": "e0154d060bee701c884fc1444c8a79874e64317dbe7db0ff37520a1d4d9283f3"
+        }
+      ],
+      "prediction": false,
+      "basis": "At least one root-account access key is active."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-02",
+      "module": "iam",
+      "lab_rule_id": "IAM-006",
+      "resource_type": "user",
+      "resource_id": "user-console-edge",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_user_mfa_enabled_console_access"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/iam/eval-iam-005-simplified.json",
+          "sha256": "2952684562e0d1fde100e8b944db17ad4c79d6ce431868777111661b73d5fe0f"
+        }
+      ],
+      "prediction": true,
+      "basis": "Console password is enabled and MFA is explicitly inactive."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-03",
+      "module": "iam",
+      "lab_rule_id": "IAM-007",
+      "resource_type": "user",
+      "resource_id": "user-key-age-91",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_rotate_access_key_90_days"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/iam/eval-iam-005-simplified.json",
+          "sha256": "2952684562e0d1fde100e8b944db17ad4c79d6ce431868777111661b73d5fe0f"
+        }
+      ],
+      "prediction": true,
+      "basis": "At least one active access key has age_days greater than 90."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-04",
+      "module": "iam",
+      "lab_rule_id": "IAM-007",
+      "resource_type": "user",
+      "resource_id": "user-key-age-90",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_rotate_access_key_90_days"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/iam/eval-iam-005-simplified.json",
+          "sha256": "2952684562e0d1fde100e8b944db17ad4c79d6ce431868777111661b73d5fe0f"
+        }
+      ],
+      "prediction": false,
+      "basis": "At least one active access key has age_days greater than 90."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-09",
+      "module": "iam",
+      "lab_rule_id": "IAM-013",
+      "resource_type": "root-account",
+      "resource_id": "root",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_no_root_access_key"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/iam/eval-iam-005-simplified.json",
+          "sha256": "2952684562e0d1fde100e8b944db17ad4c79d6ce431868777111661b73d5fe0f"
+        }
+      ],
+      "prediction": true,
+      "basis": "At least one root-account access key is active."
+    },
+    {
+      "case_id": "EVAL-IAM-006",
+      "assertion_id": "AST-IAM-006-03",
+      "module": "iam",
+      "lab_rule_id": "IAM-006",
+      "resource_type": "user",
+      "resource_id": "user-console-protected-edge",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_user_mfa_enabled_console_access"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/iam/eval-iam-006-simplified.json",
+          "sha256": "253d2bf063f5c301c42a9b98eae0336154a1ed8beb9b3131ef7fe899fe3c230c"
+        }
+      ],
+      "prediction": false,
+      "basis": "Console password is enabled and MFA is explicitly inactive."
+    },
+    {
+      "case_id": "EVAL-IAM-006",
+      "assertion_id": "AST-IAM-006-04",
+      "module": "iam",
+      "lab_rule_id": "IAM-013",
+      "resource_type": "root-account",
+      "resource_id": "root",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_no_root_access_key"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/iam/eval-iam-006-simplified.json",
+          "sha256": "253d2bf063f5c301c42a9b98eae0336154a1ed8beb9b3131ef7fe899fe3c230c"
+        }
+      ],
+      "prediction": false,
+      "basis": "At least one root-account access key is active."
+    },
+    {
+      "case_id": "EVAL-STO-001",
+      "assertion_id": "AST-STO-001-04",
+      "module": "storage",
+      "lab_rule_id": "STO-004",
+      "resource_type": "bucket",
+      "resource_id": "cobalt-export-a",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_default_encryption"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/storage/eval-sto-001-simplified.json",
+          "sha256": "e1563cd724149b88cef1c64ec5475919ce4165447627af58d8b124ea76a45977"
+        }
+      ],
+      "prediction": false,
+      "basis": "Explicit bucket default-encryption enabled state is not true."
+    },
+    {
+      "case_id": "EVAL-STO-001",
+      "assertion_id": "AST-STO-001-05",
+      "module": "storage",
+      "lab_rule_id": "STO-005",
+      "resource_type": "bucket",
+      "resource_id": "cobalt-export-a",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_object_versioning"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/storage/eval-sto-001-simplified.json",
+          "sha256": "e1563cd724149b88cef1c64ec5475919ce4165447627af58d8b124ea76a45977"
+        }
+      ],
+      "prediction": true,
+      "basis": "Bucket versioning status is not Enabled."
+    },
+    {
+      "case_id": "EVAL-STO-002",
+      "assertion_id": "AST-STO-002-04",
+      "module": "storage",
+      "lab_rule_id": "STO-004",
+      "resource_type": "bucket",
+      "resource_id": "ember-dataset-b",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_default_encryption"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/storage/eval-sto-002-simplified.json",
+          "sha256": "84e35618390ade3c17c6855b7506255437d5b6bf901536cf7a8dc01bec25d2bb"
+        }
+      ],
+      "prediction": true,
+      "basis": "Explicit bucket default-encryption enabled state is not true."
+    },
+    {
+      "case_id": "EVAL-STO-002",
+      "assertion_id": "AST-STO-002-05",
+      "module": "storage",
+      "lab_rule_id": "STO-005",
+      "resource_type": "bucket",
+      "resource_id": "ember-dataset-b",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_object_versioning"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/storage/eval-sto-002-simplified.json",
+          "sha256": "84e35618390ade3c17c6855b7506255437d5b6bf901536cf7a8dc01bec25d2bb"
+        }
+      ],
+      "prediction": true,
+      "basis": "Bucket versioning status is not Enabled."
+    },
+    {
+      "case_id": "EVAL-STO-003",
+      "assertion_id": "AST-STO-003-04",
+      "module": "storage",
+      "lab_rule_id": "STO-004",
+      "resource_type": "bucket",
+      "resource_id": "fjord-audit-a",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_default_encryption"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/storage/eval-sto-003-simplified.json",
+          "sha256": "28bf9e82509448ed35c500aab1f0b02fad9ce02719af5ff622d0e65d49723fc8"
+        }
+      ],
+      "prediction": false,
+      "basis": "Explicit bucket default-encryption enabled state is not true."
+    },
+    {
+      "case_id": "EVAL-STO-003",
+      "assertion_id": "AST-STO-003-05",
+      "module": "storage",
+      "lab_rule_id": "STO-005",
+      "resource_type": "bucket",
+      "resource_id": "fjord-audit-a",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_object_versioning"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/storage/eval-sto-003-simplified.json",
+          "sha256": "28bf9e82509448ed35c500aab1f0b02fad9ce02719af5ff622d0e65d49723fc8"
+        }
+      ],
+      "prediction": false,
+      "basis": "Bucket versioning status is not Enabled."
+    },
+    {
+      "case_id": "EVAL-STO-004",
+      "assertion_id": "AST-STO-004-04",
+      "module": "storage",
+      "lab_rule_id": "STO-004",
+      "resource_type": "bucket",
+      "resource_id": "glacier-ledger-b",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_default_encryption"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/storage/eval-sto-004-simplified.json",
+          "sha256": "bb955aca03a9f37064ad022e72e33dae3ba2fff84e7d13d2cbca3dae60f9b112"
+        }
+      ],
+      "prediction": false,
+      "basis": "Explicit bucket default-encryption enabled state is not true."
+    },
+    {
+      "case_id": "EVAL-STO-004",
+      "assertion_id": "AST-STO-004-05",
+      "module": "storage",
+      "lab_rule_id": "STO-005",
+      "resource_type": "bucket",
+      "resource_id": "glacier-ledger-b",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_object_versioning"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/storage/eval-sto-004-simplified.json",
+          "sha256": "bb955aca03a9f37064ad022e72e33dae3ba2fff84e7d13d2cbca3dae60f9b112"
+        }
+      ],
+      "prediction": false,
+      "basis": "Bucket versioning status is not Enabled."
+    },
+    {
+      "case_id": "EVAL-STO-005",
+      "assertion_id": "AST-STO-005-04",
+      "module": "storage",
+      "lab_rule_id": "STO-004",
+      "resource_type": "bucket",
+      "resource_id": "harbor-encryption-edge",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_default_encryption"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/storage/eval-sto-005-simplified.json",
+          "sha256": "33ac7074a012e90307a43271c70c73b870916c03c1baafa4ef716463f81db360"
+        }
+      ],
+      "prediction": true,
+      "basis": "Explicit bucket default-encryption enabled state is not true."
+    },
+    {
+      "case_id": "EVAL-STO-005",
+      "assertion_id": "AST-STO-005-05",
+      "module": "storage",
+      "lab_rule_id": "STO-005",
+      "resource_type": "bucket",
+      "resource_id": "harbor-encryption-edge",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_object_versioning"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/storage/eval-sto-005-simplified.json",
+          "sha256": "33ac7074a012e90307a43271c70c73b870916c03c1baafa4ef716463f81db360"
+        }
+      ],
+      "prediction": false,
+      "basis": "Bucket versioning status is not Enabled."
+    },
+    {
+      "case_id": "EVAL-STO-006",
+      "assertion_id": "AST-STO-006-04",
+      "module": "storage",
+      "lab_rule_id": "STO-004",
+      "resource_type": "bucket",
+      "resource_id": "indigo-policy-edge",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_default_encryption"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/storage/eval-sto-006-simplified.json",
+          "sha256": "e8c14f448ec0d2f5b52b274646460a8ee1d5a71960569bd1f2a71f6cf436bab1"
+        }
+      ],
+      "prediction": false,
+      "basis": "Explicit bucket default-encryption enabled state is not true."
+    },
+    {
+      "case_id": "EVAL-STO-006",
+      "assertion_id": "AST-STO-006-05",
+      "module": "storage",
+      "lab_rule_id": "STO-005",
+      "resource_type": "bucket",
+      "resource_id": "indigo-policy-edge",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_object_versioning"
+      ],
+      "input_variant_id": "simplified",
+      "evidence_files": [
+        {
+          "path": "evaluation/corpus-v1.0/storage/eval-sto-006-simplified.json",
+          "sha256": "e8c14f448ec0d2f5b52b274646460a8ee1d5a71960569bd1f2a71f6cf436bab1"
+        }
+      ],
+      "prediction": true,
+      "basis": "Bucket versioning status is not Enabled."
+    }
+  ],
+  "exclusions": [
+    {
+      "case_id": "EVAL-IAM-001",
+      "assertion_id": "AST-IAM-001-01",
+      "module": "iam",
+      "lab_rule_id": "IAM-001",
+      "resource_type": "role",
+      "resource_id": "role-admin-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-001",
+      "assertion_id": "AST-IAM-001-02",
+      "module": "iam",
+      "lab_rule_id": "IAM-003",
+      "resource_type": "role",
+      "resource_id": "role-admin-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-001",
+      "assertion_id": "AST-IAM-001-03",
+      "module": "iam",
+      "lab_rule_id": "IAM-002",
+      "resource_type": "role",
+      "resource_id": "role-partial-wildcard-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-001",
+      "assertion_id": "AST-IAM-001-04",
+      "module": "iam",
+      "lab_rule_id": "IAM-004",
+      "resource_type": "role",
+      "resource_id": "role-broad-write-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-IAM-001",
+      "assertion_id": "AST-IAM-001-05",
+      "module": "iam",
+      "lab_rule_id": "IAM-008",
+      "resource_type": "role",
+      "resource_id": "role-vendor-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-001",
+      "assertion_id": "AST-IAM-001-06",
+      "module": "iam",
+      "lab_rule_id": "IAM-009",
+      "resource_type": "role",
+      "resource_id": "role-complement-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-001",
+      "assertion_id": "AST-IAM-001-07",
+      "module": "iam",
+      "lab_rule_id": "IAM-010",
+      "resource_type": "role",
+      "resource_id": "role-exclusion-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-001",
+      "assertion_id": "AST-IAM-001-08",
+      "module": "iam",
+      "lab_rule_id": "IAM-015",
+      "resource_type": "role",
+      "resource_id": "role-boundary-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-01",
+      "module": "iam",
+      "lab_rule_id": "IAM-001",
+      "resource_type": "role",
+      "resource_id": "role-admin-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-02",
+      "module": "iam",
+      "lab_rule_id": "IAM-003",
+      "resource_type": "role",
+      "resource_id": "role-admin-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-03",
+      "module": "iam",
+      "lab_rule_id": "IAM-002",
+      "resource_type": "role",
+      "resource_id": "role-partial-wildcard-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-04",
+      "module": "iam",
+      "lab_rule_id": "IAM-004",
+      "resource_type": "role",
+      "resource_id": "role-broad-write-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-05",
+      "module": "iam",
+      "lab_rule_id": "IAM-005",
+      "resource_type": "user",
+      "resource_id": "user-sensitive-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-08",
+      "module": "iam",
+      "lab_rule_id": "IAM-008",
+      "resource_type": "role",
+      "resource_id": "role-vendor-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-09",
+      "module": "iam",
+      "lab_rule_id": "IAM-009",
+      "resource_type": "role",
+      "resource_id": "role-complement-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-10",
+      "module": "iam",
+      "lab_rule_id": "IAM-010",
+      "resource_type": "role",
+      "resource_id": "role-exclusion-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-11",
+      "module": "iam",
+      "lab_rule_id": "IAM-011",
+      "resource_type": "user",
+      "resource_id": "user-stale-key-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-12",
+      "module": "iam",
+      "lab_rule_id": "IAM-012",
+      "resource_type": "user",
+      "resource_id": "user-stale-password-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-14",
+      "module": "iam",
+      "lab_rule_id": "IAM-014",
+      "resource_type": "root-account",
+      "resource_id": "root",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-15",
+      "module": "iam",
+      "lab_rule_id": "IAM-015",
+      "resource_type": "role",
+      "resource_id": "role-boundary-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-IAM-003",
+      "assertion_id": "AST-IAM-003-01",
+      "module": "iam",
+      "lab_rule_id": "IAM-001",
+      "resource_type": "role",
+      "resource_id": "role-readonly-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-003",
+      "assertion_id": "AST-IAM-003-02",
+      "module": "iam",
+      "lab_rule_id": "IAM-002",
+      "resource_type": "role",
+      "resource_id": "role-readonly-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-003",
+      "assertion_id": "AST-IAM-003-03",
+      "module": "iam",
+      "lab_rule_id": "IAM-003",
+      "resource_type": "role",
+      "resource_id": "role-readonly-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-003",
+      "assertion_id": "AST-IAM-003-04",
+      "module": "iam",
+      "lab_rule_id": "IAM-004",
+      "resource_type": "role",
+      "resource_id": "role-readonly-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-IAM-003",
+      "assertion_id": "AST-IAM-003-05",
+      "module": "iam",
+      "lab_rule_id": "IAM-008",
+      "resource_type": "role",
+      "resource_id": "role-readonly-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-003",
+      "assertion_id": "AST-IAM-003-06",
+      "module": "iam",
+      "lab_rule_id": "IAM-009",
+      "resource_type": "role",
+      "resource_id": "role-readonly-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-003",
+      "assertion_id": "AST-IAM-003-07",
+      "module": "iam",
+      "lab_rule_id": "IAM-010",
+      "resource_type": "role",
+      "resource_id": "role-readonly-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-003",
+      "assertion_id": "AST-IAM-003-08",
+      "module": "iam",
+      "lab_rule_id": "IAM-015",
+      "resource_type": "role",
+      "resource_id": "role-readonly-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-01",
+      "module": "iam",
+      "lab_rule_id": "IAM-001",
+      "resource_type": "role",
+      "resource_id": "role-readonly-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-02",
+      "module": "iam",
+      "lab_rule_id": "IAM-002",
+      "resource_type": "role",
+      "resource_id": "role-readonly-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-03",
+      "module": "iam",
+      "lab_rule_id": "IAM-003",
+      "resource_type": "role",
+      "resource_id": "role-readonly-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-04",
+      "module": "iam",
+      "lab_rule_id": "IAM-004",
+      "resource_type": "role",
+      "resource_id": "role-readonly-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-05",
+      "module": "iam",
+      "lab_rule_id": "IAM-008",
+      "resource_type": "role",
+      "resource_id": "role-readonly-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-06",
+      "module": "iam",
+      "lab_rule_id": "IAM-009",
+      "resource_type": "role",
+      "resource_id": "role-readonly-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-07",
+      "module": "iam",
+      "lab_rule_id": "IAM-010",
+      "resource_type": "role",
+      "resource_id": "role-readonly-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-08",
+      "module": "iam",
+      "lab_rule_id": "IAM-015",
+      "resource_type": "role",
+      "resource_id": "role-readonly-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-09",
+      "module": "iam",
+      "lab_rule_id": "IAM-005",
+      "resource_type": "user",
+      "resource_id": "user-sensitive-mfa-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-12",
+      "module": "iam",
+      "lab_rule_id": "IAM-011",
+      "resource_type": "user",
+      "resource_id": "user-current-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-13",
+      "module": "iam",
+      "lab_rule_id": "IAM-012",
+      "resource_type": "user",
+      "resource_id": "user-current-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-15",
+      "module": "iam",
+      "lab_rule_id": "IAM-014",
+      "resource_type": "root-account",
+      "resource_id": "root",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-01",
+      "module": "iam",
+      "lab_rule_id": "IAM-005",
+      "resource_type": "user",
+      "resource_id": "user-sensitive-edge",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-05",
+      "module": "iam",
+      "lab_rule_id": "IAM-011",
+      "resource_type": "user",
+      "resource_id": "user-key-unused-91",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-06",
+      "module": "iam",
+      "lab_rule_id": "IAM-011",
+      "resource_type": "user",
+      "resource_id": "user-key-unused-90",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-07",
+      "module": "iam",
+      "lab_rule_id": "IAM-012",
+      "resource_type": "user",
+      "resource_id": "user-password-unused-91",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-08",
+      "module": "iam",
+      "lab_rule_id": "IAM-012",
+      "resource_type": "user",
+      "resource_id": "user-password-unused-90",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-10",
+      "module": "iam",
+      "lab_rule_id": "IAM-014",
+      "resource_type": "root-account",
+      "resource_id": "root",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-006",
+      "assertion_id": "AST-IAM-006-01",
+      "module": "iam",
+      "lab_rule_id": "IAM-005",
+      "resource_type": "user",
+      "resource_id": "user-bool-if-exists",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-IAM-006",
+      "assertion_id": "AST-IAM-006-02",
+      "module": "iam",
+      "lab_rule_id": "IAM-005",
+      "resource_type": "user",
+      "resource_id": "user-strict-mfa-edge",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-IAM-006",
+      "assertion_id": "AST-IAM-006-05",
+      "module": "iam",
+      "lab_rule_id": "IAM-014",
+      "resource_type": "root-account",
+      "resource_id": "root",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-007",
+      "assertion_id": "AST-IAM-007-01",
+      "module": "iam",
+      "lab_rule_id": "IAM-005",
+      "resource_type": "user",
+      "resource_id": "user-dynamic-mfa",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "case-ineligible",
+      "explanation": "The corpus marks this ambiguous case ineligible for baseline agreement; the retained assertion remains visible."
+    },
+    {
+      "case_id": "EVAL-IAM-008",
+      "assertion_id": "AST-IAM-008-01",
+      "module": "iam",
+      "lab_rule_id": "IAM-008",
+      "resource_type": "role",
+      "resource_id": "role-dynamic-external-id",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "case-ineligible",
+      "explanation": "The corpus marks this ambiguous case ineligible for baseline agreement; the retained assertion remains visible."
+    },
+    {
+      "case_id": "EVAL-STO-001",
+      "assertion_id": "AST-STO-001-01",
+      "module": "storage",
+      "lab_rule_id": "STO-001",
+      "resource_type": "bucket",
+      "resource_id": "cobalt-export-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-001",
+      "assertion_id": "AST-STO-001-02",
+      "module": "storage",
+      "lab_rule_id": "STO-002",
+      "resource_type": "bucket",
+      "resource_id": "cobalt-export-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-001",
+      "assertion_id": "AST-STO-001-03",
+      "module": "storage",
+      "lab_rule_id": "STO-003",
+      "resource_type": "bucket",
+      "resource_id": "cobalt-export-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-001",
+      "assertion_id": "AST-STO-001-06",
+      "module": "storage",
+      "lab_rule_id": "STO-006",
+      "resource_type": "bucket",
+      "resource_id": "cobalt-export-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-002",
+      "assertion_id": "AST-STO-002-01",
+      "module": "storage",
+      "lab_rule_id": "STO-001",
+      "resource_type": "bucket",
+      "resource_id": "ember-dataset-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-002",
+      "assertion_id": "AST-STO-002-02",
+      "module": "storage",
+      "lab_rule_id": "STO-002",
+      "resource_type": "bucket",
+      "resource_id": "ember-dataset-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-002",
+      "assertion_id": "AST-STO-002-03",
+      "module": "storage",
+      "lab_rule_id": "STO-003",
+      "resource_type": "bucket",
+      "resource_id": "ember-dataset-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-002",
+      "assertion_id": "AST-STO-002-06",
+      "module": "storage",
+      "lab_rule_id": "STO-006",
+      "resource_type": "bucket",
+      "resource_id": "ember-dataset-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-003",
+      "assertion_id": "AST-STO-003-01",
+      "module": "storage",
+      "lab_rule_id": "STO-001",
+      "resource_type": "bucket",
+      "resource_id": "fjord-audit-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-003",
+      "assertion_id": "AST-STO-003-02",
+      "module": "storage",
+      "lab_rule_id": "STO-002",
+      "resource_type": "bucket",
+      "resource_id": "fjord-audit-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-003",
+      "assertion_id": "AST-STO-003-03",
+      "module": "storage",
+      "lab_rule_id": "STO-003",
+      "resource_type": "bucket",
+      "resource_id": "fjord-audit-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-003",
+      "assertion_id": "AST-STO-003-06",
+      "module": "storage",
+      "lab_rule_id": "STO-006",
+      "resource_type": "bucket",
+      "resource_id": "fjord-audit-a",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-004",
+      "assertion_id": "AST-STO-004-01",
+      "module": "storage",
+      "lab_rule_id": "STO-001",
+      "resource_type": "bucket",
+      "resource_id": "glacier-ledger-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-004",
+      "assertion_id": "AST-STO-004-02",
+      "module": "storage",
+      "lab_rule_id": "STO-002",
+      "resource_type": "bucket",
+      "resource_id": "glacier-ledger-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-004",
+      "assertion_id": "AST-STO-004-03",
+      "module": "storage",
+      "lab_rule_id": "STO-003",
+      "resource_type": "bucket",
+      "resource_id": "glacier-ledger-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-004",
+      "assertion_id": "AST-STO-004-06",
+      "module": "storage",
+      "lab_rule_id": "STO-006",
+      "resource_type": "bucket",
+      "resource_id": "glacier-ledger-b",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-005",
+      "assertion_id": "AST-STO-005-01",
+      "module": "storage",
+      "lab_rule_id": "STO-001",
+      "resource_type": "bucket",
+      "resource_id": "harbor-encryption-edge",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-005",
+      "assertion_id": "AST-STO-005-02",
+      "module": "storage",
+      "lab_rule_id": "STO-002",
+      "resource_type": "bucket",
+      "resource_id": "harbor-encryption-edge",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-005",
+      "assertion_id": "AST-STO-005-03",
+      "module": "storage",
+      "lab_rule_id": "STO-003",
+      "resource_type": "bucket",
+      "resource_id": "harbor-encryption-edge",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-005",
+      "assertion_id": "AST-STO-005-06",
+      "module": "storage",
+      "lab_rule_id": "STO-006",
+      "resource_type": "bucket",
+      "resource_id": "harbor-encryption-edge",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-006",
+      "assertion_id": "AST-STO-006-01",
+      "module": "storage",
+      "lab_rule_id": "STO-001",
+      "resource_type": "bucket",
+      "resource_id": "indigo-policy-edge",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-006",
+      "assertion_id": "AST-STO-006-02",
+      "module": "storage",
+      "lab_rule_id": "STO-002",
+      "resource_type": "bucket",
+      "resource_id": "indigo-policy-edge",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-006",
+      "assertion_id": "AST-STO-006-03",
+      "module": "storage",
+      "lab_rule_id": "STO-003",
+      "resource_type": "bucket",
+      "resource_id": "indigo-policy-edge",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-006",
+      "assertion_id": "AST-STO-006-06",
+      "module": "storage",
+      "lab_rule_id": "STO-006",
+      "resource_type": "bucket",
+      "resource_id": "indigo-policy-edge",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-STO-007",
+      "assertion_id": "AST-STO-007-01",
+      "module": "storage",
+      "lab_rule_id": "STO-002",
+      "resource_type": "bucket",
+      "resource_id": "juno-ownership-unknown",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "case-ineligible",
+      "explanation": "The corpus marks this ambiguous case ineligible for baseline agreement; the retained assertion remains visible."
+    },
+    {
+      "case_id": "EVAL-STO-008",
+      "assertion_id": "AST-STO-008-01",
+      "module": "storage",
+      "lab_rule_id": "STO-002",
+      "resource_type": "bucket",
+      "resource_id": "kepler-ownership-unknown",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "case-ineligible",
+      "explanation": "The corpus marks this ambiguous case ineligible for baseline agreement; the retained assertion remains visible."
+    },
+    {
+      "case_id": "EVAL-NET-001",
+      "assertion_id": "AST-NET-001-01",
+      "module": "network",
+      "lab_rule_id": "NET-001",
+      "resource_type": "security_group",
+      "resource_id": "sg-0a11ce01",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-NET-001",
+      "assertion_id": "AST-NET-001-02",
+      "module": "network",
+      "lab_rule_id": "NET-002",
+      "resource_type": "security_group",
+      "resource_id": "sg-0a11ce01",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-NET-001",
+      "assertion_id": "AST-NET-001-03",
+      "module": "network",
+      "lab_rule_id": "NET-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-0a11ce01",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-NET-002",
+      "assertion_id": "AST-NET-002-01",
+      "module": "network",
+      "lab_rule_id": "NET-001",
+      "resource_type": "security_group",
+      "resource_id": "sg-0b22ce02",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-NET-002",
+      "assertion_id": "AST-NET-002-02",
+      "module": "network",
+      "lab_rule_id": "NET-002",
+      "resource_type": "security_group",
+      "resource_id": "sg-0b22ce02",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-NET-002",
+      "assertion_id": "AST-NET-002-03",
+      "module": "network",
+      "lab_rule_id": "NET-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-0b22ce02",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-NET-003",
+      "assertion_id": "AST-NET-003-01",
+      "module": "network",
+      "lab_rule_id": "NET-001",
+      "resource_type": "security_group",
+      "resource_id": "sg-0c33ce03",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-NET-003",
+      "assertion_id": "AST-NET-003-02",
+      "module": "network",
+      "lab_rule_id": "NET-002",
+      "resource_type": "security_group",
+      "resource_id": "sg-0c33ce03",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-NET-003",
+      "assertion_id": "AST-NET-003-03",
+      "module": "network",
+      "lab_rule_id": "NET-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-0c33ce03",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-NET-004",
+      "assertion_id": "AST-NET-004-01",
+      "module": "network",
+      "lab_rule_id": "NET-001",
+      "resource_type": "security_group",
+      "resource_id": "sg-0e55ce05",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-NET-004",
+      "assertion_id": "AST-NET-004-02",
+      "module": "network",
+      "lab_rule_id": "NET-002",
+      "resource_type": "security_group",
+      "resource_id": "sg-0e55ce05",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-NET-004",
+      "assertion_id": "AST-NET-004-03",
+      "module": "network",
+      "lab_rule_id": "NET-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-0e55ce05",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-NET-005",
+      "assertion_id": "AST-NET-005-01",
+      "module": "network",
+      "lab_rule_id": "NET-001",
+      "resource_type": "security_group",
+      "resource_id": "sg-0f66ce06",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-NET-005",
+      "assertion_id": "AST-NET-005-02",
+      "module": "network",
+      "lab_rule_id": "NET-002",
+      "resource_type": "security_group",
+      "resource_id": "sg-0f66ce06",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-NET-005",
+      "assertion_id": "AST-NET-005-03",
+      "module": "network",
+      "lab_rule_id": "NET-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-0f66ce06",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-NET-006",
+      "assertion_id": "AST-NET-006-01",
+      "module": "network",
+      "lab_rule_id": "NET-001",
+      "resource_type": "security_group",
+      "resource_id": "sg-1a77ce07",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-NET-006",
+      "assertion_id": "AST-NET-006-02",
+      "module": "network",
+      "lab_rule_id": "NET-002",
+      "resource_type": "security_group",
+      "resource_id": "sg-1a77ce07",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-NET-006",
+      "assertion_id": "AST-NET-006-03",
+      "module": "network",
+      "lab_rule_id": "NET-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-1a77ce07",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-NET-007",
+      "assertion_id": "AST-NET-007-01",
+      "module": "network",
+      "lab_rule_id": "NET-001",
+      "resource_type": "security_group",
+      "resource_id": "sg-2b88ce08",
+      "baseline_id": "prowler-aws",
+      "relationship": "partial",
+      "reason": "case-ineligible",
+      "explanation": "The corpus marks this ambiguous case ineligible for baseline agreement; the retained assertion remains visible."
+    },
+    {
+      "case_id": "EVAL-NET-008",
+      "assertion_id": "AST-NET-008-01",
+      "module": "network",
+      "lab_rule_id": "NET-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-4daa0e10",
+      "baseline_id": "prowler-aws",
+      "relationship": "none",
+      "reason": "case-ineligible",
+      "explanation": "The corpus marks this ambiguous case ineligible for baseline agreement; the retained assertion remains visible."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-01",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-001",
+      "resource_type": "identity",
+      "resource_id": "root",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-02",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-002",
+      "resource_type": "identity",
+      "resource_id": "target-user-a",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-03",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-6fcc2e12",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-04",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-004",
+      "resource_type": "bucket",
+      "resource_id": "lumen-archive-a",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-05",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-005",
+      "resource_type": "iam_policy",
+      "resource_id": "arn:aws:iam::579246801357:policy/evaluation-a",
+      "baseline_id": "sigma-core",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-06",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-006",
+      "resource_type": "api_activity",
+      "resource_id": "probe-a@192.0.2.44",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-07",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-007",
+      "resource_type": "identity",
+      "resource_id": "console-user-a",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-08",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-008",
+      "resource_type": "identity",
+      "resource_id": "credential-target-a",
+      "baseline_id": "sigma-core",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-09",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-009",
+      "resource_type": "role",
+      "resource_id": "federation-role-a",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-10",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-010",
+      "resource_type": "security_control",
+      "resource_id": "evaluation-trail-a",
+      "baseline_id": "sigma-core",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-11",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-011",
+      "resource_type": "kms_key",
+      "resource_id": "arn:aws:kms:ap-southeast-2:579246801357:key/evaluation-a",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-01",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-001",
+      "resource_type": "identity",
+      "resource_id": "root",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-02",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-002",
+      "resource_type": "identity",
+      "resource_id": "target-user-b",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-03",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-5ebb1e11",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-04",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-004",
+      "resource_type": "bucket",
+      "resource_id": "lumen-archive-b",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-05",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-005",
+      "resource_type": "iam_policy",
+      "resource_id": "arn:aws:iam::579246801357:policy/evaluation-b",
+      "baseline_id": "sigma-core",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-06",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-006",
+      "resource_type": "api_activity",
+      "resource_id": "probe-b@198.51.100.52",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-07",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-007",
+      "resource_type": "identity",
+      "resource_id": "console-user-b",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-08",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-008",
+      "resource_type": "identity",
+      "resource_id": "credential-target-b",
+      "baseline_id": "sigma-core",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-09",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-009",
+      "resource_type": "role",
+      "resource_id": "federation-role-b",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-10",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-010",
+      "resource_type": "security_control",
+      "resource_id": "detector-eval-b",
+      "baseline_id": "sigma-core",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-11",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-011",
+      "resource_type": "kms_key",
+      "resource_id": "arn:aws:kms:ap-southeast-2:579246801357:key/evaluation-b",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-01",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-001",
+      "resource_type": "identity",
+      "resource_id": "root",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-02",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-002",
+      "resource_type": "identity",
+      "resource_id": "negative-user-a",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-03",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-7add3e13",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-04",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-004",
+      "resource_type": "bucket",
+      "resource_id": "negative-bucket-a",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-05",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-005",
+      "resource_type": "iam_policy",
+      "resource_id": "arn:aws:iam::579246801357:policy/negative-a",
+      "baseline_id": "sigma-core",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-06",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-006",
+      "resource_type": "api_activity",
+      "resource_id": "probe-negative-a@198.51.100.70",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-07",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-007",
+      "resource_type": "identity",
+      "resource_id": "mfa-user-a",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-08",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-008",
+      "resource_type": "identity",
+      "resource_id": "credential-negative-a",
+      "baseline_id": "sigma-core",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-09",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-009",
+      "resource_type": "role",
+      "resource_id": "negative-role-a",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-10",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-010",
+      "resource_type": "security_control",
+      "resource_id": "detector-negative-a",
+      "baseline_id": "sigma-core",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-11",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-011",
+      "resource_type": "kms_key",
+      "resource_id": "arn:aws:kms:ap-southeast-2:579246801357:key/negative-a",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-01",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-001",
+      "resource_type": "identity",
+      "resource_id": "root",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-02",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-002",
+      "resource_type": "identity",
+      "resource_id": "negative-user-b",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-03",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-8bee4e14",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-04",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-004",
+      "resource_type": "bucket",
+      "resource_id": "negative-bucket-b",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-05",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-005",
+      "resource_type": "iam_policy",
+      "resource_id": "arn:aws:iam::579246801357:policy/negative-b",
+      "baseline_id": "sigma-core",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-06",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-006",
+      "resource_type": "api_activity",
+      "resource_id": "probe-negative-b@203.0.113.80",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-07",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-007",
+      "resource_type": "identity",
+      "resource_id": "mfa-console-b",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-08",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-008",
+      "resource_type": "identity",
+      "resource_id": "credential-negative-b",
+      "baseline_id": "sigma-core",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-09",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-009",
+      "resource_type": "role",
+      "resource_id": "negative-role-b",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-10",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-010",
+      "resource_type": "security_control",
+      "resource_id": "detector-negative-b",
+      "baseline_id": "sigma-core",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-11",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-011",
+      "resource_type": "kms_key",
+      "resource_id": "arn:aws:kms:ap-southeast-2:579246801357:key/negative-b",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-005",
+      "assertion_id": "AST-CLD-005-01",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-006",
+      "resource_type": "api_activity",
+      "resource_id": "probe-edge-five@192.0.2.90",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-005",
+      "assertion_id": "AST-CLD-005-02",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-006",
+      "resource_type": "api_activity",
+      "resource_id": "probe-edge-four@192.0.2.91",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-005",
+      "assertion_id": "AST-CLD-005-03",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-010",
+      "resource_type": "security_control",
+      "resource_id": "detector-disabled-edge",
+      "baseline_id": "sigma-core",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-005",
+      "assertion_id": "AST-CLD-005-04",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-010",
+      "resource_type": "security_control",
+      "resource_id": "detector-enabled-edge",
+      "baseline_id": "sigma-core",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-005",
+      "assertion_id": "AST-CLD-005-05",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-011",
+      "resource_type": "kms_key",
+      "resource_id": "arn:aws:kms:ap-southeast-2:579246801357:key/error-message-edge",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-006",
+      "assertion_id": "AST-CLD-006-01",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-001",
+      "resource_type": "identity",
+      "resource_id": "root",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-006",
+      "assertion_id": "AST-CLD-006-02",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-008",
+      "resource_type": "identity",
+      "resource_id": "credential-error-edge",
+      "baseline_id": "sigma-core",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-006",
+      "assertion_id": "AST-CLD-006-03",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-010",
+      "resource_type": "security_control",
+      "resource_id": "trail-error-edge",
+      "baseline_id": "sigma-core",
+      "relationship": "partial",
+      "reason": "partial-overlap",
+      "explanation": "The rule-level predicates are only partially related, so this decision is excluded from agreement metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-006",
+      "assertion_id": "AST-CLD-006-04",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-006",
+      "resource_type": "api_activity",
+      "resource_id": "shared-name@198.51.100.92",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "no-counterpart",
+      "explanation": "The pinned released baseline has no directly comparable rule-level predicate."
+    },
+    {
+      "case_id": "EVAL-CLD-007",
+      "assertion_id": "AST-CLD-007-01",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-007",
+      "resource_type": "identity",
+      "resource_id": "mfa-state-unknown",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "case-ineligible",
+      "explanation": "The corpus marks this ambiguous case ineligible for baseline agreement; the retained assertion remains visible."
+    },
+    {
+      "case_id": "EVAL-CLD-008",
+      "assertion_id": "AST-CLD-008-01",
+      "module": "cloudtrail",
+      "lab_rule_id": "CLD-006",
+      "resource_type": "api_activity",
+      "resource_id": "HIDDEN_DUE_TO_SECURITY_REASONS@203.0.113.95",
+      "baseline_id": "sigma-core",
+      "relationship": "none",
+      "reason": "case-ineligible",
+      "explanation": "The corpus marks this ambiguous case ineligible for baseline agreement; the retained assertion remains visible."
+    }
+  ]
+}

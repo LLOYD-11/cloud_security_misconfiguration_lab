@@ -19,8 +19,8 @@ credentials or charges.
 | Security scope | IAM, S3, EC2 security groups, and CloudTrail |
 | Detection depth | 35 cataloged rules with qualified AWS Security Hub CSPM, CIS AWS Foundations, and MITRE ATT&CK mappings |
 | Deterministic sample | 39 findings, 2 incidents, 36 remediation actions, and 11 timeline entries |
-| Engineering assurance | 415 tests; 94.75% statement and 88.04% branch coverage; Python 3.10-3.13 CI |
-| Evaluation status | Protocol and 32-case, 176-assertion holdout frozen before candidate execution; results pending |
+| Engineering assurance | 426 tests; 93.80% statement and 87.24% branch coverage; Python 3.10-3.13 CI |
+| Evaluation status | Protocol, 32-case/176-assertion holdout, 35-rule baseline matrix, and 24 baseline decisions frozen; candidate results pending |
 | Safety boundary | Offline files only; zero runtime dependencies; no credentials and no cloud writes |
 
 ## Quick Start
@@ -72,13 +72,13 @@ engineering evidence.
 
 | Quality Gate | Verified Result |
 | --- | --- |
-| Automated tests | 415 unit, regression, integration, CLI, schema, compatibility, and benchmark tests pass |
-| Coverage | 6,082/6,419 statements (94.75%) and 2,289/2,600 branches (88.04%) |
+| Automated tests | 426 unit, regression, integration, CLI, schema, compatibility, and benchmark tests pass |
+| Coverage | 6,402/6,825 statements (93.80%) and 2,380/2,728 branches (87.24%) |
 | Rule benchmark | 78/78 exact functional cases and 4/4 malformed native inputs rejected |
 | Scale benchmark | 8/8 deterministic profiles pass across 100 to 10,000 inputs |
 | Supported Python | GitHub Actions exercises every minor from Python 3.10 through 3.13 |
 | Distribution | Wheel and sdist build; installed-wheel demo and packaged benchmark pass |
-| Independent evaluation | Frozen protocol plus a hashed 32-case, 42-file, 176-assertion corpus; no holdout result claimed yet |
+| Independent evaluation | Frozen protocol, 32-case/176-assertion corpus, complete 35-rule baseline matrix, and 24 source-audited baseline decisions; candidate result remains unrevealed |
 
 Timing is measured but deliberately not used as a CI threshold. Exact outputs,
 bounded finding amplification, repeated-run equality, structural operation
@@ -90,8 +90,11 @@ M12 evaluation is intentionally separate from that development benchmark. Its
 holdout rules, ground-truth process, Prowler and Sigma baselines, metrics, and
 acceptance thresholds before corpus construction or execution. The
 [frozen corpus](docs/evaluation-corpus.md) now publishes output-blind labels,
-citations, hashes, and exact inventory. No independent accuracy result is
-claimed until raw decisions are published.
+citations, hashes, and exact inventory. The
+[external-baseline audit](docs/evaluation-baselines.md) now freezes all 35
+Prowler/Sigma overlap classifications and 24 exact-overlap baseline decisions
+without importing or executing the candidate. No independent accuracy result
+is claimed until raw candidate decisions are published in M12-R4.
 
 ## What I Learned
 
@@ -444,6 +447,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [Benchmarking and resilience](docs/benchmarking.md)
 - [Independent evaluation protocol](docs/evaluation-protocol.md)
 - [Independent evaluation corpus](docs/evaluation-corpus.md)
+- [Independent evaluation baselines](docs/evaluation-baselines.md)
 - [Supply-chain controls](docs/supply-chain.md)
 - [Documentation quality gates](docs/documentation-quality.md)
 - [Engineering checks](docs/engineering.md)
@@ -476,6 +480,7 @@ mkdir -p reports/generated
 .venv/bin/python -m tools.check_markdown_links internal
 .venv/bin/python -m tools.check_markdown_links external
 .venv/bin/python -m tools.evaluation_corpus
+.venv/bin/python -m tools.evaluation_baselines
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
 .venv/bin/coverage json -o reports/generated/coverage.json
@@ -507,6 +512,8 @@ cloud_security_misconfiguration_lab/
 ├── evaluation/
 │   ├── protocol-v1.0.json
 │   ├── corpus-manifest-v1.0.json
+│   ├── baseline-overlap-v1.0.json
+│   ├── baseline-outcomes-v1.0.json
 │   └── corpus-v1.0/
 │       ├── iam/
 │       ├── storage/
@@ -515,6 +522,7 @@ cloud_security_misconfiguration_lab/
 ├── tools/
 │   ├── check_markdown_links.py
 │   ├── evaluation_corpus.py
+│   ├── evaluation_baselines.py
 │   └── release_evidence.py
 ├── cloud_security_lab/
 │   ├── __main__.py
@@ -578,6 +586,7 @@ cloud_security_misconfiguration_lab/
 │   ├── benchmark-manifest-v1.0.schema.json
 │   ├── benchmark-results-v1.0.schema.json
 │   ├── evaluation-baseline-overlap-v1.0.schema.json
+│   ├── evaluation-baseline-outcomes-v1.0.schema.json
 │   ├── evaluation-corpus-manifest-v1.0.schema.json
 │   ├── evaluation-protocol-v1.0.schema.json
 │   ├── evaluation-results-v1.0.schema.json

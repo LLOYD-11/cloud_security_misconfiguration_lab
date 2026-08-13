@@ -72,6 +72,9 @@ jobs:
       - name: Verify frozen evaluation corpus
         run: python -m tools.evaluation_corpus
 
+      - name: Verify frozen evaluation baselines
+        run: python -m tools.evaluation_baselines
+
       - name: Test with branch coverage
         run: >-
           mkdir -p reports/generated &&
@@ -98,13 +101,19 @@ jobs:
       - name: Build wheel and source distribution
         run: python -m build --no-isolation
 
-      - name: Verify wheel contains frozen evaluation corpus
+      - name: Verify wheel contains frozen evaluation evidence
         run: >-
           python -c "import glob, zipfile;
           wheel = glob.glob('dist/*.whl')[0];
           names = zipfile.ZipFile(wheel).namelist();
           assert any(name.endswith(
+          '/schemas/evaluation-baseline-outcomes-v1.0.schema.json') for name in names);
+          assert any(name.endswith(
           '/evaluation/corpus-manifest-v1.0.json') for name in names);
+          assert any(name.endswith(
+          '/evaluation/baseline-overlap-v1.0.json') for name in names);
+          assert any(name.endswith(
+          '/evaluation/baseline-outcomes-v1.0.json') for name in names);
           assert len([name for name in names
           if '/evaluation/corpus-v1.0/' in name]) == 42"
 

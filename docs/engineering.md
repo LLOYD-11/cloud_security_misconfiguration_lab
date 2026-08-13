@@ -28,6 +28,7 @@ mkdir -p reports/generated
 .venv/bin/python -m tools.check_markdown_links internal
 .venv/bin/python -m tools.check_markdown_links external
 .venv/bin/python -m tools.evaluation_corpus
+.venv/bin/python -m tools.evaluation_baselines
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
 .venv/bin/coverage json -o reports/generated/coverage.json
@@ -96,8 +97,8 @@ from its packaged JSON source. The build gate also confirms that the wheel
 contains the simplified-input validator, rule catalog, remediation and timeline
 modules, their schemas, and the AWS fixture manifest. It also verifies the
 packaged benchmark manifest, runner, both benchmark schemas, the frozen
-evaluation protocol, corpus manifest, all 42 corpus files, and all
-independent-evaluation schemas.
+evaluation protocol, corpus manifest, overlap matrix, baseline outcomes, all 42
+corpus files, and all independent-evaluation schemas.
 
 ## Release Process
 

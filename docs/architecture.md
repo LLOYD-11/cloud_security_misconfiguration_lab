@@ -133,7 +133,7 @@ The pipeline uses explicit, versioned JSON boundaries:
 | Rule metadata | Rule-catalog schema |
 | Derived views | Remediation-plan and attack-timeline schemas |
 | Bundled AWS-shaped evidence | Sanitized fixture-manifest schema |
-| Independent evaluation | Frozen protocol, corpus-manifest, baseline-overlap, and result schemas |
+| Independent evaluation | Frozen protocol, corpus, baseline-overlap, baseline-outcome, and result schemas |
 
 Python loaders enforce cross-field invariants that JSON Schema cannot express
 conveniently, such as declared-count equality, deterministic ordering, complete
@@ -141,9 +141,10 @@ source accounting, UTC ordering, and work-item linkage. Draft 2020-12 schema
 validation remains a development and CI gate.
 
 Evaluation is a repository-level assurance boundary rather than analyzer
-runtime logic. Its frozen protocol and [holdout corpus](evaluation-corpus.md)
-are kept separate from the development benchmark so candidate output cannot
-generate its own ground truth. See the
+runtime logic. Its frozen protocol, [holdout corpus](evaluation-corpus.md), and
+[external-baseline audit](evaluation-baselines.md) are kept separate from the
+development benchmark so candidate output cannot generate its own ground
+truth. See the
 [independent evaluation protocol](evaluation-protocol.md).
 
 See [Data contracts](data-contracts.md) for the complete contract index.

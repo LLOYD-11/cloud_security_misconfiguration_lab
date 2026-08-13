@@ -1,0 +1,261 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/schemas/evaluation-baseline-outcomes-v1.0.schema.json",
+  "title": "Independent Evaluation Baseline Outcomes v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "outcomes_id",
+    "outcomes_version",
+    "status",
+    "created_on",
+    "protocol",
+    "corpus",
+    "overlap_matrix",
+    "method",
+    "baseline_runs",
+    "summary",
+    "decisions",
+    "exclusions"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "outcomes_id": { "const": "cloud-security-baseline-outcomes" },
+    "outcomes_version": { "type": "string", "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$" },
+    "status": { "const": "frozen" },
+    "created_on": { "type": "string", "format": "date" },
+    "protocol": { "$ref": "#/$defs/artifact" },
+    "corpus": { "$ref": "#/$defs/artifact" },
+    "overlap_matrix": { "$ref": "#/$defs/artifact" },
+    "method": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "candidate_executed",
+        "candidate_imported",
+        "truth_labels_consumed",
+        "input_variant_policy",
+        "statement"
+      ],
+      "properties": {
+        "type": { "const": "source-audited-predicate-replay" },
+        "candidate_executed": { "const": false },
+        "candidate_imported": { "const": false },
+        "truth_labels_consumed": { "const": false },
+        "input_variant_policy": { "const": "one-declared-simplified-variant-per-case" },
+        "statement": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    },
+    "baseline_runs": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "$ref": "#/$defs/baselineRun" }
+    },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "corpus_case_count",
+        "corpus_assertion_count",
+        "baseline_eligible_case_count",
+        "exact_rule_count",
+        "partial_rule_count",
+        "no_counterpart_rule_count",
+        "decision_count",
+        "positive_prediction_count",
+        "negative_prediction_count",
+        "exclusion_count"
+      ],
+      "properties": {
+        "corpus_case_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "corpus_assertion_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "baseline_eligible_case_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "exact_rule_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "partial_rule_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "no_counterpart_rule_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "decision_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "positive_prediction_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "negative_prediction_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "exclusion_count": { "$ref": "#/$defs/nonNegativeInteger" }
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/decision" }
+    },
+    "exclusions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/exclusion" }
+    }
+  },
+  "$defs": {
+    "nonEmptyText": { "type": "string", "minLength": 1 },
+    "nonNegativeInteger": { "type": "integer", "minimum": 0 },
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "commitSha": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+    "httpsUrl": { "type": "string", "format": "uri", "pattern": "^https://" },
+    "moduleId": { "enum": ["iam", "storage", "network", "cloudtrail"] },
+    "ruleId": { "type": "string", "pattern": "^(?:IAM|STO|NET|CLD)-[0-9]{3}$" },
+    "caseId": { "type": "string", "pattern": "^EVAL-(?:IAM|STO|NET|CLD)-[0-9]{3}$" },
+    "assertionId": { "type": "string", "pattern": "^AST-(?:IAM|STO|NET|CLD)-[0-9]{3}-[0-9]{2}$" },
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "version", "sha256"],
+      "properties": {
+        "path": { "$ref": "#/$defs/nonEmptyText" },
+        "version": { "type": "string", "pattern": "^[1-9][0-9]*\\.[0-9]+\\.[0-9]+$" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "evidenceFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256"],
+      "properties": {
+        "path": { "type": "string", "pattern": "^evaluation/corpus-v[0-9]+\\.[0-9]+/" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "sourcePredicate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "lab_rule_id",
+        "baseline_check_id",
+        "source_path",
+        "source_url",
+        "sha256"
+      ],
+      "properties": {
+        "lab_rule_id": { "$ref": "#/$defs/ruleId" },
+        "baseline_check_id": { "$ref": "#/$defs/nonEmptyText" },
+        "source_path": { "$ref": "#/$defs/nonEmptyText" },
+        "source_url": { "$ref": "#/$defs/httpsUrl" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "baselineRun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "baseline_id",
+        "version",
+        "commit_sha",
+        "execution_mode",
+        "upstream_tool_executed",
+        "exact_rule_count",
+        "decision_count",
+        "positive_prediction_count",
+        "negative_prediction_count",
+        "exclusion_count",
+        "source_predicates",
+        "release_inventory",
+        "notes"
+      ],
+      "properties": {
+        "baseline_id": { "enum": ["prowler-aws", "sigma-core"] },
+        "version": { "$ref": "#/$defs/nonEmptyText" },
+        "commit_sha": { "$ref": "#/$defs/commitSha" },
+        "execution_mode": { "enum": ["source-audited-predicate-replay", "no-exact-overlap"] },
+        "upstream_tool_executed": { "const": false },
+        "exact_rule_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "decision_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "positive_prediction_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "negative_prediction_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "exclusion_count": { "$ref": "#/$defs/nonNegativeInteger" },
+        "source_predicates": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/sourcePredicate" }
+        },
+        "release_inventory": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/releaseFile" }
+        },
+        "notes": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    },
+    "releaseFile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_path", "source_url", "sha256"],
+      "properties": {
+        "source_path": { "$ref": "#/$defs/nonEmptyText" },
+        "source_url": { "$ref": "#/$defs/httpsUrl" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_id",
+        "assertion_id",
+        "module",
+        "lab_rule_id",
+        "resource_type",
+        "resource_id",
+        "baseline_id",
+        "baseline_check_ids",
+        "input_variant_id",
+        "evidence_files",
+        "prediction",
+        "basis"
+      ],
+      "properties": {
+        "case_id": { "$ref": "#/$defs/caseId" },
+        "assertion_id": { "$ref": "#/$defs/assertionId" },
+        "module": { "$ref": "#/$defs/moduleId" },
+        "lab_rule_id": { "$ref": "#/$defs/ruleId" },
+        "resource_type": { "$ref": "#/$defs/nonEmptyText" },
+        "resource_id": { "$ref": "#/$defs/nonEmptyText" },
+        "baseline_id": { "enum": ["prowler-aws", "sigma-core"] },
+        "baseline_check_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyText" }
+        },
+        "input_variant_id": { "const": "simplified" },
+        "evidence_files": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/evidenceFile" }
+        },
+        "prediction": { "type": "boolean" },
+        "basis": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    },
+    "exclusion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "case_id",
+        "assertion_id",
+        "module",
+        "lab_rule_id",
+        "resource_type",
+        "resource_id",
+        "baseline_id",
+        "relationship",
+        "reason",
+        "explanation"
+      ],
+      "properties": {
+        "case_id": { "$ref": "#/$defs/caseId" },
+        "assertion_id": { "$ref": "#/$defs/assertionId" },
+        "module": { "$ref": "#/$defs/moduleId" },
+        "lab_rule_id": { "$ref": "#/$defs/ruleId" },
+        "resource_type": { "$ref": "#/$defs/nonEmptyText" },
+        "resource_id": { "$ref": "#/$defs/nonEmptyText" },
+        "baseline_id": { "enum": ["prowler-aws", "sigma-core"] },
+        "relationship": { "enum": ["exact", "partial", "none"] },
+        "reason": { "enum": ["case-ineligible", "partial-overlap", "no-counterpart"] },
+        "explanation": { "$ref": "#/$defs/nonEmptyText" }
+      }
+    }
+  }
+}

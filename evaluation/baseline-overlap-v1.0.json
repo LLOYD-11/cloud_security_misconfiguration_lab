@@ -1,0 +1,719 @@
+{
+  "schema_version": "1.0",
+  "matrix_id": "cloud-security-baseline-overlap",
+  "matrix_version": "1.0.0",
+  "created_on": "2026-08-13",
+  "protocol": {
+    "path": "evaluation/protocol-v1.0.json",
+    "version": "1.0.0",
+    "sha256": "23523b0d79f16cd06604c1db5966ba2b4100c53005e4cb45639870698053977d"
+  },
+  "corpus": {
+    "path": "evaluation/corpus-manifest-v1.0.json",
+    "version": "1.0.0",
+    "sha256": "9e9eb0f1d5fa84f4926b7665cc5b3738c481a0caa0c11ad55ed4ae4df1142f59"
+  },
+  "rule_count": 35,
+  "baseline_snapshots": [
+    {
+      "id": "prowler-aws",
+      "version": "5.38.0",
+      "commit_sha": "b21ddad32c6d9a98eb819f0ccadac8a6792c2837",
+      "source_url": "https://github.com/prowler-cloud/prowler/tree/b21ddad32c6d9a98eb819f0ccadac8a6792c2837"
+    },
+    {
+      "id": "sigma-core",
+      "version": "r2026-07-01",
+      "commit_sha": "552f3fee420ef232a8e5790c4fae591847e32347",
+      "source_url": "https://github.com/SigmaHQ/sigma/tree/552f3fee420ef232a8e5790c4fae591847e32347",
+      "release_asset_sha256": "45ccbd62cbf0d7ccca6f44eaa010f86bb24f082b5411c5e22c71907e7770ee46"
+    }
+  ],
+  "comparison_policy": "Only exact, equivalent rule-level predicates over retained evidence produce baseline decisions for later agreement metrics. Partial mappings are qualitative, and missing released scope is not a disagreement.",
+  "rows": [
+    {
+      "lab_rule_id": "IAM-001",
+      "module": "iam",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_aws_attached_policy_no_administrative_privileges",
+        "iam_customer_attached_policy_no_administrative_privileges",
+        "iam_customer_unattached_policy_no_administrative_privileges",
+        "iam_inline_policy_no_administrative_privileges"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "incomparable",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_aws_attached_policy_no_administrative_privileges/iam_aws_attached_policy_no_administrative_privileges.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_customer_attached_policy_no_administrative_privileges/iam_customer_attached_policy_no_administrative_privileges.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_customer_unattached_policy_no_administrative_privileges/iam_customer_unattached_policy_no_administrative_privileges.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_inline_policy_no_administrative_privileges/iam_inline_policy_no_administrative_privileges.py"
+      ],
+      "rationale": "Both identify administrative policy breadth, but their decision units and policy algebra differ.",
+      "semantic_differences": [
+        "The lab requires one explicit Allow statement with Action and Resource both equal to a full wildcard.",
+        "Prowler aggregates policy statements, recognizes alternate broad resource forms and NotAction, and reports policy resources rather than lab principals."
+      ]
+    },
+    {
+      "lab_rule_id": "IAM-002",
+      "module": "iam",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_aws_attached_policy_no_administrative_privileges",
+        "iam_customer_attached_policy_no_administrative_privileges",
+        "iam_customer_unattached_policy_no_administrative_privileges",
+        "iam_inline_policy_no_administrative_privileges",
+        "iam_policy_no_full_access_to_cloudtrail",
+        "iam_policy_no_full_access_to_kms",
+        "iam_inline_policy_no_full_access_to_cloudtrail",
+        "iam_inline_policy_no_full_access_to_kms"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "incomparable",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_aws_attached_policy_no_administrative_privileges/iam_aws_attached_policy_no_administrative_privileges.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_customer_attached_policy_no_administrative_privileges/iam_customer_attached_policy_no_administrative_privileges.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_customer_unattached_policy_no_administrative_privileges/iam_customer_unattached_policy_no_administrative_privileges.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_inline_policy_no_administrative_privileges/iam_inline_policy_no_administrative_privileges.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_policy_no_full_access_to_cloudtrail/iam_policy_no_full_access_to_cloudtrail.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_policy_no_full_access_to_kms/iam_policy_no_full_access_to_kms.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_inline_policy_no_full_access_to_cloudtrail/iam_inline_policy_no_full_access_to_cloudtrail.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_inline_policy_no_full_access_to_kms/iam_inline_policy_no_full_access_to_kms.py"
+      ],
+      "rationale": "Prowler has administrative and selected full-service checks related to wildcard actions.",
+      "semantic_differences": [
+        "The lab flags full, service-wide, and partial wildcard syntax for every AWS service without requiring Resource to be global.",
+        "Prowler evaluates effective administrative or complete CloudTrail and KMS access on all resources, including policy combinations without a literal wildcard action."
+      ]
+    },
+    {
+      "lab_rule_id": "IAM-003",
+      "module": "iam",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_aws_attached_policy_no_administrative_privileges",
+        "iam_customer_attached_policy_no_administrative_privileges",
+        "iam_customer_unattached_policy_no_administrative_privileges",
+        "iam_inline_policy_no_administrative_privileges",
+        "iam_policy_no_full_access_to_cloudtrail",
+        "iam_policy_no_full_access_to_kms",
+        "iam_inline_policy_no_full_access_to_cloudtrail",
+        "iam_inline_policy_no_full_access_to_kms"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "incomparable",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_aws_attached_policy_no_administrative_privileges/iam_aws_attached_policy_no_administrative_privileges.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_customer_attached_policy_no_administrative_privileges/iam_customer_attached_policy_no_administrative_privileges.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_customer_unattached_policy_no_administrative_privileges/iam_customer_unattached_policy_no_administrative_privileges.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_inline_policy_no_administrative_privileges/iam_inline_policy_no_administrative_privileges.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_policy_no_full_access_to_cloudtrail/iam_policy_no_full_access_to_cloudtrail.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_policy_no_full_access_to_kms/iam_policy_no_full_access_to_kms.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_inline_policy_no_full_access_to_cloudtrail/iam_inline_policy_no_full_access_to_cloudtrail.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_inline_policy_no_full_access_to_kms/iam_inline_policy_no_full_access_to_kms.py"
+      ],
+      "rationale": "Prowler administrative and full-service checks also consider wildcard resource scope.",
+      "semantic_differences": [
+        "The lab flags any allowed action whose Resource is a full wildcard.",
+        "Prowler requires administrative or selected full-service effective access and can aggregate multiple statements or NotAction constructs."
+      ]
+    },
+    {
+      "lab_rule_id": "IAM-004",
+      "module": "iam",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [],
+      "relationship": "none",
+      "predicate_direction": "no-counterpart",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/tree/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam"
+      ],
+      "rationale": "No Prowler AWS 5.38.0 IAM check evaluates the lab's generic broad S3 write predicate.",
+      "semantic_differences": [
+        "The released provider has no directly comparable retained-evidence predicate."
+      ]
+    },
+    {
+      "lab_rule_id": "IAM-005",
+      "module": "iam",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [],
+      "relationship": "none",
+      "predicate_direction": "no-counterpart",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/tree/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam"
+      ],
+      "rationale": "Prowler MFA checks evaluate enrollment or administrator group posture, not an MFA condition on each sensitive allow statement.",
+      "semantic_differences": [
+        "No released check uses the same policy-condition evidence and decision unit."
+      ]
+    },
+    {
+      "lab_rule_id": "IAM-006",
+      "module": "iam",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_user_mfa_enabled_console_access"
+      ],
+      "relationship": "exact",
+      "predicate_direction": "equivalent",
+      "comparison_eligible": true,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_user_mfa_enabled_console_access/iam_user_mfa_enabled_console_access.py"
+      ],
+      "rationale": "Both fail a non-root IAM user when console-password access is enabled and MFA is inactive.",
+      "semantic_differences": []
+    },
+    {
+      "lab_rule_id": "IAM-007",
+      "module": "iam",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_rotate_access_key_90_days"
+      ],
+      "relationship": "exact",
+      "predicate_direction": "equivalent",
+      "comparison_eligible": true,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_rotate_access_key_90_days/iam_rotate_access_key_90_days.py"
+      ],
+      "rationale": "Both fail an active IAM access key only when its age is greater than 90 days.",
+      "semantic_differences": []
+    },
+    {
+      "lab_rule_id": "IAM-008",
+      "module": "iam",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_role_cross_account_readonlyaccess_policy",
+        "iam_role_cross_service_confused_deputy_prevention"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "lab-broader",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_role_cross_account_readonlyaccess_policy/iam_role_cross_account_readonlyaccess_policy.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_role_cross_service_confused_deputy_prevention/iam_role_cross_service_confused_deputy_prevention.py"
+      ],
+      "rationale": "Prowler has narrower cross-account and confused-deputy role checks over related trust evidence.",
+      "semantic_differences": [
+        "The lab evaluates public or external principals for any assumable role and models several fixed-value guardrails.",
+        "Prowler limits these checks to ReadOnlyAccess roles or service roles and applies different condition handling."
+      ]
+    },
+    {
+      "lab_rule_id": "IAM-009",
+      "module": "iam",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_aws_attached_policy_no_administrative_privileges",
+        "iam_customer_attached_policy_no_administrative_privileges",
+        "iam_customer_unattached_policy_no_administrative_privileges",
+        "iam_inline_policy_no_administrative_privileges"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "lab-broader",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_aws_attached_policy_no_administrative_privileges/iam_aws_attached_policy_no_administrative_privileges.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_customer_attached_policy_no_administrative_privileges/iam_customer_attached_policy_no_administrative_privileges.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_customer_unattached_policy_no_administrative_privileges/iam_customer_unattached_policy_no_administrative_privileges.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_inline_policy_no_administrative_privileges/iam_inline_policy_no_administrative_privileges.py"
+      ],
+      "rationale": "Prowler's administrative-policy helper interprets Allow NotAction on broad resources.",
+      "semantic_differences": [
+        "The lab reports every supported broad Allow NotAction complement, including cases that are not administrative.",
+        "Prowler reports only when its aggregate administrative-access predicate is satisfied."
+      ]
+    },
+    {
+      "lab_rule_id": "IAM-010",
+      "module": "iam",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_aws_attached_policy_no_administrative_privileges",
+        "iam_customer_attached_policy_no_administrative_privileges",
+        "iam_customer_unattached_policy_no_administrative_privileges",
+        "iam_inline_policy_no_administrative_privileges"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "lab-broader",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_aws_attached_policy_no_administrative_privileges/iam_aws_attached_policy_no_administrative_privileges.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_customer_attached_policy_no_administrative_privileges/iam_customer_attached_policy_no_administrative_privileges.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_customer_unattached_policy_no_administrative_privileges/iam_customer_unattached_policy_no_administrative_privileges.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_inline_policy_no_administrative_privileges/iam_inline_policy_no_administrative_privileges.py"
+      ],
+      "rationale": "Prowler's administrative-policy helper interprets Allow NotResource in an administrative calculation.",
+      "semantic_differences": [
+        "The lab reports broad Allow NotResource statements even when they do not produce administrative access.",
+        "Prowler requires its aggregate administrative-access predicate and supports different broad resource forms."
+      ]
+    },
+    {
+      "lab_rule_id": "IAM-011",
+      "module": "iam",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_user_accesskey_unused"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "lab-narrower",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_user_accesskey_unused/iam_user_accesskey_unused.py"
+      ],
+      "rationale": "Both detect unused active IAM access keys, but the frozen default thresholds differ.",
+      "semantic_differences": [
+        "The lab threshold is greater than 90 days.",
+        "Prowler 5.38.0 defaults max_unused_access_keys_days to 45 days."
+      ]
+    },
+    {
+      "lab_rule_id": "IAM-012",
+      "module": "iam",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_user_console_access_unused"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "lab-narrower",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_user_console_access_unused/iam_user_console_access_unused.py"
+      ],
+      "rationale": "Both detect stale IAM console access, but the frozen default thresholds differ.",
+      "semantic_differences": [
+        "The lab threshold is greater than 90 days and uses retained credential-posture evidence.",
+        "Prowler 5.38.0 defaults max_console_access_days to 45 days and reads collected user state."
+      ]
+    },
+    {
+      "lab_rule_id": "IAM-013",
+      "module": "iam",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_no_root_access_key"
+      ],
+      "relationship": "exact",
+      "predicate_direction": "equivalent",
+      "comparison_eligible": true,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_no_root_access_key/iam_no_root_access_key.py"
+      ],
+      "rationale": "Both fail the root account when either root access-key slot is active.",
+      "semantic_differences": []
+    },
+    {
+      "lab_rule_id": "IAM-014",
+      "module": "iam",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "iam_root_mfa_enabled"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "lab-narrower",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam/iam_root_mfa_enabled/iam_root_mfa_enabled.py"
+      ],
+      "rationale": "Both identify missing root MFA from credential-report evidence.",
+      "semantic_differences": [
+        "The lab requires an active root console password before reporting.",
+        "Prowler evaluates root MFA whenever the root account has a password or active access key."
+      ]
+    },
+    {
+      "lab_rule_id": "IAM-015",
+      "module": "iam",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [],
+      "relationship": "none",
+      "predicate_direction": "no-counterpart",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/tree/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/iam"
+      ],
+      "rationale": "No Prowler AWS 5.38.0 check evaluates whether a permissions-boundary document itself allows full wildcard access.",
+      "semantic_differences": [
+        "The provider collects boundary attachment metadata but has no equivalent boundary-document predicate."
+      ]
+    },
+    {
+      "lab_rule_id": "STO-001",
+      "module": "storage",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_level_public_access_block"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "incomparable",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/s3/s3_bucket_level_public_access_block/s3_bucket_level_public_access_block.py"
+      ],
+      "rationale": "Both assess S3 Block Public Access, but they require different controls and scopes.",
+      "semantic_differences": [
+        "The lab requires all four bucket-level booleans and does not apply an account-level fallback.",
+        "Prowler checks IgnorePublicAcls and RestrictPublicBuckets and can pass from account-level settings."
+      ]
+    },
+    {
+      "lab_rule_id": "STO-002",
+      "module": "storage",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_public_list_acl",
+        "s3_bucket_public_write_acl"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "incomparable",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/s3/s3_bucket_public_list_acl/s3_bucket_public_list_acl.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/s3/s3_bucket_public_write_acl/s3_bucket_public_write_acl.py"
+      ],
+      "rationale": "Prowler has public read/list and write ACL checks over related grants.",
+      "semantic_differences": [
+        "The lab evaluates every public ACL permission and suppresses ineffective grants when IgnorePublicAcls or BucketOwnerEnforced applies.",
+        "Prowler splits permissions across checks and can use account-level or selected bucket-level public-access settings."
+      ]
+    },
+    {
+      "lab_rule_id": "STO-003",
+      "module": "storage",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_public_access",
+        "s3_bucket_policy_public_write_access"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "incomparable",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/s3/s3_bucket_public_access/s3_bucket_public_access.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/s3/s3_bucket_policy_public_write_access/s3_bucket_policy_public_write_access.py"
+      ],
+      "rationale": "Prowler evaluates public bucket policies, including a separate public-write check.",
+      "semantic_differences": [
+        "The lab classifies modeled S3 public principals and fixed-value guardrails independently of Block Public Access enforcement.",
+        "Prowler incorporates account and bucket public-access settings and applies a different public-policy helper and action scope."
+      ]
+    },
+    {
+      "lab_rule_id": "STO-004",
+      "module": "storage",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_default_encryption"
+      ],
+      "relationship": "exact",
+      "predicate_direction": "equivalent",
+      "comparison_eligible": true,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/s3/s3_bucket_default_encryption/s3_bucket_default_encryption.py"
+      ],
+      "rationale": "Both fail when retained bucket evidence has no explicit default encryption configuration.",
+      "semantic_differences": []
+    },
+    {
+      "lab_rule_id": "STO-005",
+      "module": "storage",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_object_versioning"
+      ],
+      "relationship": "exact",
+      "predicate_direction": "equivalent",
+      "comparison_eligible": true,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/s3/s3_bucket_object_versioning/s3_bucket_object_versioning.py"
+      ],
+      "rationale": "Both fail unless retained bucket versioning state is Enabled.",
+      "semantic_differences": []
+    },
+    {
+      "lab_rule_id": "STO-006",
+      "module": "storage",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "s3_bucket_acl_prohibited"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "lab-narrower",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/s3/s3_bucket_acl_prohibited/s3_bucket_acl_prohibited.py"
+      ],
+      "rationale": "Both pass BucketOwnerEnforced and identify ACL-enabled Object Ownership modes.",
+      "semantic_differences": [
+        "The lab reports only explicit BucketOwnerPreferred or ObjectWriter evidence.",
+        "Prowler also fails when Object Ownership evidence is absent or does not contain BucketOwnerEnforced."
+      ]
+    },
+    {
+      "lab_rule_id": "NET-001",
+      "module": "network",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_22",
+        "ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_3389",
+        "ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_mysql_3306",
+        "ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_postgres_5432",
+        "ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_sql_server_1433_1434",
+        "ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_oracle_1521_2483",
+        "ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_redis_6379",
+        "ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_elasticsearch_kibana_9200_9300_5601",
+        "ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_mongodb_27017_27018"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "lab-broader",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/ec2/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_22/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_22.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/ec2/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_3389/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_3389.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/ec2/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_mysql_3306/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_mysql_3306.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/ec2/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_postgres_5432/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_postgres_5432.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/ec2/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_sql_server_1433_1434/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_sql_server_1433_1434.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/ec2/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_oracle_1521_2483/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_oracle_1521_2483.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/ec2/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_redis_6379/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_redis_6379.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/ec2/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_elasticsearch_kibana_9200_9300_5601/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_elasticsearch_kibana_9200_9300_5601.py",
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/ec2/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_mongodb_27017_27018/ec2_securitygroup_allow_ingress_from_internet_to_tcp_port_mongodb_27017_27018.py"
+      ],
+      "rationale": "Prowler has individual checks for a subset of the lab's sensitive service ports.",
+      "semantic_differences": [
+        "The lab catalog contains additional administration, database, data-service, and control-plane ports and supports broad public CIDRs.",
+        "Prowler's mapped checks use 0.0.0.0/0 or ::/0, are primarily TCP-specific, and apply provider resource-use filtering."
+      ]
+    },
+    {
+      "lab_rule_id": "NET-002",
+      "module": "network",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [
+        "ec2_securitygroup_allow_ingress_from_internet_to_all_ports"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "lab-broader",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/blob/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/ec2/ec2_securitygroup_allow_ingress_from_internet_to_all_ports/ec2_securitygroup_allow_ingress_from_internet_to_all_ports.py"
+      ],
+      "rationale": "Both identify all-port public ingress security-group rules.",
+      "semantic_differences": [
+        "The lab also recognizes explicit 0-65535 ranges, protocol aliases, and broad public CIDRs.",
+        "Prowler requires all-protocol traffic from 0.0.0.0/0 or ::/0 and applies provider resource-use filtering."
+      ]
+    },
+    {
+      "lab_rule_id": "NET-003",
+      "module": "network",
+      "baseline_id": "prowler-aws",
+      "baseline_check_ids": [],
+      "relationship": "none",
+      "predicate_direction": "no-counterpart",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/prowler-cloud/prowler/tree/b21ddad32c6d9a98eb819f0ccadac8a6792c2837/prowler/providers/aws/services/ec2"
+      ],
+      "rationale": "No Prowler AWS 5.38.0 EC2 check evaluates unrestricted public egress for every security group.",
+      "semantic_differences": [
+        "The default-security-group check has a different resource scope and predicate."
+      ]
+    },
+    {
+      "lab_rule_id": "CLD-001",
+      "module": "cloudtrail",
+      "baseline_id": "sigma-core",
+      "baseline_check_ids": [],
+      "relationship": "none",
+      "predicate_direction": "no-counterpart",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/SigmaHQ/sigma/tree/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail"
+      ],
+      "rationale": "The frozen Sigma Core release asset contains no released AWS root-account-use rule.",
+      "semantic_differences": [
+        "A related repository rule exists outside the pinned release asset and is therefore out of scope."
+      ]
+    },
+    {
+      "lab_rule_id": "CLD-002",
+      "module": "cloudtrail",
+      "baseline_id": "sigma-core",
+      "baseline_check_ids": [],
+      "relationship": "none",
+      "predicate_direction": "no-counterpart",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/SigmaHQ/sigma/tree/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail"
+      ],
+      "rationale": "The frozen Sigma Core release asset contains no MFA-device deactivation or deletion rule.",
+      "semantic_differences": [
+        "No released selection covers the retained event names."
+      ]
+    },
+    {
+      "lab_rule_id": "CLD-003",
+      "module": "cloudtrail",
+      "baseline_id": "sigma-core",
+      "baseline_check_ids": [],
+      "relationship": "none",
+      "predicate_direction": "no-counterpart",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/SigmaHQ/sigma/tree/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail"
+      ],
+      "rationale": "The frozen Sigma Core release asset contains no released security-group change rule.",
+      "semantic_differences": [
+        "A related repository rule exists outside the pinned release asset and is therefore out of scope."
+      ]
+    },
+    {
+      "lab_rule_id": "CLD-004",
+      "module": "cloudtrail",
+      "baseline_id": "sigma-core",
+      "baseline_check_ids": [],
+      "relationship": "none",
+      "predicate_direction": "no-counterpart",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/SigmaHQ/sigma/tree/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail"
+      ],
+      "rationale": "The frozen Sigma Core release asset contains no bucket policy, ACL, or Public Access Block change selection.",
+      "semantic_differences": [
+        "Released S3 rules use disjoint event names or additional tool-specific evidence."
+      ]
+    },
+    {
+      "lab_rule_id": "CLD-005",
+      "module": "cloudtrail",
+      "baseline_id": "sigma-core",
+      "baseline_check_ids": [
+        "db014773-7375-4f4e-b83b-133337c0ffee"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "lab-broader",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/SigmaHQ/sigma/blob/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail/aws_iam_s3browser_templated_s3_bucket_policy_creation.yml"
+      ],
+      "rationale": "The released Sigma rule includes PutUserPolicy but only for a specific S3 Browser template signature.",
+      "semantic_differences": [
+        "The lab detects seven IAM policy mutation event names without a user-agent or policy-template requirement.",
+        "The Sigma selection is limited to PutUserPolicy with S3 Browser and three request-parameter substrings."
+      ]
+    },
+    {
+      "lab_rule_id": "CLD-006",
+      "module": "cloudtrail",
+      "baseline_id": "sigma-core",
+      "baseline_check_ids": [],
+      "relationship": "none",
+      "predicate_direction": "no-counterpart",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/SigmaHQ/sigma/tree/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail"
+      ],
+      "rationale": "The frozen Sigma Core release asset contains no actor-and-source sliding-window API failure rule.",
+      "semantic_differences": [
+        "Single-event authentication rules outside the release asset do not implement the registered threshold predicate."
+      ]
+    },
+    {
+      "lab_rule_id": "CLD-007",
+      "module": "cloudtrail",
+      "baseline_id": "sigma-core",
+      "baseline_check_ids": [],
+      "relationship": "none",
+      "predicate_direction": "no-counterpart",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/SigmaHQ/sigma/tree/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail"
+      ],
+      "rationale": "The frozen Sigma Core release asset contains no successful ConsoleLogin-without-MFA rule.",
+      "semantic_differences": [
+        "A related experimental repository rule is absent from the pinned release asset."
+      ]
+    },
+    {
+      "lab_rule_id": "CLD-008",
+      "module": "cloudtrail",
+      "baseline_id": "sigma-core",
+      "baseline_check_ids": [
+        "db014773-d9d9-4792-91e5-133337c0ffee",
+        "db014773-b1d3-46bd-ba26-133337c0ffee"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "incomparable",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/SigmaHQ/sigma/blob/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail/aws_iam_s3browser_user_or_accesskey_creation.yml",
+        "https://github.com/SigmaHQ/sigma/blob/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail/aws_iam_s3browser_loginprofile_creation.yml"
+      ],
+      "rationale": "Two released Sigma rules overlap CreateAccessKey or CreateLoginProfile only for S3 Browser activity.",
+      "semantic_differences": [
+        "The lab covers five persistent credential event types without a user-agent condition.",
+        "The Sigma rules add S3 Browser and extra event alternatives while omitting several lab credential types."
+      ]
+    },
+    {
+      "lab_rule_id": "CLD-009",
+      "module": "cloudtrail",
+      "baseline_id": "sigma-core",
+      "baseline_check_ids": [],
+      "relationship": "none",
+      "predicate_direction": "no-counterpart",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/SigmaHQ/sigma/tree/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail"
+      ],
+      "rationale": "The frozen Sigma Core release asset contains no UpdateAssumeRolePolicy selection.",
+      "semantic_differences": [
+        "No released rule covers the same role-trust mutation event."
+      ]
+    },
+    {
+      "lab_rule_id": "CLD-010",
+      "module": "cloudtrail",
+      "baseline_id": "sigma-core",
+      "baseline_check_ids": [
+        "07330162-dba1-4746-8121-a9647d49d297"
+      ],
+      "relationship": "partial",
+      "predicate_direction": "lab-broader",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/SigmaHQ/sigma/blob/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail/aws_config_disable_recording.yml"
+      ],
+      "rationale": "The released Sigma AWS Config rule matches two events within the lab's broader defense-impairment set.",
+      "semantic_differences": [
+        "The lab also covers CloudTrail, GuardDuty, flow-log, Security Hub, and an additional AWS Config disable event.",
+        "The Sigma selection is limited to DeleteDeliveryChannel and StopConfigurationRecorder."
+      ]
+    },
+    {
+      "lab_rule_id": "CLD-011",
+      "module": "cloudtrail",
+      "baseline_id": "sigma-core",
+      "baseline_check_ids": [],
+      "relationship": "none",
+      "predicate_direction": "no-counterpart",
+      "comparison_eligible": false,
+      "source_urls": [
+        "https://github.com/SigmaHQ/sigma/tree/552f3fee420ef232a8e5790c4fae591847e32347/rules/cloud/aws/cloudtrail"
+      ],
+      "rationale": "The frozen Sigma Core release asset contains no DisableKey or ScheduleKeyDeletion rule.",
+      "semantic_differences": [
+        "The released KMS rule concerns imported key material and uses disjoint events."
+      ]
+    }
+  ]
+}

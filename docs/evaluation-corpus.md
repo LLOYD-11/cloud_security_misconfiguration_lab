@@ -106,7 +106,8 @@ corpus into an analyzer or reveal candidate performance.
   whichever class benefits the candidate.
 - AWS documentation can change after the recorded retrieval date.
 
-M12-R3 may begin only after this corpus is committed and published. It will
-freeze the exact Prowler and Sigma overlap matrix and baseline outcomes before
-M12-R4 executes the candidate and publishes raw decisions, metrics,
+M12-R3 began only after this corpus was committed and published. The resulting
+[baseline audit](evaluation-baselines.md) now freezes the complete Prowler and
+Sigma overlap matrix and 24 exact-overlap baseline decisions. M12-R4 remains
+responsible for executing the candidate and publishing raw decisions, metrics,
 disagreements, ablations, and acceptance checks.
