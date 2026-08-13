@@ -95,22 +95,24 @@ mkdir -p reports/generated
 .venv/bin/python -m cloud_benchmarks.runner
 .venv/bin/python -m tools.evaluation_corpus
 .venv/bin/python -m tools.evaluation_baselines
+.venv/bin/python -m tools.evaluation_runner
 ```
 
 Current evidence:
 
-- 426 tests
-- 93.80% statement coverage
-- 87.24% branch coverage
+- 441 tests
+- 93.13% statement coverage
+- 86.68% branch coverage
 - 78 exact functional benchmark cases
 - 4 exact fail-closed malformed-input cases
 - 8 deterministic scale cases up to 10,000 inputs
 - 32 frozen output-blind evaluation cases with 176 predeclared assertions
 - 35-rule baseline matrix with 24 exact-overlap predicate decisions
+- 0.9809 holdout F1 with all three disagreements and failed acceptance disclosed
 - Python 3.10, 3.11, 3.12, and 3.13 GitHub Actions coverage
 
 Finish with [Benchmarking and resilience](benchmarking.md) and the
-[independent evaluation corpus](evaluation-corpus.md), then use the
+[independent evaluation report](evaluation-report.md), then use the
 [upgrade traceability matrix](traceability.md) to map requirements to
 implementation and verification artifacts.
 

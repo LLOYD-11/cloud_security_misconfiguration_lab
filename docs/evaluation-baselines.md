@@ -16,7 +16,8 @@ artifacts are:
   contract.
 
 The outcomes contain no candidate prediction, agreement rate, accuracy claim,
-or acceptance result. Those are M12-R4 outputs. External scanner output remains
+or acceptance result. Those remain separate M12-R4 fields in the
+[primary result](evaluation-report.md). External scanner output is
 corroborating evidence and never defines corpus ground truth.
 
 ## Frozen Sources
@@ -116,5 +117,6 @@ artifact differs from deterministic replay.
 - Prowler and Sigma can collect or infer context absent from the retained
   fixtures. Those differences are documented as partial or unsupported scope.
 - The 24 decisions are frozen baseline outputs, not an estimate of candidate
-  quality. Candidate agreement and every disagreement explanation remain
-  unrevealed until M12-R4.
+  quality. The later primary result reports 24/24 candidate agreement within
+  this exact-overlap subset; it does not extend that rate to partial or missing
+  counterparts.

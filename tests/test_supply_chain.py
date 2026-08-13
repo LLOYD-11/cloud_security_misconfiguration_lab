@@ -160,9 +160,11 @@ class SupplyChainTests(unittest.TestCase):
             "python -m tools.check_markdown_links external",
             "python -m tools.evaluation_corpus",
             "python -m tools.evaluation_baselines",
+            "python -m tools.evaluation_runner",
             "'/evaluation/corpus-manifest-v1.0.json'",
             "'/evaluation/baseline-overlap-v1.0.json'",
             "'/evaluation/baseline-outcomes-v1.0.json'",
+            "'/evaluation/results-v1.0.json'",
             "'/evaluation/corpus-v1.0/'",
         )
         for path in WORKFLOWS:

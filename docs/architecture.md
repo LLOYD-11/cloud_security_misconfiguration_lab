@@ -144,7 +144,8 @@ Evaluation is a repository-level assurance boundary rather than analyzer
 runtime logic. Its frozen protocol, [holdout corpus](evaluation-corpus.md), and
 [external-baseline audit](evaluation-baselines.md) are kept separate from the
 development benchmark so candidate output cannot generate its own ground
-truth. See the
+truth. The [primary result](evaluation-report.md) is deterministic and
+re-executable while preserving a failed acceptance outcome. See the
 [independent evaluation protocol](evaluation-protocol.md).
 
 See [Data contracts](data-contracts.md) for the complete contract index.

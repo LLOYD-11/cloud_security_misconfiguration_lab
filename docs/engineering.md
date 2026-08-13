@@ -29,6 +29,7 @@ mkdir -p reports/generated
 .venv/bin/python -m tools.check_markdown_links external
 .venv/bin/python -m tools.evaluation_corpus
 .venv/bin/python -m tools.evaluation_baselines
+.venv/bin/python -m tools.evaluation_runner
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
 .venv/bin/coverage json -o reports/generated/coverage.json
@@ -70,6 +71,15 @@ Elapsed time is measured and reported but is deliberately not gated. See
 [Benchmarking and resilience](benchmarking.md) for the manifest, methodology,
 reference measurements, and separate coverage evidence.
 
+The evaluation runner re-executes the frozen `2.1.1` candidate against all 32
+primary cases and eight native/simplified pairs. It recomputes raw decisions,
+Wilson intervals, baseline agreement, ablations, and acceptance checks before
+comparing both the object and canonical JSON bytes with the committed
+[`results-v1.0.json`](../evaluation/results-v1.0.json). A verified command exits
+successfully when the artifact is reproducible even though its recorded
+acceptance value is `false`; authenticity and scientific acceptance are
+separate claims. See the [evaluation report](evaluation-report.md).
+
 The documentation gate scans every tracked Markdown file with strict linter
 configuration, resolves local paths with exact case, validates GitHub-style
 heading anchors, and probes each unique external HTTP target with bounded
@@ -98,7 +108,7 @@ contains the simplified-input validator, rule catalog, remediation and timeline
 modules, their schemas, and the AWS fixture manifest. It also verifies the
 packaged benchmark manifest, runner, both benchmark schemas, the frozen
 evaluation protocol, corpus manifest, overlap matrix, baseline outcomes, all 42
-corpus files, and all independent-evaluation schemas.
+corpus files, primary result, and all independent-evaluation schemas.
 
 ## Release Process
 

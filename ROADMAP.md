@@ -190,9 +190,8 @@ the `v2.2.0` tag.
 
 ## M12: Independent External Evaluation
 
-Status: In progress for `v2.2.0`; the protocol, independently authored corpus,
-complete overlap matrix, and baseline outcomes are frozen before candidate
-execution.
+Status: Complete for `v2.2.0`. The primary result is published unchanged even
+though candidate `2.1.1` did not meet every preregistered acceptance threshold.
 
 - [x] Publish a versioned evaluation protocol before running the analyzers.
 - [x] Build a provenance-tracked corpus of independent positive, hardened,
@@ -201,11 +200,13 @@ execution.
       sanitized native evidence with integrity hashes.
 - [x] Compare overlapping controls with an established external baseline without
       treating unsupported scope as a disagreement.
-- [ ] Publish per-module true positives, false positives, false negatives, true
+- [x] Publish per-module true positives, false positives, false negatives, true
       negatives, precision, recall, F1, and complete disagreement analysis.
-- [ ] Measure native/simplified equivalence and the effects of reachability
-      context and incident correlation.
-- [ ] Publish machine-readable evaluation results and a reproducible runner.
+- [x] Measure native/simplified equivalence and the effects of reachability
+      context and incident correlation. The frozen reachability experiment had
+      zero eligible cases, so its result is published as non-estimable rather
+      than replaced with post-freeze evidence.
+- [x] Publish machine-readable evaluation results and a reproducible runner.
 
 ## M13: Research and Application Narrative
 

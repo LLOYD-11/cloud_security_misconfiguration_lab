@@ -298,7 +298,10 @@ unsupported assertions are reported but excluded from primary metrics;
 undeclared predictions are false positives and completeness defects. The
 project claims procedural separation, not third-party certification. A fixed
 analyzer tested again on an exposed corpus produces regression evidence, not a
-new holdout result.
+new holdout result. The primary run confirmed why this constraint matters: it
+exposed one analyzer false negative, two unlabelled corpus decisions, and a
+non-estimable registered ablation. All remain published instead of being
+relabelled or repaired inside the original result.
 
 **Alternative not chosen:** Reusing the 78-case development benchmark would be
 faster and likely produce excellent numbers, but those expectations are already

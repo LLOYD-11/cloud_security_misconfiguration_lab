@@ -95,6 +95,23 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 - `complete` means that no known coverage-affecting gap was recorded for the supplied evidence. It does not prove that collection was authorized, current, account-wide, unfiltered, or free of omissions outside the supported contracts.
 - A report with no findings does not prove that an AWS environment is secure.
 
+## Independent Evaluation
+
+- The frozen `2.1.1` candidate did not meet every preregistered acceptance
+  threshold. The [primary result](evaluation-report.md) records 0.9809 overall
+  F1, one medium-severity `IAM-005` false negative, and two unlabelled
+  `STO-001` predictions.
+- `IAM-005` currently treats `BoolIfExists` with an MFA-present value of `true`
+  as a strict MFA condition even though the context key may be absent. This can
+  suppress a finding on that policy boundary.
+- The two unlabelled storage predictions are a frozen corpus-completeness
+  defect, not evidence that `STO-001` evaluated its retained Block Public
+  Access fields incorrectly. The original labels and result remain preserved.
+- No reachability-context evidence was frozen into the holdout corpus, so that
+  registered ablation had zero eligible cases and is not estimable.
+- Ground truth used two output-blind passes by the project author. This is
+  procedural separation, not third-party annotation or certification.
+
 ## Benchmarking
 
 - Benchmark profiles are synthetic and intentionally isolate documented

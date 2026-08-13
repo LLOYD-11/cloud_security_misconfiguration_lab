@@ -1,0 +1,4226 @@
+{
+  "schema_version": "1.0",
+  "evaluation_id": "EVAL-RUN-2026-08-13-PRIMARY",
+  "evaluated_at": "2026-08-13T01:26:34Z",
+  "protocol": {
+    "path": "evaluation/protocol-v1.0.json",
+    "version": "1.0.0",
+    "sha256": "23523b0d79f16cd06604c1db5966ba2b4100c53005e4cb45639870698053977d"
+  },
+  "corpus": {
+    "path": "evaluation/corpus-manifest-v1.0.json",
+    "version": "1.0.0",
+    "sha256": "9e9eb0f1d5fa84f4926b7665cc5b3738c481a0caa0c11ad55ed4ae4df1142f59"
+  },
+  "overlap_matrix": {
+    "path": "evaluation/baseline-overlap-v1.0.json",
+    "version": "1.0.0",
+    "sha256": "2e7652643f9df31b421567ac11138707ebc373522ad0cc1ce03b1bb74f6aad49"
+  },
+  "candidate": {
+    "analyzer_revision": "6d71c99914a38b6e161bc9cf56407eb1757b8c9a",
+    "package_version": "2.1.1",
+    "rule_catalog_sha256": "5842caa836d7b8970ae9aef1261652cdd8f98a1c49598962de32be58c9e998a0"
+  },
+  "environment": {
+    "python_version": "3.12.6",
+    "platform": "macOS-26.3.1-arm64-arm-64bit",
+    "command": [
+      "python",
+      "-m",
+      "tools.evaluation_runner",
+      "--write"
+    ],
+    "clean_worktree": true
+  },
+  "validity": {
+    "valid": true,
+    "issues": [
+      "Non-gating limitation: the registered network reachability ablation was not estimable because the frozen corpus retained no reachability-context artifact."
+    ]
+  },
+  "counts": {
+    "case_count": 32,
+    "scored_assertion_count": 168,
+    "excluded_assertion_count": 8,
+    "unlabelled_prediction_count": 2,
+    "duplicate_prediction_count": 0,
+    "matched_positive_count": 77,
+    "severity_match_count": 77
+  },
+  "overall": {
+    "confusion": {
+      "true_positive": 77,
+      "false_positive": 2,
+      "false_negative": 1,
+      "true_negative": 90
+    },
+    "scores": {
+      "precision": 0.9746835443037974,
+      "recall": 0.9871794871794872,
+      "f1": 0.980891719745223,
+      "specificity": 0.9782608695652174
+    },
+    "confidence_intervals": {
+      "precision": {
+        "lower": 0.9123141537110886,
+        "upper": 0.9930296326934152
+      },
+      "recall": {
+        "lower": 0.930891429982978,
+        "upper": 0.9977332682461664
+      },
+      "specificity": {
+        "lower": 0.9241650601730417,
+        "upper": 0.9940179587711463
+      }
+    }
+  },
+  "per_module": [
+    {
+      "confusion": {
+        "true_positive": 30,
+        "false_positive": 0,
+        "false_negative": 1,
+        "true_negative": 30
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 0.967741935483871,
+        "f1": 0.9836065573770492,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.8864866068260312,
+          "upper": 0.9999999999999999
+        },
+        "recall": {
+          "lower": 0.838058948352751,
+          "upper": 0.9942827784745831
+        },
+        "specificity": {
+          "lower": 0.8864866068260312,
+          "upper": 0.9999999999999999
+        }
+      },
+      "module": "iam"
+    },
+    {
+      "confusion": {
+        "true_positive": 15,
+        "false_positive": 2,
+        "false_negative": 0,
+        "true_negative": 21
+      },
+      "scores": {
+        "precision": 0.8823529411764706,
+        "recall": 1.0,
+        "f1": 0.9375,
+        "specificity": 0.9130434782608695
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.6566364940511412,
+          "upper": 0.9671202262362074
+        },
+        "recall": {
+          "lower": 0.7961166989641515,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.7320401892425634,
+          "upper": 0.9758199955157796
+        }
+      },
+      "module": "storage"
+    },
+    {
+      "confusion": {
+        "true_positive": 8,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 10
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.6755924351161198,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.6755924351161198,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.7224672001371107,
+          "upper": 0.9999999999999999
+        }
+      },
+      "module": "network"
+    },
+    {
+      "confusion": {
+        "true_positive": 24,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 29
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.8620237953250198,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.8620237953250198,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.8830302015002593,
+          "upper": 1.0
+        }
+      },
+      "module": "cloudtrail"
+    }
+  ],
+  "per_rule": [
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "iam",
+      "rule_id": "IAM-001"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "iam",
+      "rule_id": "IAM-002"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "iam",
+      "rule_id": "IAM-003"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "iam",
+      "rule_id": "IAM-004"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 1,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 0.6666666666666666,
+        "f1": 0.8,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.2076596008020477,
+          "upper": 0.9385080552796037
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "iam",
+      "rule_id": "IAM-005"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "iam",
+      "rule_id": "IAM-006"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "iam",
+      "rule_id": "IAM-007"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "iam",
+      "rule_id": "IAM-008"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "iam",
+      "rule_id": "IAM-009"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "iam",
+      "rule_id": "IAM-010"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "iam",
+      "rule_id": "IAM-011"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "iam",
+      "rule_id": "IAM-012"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "iam",
+      "rule_id": "IAM-013"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "iam",
+      "rule_id": "IAM-014"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "iam",
+      "rule_id": "IAM-015"
+    },
+    {
+      "confusion": {
+        "true_positive": 3,
+        "false_positive": 2,
+        "false_negative": 0,
+        "true_negative": 3
+      },
+      "scores": {
+        "precision": 0.6,
+        "recall": 1.0,
+        "f1": 0.7499999999999999,
+        "specificity": 0.6
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.2307242812760128,
+          "upper": 0.882379225767352
+        },
+        "recall": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.2307242812760128,
+          "upper": 0.882379225767352
+        }
+      },
+      "module": "storage",
+      "rule_id": "STO-001"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 4
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.5101091635454027,
+          "upper": 1.0
+        }
+      },
+      "module": "storage",
+      "rule_id": "STO-002"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 4
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.5101091635454027,
+          "upper": 1.0
+        }
+      },
+      "module": "storage",
+      "rule_id": "STO-003"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 4
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.5101091635454027,
+          "upper": 1.0
+        }
+      },
+      "module": "storage",
+      "rule_id": "STO-004"
+    },
+    {
+      "confusion": {
+        "true_positive": 3,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 3
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        }
+      },
+      "module": "storage",
+      "rule_id": "STO-005"
+    },
+    {
+      "confusion": {
+        "true_positive": 3,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 3
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        }
+      },
+      "module": "storage",
+      "rule_id": "STO-006"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 4
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.5101091635454027,
+          "upper": 1.0
+        }
+      },
+      "module": "network",
+      "rule_id": "NET-001"
+    },
+    {
+      "confusion": {
+        "true_positive": 3,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 3
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        }
+      },
+      "module": "network",
+      "rule_id": "NET-002"
+    },
+    {
+      "confusion": {
+        "true_positive": 3,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 3
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        }
+      },
+      "module": "network",
+      "rule_id": "NET-003"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 3
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        }
+      },
+      "module": "cloudtrail",
+      "rule_id": "CLD-001"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "cloudtrail",
+      "rule_id": "CLD-002"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "cloudtrail",
+      "rule_id": "CLD-003"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "cloudtrail",
+      "rule_id": "CLD-004"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "cloudtrail",
+      "rule_id": "CLD-005"
+    },
+    {
+      "confusion": {
+        "true_positive": 3,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 4
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.5101091635454027,
+          "upper": 1.0
+        }
+      },
+      "module": "cloudtrail",
+      "rule_id": "CLD-006"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "cloudtrail",
+      "rule_id": "CLD-007"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 3
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        }
+      },
+      "module": "cloudtrail",
+      "rule_id": "CLD-008"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 2
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        }
+      },
+      "module": "cloudtrail",
+      "rule_id": "CLD-009"
+    },
+    {
+      "confusion": {
+        "true_positive": 3,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 4
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.5101091635454027,
+          "upper": 1.0
+        }
+      },
+      "module": "cloudtrail",
+      "rule_id": "CLD-010"
+    },
+    {
+      "confusion": {
+        "true_positive": 2,
+        "false_positive": 0,
+        "false_negative": 0,
+        "true_negative": 3
+      },
+      "scores": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "specificity": 1.0
+      },
+      "confidence_intervals": {
+        "precision": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "recall": {
+          "lower": 0.34238022750665303,
+          "upper": 1.0
+        },
+        "specificity": {
+          "lower": 0.4385029682449546,
+          "upper": 1.0
+        }
+      },
+      "module": "cloudtrail",
+      "rule_id": "CLD-011"
+    }
+  ],
+  "assertion_results": [
+    {
+      "case_id": "EVAL-IAM-001",
+      "assertion_id": "AST-IAM-001-01",
+      "module": "iam",
+      "rule_id": "IAM-001",
+      "resource_type": "role",
+      "resource_id": "role-admin-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-001",
+      "assertion_id": "AST-IAM-001-02",
+      "module": "iam",
+      "rule_id": "IAM-003",
+      "resource_type": "role",
+      "resource_id": "role-admin-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-001",
+      "assertion_id": "AST-IAM-001-03",
+      "module": "iam",
+      "rule_id": "IAM-002",
+      "resource_type": "role",
+      "resource_id": "role-partial-wildcard-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-001",
+      "assertion_id": "AST-IAM-001-04",
+      "module": "iam",
+      "rule_id": "IAM-004",
+      "resource_type": "role",
+      "resource_id": "role-broad-write-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-001",
+      "assertion_id": "AST-IAM-001-05",
+      "module": "iam",
+      "rule_id": "IAM-008",
+      "resource_type": "role",
+      "resource_id": "role-vendor-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-001",
+      "assertion_id": "AST-IAM-001-06",
+      "module": "iam",
+      "rule_id": "IAM-009",
+      "resource_type": "role",
+      "resource_id": "role-complement-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-001",
+      "assertion_id": "AST-IAM-001-07",
+      "module": "iam",
+      "rule_id": "IAM-010",
+      "resource_type": "role",
+      "resource_id": "role-exclusion-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-001",
+      "assertion_id": "AST-IAM-001-08",
+      "module": "iam",
+      "rule_id": "IAM-015",
+      "resource_type": "role",
+      "resource_id": "role-boundary-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-01",
+      "module": "iam",
+      "rule_id": "IAM-001",
+      "resource_type": "role",
+      "resource_id": "role-admin-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-02",
+      "module": "iam",
+      "rule_id": "IAM-003",
+      "resource_type": "role",
+      "resource_id": "role-admin-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-03",
+      "module": "iam",
+      "rule_id": "IAM-002",
+      "resource_type": "role",
+      "resource_id": "role-partial-wildcard-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-04",
+      "module": "iam",
+      "rule_id": "IAM-004",
+      "resource_type": "role",
+      "resource_id": "role-broad-write-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-05",
+      "module": "iam",
+      "rule_id": "IAM-005",
+      "resource_type": "user",
+      "resource_id": "user-sensitive-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-06",
+      "module": "iam",
+      "rule_id": "IAM-006",
+      "resource_type": "user",
+      "resource_id": "user-console-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-07",
+      "module": "iam",
+      "rule_id": "IAM-007",
+      "resource_type": "user",
+      "resource_id": "user-old-key-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-08",
+      "module": "iam",
+      "rule_id": "IAM-008",
+      "resource_type": "role",
+      "resource_id": "role-vendor-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-09",
+      "module": "iam",
+      "rule_id": "IAM-009",
+      "resource_type": "role",
+      "resource_id": "role-complement-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-10",
+      "module": "iam",
+      "rule_id": "IAM-010",
+      "resource_type": "role",
+      "resource_id": "role-exclusion-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-11",
+      "module": "iam",
+      "rule_id": "IAM-011",
+      "resource_type": "user",
+      "resource_id": "user-stale-key-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-12",
+      "module": "iam",
+      "rule_id": "IAM-012",
+      "resource_type": "user",
+      "resource_id": "user-stale-password-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-13",
+      "module": "iam",
+      "rule_id": "IAM-013",
+      "resource_type": "root-account",
+      "resource_id": "root",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-14",
+      "module": "iam",
+      "rule_id": "IAM-014",
+      "resource_type": "root-account",
+      "resource_id": "root",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-002",
+      "assertion_id": "AST-IAM-002-15",
+      "module": "iam",
+      "rule_id": "IAM-015",
+      "resource_type": "role",
+      "resource_id": "role-boundary-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-003",
+      "assertion_id": "AST-IAM-003-01",
+      "module": "iam",
+      "rule_id": "IAM-001",
+      "resource_type": "role",
+      "resource_id": "role-readonly-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-003",
+      "assertion_id": "AST-IAM-003-02",
+      "module": "iam",
+      "rule_id": "IAM-002",
+      "resource_type": "role",
+      "resource_id": "role-readonly-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-003",
+      "assertion_id": "AST-IAM-003-03",
+      "module": "iam",
+      "rule_id": "IAM-003",
+      "resource_type": "role",
+      "resource_id": "role-readonly-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-003",
+      "assertion_id": "AST-IAM-003-04",
+      "module": "iam",
+      "rule_id": "IAM-004",
+      "resource_type": "role",
+      "resource_id": "role-readonly-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-003",
+      "assertion_id": "AST-IAM-003-05",
+      "module": "iam",
+      "rule_id": "IAM-008",
+      "resource_type": "role",
+      "resource_id": "role-readonly-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-003",
+      "assertion_id": "AST-IAM-003-06",
+      "module": "iam",
+      "rule_id": "IAM-009",
+      "resource_type": "role",
+      "resource_id": "role-readonly-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-003",
+      "assertion_id": "AST-IAM-003-07",
+      "module": "iam",
+      "rule_id": "IAM-010",
+      "resource_type": "role",
+      "resource_id": "role-readonly-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-003",
+      "assertion_id": "AST-IAM-003-08",
+      "module": "iam",
+      "rule_id": "IAM-015",
+      "resource_type": "role",
+      "resource_id": "role-readonly-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-01",
+      "module": "iam",
+      "rule_id": "IAM-001",
+      "resource_type": "role",
+      "resource_id": "role-readonly-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-02",
+      "module": "iam",
+      "rule_id": "IAM-002",
+      "resource_type": "role",
+      "resource_id": "role-readonly-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-03",
+      "module": "iam",
+      "rule_id": "IAM-003",
+      "resource_type": "role",
+      "resource_id": "role-readonly-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-04",
+      "module": "iam",
+      "rule_id": "IAM-004",
+      "resource_type": "role",
+      "resource_id": "role-readonly-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-05",
+      "module": "iam",
+      "rule_id": "IAM-008",
+      "resource_type": "role",
+      "resource_id": "role-readonly-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-06",
+      "module": "iam",
+      "rule_id": "IAM-009",
+      "resource_type": "role",
+      "resource_id": "role-readonly-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-07",
+      "module": "iam",
+      "rule_id": "IAM-010",
+      "resource_type": "role",
+      "resource_id": "role-readonly-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-08",
+      "module": "iam",
+      "rule_id": "IAM-015",
+      "resource_type": "role",
+      "resource_id": "role-readonly-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-09",
+      "module": "iam",
+      "rule_id": "IAM-005",
+      "resource_type": "user",
+      "resource_id": "user-sensitive-mfa-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-10",
+      "module": "iam",
+      "rule_id": "IAM-006",
+      "resource_type": "user",
+      "resource_id": "user-current-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-11",
+      "module": "iam",
+      "rule_id": "IAM-007",
+      "resource_type": "user",
+      "resource_id": "user-current-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-12",
+      "module": "iam",
+      "rule_id": "IAM-011",
+      "resource_type": "user",
+      "resource_id": "user-current-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-13",
+      "module": "iam",
+      "rule_id": "IAM-012",
+      "resource_type": "user",
+      "resource_id": "user-current-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-14",
+      "module": "iam",
+      "rule_id": "IAM-013",
+      "resource_type": "root-account",
+      "resource_id": "root",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-004",
+      "assertion_id": "AST-IAM-004-15",
+      "module": "iam",
+      "rule_id": "IAM-014",
+      "resource_type": "root-account",
+      "resource_id": "root",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-01",
+      "module": "iam",
+      "rule_id": "IAM-005",
+      "resource_type": "user",
+      "resource_id": "user-sensitive-edge",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-02",
+      "module": "iam",
+      "rule_id": "IAM-006",
+      "resource_type": "user",
+      "resource_id": "user-console-edge",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-03",
+      "module": "iam",
+      "rule_id": "IAM-007",
+      "resource_type": "user",
+      "resource_id": "user-key-age-91",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-04",
+      "module": "iam",
+      "rule_id": "IAM-007",
+      "resource_type": "user",
+      "resource_id": "user-key-age-90",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-05",
+      "module": "iam",
+      "rule_id": "IAM-011",
+      "resource_type": "user",
+      "resource_id": "user-key-unused-91",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-06",
+      "module": "iam",
+      "rule_id": "IAM-011",
+      "resource_type": "user",
+      "resource_id": "user-key-unused-90",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-07",
+      "module": "iam",
+      "rule_id": "IAM-012",
+      "resource_type": "user",
+      "resource_id": "user-password-unused-91",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-08",
+      "module": "iam",
+      "rule_id": "IAM-012",
+      "resource_type": "user",
+      "resource_id": "user-password-unused-90",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-09",
+      "module": "iam",
+      "rule_id": "IAM-013",
+      "resource_type": "root-account",
+      "resource_id": "root",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-005",
+      "assertion_id": "AST-IAM-005-10",
+      "module": "iam",
+      "rule_id": "IAM-014",
+      "resource_type": "root-account",
+      "resource_id": "root",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-006",
+      "assertion_id": "AST-IAM-006-01",
+      "module": "iam",
+      "rule_id": "IAM-005",
+      "resource_type": "user",
+      "resource_id": "user-bool-if-exists",
+      "truth_label": "positive",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "false-negative",
+      "expected_severity": "medium",
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-006",
+      "assertion_id": "AST-IAM-006-02",
+      "module": "iam",
+      "rule_id": "IAM-005",
+      "resource_type": "user",
+      "resource_id": "user-strict-mfa-edge",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-006",
+      "assertion_id": "AST-IAM-006-03",
+      "module": "iam",
+      "rule_id": "IAM-006",
+      "resource_type": "user",
+      "resource_id": "user-console-protected-edge",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-006",
+      "assertion_id": "AST-IAM-006-04",
+      "module": "iam",
+      "rule_id": "IAM-013",
+      "resource_type": "root-account",
+      "resource_id": "root",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-006",
+      "assertion_id": "AST-IAM-006-05",
+      "module": "iam",
+      "rule_id": "IAM-014",
+      "resource_type": "root-account",
+      "resource_id": "root",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-IAM-007",
+      "assertion_id": "AST-IAM-007-01",
+      "module": "iam",
+      "rule_id": "IAM-005",
+      "resource_type": "user",
+      "resource_id": "user-dynamic-mfa",
+      "truth_label": "ambiguous",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "excluded",
+      "expected_severity": null,
+      "observed_severity": "medium",
+      "severity_match": null,
+      "message": "The ambiguous assertion is excluded from classification metrics."
+    },
+    {
+      "case_id": "EVAL-IAM-008",
+      "assertion_id": "AST-IAM-008-01",
+      "module": "iam",
+      "rule_id": "IAM-008",
+      "resource_type": "role",
+      "resource_id": "role-dynamic-external-id",
+      "truth_label": "ambiguous",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "excluded",
+      "expected_severity": null,
+      "observed_severity": "medium",
+      "severity_match": null,
+      "message": "The ambiguous assertion is excluded from classification metrics."
+    },
+    {
+      "case_id": "EVAL-STO-001",
+      "assertion_id": "AST-STO-001-01",
+      "module": "storage",
+      "rule_id": "STO-001",
+      "resource_type": "bucket",
+      "resource_id": "cobalt-export-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-001",
+      "assertion_id": "AST-STO-001-02",
+      "module": "storage",
+      "rule_id": "STO-002",
+      "resource_type": "bucket",
+      "resource_id": "cobalt-export-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-001",
+      "assertion_id": "AST-STO-001-03",
+      "module": "storage",
+      "rule_id": "STO-003",
+      "resource_type": "bucket",
+      "resource_id": "cobalt-export-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-001",
+      "assertion_id": "AST-STO-001-04",
+      "module": "storage",
+      "rule_id": "STO-004",
+      "resource_type": "bucket",
+      "resource_id": "cobalt-export-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-001",
+      "assertion_id": "AST-STO-001-05",
+      "module": "storage",
+      "rule_id": "STO-005",
+      "resource_type": "bucket",
+      "resource_id": "cobalt-export-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-001",
+      "assertion_id": "AST-STO-001-06",
+      "module": "storage",
+      "rule_id": "STO-006",
+      "resource_type": "bucket",
+      "resource_id": "cobalt-export-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-002",
+      "assertion_id": "AST-STO-002-01",
+      "module": "storage",
+      "rule_id": "STO-001",
+      "resource_type": "bucket",
+      "resource_id": "ember-dataset-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-002",
+      "assertion_id": "AST-STO-002-02",
+      "module": "storage",
+      "rule_id": "STO-002",
+      "resource_type": "bucket",
+      "resource_id": "ember-dataset-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-002",
+      "assertion_id": "AST-STO-002-03",
+      "module": "storage",
+      "rule_id": "STO-003",
+      "resource_type": "bucket",
+      "resource_id": "ember-dataset-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-002",
+      "assertion_id": "AST-STO-002-04",
+      "module": "storage",
+      "rule_id": "STO-004",
+      "resource_type": "bucket",
+      "resource_id": "ember-dataset-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "low",
+      "observed_severity": "low",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-002",
+      "assertion_id": "AST-STO-002-05",
+      "module": "storage",
+      "rule_id": "STO-005",
+      "resource_type": "bucket",
+      "resource_id": "ember-dataset-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-002",
+      "assertion_id": "AST-STO-002-06",
+      "module": "storage",
+      "rule_id": "STO-006",
+      "resource_type": "bucket",
+      "resource_id": "ember-dataset-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-003",
+      "assertion_id": "AST-STO-003-01",
+      "module": "storage",
+      "rule_id": "STO-001",
+      "resource_type": "bucket",
+      "resource_id": "fjord-audit-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-003",
+      "assertion_id": "AST-STO-003-02",
+      "module": "storage",
+      "rule_id": "STO-002",
+      "resource_type": "bucket",
+      "resource_id": "fjord-audit-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-003",
+      "assertion_id": "AST-STO-003-03",
+      "module": "storage",
+      "rule_id": "STO-003",
+      "resource_type": "bucket",
+      "resource_id": "fjord-audit-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-003",
+      "assertion_id": "AST-STO-003-04",
+      "module": "storage",
+      "rule_id": "STO-004",
+      "resource_type": "bucket",
+      "resource_id": "fjord-audit-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-003",
+      "assertion_id": "AST-STO-003-05",
+      "module": "storage",
+      "rule_id": "STO-005",
+      "resource_type": "bucket",
+      "resource_id": "fjord-audit-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-003",
+      "assertion_id": "AST-STO-003-06",
+      "module": "storage",
+      "rule_id": "STO-006",
+      "resource_type": "bucket",
+      "resource_id": "fjord-audit-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-004",
+      "assertion_id": "AST-STO-004-01",
+      "module": "storage",
+      "rule_id": "STO-001",
+      "resource_type": "bucket",
+      "resource_id": "glacier-ledger-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-004",
+      "assertion_id": "AST-STO-004-02",
+      "module": "storage",
+      "rule_id": "STO-002",
+      "resource_type": "bucket",
+      "resource_id": "glacier-ledger-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-004",
+      "assertion_id": "AST-STO-004-03",
+      "module": "storage",
+      "rule_id": "STO-003",
+      "resource_type": "bucket",
+      "resource_id": "glacier-ledger-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-004",
+      "assertion_id": "AST-STO-004-04",
+      "module": "storage",
+      "rule_id": "STO-004",
+      "resource_type": "bucket",
+      "resource_id": "glacier-ledger-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-004",
+      "assertion_id": "AST-STO-004-05",
+      "module": "storage",
+      "rule_id": "STO-005",
+      "resource_type": "bucket",
+      "resource_id": "glacier-ledger-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-004",
+      "assertion_id": "AST-STO-004-06",
+      "module": "storage",
+      "rule_id": "STO-006",
+      "resource_type": "bucket",
+      "resource_id": "glacier-ledger-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-005",
+      "assertion_id": "AST-STO-005-01",
+      "module": "storage",
+      "rule_id": "STO-001",
+      "resource_type": "bucket",
+      "resource_id": "harbor-encryption-edge",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-005",
+      "assertion_id": "AST-STO-005-02",
+      "module": "storage",
+      "rule_id": "STO-002",
+      "resource_type": "bucket",
+      "resource_id": "harbor-encryption-edge",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-005",
+      "assertion_id": "AST-STO-005-03",
+      "module": "storage",
+      "rule_id": "STO-003",
+      "resource_type": "bucket",
+      "resource_id": "harbor-encryption-edge",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-005",
+      "assertion_id": "AST-STO-005-04",
+      "module": "storage",
+      "rule_id": "STO-004",
+      "resource_type": "bucket",
+      "resource_id": "harbor-encryption-edge",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "low",
+      "observed_severity": "low",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-005",
+      "assertion_id": "AST-STO-005-05",
+      "module": "storage",
+      "rule_id": "STO-005",
+      "resource_type": "bucket",
+      "resource_id": "harbor-encryption-edge",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-005",
+      "assertion_id": "AST-STO-005-06",
+      "module": "storage",
+      "rule_id": "STO-006",
+      "resource_type": "bucket",
+      "resource_id": "harbor-encryption-edge",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-006",
+      "assertion_id": "AST-STO-006-01",
+      "module": "storage",
+      "rule_id": "STO-001",
+      "resource_type": "bucket",
+      "resource_id": "indigo-policy-edge",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-006",
+      "assertion_id": "AST-STO-006-02",
+      "module": "storage",
+      "rule_id": "STO-002",
+      "resource_type": "bucket",
+      "resource_id": "indigo-policy-edge",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-006",
+      "assertion_id": "AST-STO-006-03",
+      "module": "storage",
+      "rule_id": "STO-003",
+      "resource_type": "bucket",
+      "resource_id": "indigo-policy-edge",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-006",
+      "assertion_id": "AST-STO-006-04",
+      "module": "storage",
+      "rule_id": "STO-004",
+      "resource_type": "bucket",
+      "resource_id": "indigo-policy-edge",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-006",
+      "assertion_id": "AST-STO-006-05",
+      "module": "storage",
+      "rule_id": "STO-005",
+      "resource_type": "bucket",
+      "resource_id": "indigo-policy-edge",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-006",
+      "assertion_id": "AST-STO-006-06",
+      "module": "storage",
+      "rule_id": "STO-006",
+      "resource_type": "bucket",
+      "resource_id": "indigo-policy-edge",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-STO-007",
+      "assertion_id": "AST-STO-007-01",
+      "module": "storage",
+      "rule_id": "STO-002",
+      "resource_type": "bucket",
+      "resource_id": "juno-ownership-unknown",
+      "truth_label": "ambiguous",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "excluded",
+      "expected_severity": null,
+      "observed_severity": "critical",
+      "severity_match": null,
+      "message": "The ambiguous assertion is excluded from classification metrics."
+    },
+    {
+      "case_id": "EVAL-STO-008",
+      "assertion_id": "AST-STO-008-01",
+      "module": "storage",
+      "rule_id": "STO-002",
+      "resource_type": "bucket",
+      "resource_id": "kepler-ownership-unknown",
+      "truth_label": "ambiguous",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "excluded",
+      "expected_severity": null,
+      "observed_severity": "critical",
+      "severity_match": null,
+      "message": "The ambiguous assertion is excluded from classification metrics."
+    },
+    {
+      "case_id": "EVAL-NET-001",
+      "assertion_id": "AST-NET-001-01",
+      "module": "network",
+      "rule_id": "NET-001",
+      "resource_type": "security_group",
+      "resource_id": "sg-0a11ce01",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-001",
+      "assertion_id": "AST-NET-001-02",
+      "module": "network",
+      "rule_id": "NET-002",
+      "resource_type": "security_group",
+      "resource_id": "sg-0a11ce01",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-001",
+      "assertion_id": "AST-NET-001-03",
+      "module": "network",
+      "rule_id": "NET-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-0a11ce01",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-002",
+      "assertion_id": "AST-NET-002-01",
+      "module": "network",
+      "rule_id": "NET-001",
+      "resource_type": "security_group",
+      "resource_id": "sg-0b22ce02",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-002",
+      "assertion_id": "AST-NET-002-02",
+      "module": "network",
+      "rule_id": "NET-002",
+      "resource_type": "security_group",
+      "resource_id": "sg-0b22ce02",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-002",
+      "assertion_id": "AST-NET-002-03",
+      "module": "network",
+      "rule_id": "NET-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-0b22ce02",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-003",
+      "assertion_id": "AST-NET-003-01",
+      "module": "network",
+      "rule_id": "NET-001",
+      "resource_type": "security_group",
+      "resource_id": "sg-0c33ce03",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-003",
+      "assertion_id": "AST-NET-003-02",
+      "module": "network",
+      "rule_id": "NET-002",
+      "resource_type": "security_group",
+      "resource_id": "sg-0c33ce03",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-003",
+      "assertion_id": "AST-NET-003-03",
+      "module": "network",
+      "rule_id": "NET-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-0c33ce03",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-004",
+      "assertion_id": "AST-NET-004-01",
+      "module": "network",
+      "rule_id": "NET-001",
+      "resource_type": "security_group",
+      "resource_id": "sg-0e55ce05",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-004",
+      "assertion_id": "AST-NET-004-02",
+      "module": "network",
+      "rule_id": "NET-002",
+      "resource_type": "security_group",
+      "resource_id": "sg-0e55ce05",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-004",
+      "assertion_id": "AST-NET-004-03",
+      "module": "network",
+      "rule_id": "NET-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-0e55ce05",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-005",
+      "assertion_id": "AST-NET-005-01",
+      "module": "network",
+      "rule_id": "NET-001",
+      "resource_type": "security_group",
+      "resource_id": "sg-0f66ce06",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-005",
+      "assertion_id": "AST-NET-005-02",
+      "module": "network",
+      "rule_id": "NET-002",
+      "resource_type": "security_group",
+      "resource_id": "sg-0f66ce06",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-005",
+      "assertion_id": "AST-NET-005-03",
+      "module": "network",
+      "rule_id": "NET-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-0f66ce06",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-006",
+      "assertion_id": "AST-NET-006-01",
+      "module": "network",
+      "rule_id": "NET-001",
+      "resource_type": "security_group",
+      "resource_id": "sg-1a77ce07",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-006",
+      "assertion_id": "AST-NET-006-02",
+      "module": "network",
+      "rule_id": "NET-002",
+      "resource_type": "security_group",
+      "resource_id": "sg-1a77ce07",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-006",
+      "assertion_id": "AST-NET-006-03",
+      "module": "network",
+      "rule_id": "NET-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-1a77ce07",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-NET-007",
+      "assertion_id": "AST-NET-007-01",
+      "module": "network",
+      "rule_id": "NET-001",
+      "resource_type": "security_group",
+      "resource_id": "sg-2b88ce08",
+      "truth_label": "ambiguous",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "excluded",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "The ambiguous assertion is excluded from classification metrics."
+    },
+    {
+      "case_id": "EVAL-NET-008",
+      "assertion_id": "AST-NET-008-01",
+      "module": "network",
+      "rule_id": "NET-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-4daa0e10",
+      "truth_label": "ambiguous",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "excluded",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "The ambiguous assertion is excluded from classification metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-01",
+      "module": "cloudtrail",
+      "rule_id": "CLD-001",
+      "resource_type": "identity",
+      "resource_id": "root",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-02",
+      "module": "cloudtrail",
+      "rule_id": "CLD-002",
+      "resource_type": "identity",
+      "resource_id": "target-user-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-03",
+      "module": "cloudtrail",
+      "rule_id": "CLD-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-6fcc2e12",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-04",
+      "module": "cloudtrail",
+      "rule_id": "CLD-004",
+      "resource_type": "bucket",
+      "resource_id": "lumen-archive-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-05",
+      "module": "cloudtrail",
+      "rule_id": "CLD-005",
+      "resource_type": "iam_policy",
+      "resource_id": "arn:aws:iam::579246801357:policy/evaluation-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-06",
+      "module": "cloudtrail",
+      "rule_id": "CLD-006",
+      "resource_type": "api_activity",
+      "resource_id": "probe-a@192.0.2.44",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-07",
+      "module": "cloudtrail",
+      "rule_id": "CLD-007",
+      "resource_type": "identity",
+      "resource_id": "console-user-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-08",
+      "module": "cloudtrail",
+      "rule_id": "CLD-008",
+      "resource_type": "identity",
+      "resource_id": "credential-target-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-09",
+      "module": "cloudtrail",
+      "rule_id": "CLD-009",
+      "resource_type": "role",
+      "resource_id": "federation-role-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-10",
+      "module": "cloudtrail",
+      "rule_id": "CLD-010",
+      "resource_type": "security_control",
+      "resource_id": "evaluation-trail-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-001",
+      "assertion_id": "AST-CLD-001-11",
+      "module": "cloudtrail",
+      "rule_id": "CLD-011",
+      "resource_type": "kms_key",
+      "resource_id": "arn:aws:kms:ap-southeast-2:579246801357:key/evaluation-a",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-01",
+      "module": "cloudtrail",
+      "rule_id": "CLD-001",
+      "resource_type": "identity",
+      "resource_id": "root",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-02",
+      "module": "cloudtrail",
+      "rule_id": "CLD-002",
+      "resource_type": "identity",
+      "resource_id": "target-user-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-03",
+      "module": "cloudtrail",
+      "rule_id": "CLD-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-5ebb1e11",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-04",
+      "module": "cloudtrail",
+      "rule_id": "CLD-004",
+      "resource_type": "bucket",
+      "resource_id": "lumen-archive-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-05",
+      "module": "cloudtrail",
+      "rule_id": "CLD-005",
+      "resource_type": "iam_policy",
+      "resource_id": "arn:aws:iam::579246801357:policy/evaluation-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-06",
+      "module": "cloudtrail",
+      "rule_id": "CLD-006",
+      "resource_type": "api_activity",
+      "resource_id": "probe-b@198.51.100.52",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-07",
+      "module": "cloudtrail",
+      "rule_id": "CLD-007",
+      "resource_type": "identity",
+      "resource_id": "console-user-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-08",
+      "module": "cloudtrail",
+      "rule_id": "CLD-008",
+      "resource_type": "identity",
+      "resource_id": "credential-target-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-09",
+      "module": "cloudtrail",
+      "rule_id": "CLD-009",
+      "resource_type": "role",
+      "resource_id": "federation-role-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-10",
+      "module": "cloudtrail",
+      "rule_id": "CLD-010",
+      "resource_type": "security_control",
+      "resource_id": "detector-eval-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-002",
+      "assertion_id": "AST-CLD-002-11",
+      "module": "cloudtrail",
+      "rule_id": "CLD-011",
+      "resource_type": "kms_key",
+      "resource_id": "arn:aws:kms:ap-southeast-2:579246801357:key/evaluation-b",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "high",
+      "observed_severity": "high",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-01",
+      "module": "cloudtrail",
+      "rule_id": "CLD-001",
+      "resource_type": "identity",
+      "resource_id": "root",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-02",
+      "module": "cloudtrail",
+      "rule_id": "CLD-002",
+      "resource_type": "identity",
+      "resource_id": "negative-user-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-03",
+      "module": "cloudtrail",
+      "rule_id": "CLD-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-7add3e13",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-04",
+      "module": "cloudtrail",
+      "rule_id": "CLD-004",
+      "resource_type": "bucket",
+      "resource_id": "negative-bucket-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-05",
+      "module": "cloudtrail",
+      "rule_id": "CLD-005",
+      "resource_type": "iam_policy",
+      "resource_id": "arn:aws:iam::579246801357:policy/negative-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-06",
+      "module": "cloudtrail",
+      "rule_id": "CLD-006",
+      "resource_type": "api_activity",
+      "resource_id": "probe-negative-a@198.51.100.70",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-07",
+      "module": "cloudtrail",
+      "rule_id": "CLD-007",
+      "resource_type": "identity",
+      "resource_id": "mfa-user-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-08",
+      "module": "cloudtrail",
+      "rule_id": "CLD-008",
+      "resource_type": "identity",
+      "resource_id": "credential-negative-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-09",
+      "module": "cloudtrail",
+      "rule_id": "CLD-009",
+      "resource_type": "role",
+      "resource_id": "negative-role-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-10",
+      "module": "cloudtrail",
+      "rule_id": "CLD-010",
+      "resource_type": "security_control",
+      "resource_id": "detector-negative-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-003",
+      "assertion_id": "AST-CLD-003-11",
+      "module": "cloudtrail",
+      "rule_id": "CLD-011",
+      "resource_type": "kms_key",
+      "resource_id": "arn:aws:kms:ap-southeast-2:579246801357:key/negative-a",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-01",
+      "module": "cloudtrail",
+      "rule_id": "CLD-001",
+      "resource_type": "identity",
+      "resource_id": "root",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-02",
+      "module": "cloudtrail",
+      "rule_id": "CLD-002",
+      "resource_type": "identity",
+      "resource_id": "negative-user-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-03",
+      "module": "cloudtrail",
+      "rule_id": "CLD-003",
+      "resource_type": "security_group",
+      "resource_id": "sg-8bee4e14",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-04",
+      "module": "cloudtrail",
+      "rule_id": "CLD-004",
+      "resource_type": "bucket",
+      "resource_id": "negative-bucket-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-05",
+      "module": "cloudtrail",
+      "rule_id": "CLD-005",
+      "resource_type": "iam_policy",
+      "resource_id": "arn:aws:iam::579246801357:policy/negative-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-06",
+      "module": "cloudtrail",
+      "rule_id": "CLD-006",
+      "resource_type": "api_activity",
+      "resource_id": "probe-negative-b@203.0.113.80",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-07",
+      "module": "cloudtrail",
+      "rule_id": "CLD-007",
+      "resource_type": "identity",
+      "resource_id": "mfa-console-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-08",
+      "module": "cloudtrail",
+      "rule_id": "CLD-008",
+      "resource_type": "identity",
+      "resource_id": "credential-negative-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-09",
+      "module": "cloudtrail",
+      "rule_id": "CLD-009",
+      "resource_type": "role",
+      "resource_id": "negative-role-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-10",
+      "module": "cloudtrail",
+      "rule_id": "CLD-010",
+      "resource_type": "security_control",
+      "resource_id": "detector-negative-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-004",
+      "assertion_id": "AST-CLD-004-11",
+      "module": "cloudtrail",
+      "rule_id": "CLD-011",
+      "resource_type": "kms_key",
+      "resource_id": "arn:aws:kms:ap-southeast-2:579246801357:key/negative-b",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-005",
+      "assertion_id": "AST-CLD-005-01",
+      "module": "cloudtrail",
+      "rule_id": "CLD-006",
+      "resource_type": "api_activity",
+      "resource_id": "probe-edge-five@192.0.2.90",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "medium",
+      "observed_severity": "medium",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-005",
+      "assertion_id": "AST-CLD-005-02",
+      "module": "cloudtrail",
+      "rule_id": "CLD-006",
+      "resource_type": "api_activity",
+      "resource_id": "probe-edge-four@192.0.2.91",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-005",
+      "assertion_id": "AST-CLD-005-03",
+      "module": "cloudtrail",
+      "rule_id": "CLD-010",
+      "resource_type": "security_control",
+      "resource_id": "detector-disabled-edge",
+      "truth_label": "positive",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-positive",
+      "expected_severity": "critical",
+      "observed_severity": "critical",
+      "severity_match": true,
+      "message": "Exactly one matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-005",
+      "assertion_id": "AST-CLD-005-04",
+      "module": "cloudtrail",
+      "rule_id": "CLD-010",
+      "resource_type": "security_control",
+      "resource_id": "detector-enabled-edge",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-005",
+      "assertion_id": "AST-CLD-005-05",
+      "module": "cloudtrail",
+      "rule_id": "CLD-011",
+      "resource_type": "kms_key",
+      "resource_id": "arn:aws:kms:ap-southeast-2:579246801357:key/error-message-edge",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-006",
+      "assertion_id": "AST-CLD-006-01",
+      "module": "cloudtrail",
+      "rule_id": "CLD-001",
+      "resource_type": "identity",
+      "resource_id": "root",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-006",
+      "assertion_id": "AST-CLD-006-02",
+      "module": "cloudtrail",
+      "rule_id": "CLD-008",
+      "resource_type": "identity",
+      "resource_id": "credential-error-edge",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-006",
+      "assertion_id": "AST-CLD-006-03",
+      "module": "cloudtrail",
+      "rule_id": "CLD-010",
+      "resource_type": "security_control",
+      "resource_id": "trail-error-edge",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-006",
+      "assertion_id": "AST-CLD-006-04",
+      "module": "cloudtrail",
+      "rule_id": "CLD-006",
+      "resource_type": "api_activity",
+      "resource_id": "shared-name@198.51.100.92",
+      "truth_label": "negative",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "true-negative",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "No matching candidate finding was observed."
+    },
+    {
+      "case_id": "EVAL-CLD-007",
+      "assertion_id": "AST-CLD-007-01",
+      "module": "cloudtrail",
+      "rule_id": "CLD-007",
+      "resource_type": "identity",
+      "resource_id": "mfa-state-unknown",
+      "truth_label": "ambiguous",
+      "prediction_count": 0,
+      "duplicate_prediction_count": 0,
+      "outcome": "excluded",
+      "expected_severity": null,
+      "observed_severity": null,
+      "severity_match": null,
+      "message": "The ambiguous assertion is excluded from classification metrics."
+    },
+    {
+      "case_id": "EVAL-CLD-008",
+      "assertion_id": "AST-CLD-008-01",
+      "module": "cloudtrail",
+      "rule_id": "CLD-006",
+      "resource_type": "api_activity",
+      "resource_id": "HIDDEN_DUE_TO_SECURITY_REASONS@203.0.113.95",
+      "truth_label": "ambiguous",
+      "prediction_count": 1,
+      "duplicate_prediction_count": 0,
+      "outcome": "excluded",
+      "expected_severity": null,
+      "observed_severity": "medium",
+      "severity_match": null,
+      "message": "The ambiguous assertion is excluded from classification metrics."
+    }
+  ],
+  "unexpected_predictions": [
+    {
+      "case_id": "EVAL-STO-007",
+      "finding_id": "FND-357F8AD87E18DACE795FFE1BDE26A05D",
+      "rule_id": "STO-001",
+      "resource_type": "bucket",
+      "resource_id": "juno-ownership-unknown",
+      "reason": "undeclared-decision-key",
+      "counted_as_false_positive": true
+    },
+    {
+      "case_id": "EVAL-STO-008",
+      "finding_id": "FND-A01B79A990209AE38E32E275A407A2CC",
+      "rule_id": "STO-001",
+      "resource_type": "bucket",
+      "resource_id": "kepler-ownership-unknown",
+      "reason": "undeclared-decision-key",
+      "counted_as_false_positive": true
+    }
+  ],
+  "baseline_comparisons": [
+    {
+      "baseline_id": "prowler-aws",
+      "eligible_decisions": 24,
+      "agreements": 24,
+      "disagreements": 0,
+      "agreement_rate": 1.0,
+      "disagreement_records": []
+    },
+    {
+      "baseline_id": "sigma-core",
+      "eligible_decisions": 0,
+      "agreements": 0,
+      "disagreements": 0,
+      "agreement_rate": null,
+      "disagreement_records": []
+    }
+  ],
+  "ablations": [
+    {
+      "id": "native-simplified-equivalence",
+      "eligible_cases": 8,
+      "invariant_passed": true,
+      "primary_decision_agreement": 1.0,
+      "changed_severity_count": 0,
+      "changed_incident_count": 0,
+      "unexpected_change_count": 0,
+      "notes": "Compared complete rule/resource decision sets and severities for every frozen native/simplified equivalence group."
+    },
+    {
+      "id": "network-reachability-context",
+      "eligible_cases": 0,
+      "invariant_passed": false,
+      "primary_decision_agreement": null,
+      "changed_severity_count": 0,
+      "changed_incident_count": 0,
+      "unexpected_change_count": 0,
+      "notes": "Not estimable: the frozen R2 corpus contains no reachability-context artifact; post-freeze evidence was not added."
+    },
+    {
+      "id": "cloudtrail-incident-correlation",
+      "eligible_cases": 8,
+      "invariant_passed": true,
+      "primary_decision_agreement": 1.0,
+      "changed_severity_count": 0,
+      "changed_incident_count": 4,
+      "unexpected_change_count": 0,
+      "notes": "Compared findings from correlation-disabled and correlation-enabled executions; correlation added 4 incident(s)."
+    }
+  ],
+  "acceptance": {
+    "passed": false,
+    "checks": [
+      {
+        "id": "overall-micro-f1",
+        "observed": 0.980891719745223,
+        "operator": ">=",
+        "threshold": 0.9,
+        "passed": true
+      },
+      {
+        "id": "iam-precision",
+        "observed": 1.0,
+        "operator": ">=",
+        "threshold": 0.9,
+        "passed": true
+      },
+      {
+        "id": "iam-recall",
+        "observed": 0.967741935483871,
+        "operator": ">=",
+        "threshold": 0.9,
+        "passed": true
+      },
+      {
+        "id": "storage-precision",
+        "observed": 0.8823529411764706,
+        "operator": ">=",
+        "threshold": 0.9,
+        "passed": false
+      },
+      {
+        "id": "storage-recall",
+        "observed": 1.0,
+        "operator": ">=",
+        "threshold": 0.9,
+        "passed": true
+      },
+      {
+        "id": "network-precision",
+        "observed": 1.0,
+        "operator": ">=",
+        "threshold": 0.9,
+        "passed": true
+      },
+      {
+        "id": "network-recall",
+        "observed": 1.0,
+        "operator": ">=",
+        "threshold": 0.9,
+        "passed": true
+      },
+      {
+        "id": "cloudtrail-precision",
+        "observed": 1.0,
+        "operator": ">=",
+        "threshold": 0.9,
+        "passed": true
+      },
+      {
+        "id": "cloudtrail-recall",
+        "observed": 1.0,
+        "operator": ">=",
+        "threshold": 0.9,
+        "passed": true
+      },
+      {
+        "id": "critical-high-false-negatives",
+        "observed": 0.0,
+        "operator": "<=",
+        "threshold": 0.0,
+        "passed": true
+      },
+      {
+        "id": "native-simplified-decision-agreement",
+        "observed": 1.0,
+        "operator": "==",
+        "threshold": 1.0,
+        "passed": true
+      },
+      {
+        "id": "unlabelled-predictions",
+        "observed": 2.0,
+        "operator": "<=",
+        "threshold": 0.0,
+        "passed": false
+      }
+    ]
+  }
+}

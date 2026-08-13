@@ -19,8 +19,8 @@ credentials or charges.
 | Security scope | IAM, S3, EC2 security groups, and CloudTrail |
 | Detection depth | 35 cataloged rules with qualified AWS Security Hub CSPM, CIS AWS Foundations, and MITRE ATT&CK mappings |
 | Deterministic sample | 39 findings, 2 incidents, 36 remediation actions, and 11 timeline entries |
-| Engineering assurance | 426 tests; 93.80% statement and 87.24% branch coverage; Python 3.10-3.13 CI |
-| Evaluation status | Protocol, 32-case/176-assertion holdout, 35-rule baseline matrix, and 24 baseline decisions frozen; candidate results pending |
+| Engineering assurance | 441 tests; 93.13% statement and 86.68% branch coverage; Python 3.10-3.13 CI |
+| Evaluation status | Frozen holdout: 0.9809 F1, 77 TP, 2 FP, 1 FN, 90 TN; preregistered acceptance not met |
 | Safety boundary | Offline files only; zero runtime dependencies; no credentials and no cloud writes |
 
 ## Quick Start
@@ -72,13 +72,13 @@ engineering evidence.
 
 | Quality Gate | Verified Result |
 | --- | --- |
-| Automated tests | 426 unit, regression, integration, CLI, schema, compatibility, and benchmark tests pass |
-| Coverage | 6,402/6,825 statements (93.80%) and 2,380/2,728 branches (87.24%) |
+| Automated tests | 441 unit, regression, integration, CLI, schema, compatibility, evaluation, and benchmark tests pass |
+| Coverage | 6,806/7,308 statements (93.13%) and 2,498/2,882 branches (86.68%) |
 | Rule benchmark | 78/78 exact functional cases and 4/4 malformed native inputs rejected |
 | Scale benchmark | 8/8 deterministic profiles pass across 100 to 10,000 inputs |
 | Supported Python | GitHub Actions exercises every minor from Python 3.10 through 3.13 |
 | Distribution | Wheel and sdist build; installed-wheel demo and packaged benchmark pass |
-| Independent evaluation | Frozen protocol, 32-case/176-assertion corpus, complete 35-rule baseline matrix, and 24 source-audited baseline decisions; candidate result remains unrevealed |
+| Independent evaluation | 0.9809 overall F1 and 24/24 exact-overlap Prowler agreement; one IAM false negative and two unlabelled storage predictions; registered acceptance not met |
 
 Timing is measured but deliberately not used as a CI threshold. Exact outputs,
 bounded finding amplification, repeated-run equality, structural operation
@@ -91,10 +91,13 @@ holdout rules, ground-truth process, Prowler and Sigma baselines, metrics, and
 acceptance thresholds before corpus construction or execution. The
 [frozen corpus](docs/evaluation-corpus.md) now publishes output-blind labels,
 citations, hashes, and exact inventory. The
-[external-baseline audit](docs/evaluation-baselines.md) now freezes all 35
+[external-baseline audit](docs/evaluation-baselines.md) freezes all 35
 Prowler/Sigma overlap classifications and 24 exact-overlap baseline decisions
-without importing or executing the candidate. No independent accuracy result
-is claimed until raw candidate decisions are published in M12-R4.
+without importing or executing the candidate. The published
+[evaluation report](docs/evaluation-report.md) preserves every raw decision,
+Wilson interval, disagreement, ablation, and acceptance check. Candidate
+`2.1.1` achieved `0.9809` overall F1, but it did not meet the registered target
+because storage precision was `0.8824` and two predictions were unlabelled.
 
 ## What I Learned
 
@@ -448,6 +451,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [Independent evaluation protocol](docs/evaluation-protocol.md)
 - [Independent evaluation corpus](docs/evaluation-corpus.md)
 - [Independent evaluation baselines](docs/evaluation-baselines.md)
+- [Independent evaluation results](docs/evaluation-report.md)
 - [Supply-chain controls](docs/supply-chain.md)
 - [Documentation quality gates](docs/documentation-quality.md)
 - [Engineering checks](docs/engineering.md)
@@ -481,6 +485,7 @@ mkdir -p reports/generated
 .venv/bin/python -m tools.check_markdown_links external
 .venv/bin/python -m tools.evaluation_corpus
 .venv/bin/python -m tools.evaluation_baselines
+.venv/bin/python -m tools.evaluation_runner
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
 .venv/bin/coverage json -o reports/generated/coverage.json
@@ -514,6 +519,7 @@ cloud_security_misconfiguration_lab/
 │   ├── corpus-manifest-v1.0.json
 │   ├── baseline-overlap-v1.0.json
 │   ├── baseline-outcomes-v1.0.json
+│   ├── results-v1.0.json
 │   └── corpus-v1.0/
 │       ├── iam/
 │       ├── storage/
@@ -523,6 +529,7 @@ cloud_security_misconfiguration_lab/
 │   ├── check_markdown_links.py
 │   ├── evaluation_corpus.py
 │   ├── evaluation_baselines.py
+│   ├── evaluation_runner.py
 │   └── release_evidence.py
 ├── cloud_security_lab/
 │   ├── __main__.py
@@ -635,6 +642,10 @@ cloud_security_misconfiguration_lab/
 │   ├── demo-walkthrough.md
 │   ├── design-decisions.md
 │   ├── engineering.md
+│   ├── evaluation-baselines.md
+│   ├── evaluation-corpus.md
+│   ├── evaluation-protocol.md
+│   ├── evaluation-report.md
 │   ├── incident-correlation.md
 │   ├── input-resource-limits.md
 │   ├── known-limitations.md

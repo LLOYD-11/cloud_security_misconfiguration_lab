@@ -11,8 +11,9 @@ version and SHA-256 digest.
 The corpus was authored, cited, reviewed, sanitized, hashed, and committed
 without importing or executing a candidate analyzer. This is a procedural
 holdout created by the project author, not third-party annotation or an
-independent laboratory study. No accuracy, baseline-agreement, or release-pass
-result is claimed at this stage.
+independent laboratory study. The later [primary result](evaluation-report.md)
+preserves this original corpus and reports a discovered decision-universe
+completeness defect rather than altering post-run labels.
 
 ## Inventory
 
@@ -107,7 +108,7 @@ corpus into an analyzer or reveal candidate performance.
 - AWS documentation can change after the recorded retrieval date.
 
 M12-R3 began only after this corpus was committed and published. The resulting
-[baseline audit](evaluation-baselines.md) now freezes the complete Prowler and
-Sigma overlap matrix and 24 exact-overlap baseline decisions. M12-R4 remains
-responsible for executing the candidate and publishing raw decisions, metrics,
-disagreements, ablations, and acceptance checks.
+[baseline audit](evaluation-baselines.md) froze the complete Prowler and Sigma
+overlap matrix and 24 exact-overlap baseline decisions. M12-R4 is now complete:
+the [evaluation report](evaluation-report.md) publishes raw decisions, metrics,
+disagreements, ablations, and all acceptance checks.

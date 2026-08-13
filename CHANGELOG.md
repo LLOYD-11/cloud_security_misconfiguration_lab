@@ -31,6 +31,11 @@ All notable changes to this project are documented in this file.
 - A complete 35-rule Prowler/Sigma overlap matrix plus 24 frozen exact-overlap
   baseline decisions, upstream source and Sigma release inventories, a
   machine-readable outcome contract, and deterministic tamper verification.
+- Immutable independent-evaluation results with all 176 assertion outcomes,
+  confusion matrices, Wilson 95% intervals, severity agreement, baseline
+  comparisons, registered ablations, and acceptance checks, plus a complete
+  disagreement report. The frozen candidate achieved 0.9809 overall F1 but did
+  not meet the registered acceptance target.
 
 ### Changed
 
@@ -47,9 +52,10 @@ All notable changes to this project are documented in this file.
   releases separate low-privilege build and signing from an isolated release
   writer, with checksum and signer-workflow verification on both sides of the
   artifact transfer.
-- CI, release, and distribution gates now verify the frozen corpus and baseline
-  artifacts and require all 42 evidence files, both manifests, both baseline
-  artifacts, and every evaluation schema in the built wheel.
+- CI, release, and distribution gates now verify the frozen corpus, baselines,
+  and primary result and require all 42 evidence files, both manifests, both
+  baseline artifacts, the machine-readable result, and every evaluation schema
+  in the built wheel.
 
 ## 2.1.1 - 2026-07-19
 

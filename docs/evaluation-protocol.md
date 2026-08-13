@@ -9,12 +9,12 @@ by the
 [`evaluation-protocol-v1.0`](../schemas/evaluation-protocol-v1.0.schema.json)
 contract.
 
-This registration fixes the candidate, corpus rules, labels, external
+This registration fixed the candidate, corpus rules, labels, external
 baselines, metrics, thresholds, ablations, and change policy before results
-exist. The separately documented [corpus](evaluation-corpus.md) and
+existed. The separately documented [corpus](evaluation-corpus.md) and
 [external-baseline outcomes](evaluation-baselines.md) were frozen next. The
-candidate has not been executed and no candidate-performance result is claimed
-yet.
+primary run is now published in the [evaluation report](evaluation-report.md);
+the candidate did not meet every registered acceptance threshold.
 
 | Frozen Item | Value |
 | --- | --- |
@@ -285,10 +285,10 @@ the underlying CloudTrail findings.
 
 ## Result Contract And Reproduction
 
-The future runner must emit
+The published runner emits
 [`evaluation-results-v1.0`](../schemas/evaluation-results-v1.0.schema.json).
 The result records exact protocol, corpus, overlap-matrix, candidate, and rule
-catalog digests; Python and platform information; validity failures; raw
+catalog digests; Python and platform information; validity issues; raw
 assertion decisions; unexpected predictions; confusion counts; intervals;
 baseline disagreements; ablations; and every acceptance check.
 
@@ -331,8 +331,11 @@ new holdout claim requires a second independently frozen corpus.
    partial, or 12 without a released counterpart, and 24 exact-overlap
    baseline decisions are frozen without candidate execution. See the
    [baseline audit](evaluation-baselines.md).
-4. **R4, measurement:** run the candidate once, publish machine-readable
-   results, disagreement analysis, ablations, and the evaluation report.
+4. **R4, measurement:** complete; the primary run, machine-readable results,
+   disagreement analysis, ablations, and [evaluation report](evaluation-report.md)
+   are published without changing the frozen method after output disclosure.
 
-Only after those artifacts pass review will the project create the `v2.2.0`
-tag and publish its checksum, SBOM, and signed provenance assets.
+The result artifacts now enter final review before the project creates the
+`v2.2.0` tag and publishes its checksum, SBOM, and signed provenance assets.
+The release may publish the result, but it cannot claim that candidate `2.1.1`
+met the registered evaluation target.

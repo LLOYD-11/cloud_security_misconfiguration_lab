@@ -75,6 +75,9 @@ jobs:
       - name: Verify frozen evaluation baselines
         run: python -m tools.evaluation_baselines
 
+      - name: Reproduce frozen evaluation results
+        run: python -m tools.evaluation_runner
+
       - name: Test with branch coverage
         run: >-
           mkdir -p reports/generated &&
@@ -114,6 +117,12 @@ jobs:
           '/evaluation/baseline-overlap-v1.0.json') for name in names);
           assert any(name.endswith(
           '/evaluation/baseline-outcomes-v1.0.json') for name in names);
+          assert any(name.endswith(
+          '/evaluation/results-v1.0.json') for name in names);
+          result_name = next(name for name in names if name.endswith(
+          '/evaluation/results-v1.0.json'));
+          assert zipfile.ZipFile(wheel).read(result_name) ==
+          open('evaluation/results-v1.0.json', 'rb').read();
           assert len([name for name in names
           if '/evaluation/corpus-v1.0/' in name]) == 42"
 

@@ -114,13 +114,13 @@ different elapsed times.
 
 ## Coverage Evidence
 
-The 2026-08-13 M12-R3 quality-gate run executed 426 tests and measured the
+The 2026-08-13 M12-R4 quality-gate run executed 441 tests and measured the
 runtime packages plus the repository quality-gate tools:
 
 | Metric | Covered | Total | Result | Minimum |
 | --- | ---: | ---: | ---: | ---: |
-| Statements | 6,402 | 6,825 | 93.80% | 90.00% |
-| Branches | 2,380 | 2,728 | 87.24% | 85.00% |
+| Statements | 6,806 | 7,308 | 93.13% | 90.00% |
+| Branches | 2,498 | 2,882 | 86.68% | 85.00% |
 
 `coverage.py` also reports a combined display percentage, but the acceptance
 gate deliberately computes statements and branches independently from

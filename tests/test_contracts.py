@@ -81,6 +81,10 @@ SCHEMA_SAMPLE_PAIRS = (
         "evaluation-corpus-manifest-v1.0.schema.json",
         "evaluation/corpus-manifest-v1.0.json",
     ),
+    (
+        "evaluation-results-v1.0.schema.json",
+        "evaluation/results-v1.0.json",
+    ),
 )
 
 
