@@ -137,19 +137,31 @@ def _statement_effect(statement: dict[str, Any]) -> str:
     return str(statement.get("effect", statement.get("Effect", ""))).lower()
 
 
-def _has_mfa_condition(statement: dict[str, Any]) -> bool:
+def _has_strict_mfa_condition(statement: dict[str, Any]) -> bool:
     condition = statement.get("condition", statement.get("Condition", {}))
     if not isinstance(condition, dict):
         return False
 
-    for operator_values in condition.values():
+    values_by_operator: dict[str, list[str]] = {}
+    for operator, operator_values in condition.items():
         if not isinstance(operator_values, dict):
             continue
         for key, value in operator_values.items():
             if str(key).lower() != "aws:multifactorauthpresent":
                 continue
-            return any(str(item).lower() == "true" for item in _as_list(value))
-    return False
+            normalized_operator = str(operator).lower()
+            values_by_operator.setdefault(normalized_operator, []).extend(
+                str(item).lower() for item in _as_list(value)
+            )
+
+    def requires_only(operator: str, expected: str) -> bool:
+        values = values_by_operator.get(operator, [])
+        return bool(values) and all(value == expected for value in values)
+
+    return requires_only("bool", "true") or (
+        requires_only("boolifexists", "true")
+        and requires_only("null", "false")
+    )
 
 
 def _contains_wildcard(values: Iterable[str]) -> bool:
@@ -552,7 +564,7 @@ def analyze_principal(
             if (
                 subject_type in {"user", "group"}
                 and _has_sensitive_action(actions)
-                and not _has_mfa_condition(statement)
+                and not _has_strict_mfa_condition(statement)
             ):
                 _add_finding(
                     findings,

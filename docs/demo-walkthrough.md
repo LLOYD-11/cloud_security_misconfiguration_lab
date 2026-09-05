@@ -100,9 +100,9 @@ mkdir -p reports/generated
 
 Current evidence:
 
-- 443 tests
+- 447 tests
 - 92.82% statement coverage
-- 86.34% branch coverage
+- 86.41% branch coverage
 - 78 exact functional benchmark cases
 - 4 exact fail-closed malformed-input cases
 - 8 deterministic scale cases up to 10,000 inputs
@@ -110,6 +110,10 @@ Current evidence:
 - 35-rule baseline matrix with 24 exact-overlap predicate decisions
 - 0.9809 holdout F1 with all three disagreements and failed acceptance disclosed
 - Python 3.10, 3.11, 3.12, and 3.13 GitHub Actions coverage
+
+The revealed IAM false negative is now a development regression test and is
+fixed in the current analyzer. It remains part of the frozen `2.1.1` result;
+the published holdout score is not recalculated after disclosure.
 
 Finish with [Benchmarking and resilience](benchmarking.md) and the
 [independent evaluation report](evaluation-report.md), then use the

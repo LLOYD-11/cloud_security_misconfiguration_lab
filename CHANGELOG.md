@@ -4,6 +4,18 @@ All notable changes to this project are documented in this file.
 
 ## Unreleased
 
+### Fixed
+
+- `IAM-005` now requires every value in a `Bool` MFA condition to be `true`.
+  `BoolIfExists=true` remains a finding when the request-context key may be
+  absent, while a matching `Null=false` presence guard is recognized as strict.
+
+### Changed
+
+- The revealed `EVAL-IAM-006` boundary case is now an explicit development
+  regression. Frozen candidate `2.1.1` continues to replay in isolation, so the
+  original failed-acceptance result remains unchanged.
+
 ## 2.2.1 - 2026-09-05
 
 ### Fixed

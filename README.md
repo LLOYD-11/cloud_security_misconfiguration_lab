@@ -20,7 +20,7 @@ credentials or charges.
 | Security scope | IAM, S3, EC2 security groups, and CloudTrail |
 | Detection depth | 35 cataloged rules with qualified AWS Security Hub CSPM, CIS AWS Foundations, and MITRE ATT&CK mappings |
 | Deterministic sample | 39 findings, 2 incidents, 36 remediation actions, and 11 timeline entries |
-| Engineering assurance | 443 tests; 92.82% statement and 86.34% branch coverage; Python 3.10-3.13 CI |
+| Engineering assurance | 447 tests; 92.82% statement and 86.41% branch coverage; Python 3.10-3.13 CI |
 | Evaluation status | Frozen holdout: 0.9809 F1, 77 TP, 2 FP, 1 FN, 90 TN; preregistered acceptance not met |
 | Safety boundary | Offline files only; zero runtime dependencies; no credentials and no cloud writes |
 
@@ -73,8 +73,8 @@ engineering evidence.
 
 | Quality Gate | Verified Result |
 | --- | --- |
-| Automated tests | 443 unit, regression, integration, CLI, schema, compatibility, evaluation, and benchmark tests pass |
-| Coverage | 6,861/7,392 statements (92.82%) and 2,509/2,906 branches (86.34%) |
+| Automated tests | 447 unit, regression, integration, CLI, schema, compatibility, evaluation, and benchmark tests pass |
+| Coverage | 6,866/7,397 statements (92.82%) and 2,511/2,906 branches (86.41%) |
 | Rule benchmark | 78/78 exact functional cases and 4/4 malformed native inputs rejected |
 | Scale benchmark | 8/8 deterministic profiles pass across 100 to 10,000 inputs |
 | Supported Python | GitHub Actions exercises every minor from Python 3.10 through 3.13 |
@@ -102,6 +102,10 @@ because storage precision was `0.8824` and two predictions were unlabelled.
 The release-safe replay command restores candidate `2.1.1` in an isolated local
 checkout before invoking the byte-frozen runner, so package version `2.2.1`
 cannot silently replace the measured analyzer implementation.
+
+The revealed `EVAL-IAM-006` false negative is fixed in current development and
+retained as an explicit regression test. That post-evaluation correction does
+not alter the frozen candidate, corpus, runner, result, or reported score.
 
 ## What I Learned
 

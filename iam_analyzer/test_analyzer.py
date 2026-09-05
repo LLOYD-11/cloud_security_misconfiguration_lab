@@ -11,6 +11,9 @@ from iam_analyzer.analyzer import (
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SAMPLE_FILE = PROJECT_ROOT / "sample_data" / "iam" / "sample_iam_environment.json"
+REVEALED_MFA_REGRESSION = (
+    PROJECT_ROOT / "evaluation" / "corpus-v1.0" / "iam" / "eval-iam-006-simplified.json"
+)
 
 
 class AnalyzerTests(unittest.TestCase):
@@ -179,6 +182,94 @@ class AnalyzerTests(unittest.TestCase):
         findings = analyze_environment(environment)
 
         self.assertEqual(["IAM-005"], [finding.rule_id for finding in findings])
+
+    def test_revealed_bool_if_exists_case_is_a_regression_finding(self):
+        environment = load_environment(REVEALED_MFA_REGRESSION)
+
+        findings = [
+            finding
+            for finding in analyze_environment(environment)
+            if finding.rule_id == "IAM-005"
+        ]
+
+        self.assertEqual(
+            ["user-bool-if-exists"],
+            [finding.resource_id for finding in findings],
+        )
+
+    def test_mfa_condition_rejects_mixed_boolean_values(self):
+        environment = {
+            "account_id": "111122223333",
+            "users": [
+                {
+                    "name": "mixed-bool-values",
+                    "mfa_enabled": True,
+                    "access_keys": [],
+                    "attached_policies": [
+                        {
+                            "policy_name": "SensitiveChange",
+                            "statements": [
+                                {
+                                    "effect": "Allow",
+                                    "action": "iam:CreateUser",
+                                    "resource": "arn:aws:iam::111122223333:user/target",
+                                    "condition": {
+                                        "Bool": {
+                                            "aws:MultiFactorAuthPresent": [
+                                                "true",
+                                                "false",
+                                            ]
+                                        }
+                                    },
+                                }
+                            ],
+                        }
+                    ],
+                }
+            ],
+            "roles": [],
+        }
+
+        findings = analyze_environment(environment)
+
+        self.assertEqual(["IAM-005"], [finding.rule_id for finding in findings])
+
+    def test_bool_if_exists_with_null_guard_is_strict(self):
+        environment = {
+            "account_id": "111122223333",
+            "users": [
+                {
+                    "name": "guarded-bool-if-exists",
+                    "mfa_enabled": True,
+                    "access_keys": [],
+                    "attached_policies": [
+                        {
+                            "policy_name": "SensitiveChange",
+                            "statements": [
+                                {
+                                    "effect": "Allow",
+                                    "action": "iam:CreateUser",
+                                    "resource": "arn:aws:iam::111122223333:user/target",
+                                    "condition": {
+                                        "BoolIfExists": {
+                                            "aws:MultiFactorAuthPresent": "true"
+                                        },
+                                        "Null": {
+                                            "aws:MultiFactorAuthPresent": "false"
+                                        },
+                                    },
+                                }
+                            ],
+                        }
+                    ],
+                }
+            ],
+            "roles": [],
+        }
+
+        findings = analyze_environment(environment)
+
+        self.assertEqual([], findings)
 
     def test_s3_write_wildcard_action_is_detected(self):
         environment = {

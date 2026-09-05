@@ -16,6 +16,7 @@ from tools.evaluation_runner import (
     EvaluationRunError,
     EvaluationSummary,
     _validate_result_invariants,
+    build_evaluation_results,
     verify_evaluation_results,
     write_evaluation_results,
 )
@@ -37,9 +38,16 @@ class EvaluationResultTests(unittest.TestCase):
         return path
 
     def _verify_in_process(self, path: Path | None = None) -> EvaluationSummary:
-        # The isolated replay below proves candidate identity. This in-process
-        # pass exercises the frozen computation path for repository coverage.
-        with patch("tools.evaluation_runner._validate_candidate_identity"):
+        # The isolated replay below proves candidate identity and computation.
+        # Injecting its frozen result here exercises verifier-only paths without
+        # substituting a later analyzer implementation for candidate 2.1.1.
+        with (
+            patch("tools.evaluation_runner._validate_candidate_identity"),
+            patch(
+                "tools.evaluation_runner.build_evaluation_results",
+                return_value=self._load_result(),
+            ),
+        ):
             return verify_evaluation_results(PROJECT_ROOT, path or PROJECT_ROOT / RESULTS_PATH)
 
     def test_committed_primary_result_replays_exactly(self) -> None:
@@ -66,6 +74,28 @@ class EvaluationResultTests(unittest.TestCase):
                 matched_positives=77,
                 acceptance_passed=False,
             ),
+        )
+
+    def test_revealed_mfa_case_is_fixed_as_development_regression(self) -> None:
+        frozen = self._load_result()
+        with patch("tools.evaluation_runner._validate_candidate_identity"):
+            current = build_evaluation_results(
+                PROJECT_ROOT,
+                recorded_environment=frozen["environment"],
+                recorded_evaluated_at=str(frozen["evaluated_at"]),
+            )
+        regression = next(
+            record
+            for record in current["assertion_results"]
+            if record["case_id"] == "EVAL-IAM-006"
+            and record["rule_id"] == "IAM-005"
+        )
+
+        self.assertEqual("true-positive", regression["outcome"])
+        self.assertNotEqual(frozen, current)
+        self.assertEqual(
+            RESULT_SHA256,
+            hashlib.sha256((PROJECT_ROOT / RESULTS_PATH).read_bytes()).hexdigest(),
         )
 
     def test_runner_and_primary_result_match_pre_execution_freeze(self) -> None:
