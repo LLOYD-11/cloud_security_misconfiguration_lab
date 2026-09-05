@@ -101,9 +101,10 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
   threshold. The [primary result](evaluation-report.md) records 0.9809 overall
   F1, one medium-severity `IAM-005` false negative, and two unlabelled
   `STO-001` predictions.
-- `IAM-005` currently treats `BoolIfExists` with an MFA-present value of `true`
-  as a strict MFA condition even though the context key may be absent. This can
-  suppress a finding on that policy boundary.
+- The revealed `IAM-005` `BoolIfExists=true` boundary is fixed in current
+  development and retained as a regression test. This does not revise the
+  frozen candidate or score. The analyzer still evaluates only the documented
+  MFA condition patterns rather than complete IAM policy logic.
 - The two unlabelled storage predictions are a frozen corpus-completeness
   defect, not evidence that `STO-001` evaluated its retained Block Public
   Access fields incorrectly. The original labels and result remain preserved.

@@ -448,6 +448,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [Version 2.1.0 release notes](docs/release-v2.1.0.md)
 - [Version 2.0.0 release notes](docs/release-v2.0.0.md)
 - [Five-minute demo walkthrough](docs/demo-walkthrough.md)
+- [Research question and evidence claims](docs/research-question.md)
 - [Data contracts](docs/data-contracts.md)
 - [Simplified-input runtime validation](docs/simplified-input-validation.md)
 - [Input resource limits](docs/input-resource-limits.md)

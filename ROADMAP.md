@@ -211,9 +211,9 @@ every preregistered acceptance threshold.
 
 ## M13: Research and Application Narrative
 
-Status: Planned for `v2.3.0`.
+Status: In progress for `v2.3.0`.
 
-- [ ] State one bounded research question and connect every public claim to
+- [x] State one bounded research question and connect every public claim to
       architecture or evaluation evidence.
 - [ ] Publish a concise technical case study with method, results, threats to
       validity, limitations, and future work.

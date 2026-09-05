@@ -173,7 +173,7 @@ release evidence exist.
 
 | ID | Requirement | Status | Evidence |
 | --- | --- | --- | --- |
-| M13-R1 | State a bounded research question and evidence-backed contribution claims. | Open | Planned application case study and claim-to-evidence table. |
+| M13-R1 | State a bounded research question and evidence-backed contribution claims. | Complete | Bounded [research question and public claim register](research-question.md) tied to the frozen candidate and corpus, architecture and contract evidence, commit-specific engineering gates, explicit post-evaluation boundaries, and prohibited overclaims. |
 | M13-R2 | Publish methods, results, threats to validity, limitations, and future work. | Open | Planned concise technical report. |
 | M13-R3 | Make personal contribution, design evolution, and difficult defects visible. | Open | Planned contribution and engineering-reflection material. |
 | M13-R4 | Produce a reviewer-first README, short real-system demo, and one-page summary. | Open | Planned application presentation artifacts. |

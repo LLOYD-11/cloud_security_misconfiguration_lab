@@ -4,6 +4,12 @@ All notable changes to this project are documented in this file.
 
 ## Unreleased
 
+### Added
+
+- A bounded application research question, evidence hierarchy, public
+  claim-to-evidence register, post-evaluation boundary, and explicit prohibited
+  overclaims.
+
 ### Fixed
 
 - `IAM-005` now requires every value in a `Bool` MFA condition to be `true`.
