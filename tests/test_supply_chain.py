@@ -195,6 +195,8 @@ class SupplyChainTests(unittest.TestCase):
         publish = release.split("\n  publish:\n", 1)[1]
         self.assertNotIn("actions/checkout", publish)
         self.assertNotIn("python ", publish)
+        create_release = publish.split("- name: Create GitHub Release", 1)[1]
+        self.assertIn('--repo "$GITHUB_REPOSITORY"', create_release)
 
     def test_release_workflow_builds_and_reverifies_integrity_evidence(self):
         release = (PROJECT_ROOT / ".github/workflows/release.yml").read_text(

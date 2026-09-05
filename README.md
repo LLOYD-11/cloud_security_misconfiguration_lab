@@ -16,7 +16,7 @@ credentials or charges.
 
 | At a Glance | Evidence |
 | --- | --- |
-| Current release candidate | `v2.2.0` for runtime hardening and frozen evaluation evidence |
+| Current release candidate | `v2.2.1` for runtime hardening and frozen evaluation evidence |
 | Security scope | IAM, S3, EC2 security groups, and CloudTrail |
 | Detection depth | 35 cataloged rules with qualified AWS Security Hub CSPM, CIS AWS Foundations, and MITRE ATT&CK mappings |
 | Deterministic sample | 39 findings, 2 incidents, 36 remediation actions, and 11 timeline entries |
@@ -100,7 +100,7 @@ Wilson interval, disagreement, ablation, and acceptance check. Candidate
 `2.1.1` achieved `0.9809` overall F1, but it did not meet the registered target
 because storage precision was `0.8824` and two predictions were unlabelled.
 The release-safe replay command restores candidate `2.1.1` in an isolated local
-checkout before invoking the byte-frozen runner, so package version `2.2.0`
+checkout before invoking the byte-frozen runner, so package version `2.2.1`
 cannot silently replace the measured analyzer implementation.
 
 ## What I Learned
@@ -438,6 +438,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [Threat model](docs/threat-model.md)
 - [Design decisions](docs/design-decisions.md)
 - [Release integrity and verification](docs/release-integrity.md)
+- [Version 2.2.1 release notes](docs/release-v2.2.1.md)
 - [Version 2.2.0 release notes](docs/release-v2.2.0.md)
 - [Version 2.1.1 release notes](docs/release-v2.1.1.md)
 - [Version 2.1.0 release notes](docs/release-v2.1.0.md)
@@ -662,6 +663,7 @@ cloud_security_misconfiguration_lab/
 │   ├── release-v2.1.0.md
 │   ├── release-v2.1.1.md
 │   ├── release-v2.2.0.md
+│   ├── release-v2.2.1.md
 │   ├── rule-catalog.md
 │   ├── simplified-input-validation.md
 │   ├── threat-model.md

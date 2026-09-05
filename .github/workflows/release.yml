@@ -289,6 +289,7 @@ jobs:
           release-candidate/dist/SHA256SUMS
           release-candidate/dist/*.sigstore.json
           --verify-tag
+          --repo "$GITHUB_REPOSITORY"
           --title "Cloud Security Misconfiguration Lab $GITHUB_REF_NAME"
           --notes-file
           "release-candidate/docs/release-$GITHUB_REF_NAME.md"

@@ -147,6 +147,14 @@ trust boundaries.
 - `d316a1c`: freeze the primary measurement runner
 - `5067d05`: publish the immutable primary result
 
-The annotated `v2.2.0` tag identifies the M11-M12 release checkpoint. Public
-checksums, SBOM, and signed attestations are generated and verified by that
-tag's release workflow.
+## Publication Outcome
+
+The annotated `v2.2.0` tag froze this M11-M12 checkpoint. Its release workflow
+passed the full quality gate, generated and verified the checksum, SBOM, build-
+provenance, and SBOM-attestation evidence, and reverified the transferred
+assets. The final publication command then failed safely because the isolated
+release-authority job had no Git worktree and did not identify the repository
+explicitly. No GitHub Release was created and the tag was not moved or deleted.
+
+Version `2.2.1` carries this evidence forward unchanged and corrects only that
+repository-selection defect. See the [version 2.2.1 release notes](release-v2.2.1.md).

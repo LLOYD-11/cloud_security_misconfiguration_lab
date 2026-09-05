@@ -151,7 +151,8 @@ Planned release checkpoints:
 | Release | Milestones | Purpose |
 | --- | --- | --- |
 | `v2.1.1` | M10 | Close verified correctness and report-integrity defects. |
-| `v2.2.0` | M11-M12 | Harden runtime boundaries and publish independent evaluation evidence. |
+| `v2.2.0` | M11-M12 | Freeze runtime-hardening and independent-evaluation evidence; publication stopped safely before release creation. |
+| `v2.2.1` | M11-M12 | Publish the unchanged checkpoint with repository-explicit release authority. |
 | `v2.3.0` | M13-M14 | Publish the research narrative and final application release. |
 
 ## M10: Verified Boundary Defects
@@ -171,8 +172,8 @@ Status: Complete in `v2.1.1`.
 
 ## M11: Runtime and Supply-Chain Hardening
 
-Status: Substantially complete for `v2.2.0`; the release candidate is ready, and
-generated release evidence awaits the tag-triggered publication workflow.
+Status: Substantially complete for `v2.2.1`; the patch release candidate is
+ready after correcting repository discovery in the isolated publisher.
 
 - [x] Define evidence-based limits for JSON size, decompressed gzip size,
       resource count, node count, and nesting depth.
@@ -186,12 +187,13 @@ generated release evidence awaits the tag-triggered publication workflow.
       signed build provenance, a signed SBOM predicate, and isolated
       release-authority boundaries.
 - [ ] Publish the generated checksum, SBOM, and attestation assets with the
-      `v2.2.0` tag after M12 is complete.
+      `v2.2.1` tag after M12 is complete.
 
 ## M12: Independent External Evaluation
 
-Status: Complete for `v2.2.0`. The primary result is published unchanged even
-though candidate `2.1.1` did not meet every preregistered acceptance threshold.
+Status: Complete. The evidence frozen for `v2.2.0` is carried unchanged into
+`v2.2.1`, even though candidate `2.1.1` did not meet every preregistered
+acceptance threshold.
 
 - [x] Publish a versioned evaluation protocol before running the analyzers.
 - [x] Build a provenance-tracked corpus of independent positive, hardened,

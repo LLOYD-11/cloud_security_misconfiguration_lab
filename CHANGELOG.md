@@ -4,6 +4,20 @@ All notable changes to this project are documented in this file.
 
 ## Unreleased
 
+## 2.2.1 - 2026-09-05
+
+### Fixed
+
+- The isolated release-authority job now passes its repository explicitly to
+  `gh release create`. This preserves the no-checkout permission boundary while
+  allowing publication outside a Git worktree.
+
+### Changed
+
+- Republished the unchanged version 2.2 runtime-hardening and frozen-evaluation
+  checkpoint as a patch release after the `v2.2.0` workflow safely stopped
+  before creating a GitHub Release.
+
 ## 2.2.0 - 2026-09-05
 
 ### Added
