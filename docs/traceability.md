@@ -7,8 +7,8 @@ unsupported completion claims.
 The canonical plan is [ROADMAP.md](../ROADMAP.md). `v2.0.0` at commit
 `7acfda6` is an immutable checkpoint. `v2.1.0` closes the remaining requirements
 from the original M0-M9 plan. `v2.1.1` closes the verified M10 boundary defects.
-The M11-M12 evidence was frozen under `v2.2.0` and is being republished unchanged
-as `v2.2.1` after correcting repository discovery in the isolated publisher.
+The M11-M12 evidence was frozen under `v2.2.0` and published unchanged as
+`v2.2.1` after correcting repository discovery in the isolated publisher.
 
 ## Status Legend
 
@@ -26,10 +26,12 @@ as `v2.2.1` after correcting repository discovery in the isolated publisher.
 | `v2.0.0` | `7acfda6` | Working reliability, native-input, detection-depth, and reporting release. |
 | `v2.1.0` | Tag `v2.1.0` | Completion release for every remaining M0-M9 acceptance item. |
 | `v2.1.1` | Tag `v2.1.1` | Verified input, detection, duplicate-event, and report-integrity boundary fixes. |
+| `v2.2.0` | Tag `v2.2.0` | Frozen M11-M12 evidence; release creation stopped safely after successful build and signing. |
+| `v2.2.1` | [Tag and release](https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/releases/tag/v2.2.1) | Published M11-M12 hardening and immutable independent-evaluation evidence. |
 
-The pending checkpoint is `v2.2.1` for M11-M12; `v2.3.0` remains planned for
-M13-M14. A version becomes a completed release checkpoint in this table only
-after both its tag and public release evidence exist.
+The remaining planned checkpoint is `v2.3.0` for M13-M14. A version becomes a
+completed release checkpoint in this table only after both its tag and public
+release evidence exist.
 
 ## M0: Freeze v1 and Record the Baseline
 
@@ -156,7 +158,7 @@ after both its tag and public release evidence exist.
 | M11-R1 | Bound JSON, gzip, resource-count, node-count, and nesting inputs. | Complete | Shared [bounded input layer](../cloud_inputs/bounds.py), measured [input resource limits](input-resource-limits.md), analyzer and artifact-loader enforcement, in-memory API checks, and adversarial byte, gzip, depth, node, resource, aggregate-budget, and file-count tests. |
 | M11-R2 | Make CI actions and development dependency resolution reproducible. | Complete | Full-SHA [CI](../.github/workflows/ci.yml) and [release](../.github/workflows/release.yml) actions, universal hash-locked [development dependencies](../requirements-dev.lock), no-isolation local builds, executable supply-chain regression tests, and documented [supply-chain controls](supply-chain.md). |
 | M11-R3 | Exercise every documented Python minor version and validate public links and Markdown. | Complete | Python-classifier/matrix regression tests, four-version [CI](../.github/workflows/ci.yml), strict Markdown lint, tested [internal and external link checker](../tools/check_markdown_links.py), repeated release gates, and documented [quality and safety controls](documentation-quality.md). |
-| M11-R4 | Publish security, threat-model, checksum, SBOM, and build-provenance evidence. | Partial | Public [security policy](../SECURITY.md), bounded [threat model](threat-model.md), tested [release verifier](../tools/release_evidence.py), pinned installed-wheel SPDX generation, SHA-256 manifest, signed provenance and SBOM workflow, split release authority, consumer [verification guide](release-integrity.md), and a successful local Syft `v1.48.0` release simulation. The `v2.2.0` build and signing stage passed, but repository discovery safely blocked release creation; the corrected `v2.2.1` candidate awaits publication. |
+| M11-R4 | Publish security, threat-model, checksum, SBOM, and build-provenance evidence. | Complete | Public [security policy](../SECURITY.md), bounded [threat model](threat-model.md), tested [release verifier](../tools/release_evidence.py), pinned installed-wheel SPDX generation, SHA-256 manifest, signed provenance and SBOM workflow, split release authority, consumer [verification guide](release-integrity.md), and the public [`v2.2.1` release](https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/releases/tag/v2.2.1) with wheel, source distribution, SBOM, checksum manifest, and two Sigstore bundles. |
 
 ## M12: Independent External Evaluation
 

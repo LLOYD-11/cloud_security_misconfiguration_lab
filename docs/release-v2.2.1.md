@@ -76,3 +76,12 @@ The release candidate is required to pass:
 See [Independent evaluation results](evaluation-report.md),
 [Release integrity](release-integrity.md), [Threat model](threat-model.md), and
 [Known limitations](known-limitations.md) for the full evidence and its limits.
+
+## Publication Outcome
+
+[Release workflow #5](https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/actions/runs/33952782033)
+completed both the low-privilege build-and-sign stage and the isolated
+reverification-and-publish stage. The public
+[`v2.2.1` release](https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/releases/tag/v2.2.1)
+contains the wheel, source distribution, SPDX 2.3 SBOM, `SHA256SUMS`, signed
+build-provenance bundle, and signed SBOM-attestation bundle.

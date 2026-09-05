@@ -16,7 +16,7 @@ credentials or charges.
 
 | At a Glance | Evidence |
 | --- | --- |
-| Current release candidate | `v2.2.1` for runtime hardening and frozen evaluation evidence |
+| Current release | [`v2.2.1`](https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/releases/tag/v2.2.1) with signed runtime-hardening and frozen-evaluation evidence |
 | Security scope | IAM, S3, EC2 security groups, and CloudTrail |
 | Detection depth | 35 cataloged rules with qualified AWS Security Hub CSPM, CIS AWS Foundations, and MITRE ATT&CK mappings |
 | Deterministic sample | 39 findings, 2 incidents, 36 remediation actions, and 11 timeline entries |

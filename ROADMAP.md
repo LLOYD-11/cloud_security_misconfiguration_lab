@@ -146,7 +146,7 @@ extend the project from a deterministic synthetic lab into an independently
 evaluated application project without renumbering or reopening the original
 requirements.
 
-Planned release checkpoints:
+Release checkpoints:
 
 | Release | Milestones | Purpose |
 | --- | --- | --- |
@@ -172,8 +172,7 @@ Status: Complete in `v2.1.1`.
 
 ## M11: Runtime and Supply-Chain Hardening
 
-Status: Substantially complete for `v2.2.1`; the patch release candidate is
-ready after correcting repository discovery in the isolated publisher.
+Status: Complete in `v2.2.1`.
 
 - [x] Define evidence-based limits for JSON size, decompressed gzip size,
       resource count, node count, and nesting depth.
@@ -186,14 +185,14 @@ ready after correcting repository discovery in the isolated publisher.
 - [x] Implement and test exact release checksums, an installed-wheel SPDX SBOM,
       signed build provenance, a signed SBOM predicate, and isolated
       release-authority boundaries.
-- [ ] Publish the generated checksum, SBOM, and attestation assets with the
+- [x] Publish the generated checksum, SBOM, and attestation assets with the
       `v2.2.1` tag after M12 is complete.
 
 ## M12: Independent External Evaluation
 
-Status: Complete. The evidence frozen for `v2.2.0` is carried unchanged into
-`v2.2.1`, even though candidate `2.1.1` did not meet every preregistered
-acceptance threshold.
+Status: Complete in `v2.2.1`. The evidence frozen for `v2.2.0` is carried
+unchanged into the published patch, even though candidate `2.1.1` did not meet
+every preregistered acceptance threshold.
 
 - [x] Publish a versioned evaluation protocol before running the analyzers.
 - [x] Build a provenance-tracked corpus of independent positive, hardened,

@@ -155,6 +155,7 @@ provenance, and SBOM-attestation evidence, and reverified the transferred
 assets. The final publication command then failed safely because the isolated
 release-authority job had no Git worktree and did not identify the repository
 explicitly. No GitHub Release was created and the tag was not moved or deleted.
+The failed run remains visible as [Release workflow #4](https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/actions/runs/33952155558).
 
 Version `2.2.1` carries this evidence forward unchanged and corrects only that
 repository-selection defect. See the [version 2.2.1 release notes](release-v2.2.1.md).
