@@ -6,6 +6,10 @@ README, demo, case study, application summary, or interview discussion. It
 prevents development results, frozen evaluation results, and broader security
 claims from being blended together.
 
+The concise [technical case study](technical-case-study.md) applies this claim
+policy to the system design, method, results, failures, validity threats, and
+future work.
+
 ## Bounded Research Question
 
 > Within a frozen synthetic corpus covering 35 predefined rules over exported

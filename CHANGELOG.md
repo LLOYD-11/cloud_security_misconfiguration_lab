@@ -9,6 +9,9 @@ All notable changes to this project are documented in this file.
 - A bounded application research question, evidence hierarchy, public
   claim-to-evidence register, post-evaluation boundary, and explicit prohibited
   overclaims.
+- A concise technical case study connecting architecture, method, frozen
+  results, failure analysis, validity threats, operational limits, and
+  evidence-gated future work.
 
 ### Fixed
 

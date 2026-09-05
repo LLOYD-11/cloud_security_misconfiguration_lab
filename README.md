@@ -107,6 +107,10 @@ The revealed `EVAL-IAM-006` false negative is fixed in current development and
 retained as an explicit regression test. That post-evaluation correction does
 not alter the frozen candidate, corpus, runner, result, or reported score.
 
+The [technical case study](docs/technical-case-study.md) condenses the system,
+method, results, failure analysis, validity threats, and evidence-gated future
+work into one reviewer-oriented narrative.
+
 ## What I Learned
 
 - Evidence completeness must be reported independently from finding count.
@@ -449,6 +453,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [Version 2.0.0 release notes](docs/release-v2.0.0.md)
 - [Five-minute demo walkthrough](docs/demo-walkthrough.md)
 - [Research question and evidence claims](docs/research-question.md)
+- [Technical case study](docs/technical-case-study.md)
 - [Data contracts](docs/data-contracts.md)
 - [Simplified-input runtime validation](docs/simplified-input-validation.md)
 - [Input resource limits](docs/input-resource-limits.md)
