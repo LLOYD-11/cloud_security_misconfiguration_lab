@@ -95,14 +95,14 @@ mkdir -p reports/generated
 .venv/bin/python -m cloud_benchmarks.runner
 .venv/bin/python -m tools.evaluation_corpus
 .venv/bin/python -m tools.evaluation_baselines
-.venv/bin/python -m tools.evaluation_runner
+.venv/bin/python -m tools.evaluation_replay
 ```
 
 Current evidence:
 
-- 441 tests
-- 93.13% statement coverage
-- 86.68% branch coverage
+- 443 tests
+- 92.82% statement coverage
+- 86.34% branch coverage
 - 78 exact functional benchmark cases
 - 4 exact fail-closed malformed-input cases
 - 8 deterministic scale cases up to 10,000 inputs

@@ -183,12 +183,14 @@ From a clean clone with full Git history and the locked development environment:
 ```bash
 .venv/bin/python -m tools.evaluation_corpus
 .venv/bin/python -m tools.evaluation_baselines
-.venv/bin/python -m tools.evaluation_runner
+.venv/bin/python -m tools.evaluation_replay
 ```
 
-The final command re-executes all registered candidate paths, validates the
-result contract and internal count invariants, and compares the generated
-object and canonical JSON bytes with the committed artifact. It exits
-successfully when the published result is authentic and reproducible even
-though the recorded acceptance value is `false`. The original `--write` path
-now refuses to overwrite the frozen primary result.
+The final command checks out the registered candidate revision into a temporary
+local clone, overlays only the frozen evaluation artifacts, and invokes the
+byte-unchanged runner there. It validates the result contract and internal count
+invariants and compares the generated object and canonical JSON bytes with the
+committed artifact. It exits successfully when the published result is
+authentic and reproducible even though the recorded acceptance value is
+`false`. The original `--write` path remains frozen and refuses to overwrite
+the primary result.

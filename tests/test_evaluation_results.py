@@ -8,7 +8,9 @@ import tempfile
 import unittest
 from pathlib import Path
 from typing import Any
+from unittest.mock import patch
 
+from tools.evaluation_replay import replay_evaluation
 from tools.evaluation_runner import (
     RESULTS_PATH,
     EvaluationRunError,
@@ -34,9 +36,21 @@ class EvaluationResultTests(unittest.TestCase):
         path.write_bytes(content)
         return path
 
+    def _verify_in_process(self, path: Path | None = None) -> EvaluationSummary:
+        # The isolated replay below proves candidate identity. This in-process
+        # pass exercises the frozen computation path for repository coverage.
+        with patch("tools.evaluation_runner._validate_candidate_identity"):
+            return verify_evaluation_results(PROJECT_ROOT, path or PROJECT_ROOT / RESULTS_PATH)
+
     def test_committed_primary_result_replays_exactly(self) -> None:
         self.assertEqual(
-            verify_evaluation_results(PROJECT_ROOT),
+            replay_evaluation(PROJECT_ROOT),
+            "Independent evaluation verified: 168 scored, 8 excluded; "
+            "TP=77, FP=2, FN=1, TN=90; precision=0.9747, recall=0.9872, "
+            "F1=0.9809, specificity=0.9783; severity=77/77; acceptance=failed.",
+        )
+        self.assertEqual(
+            self._verify_in_process(),
             EvaluationSummary(
                 scored_assertions=168,
                 excluded_assertions=8,
@@ -132,7 +146,7 @@ class EvaluationResultTests(unittest.TestCase):
             EvaluationRunError,
             "differ from deterministic candidate execution",
         ):
-            verify_evaluation_results(PROJECT_ROOT, path)
+            self._verify_in_process(path)
 
     def test_noncanonical_result_bytes_are_rejected(self) -> None:
         content = (PROJECT_ROOT / RESULTS_PATH).read_bytes() + b"\n"
@@ -142,7 +156,7 @@ class EvaluationResultTests(unittest.TestCase):
             EvaluationRunError,
             "canonical deterministic JSON",
         ):
-            verify_evaluation_results(PROJECT_ROOT, path)
+            self._verify_in_process(path)
 
     def test_result_invariants_reject_tampered_counts(self) -> None:
         result = copy.deepcopy(self._load_result())

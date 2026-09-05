@@ -16,10 +16,11 @@ credentials or charges.
 
 | At a Glance | Evidence |
 | --- | --- |
+| Current release candidate | `v2.2.0` for runtime hardening and frozen evaluation evidence |
 | Security scope | IAM, S3, EC2 security groups, and CloudTrail |
 | Detection depth | 35 cataloged rules with qualified AWS Security Hub CSPM, CIS AWS Foundations, and MITRE ATT&CK mappings |
 | Deterministic sample | 39 findings, 2 incidents, 36 remediation actions, and 11 timeline entries |
-| Engineering assurance | 441 tests; 93.13% statement and 86.68% branch coverage; Python 3.10-3.13 CI |
+| Engineering assurance | 443 tests; 92.82% statement and 86.34% branch coverage; Python 3.10-3.13 CI |
 | Evaluation status | Frozen holdout: 0.9809 F1, 77 TP, 2 FP, 1 FN, 90 TN; preregistered acceptance not met |
 | Safety boundary | Offline files only; zero runtime dependencies; no credentials and no cloud writes |
 
@@ -72,8 +73,8 @@ engineering evidence.
 
 | Quality Gate | Verified Result |
 | --- | --- |
-| Automated tests | 441 unit, regression, integration, CLI, schema, compatibility, evaluation, and benchmark tests pass |
-| Coverage | 6,806/7,308 statements (93.13%) and 2,498/2,882 branches (86.68%) |
+| Automated tests | 443 unit, regression, integration, CLI, schema, compatibility, evaluation, and benchmark tests pass |
+| Coverage | 6,861/7,392 statements (92.82%) and 2,509/2,906 branches (86.34%) |
 | Rule benchmark | 78/78 exact functional cases and 4/4 malformed native inputs rejected |
 | Scale benchmark | 8/8 deterministic profiles pass across 100 to 10,000 inputs |
 | Supported Python | GitHub Actions exercises every minor from Python 3.10 through 3.13 |
@@ -98,6 +99,9 @@ without importing or executing the candidate. The published
 Wilson interval, disagreement, ablation, and acceptance check. Candidate
 `2.1.1` achieved `0.9809` overall F1, but it did not meet the registered target
 because storage precision was `0.8824` and two predictions were unlabelled.
+The release-safe replay command restores candidate `2.1.1` in an isolated local
+checkout before invoking the byte-frozen runner, so package version `2.2.0`
+cannot silently replace the measured analyzer implementation.
 
 ## What I Learned
 
@@ -434,6 +438,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [Threat model](docs/threat-model.md)
 - [Design decisions](docs/design-decisions.md)
 - [Release integrity and verification](docs/release-integrity.md)
+- [Version 2.2.0 release notes](docs/release-v2.2.0.md)
 - [Version 2.1.1 release notes](docs/release-v2.1.1.md)
 - [Version 2.1.0 release notes](docs/release-v2.1.0.md)
 - [Version 2.0.0 release notes](docs/release-v2.0.0.md)
@@ -485,7 +490,7 @@ mkdir -p reports/generated
 .venv/bin/python -m tools.check_markdown_links external
 .venv/bin/python -m tools.evaluation_corpus
 .venv/bin/python -m tools.evaluation_baselines
-.venv/bin/python -m tools.evaluation_runner
+.venv/bin/python -m tools.evaluation_replay
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
 .venv/bin/coverage json -o reports/generated/coverage.json
@@ -529,6 +534,7 @@ cloud_security_misconfiguration_lab/
 │   ├── check_markdown_links.py
 │   ├── evaluation_corpus.py
 │   ├── evaluation_baselines.py
+│   ├── evaluation_replay.py
 │   ├── evaluation_runner.py
 │   └── release_evidence.py
 ├── cloud_security_lab/
@@ -655,6 +661,7 @@ cloud_security_misconfiguration_lab/
 │   ├── release-v2.0.0.md
 │   ├── release-v2.1.0.md
 │   ├── release-v2.1.1.md
+│   ├── release-v2.2.0.md
 │   ├── rule-catalog.md
 │   ├── simplified-input-validation.md
 │   ├── threat-model.md

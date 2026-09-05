@@ -307,6 +307,32 @@ relabelled or repaired inside the original result.
 faster and likely produce excellent numbers, but those expectations are already
 known and therefore unsuitable as independent evidence.
 
+## DD-015: Replay the Frozen Candidate in an Isolated Checkout
+
+**Status:** Accepted
+
+**Decision:** Keep the pre-execution evaluation runner byte-unchanged and replay
+it inside a temporary local checkout of candidate commit `6d71c99`. Overlay only
+the frozen protocol, corpus, baseline, result, evaluation schemas, and runner
+artifacts before execution. Use this isolated replay in CI and release gates
+after the public package version advances beyond candidate `2.1.1`.
+
+**Why:** The frozen runner correctly rejects a different imported package
+version or any changed candidate-runtime path. A normal `2.2.0` version bump
+would therefore make direct replay fail, while relaxing those identity checks
+would modify the runner after the primary result was visible. The release must
+preserve both coherent package versioning and the original measurement boundary.
+
+**Consequences:** Replay requires a repository with full Git history and creates
+an offline local clone under a temporary directory. Current analyzer code is not
+executed as the measured candidate, and temporary files are removed after the
+run. Unit coverage exercises the runner's deterministic computation separately;
+the isolated replay remains the authoritative candidate-identity check.
+
+**Alternative not chosen:** Running the current package while overriding its
+version, or weakening the runner's revision and path checks, would allow
+post-freeze runtime changes to masquerade as the measured candidate.
+
 ## Revisit Triggers
 
 These decisions should be revisited if the project adds:

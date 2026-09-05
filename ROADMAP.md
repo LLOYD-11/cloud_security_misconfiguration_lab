@@ -171,8 +171,8 @@ Status: Complete in `v2.1.1`.
 
 ## M11: Runtime and Supply-Chain Hardening
 
-Status: Substantially complete for `v2.2.0`; generated release evidence awaits
-the `v2.2.0` tag.
+Status: Substantially complete for `v2.2.0`; the release candidate is ready, and
+generated release evidence awaits the tag-triggered publication workflow.
 
 - [x] Define evidence-based limits for JSON size, decompressed gzip size,
       resource count, node count, and nesting depth.

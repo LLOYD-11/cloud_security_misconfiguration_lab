@@ -160,7 +160,7 @@ class SupplyChainTests(unittest.TestCase):
             "python -m tools.check_markdown_links external",
             "python -m tools.evaluation_corpus",
             "python -m tools.evaluation_baselines",
-            "python -m tools.evaluation_runner",
+            "python -m tools.evaluation_replay",
             "'/evaluation/corpus-manifest-v1.0.json'",
             "'/evaluation/baseline-overlap-v1.0.json'",
             "'/evaluation/baseline-outcomes-v1.0.json'",
@@ -172,6 +172,7 @@ class SupplyChainTests(unittest.TestCase):
             for fragment in required_fragments:
                 with self.subTest(workflow=path.name, fragment=fragment):
                     self.assertIn(fragment, text)
+            self.assertNotIn("python -m tools.evaluation_runner", text)
             self.assertEqual(
                 text.count("persist-credentials: false"),
                 1,

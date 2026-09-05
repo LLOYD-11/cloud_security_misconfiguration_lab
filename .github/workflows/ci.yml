@@ -70,7 +70,7 @@ jobs:
         run: python -m tools.evaluation_baselines
 
       - name: Reproduce frozen evaluation results
-        run: python -m tools.evaluation_runner
+        run: python -m tools.evaluation_replay
 
       - name: Test with branch coverage
         run: >-

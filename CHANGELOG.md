@@ -4,6 +4,8 @@ All notable changes to this project are documented in this file.
 
 ## Unreleased
 
+## 2.2.0 - 2026-09-05
+
 ### Added
 
 - Evidence-based resource ceilings for external JSON, gzip, credential-report,
@@ -56,6 +58,10 @@ All notable changes to this project are documented in this file.
   and primary result and require all 42 evidence files, both manifests, both
   baseline artifacts, the machine-readable result, and every evaluation schema
   in the built wheel.
+- Frozen-result verification now stages the immutable `2.1.1` candidate in an
+  isolated local checkout, allowing the public package version to advance
+  without modifying the pre-execution runner or executing post-freeze analyzer
+  code.
 
 ## 2.1.1 - 2026-07-19
 

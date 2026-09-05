@@ -29,7 +29,7 @@ mkdir -p reports/generated
 .venv/bin/python -m tools.check_markdown_links external
 .venv/bin/python -m tools.evaluation_corpus
 .venv/bin/python -m tools.evaluation_baselines
-.venv/bin/python -m tools.evaluation_runner
+.venv/bin/python -m tools.evaluation_replay
 .venv/bin/coverage run -m unittest discover
 .venv/bin/coverage report
 .venv/bin/coverage json -o reports/generated/coverage.json
@@ -71,14 +71,19 @@ Elapsed time is measured and reported but is deliberately not gated. See
 [Benchmarking and resilience](benchmarking.md) for the manifest, methodology,
 reference measurements, and separate coverage evidence.
 
-The evaluation runner re-executes the frozen `2.1.1` candidate against all 32
-primary cases and eight native/simplified pairs. It recomputes raw decisions,
-Wilson intervals, baseline agreement, ablations, and acceptance checks before
-comparing both the object and canonical JSON bytes with the committed
-[`results-v1.0.json`](../evaluation/results-v1.0.json). A verified command exits
-successfully when the artifact is reproducible even though its recorded
-acceptance value is `false`; authenticity and scientific acceptance are
-separate claims. See the [evaluation report](evaluation-report.md).
+The evaluation replay tool creates a temporary local checkout at the frozen
+`2.1.1` candidate revision, overlays only the frozen protocol, corpus,
+baselines, runner, schemas, and result, and invokes the byte-unchanged runner
+there. The runner recomputes raw decisions, Wilson intervals, baseline
+agreement, ablations, and acceptance checks before comparing both the object
+and canonical JSON bytes with the committed
+[`results-v1.0.json`](../evaluation/results-v1.0.json). This isolation lets the
+public package version advance without substituting current analyzer code for
+the measured candidate. It requires a local clone with full Git history but no
+network access. A verified command exits successfully when the artifact is
+reproducible even though its recorded acceptance value is `false`; authenticity
+and scientific acceptance are separate claims. See the
+[evaluation report](evaluation-report.md).
 
 The documentation gate scans every tracked Markdown file with strict linter
 configuration, resolves local paths with exact case, validates GitHub-style
@@ -112,8 +117,8 @@ corpus files, primary result, and all independent-evaluation schemas.
 
 ## Release Process
 
-1. Set `cloud_security_lab.__version__`, close the changelog section, complete
-   the roadmap milestone, and add `docs/release-vX.Y.Z.md`.
+1. Set `cloud_security_lab.__version__`, close the changelog section, mark the
+   roadmap release-candidate state, and add `docs/release-vX.Y.Z.md`.
 2. Run the complete local release gate and install the wheel into a clean
    environment for one deterministic demo.
 3. Commit and push the release candidate branch, then require all four Python
@@ -121,6 +126,8 @@ corpus files, primary result, and all independent-evaluation schemas.
 4. Fast-forward `main` to the verified commit and require the main-branch CI run
    to pass.
 5. Create and push an annotated `vX.Y.Z` tag.
+6. After the release workflow succeeds, verify every public asset and mark the
+   release-dependent roadmap and traceability rows complete.
 
 The tag starts `.github/workflows/release.yml`. That workflow verifies the tag
 against the installed package version, requires the matching release-notes
