@@ -302,6 +302,11 @@ classification table above, which remains a measurement of candidate `2.1.1`.
 | 5 | Add a bounded real-system demonstration. | Authorized disposable AWS environment, documented collection commands, cost and credential controls, sanitized exports, and teardown evidence. |
 | 6 | Expand semantic scope only behind explicit contracts. | New rules or a proven policy engine for effective IAM interactions, S3 access points, richer network paths, or signed CloudTrail evidence, each with new tests and evaluation cases. |
 
+The [real-system demo protocol](real-system-demo.md), minimal deployment
+template, and safety assertions now prepare priority 5. Actual execution,
+sanitized AWS evidence, and teardown verification remain pending and are not
+claimed by this case study.
+
 The order matters. Fixing known cases strengthens regression safety, but only a
 new unseen corpus can support a new generalization claim.
 

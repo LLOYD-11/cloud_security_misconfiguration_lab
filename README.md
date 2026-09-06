@@ -5,40 +5,183 @@
 ![Runtime dependencies: 0](https://img.shields.io/badge/runtime%20dependencies-0-198754)
 [![License: MIT](https://img.shields.io/badge/License-MIT-172033.svg)](LICENSE)
 
-An offline-first AWS security analysis lab that turns exported IAM, S3, EC2
-security-group, and CloudTrail evidence into explainable findings, correlated
-incidents, prioritized remediation, and a chronological attack timeline.
+An offline-first AWS security analysis project that turns exported IAM, S3,
+EC2 security-group, and CloudTrail evidence into explainable findings,
+correlated incidents, prioritized remediation, and a chronological attack
+timeline.
 
-The runtime never authenticates to AWS and never changes cloud resources. Native
-AWS-shaped exports are normalized into stable offline contracts so the same
-detection logic can be tested, explained, and reproduced without cloud
-credentials or charges.
+The analyzer runtime never authenticates to AWS or changes cloud resources.
+Native AWS-shaped exports cross explicit validation and normalization boundaries
+so the same detection logic can be tested, reviewed, and reproduced without
+cloud credentials or runtime package dependencies.
 
 | At a Glance | Evidence |
 | --- | --- |
-| Current release | [`v2.2.1`](https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/releases/tag/v2.2.1) with signed runtime-hardening and frozen-evaluation evidence |
-| Security scope | IAM, S3, EC2 security groups, and CloudTrail |
-| Detection depth | 35 cataloged rules with qualified AWS Security Hub CSPM, CIS AWS Foundations, and MITRE ATT&CK mappings |
+| Public release | [`v2.2.1`](https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/releases/tag/v2.2.1) |
+| Security scope | 35 cataloged rules: 15 IAM, 6 S3, 3 network, and 11 CloudTrail |
 | Deterministic sample | 39 findings, 2 incidents, 36 remediation actions, and 11 timeline entries |
-| Engineering assurance | 447 tests; 92.82% statement and 86.41% branch coverage; Python 3.10-3.13 CI |
-| Evaluation status | Frozen holdout: 0.9809 F1, 77 TP, 2 FP, 1 FN, 90 TN; preregistered acceptance not met |
-| Safety boundary | Offline files only; zero runtime dependencies; no credentials and no cloud writes |
+| Engineering assurance | Python 3.10-3.13 CI, 90% statement and 85% branch gates, exact functional and scale benchmarks |
+| Frozen evaluation | 77 TP, 2 FP, 1 FN, 90 TN, F1 `0.9809`; preregistered acceptance **not met** |
+| Analyzer boundary | Offline files only; no cloud writes, credentials, or third-party runtime packages |
+| Real-system status | Bounded AWS protocol prepared; no live result claimed yet |
 
-## Quick Start
+## Why This Project
 
-Run the complete deterministic sample pipeline from the repository root:
+A cloud scanner can produce a long alert list while hiding whether its input was
+complete, how provider data became a finding, or which claims were actually
+measured. This project asks a narrower question: can exported AWS evidence be
+analyzed through a deterministic pipeline whose assumptions, provenance,
+failures, and evaluation remain inspectable?
+
+The goal is not to replace AWS Security Hub, IAM Access Analyzer, Prowler, or a
+production SIEM. The goal is to demonstrate security reasoning and engineering
+discipline at the boundary between cloud evidence, detection logic, and
+reviewer-facing output.
+
+## System
+
+```text
+Simplified or AWS-shaped exports
+              |
+       validate + normalize
+              |
+ IAM | S3 | network | CloudTrail
+              |
+       shared Finding contract
+              |
+ coverage | incidents | remediation | timeline
+              |
+      deterministic Markdown report
+```
+
+| Module | Selected Analysis |
+| --- | --- |
+| IAM | Wildcard and administrative access, MFA guards, trust policies, credentials, and permissions boundaries |
+| S3 | Block Public Access, ACL and policy exposure, Object Ownership, encryption posture, and versioning |
+| EC2 security groups | Public sensitive ports, all-port ingress, broad egress, and optional reachability context |
+| CloudTrail | Root and identity changes, security-control changes, failure bursts, and bounded incident correlation |
+
+Every analyzer emits the same versioned finding model. Derived artifacts retain
+evidence references and deterministic identities without changing the original
+finding. See the [architecture](docs/architecture.md) and
+[rule catalog](docs/rule-catalog.md) for the complete design and rule semantics.
+
+## Run It In One Minute
+
+From the repository root with Python 3.10 or later:
 
 ```bash
 python3 -m cloud_security_lab demo --report-date 2026-06-30
 ```
 
-This writes versioned findings, coverage summaries, incidents, remediation,
-timeline, and report artifacts under `reports/generated/`. The final report must
-match the committed
-[`cloud_security_report_sample.md`](reports/cloud_security_report_sample.md)
-byte-for-byte.
+Expected summary:
 
-Install the project in a virtual environment to expose the `cloud-security-lab` command:
+```text
+IAM: 9 findings
+Storage: 9 findings
+Network: 10 findings
+CloudTrail: 11 findings
+CloudTrail incidents: 2
+Prioritized remediation: 36 actions
+Attack timeline: 11 entries
+Combined report: 39 findings
+```
+
+Artifacts are written under `reports/generated/`. The final report must match
+the committed sample byte-for-byte. Detailed analyzer, catalog, report, native
+input, and compatibility commands are in the
+[command-line reference](docs/cli-reference.md).
+
+## Inspect Generated Output
+
+[![Cloud Security Risk Report preview](docs/assets/report-preview.svg)](reports/cloud_security_report_sample.md)
+
+The [full sample report](reports/cloud_security_report_sample.md) contains the
+39 synthetic findings, evidence coverage, a critical eight-event correlation,
+P0-P3 remediation, and an 11-entry timeline. It repeatedly distinguishes
+observed configuration and API evidence from intent, causation, attribution,
+and proven reachability.
+
+## Evidence That Matters
+
+| Question | Inspectable Answer |
+| --- | --- |
+| Does the software pass its own engineering gates? | A measured development checkpoint passed 447 tests, 92.82% statement coverage, 86.41% branch coverage, 78/78 functional cases, 4/4 malformed-input cases, and 8/8 scale profiles across Python 3.10-3.13. |
+| Was accuracy measured separately from development tests? | Candidate `2.1.1` was frozen before a 32-case, 42-file, 176-assertion synthetic corpus was executed. |
+| What was the result? | 77 TP, 2 FP, 1 FN, and 90 TN produced precision `0.9747`, recall `0.9872`, and F1 `0.9809`. |
+| Did it meet the registered target? | No. Storage precision was `0.8824`, and two outputs lacked predeclared decision keys. The failed acceptance decision is preserved. |
+| Was an external tool comparison bounded? | Five exact-overlap Prowler predicates produced 24/24 matching decisions. Partial and absent Prowler or Sigma relationships were excluded from agreement metrics. |
+| Can the published result be replayed? | The replay restores the frozen candidate in an isolated checkout and verifies the canonical failed result without substituting later code. |
+
+The [research question and claim register](docs/research-question.md) defines
+exactly what these numbers support. The
+[technical case study](docs/technical-case-study.md) explains the method,
+results, failure analysis, validity threats, and future work. Raw decisions,
+intervals, disagreements, and acceptance checks remain in the
+[evaluation report](docs/evaluation-report.md).
+
+### What The Evaluation Exposed
+
+- `IAM-005` missed a non-strict `BoolIfExists=true` MFA condition because the
+  candidate ignored condition-operator semantics.
+- Two storage cases omitted applicable `STO-001` decision keys, exposing a
+  defect in the evaluation decision universe rather than a hidden analyzer
+  mismatch.
+- The registered reachability-context experiment had no eligible frozen case
+  and was reported as not estimable.
+
+Current development fixes the IAM defect as a regression. It does not replace
+candidate `2.1.1`, alter the frozen corpus or runner, or improve the published
+score after disclosure.
+
+## Reviewer Paths
+
+| Available Time | Start Here | Continue With |
+| --- | --- | --- |
+| 60 seconds | [One-page application summary](docs/application-summary.md) | [Sample report](reports/cloud_security_report_sample.md) |
+| 5 minutes | [Demo walkthrough](docs/demo-walkthrough.md) | [Contribution and engineering reflection](docs/contribution-and-reflection.md) |
+| Technical review | [Technical case study](docs/technical-case-study.md) | [Architecture](docs/architecture.md), [design decisions](docs/design-decisions.md), and [traceability](docs/traceability.md) |
+| Reproduction | [Command-line reference](docs/cli-reference.md) | [Engineering checks](docs/engineering.md) and [evaluation protocol](docs/evaluation-protocol.md) |
+| Real AWS boundary | [Prepared real-system demo](docs/real-system-demo.md) | Execution remains pending an authorized disposable account and sanitized teardown evidence. |
+
+## Authorship And Assistance
+
+This is a Lloyd-directed, AI-assisted portfolio project. Lloyd selected and
+approved the problem, safety boundary, scope, quality standard, evidence policy,
+and publication decisions. OpenAI Codex materially assisted architecture
+exploration, implementation, tests, debugging, documentation, command
+execution, and review; a second AI reviewer was consulted intermittently during
+earlier development.
+
+AI assistance also supported evaluation-artifact preparation. Output-blind
+controls provide procedural separation from candidate execution, not
+personnel-independent annotation. AI review and automated gates are not
+presented as independent human validation. The full
+[authorship disclosure](docs/contribution-and-reflection.md) separates decision
+ownership from assisted implementation and provides an interview-readiness
+checklist.
+
+## Boundaries
+
+- The analyzer consumes synthetic or user-supplied point-in-time files instead
+  of querying live account state.
+- IAM rules do not calculate complete effective authorization across every AWS
+  policy layer.
+- Security-group permissions do not by themselves prove workload reachability.
+- S3 analysis does not cover every access point, object ACL, organization
+  policy, identity policy, or KMS interaction.
+- CloudTrail correlation does not prove compromise, intent, causation, or
+  attribution.
+- Severity and remediation priority omit organization-specific business impact
+  and change constraints.
+- Tests, benchmarks, evaluation, and release attestations support bounded
+  claims; none certifies that an AWS account or this software is secure.
+
+The complete inventory is maintained in
+[Known limitations](docs/known-limitations.md) and the
+[threat model](docs/threat-model.md).
+
+## Install
 
 ```bash
 python3 -m venv .venv
@@ -46,666 +189,20 @@ python3 -m venv .venv
 .venv/bin/cloud-security-lab --help
 ```
 
-## Sample Report
+The project requires Python 3.10 or later. Development and release checks use a
+SHA-256-locked tool environment; the analyzer runtime itself has no third-party
+dependencies.
 
-[![Cloud Security Risk Report preview](docs/assets/report-preview.svg)](reports/cloud_security_report_sample.md)
+## Documentation Map
 
-The preview shows real output from the bundled synthetic evidence: complete
-coverage across all four modules, a critical eight-event `alice-admin`
-correlation, and an explainable P0-P3 remediation queue. Open the
-[full sample report](reports/cloud_security_report_sample.md) for finding
-evidence, qualified control mappings, analyst context, and recommended actions.
-
-## Demo Walkthrough
-
-| Step | Pipeline Behavior | Primary Output |
-| ---: | --- | --- |
-| 1 | Normalize simplified or native AWS-shaped exports into stable offline environments. | Canonical evidence and analysis coverage |
-| 2 | Apply 35 cataloged rules while preserving provenance, confidence, and source references. | Four versioned findings files |
-| 3 | Correlate CloudTrail signals by account, actor, source, and bounded time window. | Incidents and chronological timeline |
-| 4 | Separate incident response from configuration hardening and render the reviewer-facing result. | P0-P3 plan and consolidated report |
-
-The [five-minute demo guide](docs/demo-walkthrough.md) provides a concise
-presentation path through the CLI, attack sequence, remediation decisions, and
-engineering evidence.
-
-## Tested Results
-
-| Quality Gate | Verified Result |
+| Area | Primary Documents |
 | --- | --- |
-| Automated tests | 447 unit, regression, integration, CLI, schema, compatibility, evaluation, and benchmark tests pass |
-| Coverage | 6,866/7,397 statements (92.82%) and 2,511/2,906 branches (86.41%) |
-| Rule benchmark | 78/78 exact functional cases and 4/4 malformed native inputs rejected |
-| Scale benchmark | 8/8 deterministic profiles pass across 100 to 10,000 inputs |
-| Supported Python | GitHub Actions exercises every minor from Python 3.10 through 3.13 |
-| Distribution | Wheel and sdist build; installed-wheel demo and packaged benchmark pass |
-| Independent evaluation | 0.9809 overall F1 and 24/24 exact-overlap Prowler agreement; one IAM false negative and two unlabelled storage predictions; registered acceptance not met |
-
-Timing is measured but deliberately not used as a CI threshold. Exact outputs,
-bounded finding amplification, repeated-run equality, structural operation
-bounds, and calibrated memory ceilings provide more stable regression evidence.
-See [Benchmarking and resilience](docs/benchmarking.md).
-
-M12 evaluation is intentionally separate from that development benchmark. Its
-[pre-registered protocol](docs/evaluation-protocol.md) freezes the candidate,
-holdout rules, ground-truth process, Prowler and Sigma baselines, metrics, and
-acceptance thresholds before corpus construction or execution. The
-[frozen corpus](docs/evaluation-corpus.md) now publishes output-blind labels,
-citations, hashes, and exact inventory. The
-[external-baseline audit](docs/evaluation-baselines.md) freezes all 35
-Prowler/Sigma overlap classifications and 24 exact-overlap baseline decisions
-without importing or executing the candidate. The published
-[evaluation report](docs/evaluation-report.md) preserves every raw decision,
-Wilson interval, disagreement, ablation, and acceptance check. Candidate
-`2.1.1` achieved `0.9809` overall F1, but it did not meet the registered target
-because storage precision was `0.8824` and two predictions were unlabelled.
-The release-safe replay command restores candidate `2.1.1` in an isolated local
-checkout before invoking the byte-frozen runner, so package version `2.2.1`
-cannot silently replace the measured analyzer implementation.
-
-The revealed `EVAL-IAM-006` false negative is fixed in current development and
-retained as an explicit regression test. That post-evaluation correction does
-not alter the frozen candidate, corpus, runner, result, or reported score.
-
-The [technical case study](docs/technical-case-study.md) condenses the system,
-method, results, failure analysis, validity threats, and evidence-gated future
-work into one reviewer-oriented narrative.
-
-## Authorship And Assistance
-
-This is a Lloyd-directed, AI-assisted portfolio project. Lloyd selected the
-problem, safety boundary, scope, quality standard, evidence policy, and release
-decisions. OpenAI Codex materially assisted implementation, tests, debugging,
-documentation, command execution, and review; a second AI reviewer was also
-consulted intermittently during earlier development. Neither AI review nor the
-automated quality gates are presented as independent human validation.
-
-The [contribution and engineering reflection](docs/contribution-and-reflection.md)
-separates personal decision ownership from assisted implementation, traces the
-major design changes and difficult defects to repository evidence, and provides
-a truthful application description and author-readiness checklist.
-
-## What I Learned
-
-- Evidence completeness must be reported independently from finding count.
-  Zero findings cannot be treated as proof that collection was complete.
-- Native AWS response parsing belongs at an adapter boundary. Keeping detector
-  inputs stable made deeper rules possible without coupling them to collection
-  formats.
-- Correlation and chronology are useful only when their claims stay narrow.
-  The project preserves actor, source, event, and resource evidence while
-  explicitly refusing to infer intent, causation, or attribution.
-- Deterministic IDs, versioned contracts, golden artifacts, and machine-readable
-  benchmarks turn a security script into a reviewable engineering system.
-
-## Modules
-
-### Module 1: IAM Policy Analyzer
-
-The first module analyzes sample IAM users, identity policies, and trust policies for common cloud security risks:
-
-- Full, service, and partial action wildcards such as `*`, `iam:*`, and `iam:Get*`
-- Unscoped resources and broad `NotAction` or `NotResource` complements
-- Administrator-style access
-- Broad S3 permissions
-- Sensitive user permissions without an MFA policy guard
-- Public and cross-account role trust, with recognized trust-condition guardrails
-- Direct and group policy exposure
-- Long-lived and stale credentials, root credentials, and ineffective permissions boundaries
-
-The analyzer produces terminal findings and exports structured JSON evidence for reporting.
-
-IAM input can use either the documented simplified environment contract or native AWS `GetAccountAuthorizationDetails` plus credential-report exports. Native input preserves direct policies, IAM groups and members, role trust, permissions boundaries, console-password posture, root credentials, and access-key age and usage before applying the same detection rules.
-
-Rule catalog:
-
-| Rule | Risk Pattern |
-| --- | --- |
-| `IAM-001` | Administrator-style `Action "*"` on `Resource "*"` |
-| `IAM-002` | Full, service, or partial wildcard action |
-| `IAM-003` | Unscoped wildcard resource |
-| `IAM-004` | Broad S3 write permission |
-| `IAM-005` | Sensitive action without MFA condition |
-| `IAM-006` | Console-enabled user without MFA |
-| `IAM-007` | Long-lived access key |
-| `IAM-008` | Public or cross-account role trust |
-| `IAM-009` | Broad allow using `NotAction` |
-| `IAM-010` | Broad allow using `NotResource` |
-| `IAM-011` | Stale active access key |
-| `IAM-012` | Stale console password |
-| `IAM-013` | Active root access key |
-| `IAM-014` | Root password without MFA |
-| `IAM-015` | Unrestricted permissions boundary |
-
-### Module 2: Risk Report Generator
-
-The report generator reads one or more finding JSON files and creates a consolidated Markdown risk report. Optional analysis summaries replace finding-only module counts with evaluated and discovered resource counts, coverage status, skipped evidence, and normalization warnings. Findings and correlated incidents also produce an explainable P0-P3 work queue that separates immediate response from permanent configuration hardening. Timestamped CloudTrail findings form an evidence-preserving timeline, while incident sections explain observed sequence and triage context without presenting chronology as proof of intent or causation.
-
-Artifact-derived text crosses a documented
-[Markdown report-integrity boundary](docs/report-integrity.md). Context-specific
-renderers preserve headings, lists, tables, code spans, and links even when
-model-valid input contains Markdown control characters or embedded line breaks.
-
-Each analyzer can write a versioned analysis summary through `--summary-output`. A summary records `complete`, `partial`, or `empty` coverage independently from the finding count, so zero findings no longer imply that evidence was complete. See [Analysis coverage](docs/analysis-coverage.md) for the status and counting rules.
-
-All analyzers should emit the same finding schema:
-
-| Field | Purpose |
-| --- | --- |
-| `finding_id` | Deterministic identity derived from rule, resource, provenance, and source evidence |
-| `rule_id` | Stable detection rule identifier |
-| `severity` | `critical`, `high`, `medium`, `low`, or `info` |
-| `confidence` | How directly the supplied evidence supports the rule condition |
-| `module` | Analyzer module name, such as `iam` |
-| `category` | Security domain, such as `identity-and-access` |
-| `account_id` | Evidence account, or `unknown` when it cannot be established |
-| `region` | Evidence Region, `global`, or `unknown` |
-| `observed_at` | UTC evidence observation time, or `null` when unavailable |
-| `resource_type` | Affected resource type |
-| `resource_id` | Affected resource name or identifier |
-| `evidence_references` | Structured pointers to policy statements, rules, credential rows, or events |
-| `title` | Short finding title |
-| `evidence` | Concrete observed evidence |
-| `impact` | Why the issue matters |
-| `remediation` | Recommended fix |
-| `references` | Optional reference links |
-| `metadata` | Optional module-specific details |
-
-New exports use the strict
-[`findings-v2.0`](schemas/findings-v2.0.schema.json) contract. The loader also
-accepts versioned v1 files and migrates unavailable provenance to explicit
-`unknown` or `null` values; unversioned lists remain rejected. The report
-validates each built-in finding's rule, module, severity, and non-unknown
-confidence against the versioned [detection rule catalog](docs/rule-catalog.md),
-then summarizes qualified control mappings. Unknown custom rule IDs remain
-report-compatible and are marked as not cataloged.
-
-The prioritizer groups equivalent remediation without losing finding or resource
-counts, preserves incident response as separate work, and raises configuration
-linked to correlated activity through published rules rather than a hidden risk
-score. It can write a versioned JSON plan through `--remediation-output`; see
-[Remediation prioritization](docs/remediation-prioritization.md).
-
-The timeline includes only CloudTrail findings with valid UTC times and event
-IDs, records every omission, and links an entry to an incident only when rule,
-resource, and event ID agree. It can write a versioned JSON artifact through
-`--timeline-output`; see [Attack timeline](docs/attack-timeline.md).
-
-### Module 3: Storage Exposure Analyzer
-
-The storage analyzer checks sample S3-style bucket configurations for common exposure and resilience risks:
-
-- Incomplete S3 Block Public Access controls
-- Public ACL grants that remain effective under Block Public Access and Object Ownership
-- Bucket policies with unrestricted `Principal: "*"` or broad `NotPrincipal`
-- Policy conditions that do not create an AWS-recognized fixed-value access boundary
-- ACL-enabled Object Ownership modes
-- Missing an explicit bucket encryption configuration beyond the S3 SSE-S3 baseline
-- Missing or suspended versioning
-
-Storage input can use either the simplified environment contract or a versioned native evidence bundle containing `ListBuckets`, account and bucket Public Access Block, Object Ownership, ACL, policy, default encryption, and versioning responses.
-
-Public ACL and bucket-policy exposure findings account for `BucketOwnerEnforced`, effective `IgnorePublicAcls`, and effective `RestrictPublicBuckets` rather than reporting blocked access paths as active exposure. Wildcard-principal policies are treated as non-public only when a supported positive condition operator fixes access to an AWS-recognized organization, account, source ARN, VPC, VPC endpoint, data access point, or sufficiently narrow source network.
-
-In this module, non-public means that a statement is constrained under the S3 Block Public Access model; it does not mean that the named external account, organization, network, or service is automatically trusted.
-
-Rule catalog:
-
-| Rule | Risk Pattern |
-| --- | --- |
-| `STO-001` | S3 public access block is incomplete |
-| `STO-002` | Bucket ACL grants public access |
-| `STO-003` | Bucket policy allows an effectively public principal |
-| `STO-004` | Bucket lacks an explicit encryption configuration |
-| `STO-005` | Bucket versioning is not enabled |
-| `STO-006` | Bucket ACLs remain enabled by Object Ownership |
-
-### Module 4: Network Configuration Analyzer
-
-The network analyzer checks sample security group configurations for risky network exposure:
-
-- Protocol-aware exposure across 20 remote-administration, database, data-service, and control-plane endpoints
-- All inbound ports open to the internet
-- Unrestricted outbound traffic to the internet
-- Optional, direction-specific reachability evidence that distinguishes a permitted security-group path from reported end-to-end connectivity
-
-Network input can use either the simplified environment contract or a complete native EC2 `DescribeSecurityGroups` response. Native normalization validates account, VPC, security-group, peering, protocol, port, and CIDR evidence before applying the same rules. Prefix-list and security-group targets are preserved with visible warnings but are not resolved into public reachability.
-
-An optional versioned reachability context can mark ingress and egress as `reachable`, `not_reachable`, or `inconclusive`, with an explicit scope, assessment method, timestamp, evidence, and related resource IDs. Missing context is recorded as `not_assessed`. A valid `not_reachable` assessment lowers severity by one level but never suppresses the permissive configuration finding; `reachable`, `inconclusive`, and `not_assessed` retain the service default. The lab validates and reports this supplied context but does not independently reproduce AWS path analysis.
-
-Rule catalog:
-
-| Rule | Risk Pattern |
-| --- | --- |
-| `NET-001` | Sensitive service port permits traffic from an internet-wide or broad public CIDR |
-| `NET-002` | All inbound ports are open to the internet |
-| `NET-003` | Unrestricted outbound traffic is allowed |
-
-See the [Network analyzer documentation](network_analyzer/README.md) for the complete service catalog and reachability semantics.
-
-### Module 5: CloudTrail-Style Event Detector
-
-The CloudTrail detector checks sample audit events for suspicious cloud API activity:
-
-- Root account console login
-- MFA device disabled or deleted
-- Successful security group authorization changes
-- Successful bucket access changes that can weaken controls
-- Successful IAM policy changes that can add access
-- Repeated API failures from one actor and source
-- IAM user console logins explicitly recorded without MFA
-- Persistent credential creation and role trust-policy changes
-- Audit or threat-detection controls being disabled
-- KMS keys being disabled or scheduled for deletion
-
-Change findings require both a supported API name and its expected AWS
-`eventSource`. Identical CloudTrail events with the same `eventID` are analyzed
-once; conflicting records sharing an ID stop analysis before findings,
-incidents, or coverage summaries are produced. Failed API calls remain
-available to the failure-spike detector but are not reported as successful
-configuration changes.
-
-CloudTrail input can use either the simplified event contract or one or more native `Records` log files in JSON or gzip format. Native normalization validates version 1.x records, UTC timestamps, identity and account context, and event GUIDs before merging files.
-
-The `CLD-006` failure-spike search uses a near-linear bounded-window scan after
-stable per-group sorting. Exact old/new finding equivalence, edge semantics, and
-a deterministic 10,000-point structural performance bound are documented in
-[CloudTrail failure-window performance](docs/detection-performance.md).
-
-Rule catalog:
-
-| Rule | Risk Pattern |
-| --- | --- |
-| `CLD-001` | Root account console login |
-| `CLD-002` | MFA device disabled or deleted |
-| `CLD-003` | Security group configuration changed |
-| `CLD-004` | Bucket access policy changed |
-| `CLD-005` | IAM policy configuration changed |
-| `CLD-006` | Repeated API failures |
-| `CLD-007` | IAM user console login without MFA |
-| `CLD-008` | Persistent cloud credential created |
-| `CLD-009` | Role trust policy changed |
-| `CLD-010` | Audit or threat-detection control disabled |
-| `CLD-011` | KMS key disabled or scheduled for deletion |
-
-The detector also correlates eligible findings from the same actor and source into versioned incidents. The default 30-minute window, qualification rules, deterministic IDs, confidence model, and limitations are documented in [CloudTrail incident correlation](docs/incident-correlation.md). The reporting pipeline separately converts timestamped findings into a chronological [attack timeline](docs/attack-timeline.md), preserving aggregate failure windows and explicit evidence gaps.
-
-## Unified CLI
-
-Every simplified JSON file crosses the same dependency-free
-[runtime validation boundary](docs/simplified-input-validation.md) before
-analysis. Errors identify the first invalid field with a stable JSON-style path;
-the unified and compatibility CLIs therefore reject malformed nested evidence
-consistently. All external evidence and report artifacts also cross measured
-[input resource limits](docs/input-resource-limits.md) for bytes, gzip
-decompression, JSON nodes and depth, resource counts, and file counts.
-
-Run one analyzer:
-
-```bash
-python3 -m cloud_security_lab analyze iam \
-  sample_data/iam/sample_iam_environment.json \
-  --output reports/generated/iam_findings.json \
-  --summary-output reports/generated/iam_analysis_summary.json
-```
-
-Analyze native AWS IAM exports without connecting the lab to an account:
-
-```bash
-python3 -m cloud_security_lab analyze iam \
-  sample_data/aws/iam/account_authorization_details.json \
-  --input-format aws \
-  --credential-report sample_data/aws/iam/credential_report.csv \
-  --as-of 2026-06-30 \
-  --observed-at 2026-06-30T00:00:00Z \
-  --normalized-output reports/generated/normalized_iam_environment.json \
-  --output reports/generated/iam_findings.json \
-  --summary-output reports/generated/iam_analysis_summary.json
-```
-
-See [Native AWS inputs](docs/native-aws-inputs.md) for evidence collection,
-validation behavior, limitations, and the machine-readable provenance manifest
-for every bundled AWS-shaped fixture.
-
-Analyze the bundled native AWS S3 evidence:
-
-```bash
-python3 -m cloud_security_lab analyze storage \
-  sample_data/aws/s3/s3_security_evidence_bundle.json \
-  --input-format aws \
-  --normalized-output reports/generated/normalized_storage_environment.json \
-  --output reports/generated/storage_findings.json \
-  --summary-output reports/generated/storage_analysis_summary.json
-```
-
-Analyze the bundled native EC2 security-group response:
-
-```bash
-python3 -m cloud_security_lab analyze network \
-  sample_data/aws/ec2/describe_security_groups.json \
-  --input-format aws \
-  --reachability-context sample_data/aws/ec2/network_reachability_context.json \
-  --region ap-southeast-2 \
-  --normalized-output reports/generated/normalized_network_environment.json \
-  --output reports/generated/network_findings.json \
-  --summary-output reports/generated/network_analysis_summary.json
-```
-
-Analyze the bundled native CloudTrail JSON and gzip files:
-
-```bash
-python3 -m cloud_security_lab analyze cloudtrail \
-  sample_data/aws/cloudtrail/111122223333_CloudTrail_20260630T0200Z_part1.json \
-  sample_data/aws/cloudtrail/111122223333_CloudTrail_20260630T0300Z_part2.json.gz \
-  --input-format aws \
-  --normalized-output reports/generated/normalized_cloudtrail_environment.json \
-  --output reports/generated/cloudtrail_findings.json \
-  --incidents-output reports/generated/cloudtrail_incidents.json \
-  --summary-output reports/generated/cloudtrail_analysis_summary.json
-```
-
-Inspect the complete built-in rule catalog or filter it by analyzer:
-
-```bash
-python3 -m cloud_security_lab catalog
-python3 -m cloud_security_lab catalog --module storage --format json
-```
-
-The catalog records each rule's allowed severities, evidence-to-rule confidence,
-confidence basis, and `direct` or `related` mappings to AWS Security Hub CSPM,
-MITRE ATT&CK, and a verified CIS AWS Foundations Benchmark crosswalk. The
-committed [catalog reference](docs/rule-catalog.md) is generated from the same
-JSON used by the analyzers and report generator.
-
-Merge one or more versioned finding files:
-
-```bash
-python3 -m cloud_security_lab report \
-  --findings reports/generated/iam_findings.json \
-  --findings reports/generated/storage_findings.json \
-  --findings reports/generated/network_findings.json \
-  --findings reports/generated/cloudtrail_findings.json \
-  --incidents reports/generated/cloudtrail_incidents.json \
-  --analysis-summary reports/generated/iam_analysis_summary.json \
-  --analysis-summary reports/generated/storage_analysis_summary.json \
-  --analysis-summary reports/generated/network_analysis_summary.json \
-  --analysis-summary reports/generated/cloudtrail_analysis_summary.json \
-  --report-date 2026-06-30 \
-  --remediation-output reports/generated/remediation_plan.json \
-  --timeline-output reports/generated/attack_timeline.json \
-  --output reports/generated/cloud_security_report.md
-```
-
-The installed `cloud-security-lab` command exposes the same `analyze`, `report`,
-`catalog`, and `demo` subcommands. The explicit report date makes sample output
-reproducible; omit `--report-date` to use the current local date.
-
-## Compatibility Entrypoints
-
-The original module scripts remain supported:
-
-```bash
-python3 iam_analyzer/analyzer.py sample_data/iam/sample_iam_environment.json
-python3 storage_analyzer/analyzer.py sample_data/storage/sample_storage_environment.json
-python3 network_analyzer/analyzer.py sample_data/network/sample_network_environment.json
-python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail_events.json
-```
-
-## Project Documentation
-
-- [Security policy](SECURITY.md)
-- [Upgrade roadmap](ROADMAP.md)
-- [Upgrade traceability](docs/traceability.md)
-- [System architecture](docs/architecture.md)
-- [Threat model](docs/threat-model.md)
-- [Design decisions](docs/design-decisions.md)
-- [Release integrity and verification](docs/release-integrity.md)
-- [Version 2.2.1 release notes](docs/release-v2.2.1.md)
-- [Version 2.2.0 release notes](docs/release-v2.2.0.md)
-- [Version 2.1.1 release notes](docs/release-v2.1.1.md)
-- [Version 2.1.0 release notes](docs/release-v2.1.0.md)
-- [Version 2.0.0 release notes](docs/release-v2.0.0.md)
-- [Five-minute demo walkthrough](docs/demo-walkthrough.md)
-- [Research question and evidence claims](docs/research-question.md)
-- [Technical case study](docs/technical-case-study.md)
-- [Contribution and engineering reflection](docs/contribution-and-reflection.md)
-- [Data contracts](docs/data-contracts.md)
-- [Simplified-input runtime validation](docs/simplified-input-validation.md)
-- [Input resource limits](docs/input-resource-limits.md)
-- [Detection rule catalog](docs/rule-catalog.md)
-- [Remediation prioritization](docs/remediation-prioritization.md)
-- [Attack timeline](docs/attack-timeline.md)
-- [Analysis coverage](docs/analysis-coverage.md)
-- [Native AWS inputs](docs/native-aws-inputs.md)
-- [CloudTrail failure-window performance](docs/detection-performance.md)
-- [Benchmarking and resilience](docs/benchmarking.md)
-- [Independent evaluation protocol](docs/evaluation-protocol.md)
-- [Independent evaluation corpus](docs/evaluation-corpus.md)
-- [Independent evaluation baselines](docs/evaluation-baselines.md)
-- [Independent evaluation results](docs/evaluation-report.md)
-- [Supply-chain controls](docs/supply-chain.md)
-- [Documentation quality gates](docs/documentation-quality.md)
-- [Engineering checks](docs/engineering.md)
-- [Known limitations](docs/known-limitations.md)
-- [Change log](CHANGELOG.md)
-
-## Requirements
-
-Runtime: Python 3.10 or later. The analyzers and unified CLI have no third-party runtime dependencies.
-
-Development and contract checks use the universal, SHA-256-locked transitive
-environment in `requirements-dev.lock`:
-
-```bash
-.venv/bin/python -m pip install --require-hashes -r requirements-dev.lock
-.venv/bin/python -m pip install --no-build-isolation --no-deps -e .
-.venv/bin/python -m pip check
-```
-
-See [Supply-chain controls](docs/supply-chain.md) for the lock update and
-immutable GitHub Actions verification process.
-
-## Quality Checks
-
-```bash
-mkdir -p reports/generated
-.venv/bin/ruff check .
-.venv/bin/mypy cloud_analysis cloud_benchmarks cloud_security_lab cloud_findings cloud_inputs cloud_incidents cloud_remediation cloud_rules cloud_timeline iam_analyzer storage_analyzer network_analyzer cloudtrail_detector report_generator tools
-.venv/bin/pymarkdown --strict-config scan --respect-gitignore .
-.venv/bin/python -m tools.check_markdown_links internal
-.venv/bin/python -m tools.check_markdown_links external
-.venv/bin/python -m tools.evaluation_corpus
-.venv/bin/python -m tools.evaluation_baselines
-.venv/bin/python -m tools.evaluation_replay
-.venv/bin/coverage run -m unittest discover
-.venv/bin/coverage report
-.venv/bin/coverage json -o reports/generated/coverage.json
-.venv/bin/python -m cloud_benchmarks.coverage_gate reports/generated/coverage.json
-.venv/bin/python -m cloud_benchmarks.runner
-```
-
-The benchmark gate covers all 35 built-in rules through 78 exact functional
-cases plus eight deterministic scale profiles. Coverage is enforced separately
-at 90% for statements and 85% for branches. GitHub Actions runs the quality,
-benchmark, and deterministic pipeline on Python 3.10, 3.11, 3.12, and 3.13,
-and builds the distributions on Python 3.13. Starting with `v2.2.0`, tagged
-releases add a verified SPDX inventory, SHA-256 manifest, and signed build and
-SBOM attestations; see [Release integrity](docs/release-integrity.md).
-
-## Project Structure
-
-```text
-cloud_security_misconfiguration_lab/
-├── .github/workflows/
-│   ├── ci.yml
-│   └── release.yml
-├── README.md
-├── SECURITY.md
-├── ROADMAP.md
-├── CHANGELOG.md
-├── pyproject.toml
-├── requirements-dev.lock
-├── evaluation/
-│   ├── protocol-v1.0.json
-│   ├── corpus-manifest-v1.0.json
-│   ├── baseline-overlap-v1.0.json
-│   ├── baseline-outcomes-v1.0.json
-│   ├── results-v1.0.json
-│   └── corpus-v1.0/
-│       ├── iam/
-│       ├── storage/
-│       ├── network/
-│       └── cloudtrail/
-├── tools/
-│   ├── check_markdown_links.py
-│   ├── evaluation_corpus.py
-│   ├── evaluation_baselines.py
-│   ├── evaluation_replay.py
-│   ├── evaluation_runner.py
-│   └── release_evidence.py
-├── cloud_security_lab/
-│   ├── __main__.py
-│   ├── analysis.py
-│   ├── cli.py
-│   └── normalizers/
-│       ├── cloudtrail.py
-│       ├── common.py
-│       ├── ec2.py
-│       ├── iam.py
-│       ├── network_context.py
-│       └── s3.py
-├── cloud_benchmarks/
-│   ├── benchmark-manifest-v1.0.json
-│   ├── coverage_gate.py
-│   ├── manifest_builder.py
-│   ├── profiles.py
-│   └── runner.py
-├── cloud_analysis/
-│   └── summary.py
-├── cloud_findings/
-│   └── finding.py
-├── cloud_inputs/
-│   ├── bounds.py
-│   ├── test_bounds.py
-│   ├── validation.py
-│   └── test_validation.py
-├── cloud_incidents/
-│   └── incident.py
-├── cloud_remediation/
-│   └── plan.py
-├── cloud_rules/
-│   ├── catalog.py
-│   └── rules-v1.0.json
-├── cloud_timeline/
-│   ├── timeline.py
-│   └── test_timeline.py
-├── cloudtrail_detector/
-│   ├── correlation.py
-│   ├── detector.py
-│   ├── README.md
-│   └── test_detector.py
-├── iam_analyzer/
-│   ├── analyzer.py
-│   ├── README.md
-│   └── test_analyzer.py
-├── network_analyzer/
-│   ├── analyzer.py
-│   ├── README.md
-│   └── test_analyzer.py
-├── report_generator/
-│   ├── generate_report.py
-│   ├── README.md
-│   └── test_generate_report.py
-├── reports/
-│   └── cloud_security_report_sample.md
-├── schemas/
-│   ├── analysis-summary-v1.0.schema.json
-│   ├── attack-timeline-v1.0.schema.json
-│   ├── aws-fixture-manifest-v1.0.schema.json
-│   ├── benchmark-manifest-v1.0.schema.json
-│   ├── benchmark-results-v1.0.schema.json
-│   ├── evaluation-baseline-overlap-v1.0.schema.json
-│   ├── evaluation-baseline-outcomes-v1.0.schema.json
-│   ├── evaluation-corpus-manifest-v1.0.schema.json
-│   ├── evaluation-protocol-v1.0.schema.json
-│   ├── evaluation-results-v1.0.schema.json
-│   ├── findings-v1.0.schema.json
-│   ├── findings-v2.0.schema.json
-│   ├── incidents-v1.0.schema.json
-│   ├── remediation-plan-v1.0.schema.json
-│   ├── rule-catalog-v1.0.schema.json
-│   ├── aws-cloudtrail-records-v1.0.schema.json
-│   ├── aws-iam-authorization-details-v1.0.schema.json
-│   ├── aws-ec2-describe-security-groups-v1.0.schema.json
-│   ├── network-reachability-context-v1.0.schema.json
-│   ├── aws-s3-evidence-bundle-v1.0.schema.json
-│   └── *-environment-v1.0.schema.json
-├── sample_data/
-│   ├── aws/fixture-manifest-v1.0.json
-│   ├── aws/cloudtrail/
-│   │   ├── 111122223333_CloudTrail_20260630T0200Z_part1.json
-│   │   └── 111122223333_CloudTrail_20260630T0300Z_part2.json.gz
-│   ├── aws/iam/
-│   │   ├── account_authorization_details.json
-│   │   └── credential_report.csv
-│   ├── aws/ec2/
-│   │   ├── describe_security_groups.json
-│   │   └── network_reachability_context.json
-│   ├── aws/s3/
-│   │   └── s3_security_evidence_bundle.json
-│   ├── cloudtrail/
-│   │   └── sample_cloudtrail_events.json
-│   ├── iam/
-│   │   └── sample_iam_environment.json
-│   ├── network/
-│   │   └── sample_network_environment.json
-│   └── storage/
-│       └── sample_storage_environment.json
-├── storage_analyzer/
-│   ├── analyzer.py
-│   ├── README.md
-│   └── test_analyzer.py
-├── docs/
-│   ├── analysis-coverage.md
-│   ├── attack-timeline.md
-│   ├── architecture.md
-│   ├── benchmarking.md
-│   ├── data-contracts.md
-│   ├── demo-walkthrough.md
-│   ├── design-decisions.md
-│   ├── engineering.md
-│   ├── evaluation-baselines.md
-│   ├── evaluation-corpus.md
-│   ├── evaluation-protocol.md
-│   ├── evaluation-report.md
-│   ├── incident-correlation.md
-│   ├── input-resource-limits.md
-│   ├── known-limitations.md
-│   ├── native-aws-inputs.md
-│   ├── release-integrity.md
-│   ├── remediation-prioritization.md
-│   ├── release-v2.0.0.md
-│   ├── release-v2.1.0.md
-│   ├── release-v2.1.1.md
-│   ├── release-v2.2.0.md
-│   ├── release-v2.2.1.md
-│   ├── rule-catalog.md
-│   ├── simplified-input-validation.md
-│   ├── threat-model.md
-│   ├── traceability.md
-│   └── assets/
-│       └── report-preview.svg
-├── tests/
-│   ├── test_benchmarks.py
-│   ├── test_contracts.py
-│   ├── test_legacy_clis.py
-│   ├── test_markdown_links.py
-│   ├── test_release_evidence.py
-│   └── test_supply_chain.py
-├── LICENSE
-└── .gitignore
-```
-
-## Safety Boundary
-
-This project operates on offline sample data. Do not connect future collectors to a real cloud account unless the account is owned by you or you have explicit permission to assess it.
+| Application review | [Summary](docs/application-summary.md), [case study](docs/technical-case-study.md), [contribution reflection](docs/contribution-and-reflection.md), [five-minute demo](docs/demo-walkthrough.md) |
+| Use and architecture | [CLI reference](docs/cli-reference.md), [architecture](docs/architecture.md), [native AWS inputs](docs/native-aws-inputs.md), [data contracts](docs/data-contracts.md), [rule catalog](docs/rule-catalog.md) |
+| Evaluation | [Research claims](docs/research-question.md), [protocol](docs/evaluation-protocol.md), [corpus](docs/evaluation-corpus.md), [baselines](docs/evaluation-baselines.md), [results](docs/evaluation-report.md) |
+| Assurance | [Engineering](docs/engineering.md), [benchmarking](docs/benchmarking.md), [security policy](SECURITY.md), [threat model](docs/threat-model.md), [release integrity](docs/release-integrity.md) |
+| Project history | [Roadmap](ROADMAP.md), [traceability](docs/traceability.md), [changelog](CHANGELOG.md), [v2.2.1 evidence](docs/release-v2.2.1.md) |
+
+Released under the [MIT License](LICENSE). Analyze only evidence that you own or
+are authorized to assess, keep raw account exports out of Git history, and
+review all findings before acting on them.

@@ -219,9 +219,12 @@ Status: In progress for `v2.3.0`.
       validity, limitations, and future work.
 - [x] Identify personal contribution, important design changes, difficult
       defects, and lessons learned without overstating authorship.
-- [ ] Reduce the main README to a reviewer-first project entry point and move
+- [x] Reduce the main README to a reviewer-first project entry point and move
       detailed reference material into focused documents.
-- [ ] Publish a short real-system demo and a one-page application summary.
+- [x] Publish a one-page application summary.
+- [ ] Execute and publish a short real-system demo. The bounded template,
+      safety tests, collection protocol, sanitization requirements, and
+      teardown procedure are prepared; authorized live evidence is pending.
 - [ ] Make public author, project, version, and support information consistent.
 
 ## M14: Final Application Release

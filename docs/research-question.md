@@ -136,6 +136,7 @@ claims. New claims must either fit one of these rows or add a new evidence row.
 | `C-14` | The package requires Python 3.10 or later, declares no third-party runtime dependency, and is tested in CI on Python 3.10 through 3.13. | [Project metadata](../pyproject.toml), locked [CI workflow](../.github/workflows/ci.yml), and [CI run 51](https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/actions/runs/33965567520) | Development and release verification use separately declared third-party tools. |
 | `C-15` | Release `v2.2.1` publishes a wheel, source distribution, checksums, SPDX SBOM, and signed provenance and SBOM bundles. | [Release notes](release-v2.2.1.md), [verification guide](release-integrity.md), and [public release](https://github.com/LLOYD-11/cloud_security_misconfiguration_lab/releases/tag/v2.2.1) | Supply-chain evidence authenticates identified artifacts and workflow claims; it does not prove analyzer correctness. |
 | `C-16` | This is a Lloyd-directed project produced with material AI assistance across implementation, verification, evaluation artifacts, documentation, and review. | [Contribution and engineering reflection](contribution-and-reflection.md), [roadmap](../ROADMAP.md), and repository history | Direction and final publication responsibility do not imply unaided implementation, personnel-independent annotation, or third-party review. |
+| `C-17` | A bounded AWS real-system demonstration protocol and minimal unattached-security-group template are prepared and safety-tested. | [Real-system demo](real-system-demo.md), [CloudFormation template](../demo/real-system/network-demo-stack.json), and [template regressions](../tests/test_real_system_demo.py) | The template has not been executed for this repository; no live AWS result, cost guarantee, real-world accuracy, or teardown evidence is claimed yet. |
 
 ## Prohibited Overclaims
 
@@ -151,7 +152,10 @@ The project and application materials must not state or imply that:
 - the post-evaluation IAM correction improves the frozen holdout score;
 - the implementation and evaluation artifacts were produced without material
   AI assistance; or
-- an AI reviewer constitutes independent human or third-party validation.
+- an AI reviewer constitutes independent human or third-party validation;
+- a prepared deployment template or synthetic AWS-shaped fixture is evidence
+  that the real-system demonstration was executed; or
+- a future sanitized demo subset represents a complete AWS account snapshot.
 
 These restrictions are part of the project's research integrity, not missing
 marketing language.

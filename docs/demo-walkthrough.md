@@ -98,11 +98,10 @@ mkdir -p reports/generated
 .venv/bin/python -m tools.evaluation_replay
 ```
 
-Current evidence:
+Published and measured evidence:
 
-- 447 tests
-- 92.82% statement coverage
-- 86.41% branch coverage
+- development checkpoint `55bed95`: 447 tests, 92.82% statement coverage, and
+  86.41% branch coverage
 - 78 exact functional benchmark cases
 - 4 exact fail-closed malformed-input cases
 - 8 deterministic scale cases up to 10,000 inputs
@@ -127,3 +126,7 @@ design, deterministic testing, and evidence-aware reporting. It is not a live
 AWS policy engine, a replacement for Security Hub or IAM Access Analyzer, or
 proof that an account is secure. Those limits are part of the design rather than
 hidden caveats.
+
+The separate [real-system demo](real-system-demo.md) is currently a prepared
+protocol, not a claimed AWS result. It becomes presentation evidence only after
+authorized execution, sanitization, and teardown verification.

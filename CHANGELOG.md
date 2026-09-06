@@ -16,18 +16,27 @@ All notable changes to this project are documented in this file.
   assistance, distinguishes author-owned decisions from assisted
   implementation, traces design evolution and difficult defects to commits,
   and provides an application-ready description and readiness checklist.
+- A one-page application summary and a focused command-line reference for
+  reviewer and reproduction paths.
+- A bounded real-system demonstration protocol, minimal unattached
+  security-group CloudFormation template, and executable safety assertions.
+
+### Changed
+
+- The main README is now a reviewer-first project entry point; detailed module,
+  command, verification, and repository-reference material is linked from
+  focused documents instead of duplicated inline.
+- Real-system demonstration status is explicitly `prepared, not executed`
+  until authorized AWS evidence, sanitization, and teardown records exist.
+- The revealed `EVAL-IAM-006` boundary case is now an explicit development
+  regression. Frozen candidate `2.1.1` continues to replay in isolation, so the
+  original failed-acceptance result remains unchanged.
 
 ### Fixed
 
 - `IAM-005` now requires every value in a `Bool` MFA condition to be `true`.
   `BoolIfExists=true` remains a finding when the request-context key may be
   absent, while a matching `Null=false` presence guard is recognized as strict.
-
-### Changed
-
-- The revealed `EVAL-IAM-006` boundary case is now an explicit development
-  regression. Frozen candidate `2.1.1` continues to replay in isolation, so the
-  original failed-acceptance result remains unchanged.
 
 ## 2.2.1 - 2026-09-05
 

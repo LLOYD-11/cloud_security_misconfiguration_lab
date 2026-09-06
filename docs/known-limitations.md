@@ -23,6 +23,9 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
 - A stable finding ID identifies the same rule, resource, provenance, and source
   references. It is not a case-management ID and intentionally changes when
   those identity fields change.
+- The bounded real-system demo has a reviewed template and runbook but has not
+  been executed for this repository. No live AWS result or teardown evidence is
+  currently claimed; see the [demo status](real-system-demo.md).
 
 ## IAM Analysis
 

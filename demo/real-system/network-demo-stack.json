@@ -1,0 +1,58 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Bounded cloud-security-lab demo: one unattached security group in an operator-selected VPC.",
+  "Metadata": {
+    "SafetyBoundary": "Only one unattached security group is created. No VPC, compute, ENI, subnet, route, gateway, endpoint, load balancer, public IP, IAM identity, S3 object, or secret is created."
+  },
+  "Parameters": {
+    "VpcId": {
+      "Type": "AWS::EC2::VPC::Id",
+      "Description": "Existing authorized VPC in which to create the disposable unattached group."
+    }
+  },
+  "Resources": {
+    "DemoSecurityGroup": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Unattached group for bounded public-SSH rule analysis",
+        "VpcId": {
+          "Ref": "VpcId"
+        },
+        "SecurityGroupIngress": [
+          {
+            "Description": "Intentional static analyzer input; no workload is attached",
+            "IpProtocol": "tcp",
+            "FromPort": 22,
+            "ToPort": 22,
+            "CidrIp": "0.0.0.0/0"
+          }
+        ],
+        "SecurityGroupEgress": [
+          {
+            "Description": "Private address range only",
+            "IpProtocol": "-1",
+            "CidrIp": "10.0.0.0/8"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "Project",
+            "Value": "cloud-security-misconfiguration-lab-demo"
+          },
+          {
+            "Key": "Purpose",
+            "Value": "Disposable offline-analyzer evidence"
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "SecurityGroupId": {
+      "Description": "Unattached group expected to produce NET-001.",
+      "Value": {
+        "Ref": "DemoSecurityGroup"
+      }
+    }
+  }
+}
