@@ -108,8 +108,11 @@ excluded.
 Ground truth came from retained evidence and cited AWS semantics, not scanner
 majority vote. Two output-blind review passes checked each declared decision
 key, label, severity, rationale, evidence boundary, and citation before
-candidate execution. Both passes were performed by the project author, so the
-study claims procedural separation rather than third-party independence.
+candidate execution. Both passes remained under project-author accountability,
+and AI assistants materially supported artifact preparation. The study
+therefore claims procedural separation rather than personnel or third-party
+independence. The [contribution disclosure](contribution-and-reflection.md)
+defines that assistance boundary.
 
 Every corpus path, size, contract, media type, transformation, sanitization
 action, and SHA-256 digest is recorded. Candidate-independent verification
@@ -246,7 +249,7 @@ varying bounded reachability evidence.
 | Threat | Mitigation | Residual Risk |
 | --- | --- | --- |
 | Construct validity | Exact rule-resource decisions, separate severity agreement, and qualified control mappings limit what each score represents. | Rule matches are proxies for selected evidence conditions, not effective AWS security or malicious intent. |
-| Internal validity | Candidate identity, protocol, labels, evidence hashes, baseline logic, and thresholds were frozen before execution. | Both label reviews and overlap classifications were performed by the project author. |
+| Internal validity | Candidate identity, protocol, labels, evidence hashes, baseline logic, and thresholds were frozen before execution. | Both label reviews and overlap classifications remained under project-author accountability and used material AI assistance; personnel independence is not claimed. |
 | Decision-universe completeness | Every declared key was frozen and undeclared outputs were penalized. | Two storage predictions proved that manual output-blind review still missed applicable keys. |
 | External validity | All four modules, every rule, positive, negative, boundary, ambiguous, and native/simplified cases were represented. | Thirty-two synthetic cases cannot estimate behavior across real organizations, policies, topology, workloads, or event prevalence. |
 | Conclusion validity | Raw denominators, micro and module metrics, Wilson intervals, severity checks, and failed thresholds were published. | Two positive and two negative assertions per rule leave wide rule-level uncertainty; micro F1 can hide weak individual rules. |

@@ -111,6 +111,20 @@ The [technical case study](docs/technical-case-study.md) condenses the system,
 method, results, failure analysis, validity threats, and evidence-gated future
 work into one reviewer-oriented narrative.
 
+## Authorship And Assistance
+
+This is a Lloyd-directed, AI-assisted portfolio project. Lloyd selected the
+problem, safety boundary, scope, quality standard, evidence policy, and release
+decisions. OpenAI Codex materially assisted implementation, tests, debugging,
+documentation, command execution, and review; a second AI reviewer was also
+consulted intermittently during earlier development. Neither AI review nor the
+automated quality gates are presented as independent human validation.
+
+The [contribution and engineering reflection](docs/contribution-and-reflection.md)
+separates personal decision ownership from assisted implementation, traces the
+major design changes and difficult defects to repository evidence, and provides
+a truthful application description and author-readiness checklist.
+
 ## What I Learned
 
 - Evidence completeness must be reported independently from finding count.
@@ -454,6 +468,7 @@ python3 cloudtrail_detector/detector.py sample_data/cloudtrail/sample_cloudtrail
 - [Five-minute demo walkthrough](docs/demo-walkthrough.md)
 - [Research question and evidence claims](docs/research-question.md)
 - [Technical case study](docs/technical-case-study.md)
+- [Contribution and engineering reflection](docs/contribution-and-reflection.md)
 - [Data contracts](docs/data-contracts.md)
 - [Simplified-input runtime validation](docs/simplified-input-validation.md)
 - [Input resource limits](docs/input-resource-limits.md)

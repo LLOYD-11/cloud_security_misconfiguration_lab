@@ -112,8 +112,10 @@ artifact differs from deterministic replay.
 
 - Source-audited predicate replay is narrower than running Prowler against a
   live AWS account or compiling Sigma for a production SIEM backend.
-- Exact overlap is a semantic classification made by the project author under
-  procedural review, not third-party certification.
+- Exact overlap is a semantic classification retained under project-author
+  accountability with material AI assistance, not personnel-independent review
+  or third-party certification. See the
+  [authorship disclosure](contribution-and-reflection.md).
 - Prowler and Sigma can collect or infer context absent from the retained
   fixtures. Those differences are documented as partial or unsupported scope.
 - The 24 decisions are frozen baseline outputs, not an estimate of candidate

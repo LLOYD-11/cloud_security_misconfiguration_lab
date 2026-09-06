@@ -8,12 +8,14 @@ Corpus `1.0.0` was frozen on 2026-08-13 for the candidate at commit
 the previously frozen [evaluation protocol](evaluation-protocol.md) by protocol
 version and SHA-256 digest.
 
-The corpus was authored, cited, reviewed, sanitized, hashed, and committed
-without importing or executing a candidate analyzer. This is a procedural
-holdout created by the project author, not third-party annotation or an
-independent laboratory study. The later [primary result](evaluation-report.md)
-preserves this original corpus and reports a discovered decision-universe
-completeness defect rather than altering post-run labels.
+The corpus was drafted, cited, reviewed, sanitized, hashed, and committed
+without importing or executing a candidate analyzer. AI assistants materially
+supported artifact preparation under project-author direction; they were tools
+in the same authorship process, not independent annotators. This is a
+procedural holdout, not third-party annotation or an independent laboratory
+study. The later [primary result](evaluation-report.md) preserves this original
+corpus and reports a discovered decision-universe completeness defect rather
+than altering post-run labels. See the [authorship and assistance disclosure](contribution-and-reflection.md).
 
 ## Inventory
 
@@ -97,8 +99,9 @@ corpus into an analyzer or reveal candidate performance.
 
 ## Interpretation Limits
 
-- Both annotation passes were performed under procedural context separation by
-  the project author. Personnel independence is not claimed.
+- Both annotation passes were recorded under project-author accountability and
+  procedural context separation, with material AI assistance disclosed.
+  Personnel independence is not claimed.
 - Synthetic cases improve safety and predicate control but cannot represent all
   organization policies, live topology, service interactions, or behavior.
 - Two positive and two negative assertions per rule are enough for broad rule

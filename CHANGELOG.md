@@ -12,6 +12,10 @@ All notable changes to this project are documented in this file.
 - A concise technical case study connecting architecture, method, frozen
   results, failure analysis, validity threats, operational limits, and
   evidence-gated future work.
+- A contribution and engineering reflection that discloses material AI
+  assistance, distinguishes author-owned decisions from assisted
+  implementation, traces design evolution and difficult defects to commits,
+  and provides an application-ready description and readiness checklist.
 
 ### Fixed
 

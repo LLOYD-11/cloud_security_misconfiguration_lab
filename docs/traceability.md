@@ -175,7 +175,7 @@ release evidence exist.
 | --- | --- | --- | --- |
 | M13-R1 | State a bounded research question and evidence-backed contribution claims. | Complete | Bounded [research question and public claim register](research-question.md) tied to the frozen candidate and corpus, architecture and contract evidence, commit-specific engineering gates, explicit post-evaluation boundaries, and prohibited overclaims. |
 | M13-R2 | Publish methods, results, threats to validity, limitations, and future work. | Complete | Reviewer-oriented [technical case study](technical-case-study.md) covering the bounded system, candidate and corpus freeze, development-versus-holdout separation, ground truth, baselines, metrics, results, root-cause analysis, validity threats, operational limits, evidence-gated future work, and reproduction. |
-| M13-R3 | Make personal contribution, design evolution, and difficult defects visible. | Open | Planned contribution and engineering-reflection material. |
+| M13-R3 | Make personal contribution, design evolution, and difficult defects visible. | Complete | Public [contribution and engineering reflection](contribution-and-reflection.md) with explicit AI-assistance boundaries, author-owned decisions, commit-linked design evolution and defects, lessons learned, a defensible application description, and an author-readiness checklist. |
 | M13-R4 | Produce a reviewer-first README, short real-system demo, and one-page summary. | Open | Planned application presentation artifacts. |
 | M13-R5 | Make public identity, version, and support information consistent. | Open | Planned metadata and documentation review. |
 

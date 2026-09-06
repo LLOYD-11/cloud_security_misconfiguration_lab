@@ -110,8 +110,10 @@ This project is an explainable offline lab, not a replacement for AWS IAM Access
   Access fields incorrectly. The original labels and result remain preserved.
 - No reachability-context evidence was frozen into the holdout corpus, so that
   registered ablation had zero eligible cases and is not estimable.
-- Ground truth used two output-blind passes by the project author. This is
-  procedural separation, not third-party annotation or certification.
+- Ground truth used two output-blind passes under project-author accountability,
+  with material AI assistance in artifact preparation. This is procedural
+  separation, not personnel-independent or third-party annotation or
+  certification. See the [authorship disclosure](contribution-and-reflection.md).
 
 ## Benchmarking
 

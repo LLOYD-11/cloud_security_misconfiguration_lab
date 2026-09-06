@@ -157,8 +157,10 @@ equivalence.
 
 ## Validity And Limits
 
-- Ground truth used two output-blind review passes, but both were performed by
-  the project author. Procedural separation is not personnel independence.
+- Ground truth used two output-blind review passes under project-author
+  accountability, with material AI assistance in artifact preparation.
+  Procedural separation is not personnel independence; see the
+  [authorship disclosure](contribution-and-reflection.md).
 - The corpus is sanitized and synthetic. It tests frozen predicates, not live
   organization policy, topology, data collection, or event prevalence.
 - Two positive and two negative assertions per rule provide breadth but wide

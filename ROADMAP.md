@@ -217,7 +217,7 @@ Status: In progress for `v2.3.0`.
       architecture or evaluation evidence.
 - [x] Publish a concise technical case study with method, results, threats to
       validity, limitations, and future work.
-- [ ] Identify personal contribution, important design changes, difficult
+- [x] Identify personal contribution, important design changes, difficult
       defects, and lessons learned without overstating authorship.
 - [ ] Reduce the main README to a reviewer-first project entry point and move
       detailed reference material into focused documents.
